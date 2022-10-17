@@ -1,18 +1,48 @@
 {
-    "name": "believers-sword",
-    "version": "1.0.0",
-    "description": "This is the main believers sword app",
-    "main": "main.ts",
+    "name": "believers-sword-nightly",
     "author": "BroJenuel",
-    "license": "MIT",
-    "type": "module",
+    "version": "0.0.1",
+    "main": "./dist/main.js",
     "scripts": {
-        "start": "electron .",
-        "setup": "yarn && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./setup.ps1",
-        "front:build": "build_front.bat"
+        "build": "tsc",
+        "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn serve:electron\"",
+        "front:setup": "cd FrontEndApp && yarn",
+        "electron:setup": "yarn",
+        "setup": "yarn front:setup && yarn electron:setup",
+        "serve:front": "cd FrontEndApp && yarn dev",
+        "serve:electron": "yarn build && wait-on tcp:3000 && cross-env IS_DEV=true electron .",
+        "build:front": "cd FrontEndApp && yarn build",
+        "electron:build": "yarn build",
+        "electron:builder": "electron-builder",
+        "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
+        "app:build:nightly": "yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
+        "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\"",
+        "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\""
     },
     "devDependencies": {
         "concurrently": "^7.4.0",
-        "electron": "^21.1.1"
+        "cross-env": "^7.0.3",
+        "electron": "^21.1.1",
+        "electron-builder": "^23.6.0",
+        "wait-on": "^6.0.1"
+    },
+    "build": {
+        "appId": "com.official-believers-sword.app",
+        "productName": "Believers Sword",
+        "copyright": "Copyright © 2019 ${author}",
+        "mac": {
+            "category": "public.app-category.productivity"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        },
+        "files": [
+            "dist/**/*"
+        ],
+        "directories": {
+            "buildResources": "assets",
+            "output": "dist_electron"
+        }
     }
 }

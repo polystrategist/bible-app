@@ -9,8 +9,7 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true,
+            preload: __dirname + "/preload.js",
         },
     });
 
@@ -19,7 +18,7 @@ function createWindow() {
     mainWindow.loadURL(
         isDev
             ? "http://localhost:3000"
-            : `file://${path.join(__dirname, "../dist/index.html")}`
+            : `file://${path.join(__dirname, "./index.html")}`
     );
     // Open the DevTools.
     if (isDev) {
