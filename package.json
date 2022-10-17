@@ -4,19 +4,21 @@
     "version": "0.0.1",
     "main": "electron/electron.ts",
     "scripts": {
-        "dev": "vite",
+        "dev": "vite --port 3000",
         "build": "vue-tsc --noEmit && vite build",
         "preview": "vite preview",
         "serve": "vite preview",
         "electron": "wait-on tcp:3000 && cross-env IS_DEV=true electron .",
         "electron:pack": "electron-builder --dir",
-        "electron:dev": "concurrently  \"cross-env BROWSER=none yarn dev --port 3000\" \"yarn electron\"",
+        "electron:dev": "concurrently  \"cross-env BROWSER=none yarn dev\" \"yarn electron\"",
         "electron:builder": "electron-builder",
         "build:for:electron": "vue-tsc --noEmit && cross-env ELECTRON=true vite build",
         "app:build": "yarn build:for:electron && yarn electron:builder"
     },
     "dependencies": {
-        "vue": "^3.2.40"
+        "pinia": "^2.0.23",
+        "vue": "^3.2.40",
+        "vue-router": "4"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^3.1.0",
@@ -26,12 +28,14 @@
         "electron-builder": "^23.6.0",
         "typescript": "^4.6.4",
         "vite": "^3.1.0",
+        "vite-plugin-windicss": "^1.8.8",
         "vue-tsc": "^1.0.7",
-        "wait-on": "^6.0.1"
+        "wait-on": "^6.0.1",
+        "windicss": "^3.5.6"
     },
     "build": {
-        "appId": "com.my-website.my-app",
-        "productName": "MyApp",
+        "appId": "com.believers-sword-next.app",
+        "productName": "Believers Sword",
         "copyright": "Copyright © 2019 ${author}",
         "mac": {
             "category": "public.app-category.utilities"
