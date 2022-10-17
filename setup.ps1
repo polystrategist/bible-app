@@ -1,2 +1,0 @@
-cd FrontEndApp
-yarn

@@ -7,5 +7,9 @@ export default defineConfig({
         outDir: "./../dist",
         chunkSizeWarningLimit: 1000,
     },
+    base: process.env.ELECTRON == "true" ? "./" : ".",
     plugins: [vue()],
+    server: {
+        port: 3000,
+    },
 });
