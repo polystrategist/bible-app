@@ -1,0 +1,36 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\yarn\bin\yarn.js init
+
+PATH: 
+  C:\Program Files\PowerShell\7;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64\compiler;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\ProgramData\chocolatey\bin;C:\ProgramData\ComposerSetup\bin;C:\Program Files\nodejs;D:\laragon\bin\php\php74;D:\Portables\ngrok\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Program Files\dotnet\;D:\tools\nvm;C:\Program Files\nodejs;D:\Program Files\CMake\bin;C:\src\flutter\bin;C:\Program Files\PowerShell\7\;C:\Program Files\Git\cmd;C:\Users\Admin\AppData\Local\Yarn\config\global\node_modules\.bin;C:\Users\Admin\AppData\Roaming\Composer\vendor\bin;C:\Users\Admin\AppData\Roaming\npm;D:\laragon\bin;D:\laragon\bin\apache\httpd-2.4.47-win64-VS16\bin;D:\laragon\bin\composer;D:\laragon\bin\git\bin;D:\laragon\bin\git\cmd;D:\laragon\bin\git\mingw64\bin;D:\laragon\bin\git\usr\bin;D:\laragon\bin\laragon\utils;D:\laragon\bin\mysql\mysql-5.7.33-winx64\bin;D:\laragon\bin\nginx\nginx-1.19.10;D:\laragon\bin\ngrok;D:\laragon\bin\nodejs\node-v16.13.2-win-x64;D:\laragon\bin\notepad++;D:\laragon\bin\php\php74;D:\laragon\bin\postgresql\postgresql-13.4-1\bin;D:\laragon\bin\redis\redis-x64-3.2.100;D:\laragon\bin\telnet;D:\laragon\usr\bin;D:\Ruby31-x64\bin;C:\Users\Admin\.cargo\bin;C:\Users\Admin\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\Admin\AppData\Local\Programs\Python\Python39\;C:\Users\Admin\scoop\shims;C:\Users\Admin\AppData\Local\Microsoft\WindowsApps;C:\Users\Admin\AppData\Local\GitHubDesktop\bin;C:\Program Files\nodejs;C:\Users\Admin\.deno\bin;C:\Program Files\heroku\bin;D:\tools\nvm;D:\tools\flutter\bin;D:\tools\MinGW\bin;D:\Program Files\JetBrains\PhpStorm 2021.2.3\bin;D:\tools\sqlite;D:\Program Files\wkhtmltopdf\bin;C:\Users\Admin\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Admin\.dotnet\tools;D:\tools\sndcpy;
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.16.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (D:\tools\nvm\v16.16.0\node_modules\yarn\lib\cli.js:137150:13)
+      at Interface.emit (node:events:527:28)
+      at Interface._ttyWrite (node:readline:1081:16)
+      at ReadStream.onkeypress (node:readline:288:10)
+      at ReadStream.emit (node:events:527:28)
+      at emitKeys (node:internal/readline/utils:358:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (node:internal/readline/emitKeypressEvents:61:36)
+      at ReadStream.emit (node:events:527:28)
+      at addChunk (node:internal/streams/readable:315:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
