@@ -16,8 +16,8 @@
         "electron:builder": "electron-builder",
         "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
         "app:build:nightly": "yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
-        "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\"",
-        "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\""
+        "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\" && json -I -f package.json -e \"this.build.productName='Believers Sword Nightly'\"",
+        "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\" && json -I -f package.json -e \"this.build.productName='Believers Sword'\""
     },
     "devDependencies": {
         "concurrently": "^7.4.0",
@@ -28,7 +28,7 @@
     },
     "build": {
         "appId": "com.official-believers-sword.app",
-        "productName": "Believers Sword",
+        "productName": "Believers Sword Nightly",
         "copyright": "Copyright © 2019 ${author}",
         "mac": {
             "category": "public.app-category.productivity"
