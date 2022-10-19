@@ -5,7 +5,8 @@
     "main": "./dist/main.js",
     "scripts": {
         "build": "tsc",
-        "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn serve:electron\"",
+        "watch": "nodemon --exec yarn serve:electron",
+        "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn watch\"",
         "front:setup": "cd FrontEndApp && yarn",
         "electron:setup": "yarn",
         "setup": "yarn front:setup && yarn electron:setup",
@@ -24,6 +25,8 @@
         "cross-env": "^7.0.3",
         "electron": "^21.1.1",
         "electron-builder": "^23.6.0",
+        "electron-devtools-installer": "^3.2.0",
+        "nodemon": "^2.0.20",
         "wait-on": "^6.0.1"
     },
     "build": {
