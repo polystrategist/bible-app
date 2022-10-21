@@ -1,51 +1,51 @@
 {
-    "name": "believers-sword-nightly",
-    "author": "BroJenuel",
-    "version": "0.0.1",
-    "main": "./dist/main.js",
-    "scripts": {
-        "build": "tsc",
-        "watch": "nodemon --exec yarn serve:electron",
-        "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn watch\"",
-        "front:setup": "cd FrontEndApp && yarn",
-        "electron:setup": "yarn",
-        "setup": "yarn front:setup && yarn electron:setup",
-        "serve:front": "cd FrontEndApp && yarn dev",
-        "serve:electron": "yarn build && wait-on tcp:3000 && cross-env IS_DEV=true electron .",
-        "build:front": "cd FrontEndApp && yarn build",
-        "electron:build": "yarn build",
-        "electron:builder": "electron-builder",
-        "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
-        "app:build:nightly": "yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
-        "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\" && json -I -f package.json -e \"this.build.productName='Believers Sword Nightly'\"",
-        "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\" && json -I -f package.json -e \"this.build.productName='Believers Sword'\""
+  "name": "believers-sword-nightly",
+  "author": "BroJenuel",
+  "version": "0.0.1",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "nodemon --exec yarn serve:electron",
+    "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn watch\"",
+    "front:setup": "cd FrontEndApp && yarn",
+    "electron:setup": "yarn",
+    "setup": "yarn front:setup && yarn electron:setup",
+    "serve:front": "cd FrontEndApp && yarn dev",
+    "serve:electron": "yarn build && wait-on tcp:3000 && cross-env IS_DEV=true electron .",
+    "build:front": "cd FrontEndApp && yarn build",
+    "electron:build": "yarn build",
+    "electron:builder": "electron-builder",
+    "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
+    "app:build:nightly": "yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
+    "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\" && json -I -f package.json -e \"this.build.productName='Believers Sword Nightly'\"",
+    "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\" && json -I -f package.json -e \"this.build.productName='Believers Sword'\""
+  },
+  "devDependencies": {
+    "concurrently": "^7.4.0",
+    "cross-env": "^7.0.3",
+    "electron": "^21.1.1",
+    "electron-builder": "^23.6.0",
+    "electron-devtools-installer": "^3.2.0",
+    "nodemon": "^2.0.20",
+    "wait-on": "^6.0.1"
+  },
+  "build": {
+    "appId": "com.official-believers-sword.app",
+    "productName": "Believers Sword Nightly",
+    "copyright": "Copyright © 2019 ${author}",
+    "mac": {
+      "category": "public.app-category.productivity"
     },
-    "devDependencies": {
-        "concurrently": "^7.4.0",
-        "cross-env": "^7.0.3",
-        "electron": "^21.1.1",
-        "electron-builder": "^23.6.0",
-        "electron-devtools-installer": "^3.2.0",
-        "nodemon": "^2.0.20",
-        "wait-on": "^6.0.1"
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     },
-    "build": {
-        "appId": "com.official-believers-sword.app",
-        "productName": "Believers Sword Nightly",
-        "copyright": "Copyright © 2019 ${author}",
-        "mac": {
-            "category": "public.app-category.productivity"
-        },
-        "nsis": {
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true
-        },
-        "files": [
-            "dist/**/*"
-        ],
-        "directories": {
-            "buildResources": "assets",
-            "output": "dist_electron"
-        }
+    "files": [
+      "dist/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist_electron"
     }
+  }
 }
