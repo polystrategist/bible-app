@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import WindiCSS from "vite-plugin-windicss";
 
 export default defineConfig(({ mode }) => ({
     build: {
@@ -7,7 +8,7 @@ export default defineConfig(({ mode }) => ({
         chunkSizeWarningLimit: 1000,
     },
     base: mode == "development" ? "" : "./",
-    plugins: [vue()],
+    plugins: [vue(), WindiCSS()],
     server: {
         port: 3000,
     },
