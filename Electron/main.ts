@@ -1,23 +1,37 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import path from "path";
+import { appConfig } from "./ElectronStore/Configuration";
+import IpcMainEvents from "./IpcMainEvents/IpcMainEvents";
 const isDev = process.env.IS_DEV == "true" ? true : false;
 
 async function createWindow() {
-    const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const appBounds: any = appConfig.get("setting.appBounds");
+    const BrowserWindowOptions: BrowserWindowConstructorOptions = {
+        width: 1200,
+        height: 750,
         webPreferences: {
             preload: __dirname + "/preload.js",
         },
         show: false,
         alwaysOnTop: true,
-    } as BrowserWindowConstructorOptions);
+        frame: false,
+    };
+
+    if (appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
+    const mainWindow = new BrowserWindow(BrowserWindowOptions);
+
+    // run ipcMain events before loading the window
+    IpcMainEvents(mainWindow);
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
     await mainWindow.loadURL(isDev ? "http://localhost:3000" : `file://${path.join(__dirname, "./index.html")}`);
-    mainWindow.show();
+
+    if (appBounds !== undefined && appBounds !== null && appBounds.width > width && appBounds.height > height)
+        mainWindow.maximize();
+    else mainWindow.show();
 
     // this will turn off always on top after opening the application
     setTimeout(() => {

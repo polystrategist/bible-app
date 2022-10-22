@@ -1,14 +1,9 @@
-// electron/preload.js
+import { contextBridge, ipcRenderer } from "electron";
 
-// All of the Node.js APIs are available in the preload process.
-// It has the same sandbox as a Chrome extension.
-window.addEventListener("DOMContentLoaded", () => {
-    const replaceText = (selector: any, text: any) => {
-        const element = document.getElementById(selector);
-        if (element) element.innerText = text;
-    };
-
-    for (const dependency of ["chrome", "node", "electron"]) {
-        replaceText(`${dependency}-version`, process.versions[dependency]);
-    }
+contextBridge.exposeInMainWorld("browserWindow", {
+    minimizeWindow: () => ipcRenderer.invoke("minimizeWindow"),
+    maximizeWindow: () => ipcRenderer.invoke("maximizeWindow"),
+    closeWindow: () => ipcRenderer.invoke("closeWindow"),
+    isWindowBrowserMaximized: () => ipcRenderer.invoke("isWindowBrowserMaximized"),
+    versions: () => ipcRenderer.invoke("versions"),
 });
