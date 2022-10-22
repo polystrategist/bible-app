@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NConfigProvider, NDialogProvider, NNotificationProvider, NMessageProvider, darkTheme, NLayout, NButton } from "naive-ui";
+import { NConfigProvider, NDialogProvider, NNotificationProvider, NMessageProvider, darkTheme, NLayout } from "naive-ui";
 import ReadBible from "./Views/ReadBible/ReadBible.vue";
 import { useMenuStore } from "./store/menu";
 import { onBeforeMount } from "vue";
@@ -26,12 +26,6 @@ onBeforeMount(() => {
                     <NLayout class="h-[100vh]">
                         <TitleBar class="h-25px" />
                         <div class="h-[calc(100%-25px)]">
-                            <ul>
-                                <li @click="menuStore.setMenu('read-bible')">Read Bible</li>
-                                <li @click="menuStore.setMenu('/prayer-list')">Prayer List</li>
-                            </ul>
-                            <NButton type="primary" @click="themeStore.isDark = !themeStore.isDark">Change Theme</NButton>
-                            <pre>{{ menuStore.isRouter }}</pre>
                             <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
                             <div v-show="menuStore.isRouter == true">
                                 <RouterView />

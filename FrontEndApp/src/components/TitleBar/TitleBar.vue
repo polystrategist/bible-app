@@ -35,7 +35,6 @@ function changeTheme() {
 onBeforeMount(async () => {
     const isWindowBrowserMaximized: boolean = await window.browserWindow.isWindowBrowserMaximized();
     isMaximized.value = isWindowBrowserMaximized;
-    console.log("Halo");
 });
 </script>
 <template>
