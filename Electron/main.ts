@@ -10,7 +10,9 @@ async function createWindow() {
     const appBounds: any = appConfig.get("setting.appBounds");
     const BrowserWindowOptions: BrowserWindowConstructorOptions = {
         width: 1200,
+        minWidth: 900,
         height: 750,
+        minHeight: 600,
         webPreferences: {
             preload: __dirname + "/preload.js",
         },
@@ -47,11 +49,11 @@ async function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     // if dev
 
     if (isDev) {
-        installExtension(VUEJS_DEVTOOLS)
+        await installExtension(VUEJS_DEVTOOLS)
             .then(() => {
                 console.log("Added Extension");
             })
