@@ -19,11 +19,10 @@ export const useThemeStore = defineStore("useThemeStore", () => {
     watch(
         () => isDark.value,
         (itsDark) => {
-            if (itsDark) {
-                if (themeOverrides.value.common) themeOverrides.value.common = getTheme(selectedTheme.value).dark;
-            } else {
-                if (themeOverrides.value.common) themeOverrides.value.common = getTheme(selectedTheme.value).light;
-            }
+            if (themeOverrides.value.common)
+                themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
+
+            document.body.className = itsDark ? "dark" : "light";
 
             SESSION.set(saveThemeStorageKey, {
                 selectedTheme: selectedTheme.value,
@@ -37,6 +36,7 @@ export const useThemeStore = defineStore("useThemeStore", () => {
         if (savedTheme) {
             selectedTheme.value = savedTheme.selectedTheme;
             isDark.value = savedTheme.isDark;
+            document.body.classList.add(isDark.value ? "dark" : "light");
         }
     });
 
