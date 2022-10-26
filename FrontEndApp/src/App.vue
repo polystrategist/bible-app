@@ -1,19 +1,31 @@
 <script setup lang="ts">
-import { NConfigProvider, NDialogProvider, NNotificationProvider, NMessageProvider, darkTheme, NLayout } from "naive-ui";
+import {
+    NConfigProvider,
+    NDialogProvider,
+    NNotificationProvider,
+    NMessageProvider,
+    darkTheme,
+    NLayout,
+    NLayoutSider,
+    NMenu,
+    MenuOption,
+} from "naive-ui";
 import ReadBible from "./Views/ReadBible/ReadBible.vue";
 import { useMenuStore } from "./store/menu";
 import { onBeforeMount } from "vue";
 import { useThemeStore } from "./store/theme";
+import { menuOptions } from "./AppMenuOptions";
 import TitleBar from "./components/TitleBar/TitleBar.vue";
+
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
-
 async function getVersions() {
     const versions = await window.browserWindow.versions();
     console.log(
         `This app is using Chrome (v${versions.chrome}), Node.js (v${versions.node}), and Electron (v${versions.electron})`
     );
 }
+
 onBeforeMount(() => {
     getVersions();
 });
@@ -25,12 +37,37 @@ onBeforeMount(() => {
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
                         <TitleBar class="h-25px" />
-                        <div class="h-[calc(100%-25px)]">
-                            <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
-                            <div v-show="menuStore.isRouter == true">
-                                <RouterView />
-                            </div>
-                        </div>
+                        <NLayout class="h-[calc(100%-25px)]" has-sider>
+                            <NLayoutSider
+                                bordered
+                                show-trigger="bar"
+                                collapse-mode="width"
+                                :collapsed-trigger-style="'height: 45px'"
+                                :collapsed-width="45"
+                                :width="180"
+                                :native-scrollbar="false"
+                                :inverted="false"
+                                :default-collapsed="true"
+                            >
+                                <NMenu
+                                    :value="menuStore.menuSelected"
+                                    :on-update:value="(key: string, item: MenuOption) => {
+                                        menuStore.setMenu(key);
+                                    }"
+                                    :inverted="false"
+                                    :collapsed-width="45"
+                                    :collapsed-icon-size="22"
+                                    :indent="20"
+                                    :options="menuOptions"
+                                />
+                            </NLayoutSider>
+                            <NLayout>
+                                <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
+                                <div v-show="menuStore.isRouter == true">
+                                    <RouterView />
+                                </div>
+                            </NLayout>
+                        </NLayout>
                     </NLayout>
                 </NMessageProvider>
             </NNotificationProvider>

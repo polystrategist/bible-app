@@ -38,6 +38,7 @@ export const useMenuStore = defineStore("useMenuStore", () => {
         if (menu == menuSelected.value) return;
         else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
+        else console.log(menu + " was not found");
     }
 
     onBeforeMount(() => {
