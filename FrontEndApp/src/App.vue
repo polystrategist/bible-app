@@ -42,12 +42,12 @@ onBeforeMount(() => {
                                 bordered
                                 show-trigger="bar"
                                 collapse-mode="width"
-                                :collapsed-trigger-style="'height: 45px'"
                                 :collapsed-width="45"
                                 :width="180"
                                 :native-scrollbar="false"
                                 :inverted="false"
                                 :default-collapsed="true"
+                                class="side-bar-menu"
                             >
                                 <NMenu
                                     :value="menuStore.menuSelected"
@@ -56,8 +56,8 @@ onBeforeMount(() => {
                                     }"
                                     :inverted="false"
                                     :collapsed-width="45"
-                                    :collapsed-icon-size="22"
-                                    :indent="20"
+                                    :collapsed-icon-size="24"
+                                    :indent="15"
                                     :options="menuOptions"
                                 />
                             </NLayoutSider>
@@ -74,3 +74,16 @@ onBeforeMount(() => {
         </NDialogProvider>
     </NConfigProvider>
 </template>
+<style lang="scss">
+.side-bar-menu {
+    .n-menu-item {
+        height: 40px;
+        transition: height 0.3s;
+    }
+    .n-menu--collapsed {
+        .n-menu-item {
+            height: 30px;
+        }
+    }
+}
+</style>
