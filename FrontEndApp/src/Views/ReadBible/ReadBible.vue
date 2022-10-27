@@ -1,3 +1,3 @@
 <template>
-    <div>Read Bible</div>
+    <div class="h-full"></div>
 </template>
