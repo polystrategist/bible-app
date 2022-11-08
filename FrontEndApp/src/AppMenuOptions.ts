@@ -1,6 +1,6 @@
-import { Component, h } from "vue";
-import { NIcon } from "naive-ui";
-import { Book, Person, WindPower, MediaLibrary } from "@vicons/carbon";
+import { Component, h } from 'vue';
+import { NIcon } from 'naive-ui';
+import { Book, Person, WindPower, MediaLibrary } from '@vicons/carbon';
 
 function renderIcon(icon: Component) {
     return () => h(NIcon, null, { default: () => h(icon) });
@@ -8,18 +8,18 @@ function renderIcon(icon: Component) {
 
 export const menuOptions = [
     {
-        label: "Read Bible",
-        key: "read-bible",
+        label: 'Read Bible',
+        key: 'read-bible',
         icon: renderIcon(Book),
     },
     {
-        label: "Sermons",
-        key: "sermons",
+        label: 'Sermons',
+        key: 'sermons',
         icon: renderIcon(MediaLibrary),
     },
     {
-        label: "Prayer List",
-        key: "/prayer-list",
+        label: 'Prayer List',
+        key: '/prayer-list',
         icon: renderIcon(Book),
     },
     // {

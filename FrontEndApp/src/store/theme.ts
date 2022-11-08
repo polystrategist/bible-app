@@ -1,18 +1,18 @@
-import { defineStore } from "pinia";
-import { onBeforeMount, ref, watch } from "vue";
-import SESSION from "../util/session";
-import { getTheme, typeNameInterface } from "../util/themes";
+import { defineStore } from 'pinia';
+import { onBeforeMount, ref, watch } from 'vue';
+import SESSION from '../util/session';
+import { getTheme, typeNameInterface } from '../util/themes';
 
-export const useThemeStore = defineStore("useThemeStore", () => {
-    const saveThemeStorageKey = "savedThemeStorage";
+export const useThemeStore = defineStore('useThemeStore', () => {
+    const saveThemeStorageKey = 'savedThemeStorage';
     const isDark = ref(true);
-    const selectedTheme = ref<typeNameInterface>("default");
+    const selectedTheme = ref<typeNameInterface>('default');
     const themeOverrides = ref<any>({
         common: {
-            primaryColor: "#F2C423",
-            primaryColorHover: "#D5B33A",
-            primaryColorSuppl: "#E4BB2F",
-            primaryColorPressed: "#E5BD1D",
+            primaryColor: '#f2c423',
+            primaryColorHover: '#D5B33A',
+            primaryColorSuppl: '#E4BB2F',
+            primaryColorPressed: '#E5BD1D',
         },
     });
 
@@ -22,7 +22,7 @@ export const useThemeStore = defineStore("useThemeStore", () => {
             if (themeOverrides.value.common)
                 themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
 
-            document.body.className = itsDark ? "dark" : "light";
+            document.body.className = itsDark ? 'dark' : 'light';
 
             SESSION.set(saveThemeStorageKey, {
                 selectedTheme: selectedTheme.value,
@@ -36,7 +36,7 @@ export const useThemeStore = defineStore("useThemeStore", () => {
         if (savedTheme) {
             selectedTheme.value = savedTheme.selectedTheme;
             isDark.value = savedTheme.isDark;
-            document.body.classList.add(isDark.value ? "dark" : "light");
+            document.body.classList.add(isDark.value ? 'dark' : 'light');
         }
     });
 

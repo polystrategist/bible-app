@@ -1,19 +1,19 @@
-import { routes } from "./../router/router";
-import { defineStore } from "pinia";
-import { useRouter } from "vue-router";
-import { onBeforeMount, ref } from "vue";
-import session from "./../util/session";
+import { routes } from './../router/router';
+import { defineStore } from 'pinia';
+import { useRouter } from 'vue-router';
+import { onBeforeMount, ref } from 'vue';
+import session from './../util/session';
 
-type menuHasRoute = "/prayer-list";
-type menuHasNoRoute = "read-bible";
+type menuHasRoute = '/prayer-list';
+type menuHasNoRoute = 'read-bible' | 'sermons';
 
-export const useMenuStore = defineStore("useMenuStore", () => {
+export const useMenuStore = defineStore('useMenuStore', () => {
     const menuWithRoute: Array<menuHasRoute | string> = routes.map((route) => route.path);
-    const menuWithNoRoute: Array<menuHasNoRoute> = ["read-bible"];
-    const menuSelected = ref<menuHasRoute | menuHasNoRoute>("read-bible");
+    const menuWithNoRoute: Array<menuHasNoRoute> = ['read-bible', 'sermons'];
+    const menuSelected = ref<menuHasRoute | menuHasNoRoute>('read-bible');
     const router = useRouter();
     const isRouter = ref<boolean>(false);
-    const menuSessionKey = "menu-session";
+    const menuSessionKey = 'menu-session';
 
     function setMenuWithNoRoute(menu: menuHasNoRoute) {
         menuSelected.value = menu;
@@ -38,7 +38,7 @@ export const useMenuStore = defineStore("useMenuStore", () => {
         if (menu == menuSelected.value) return;
         else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
-        else console.log(menu + " was not found");
+        else console.log(menu + ' was not found');
     }
 
     onBeforeMount(() => {

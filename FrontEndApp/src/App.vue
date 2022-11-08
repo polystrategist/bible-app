@@ -9,13 +9,14 @@ import {
     NLayoutSider,
     NMenu,
     MenuOption,
-} from "naive-ui";
-import ReadBible from "./Views/ReadBible/ReadBible.vue";
-import { useMenuStore } from "./store/menu";
-import { onBeforeMount } from "vue";
-import { useThemeStore } from "./store/theme";
-import { menuOptions } from "./AppMenuOptions";
-import TitleBar from "./components/TitleBar/TitleBar.vue";
+} from 'naive-ui';
+import ReadBible from './Views/ReadBible/ReadBible.vue';
+import { useMenuStore } from './store/menu';
+import { onBeforeMount } from 'vue';
+import { useThemeStore } from './store/theme';
+import { menuOptions } from './AppMenuOptions';
+import TitleBar from './components/TitleBar/TitleBar.vue';
+import Sermons from './Views/Sermons/Sermons.vue';
 
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
@@ -42,7 +43,7 @@ onBeforeMount(() => {
                                 bordered
                                 show-trigger="bar"
                                 collapse-mode="width"
-                                :collapsed-width="45"
+                                :collapsed-width="50"
                                 :width="180"
                                 :native-scrollbar="false"
                                 :inverted="false"
@@ -55,14 +56,15 @@ onBeforeMount(() => {
                                         menuStore.setMenu(key);
                                     }"
                                     :inverted="false"
-                                    :collapsed-width="45"
-                                    :collapsed-icon-size="24"
+                                    :collapsed-width="48"
+                                    :collapsed-icon-size="25"
                                     :indent="15"
                                     :options="menuOptions"
                                 />
                             </NLayoutSider>
                             <NLayout>
                                 <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
+                                <Sermons v-show="menuStore.isRouter == false && menuStore.menuSelected == 'sermons'" />
                                 <div v-show="menuStore.isRouter == true">
                                     <RouterView />
                                 </div>
