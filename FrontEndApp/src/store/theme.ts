@@ -32,6 +32,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     );
 
     onBeforeMount(() => {
+        document.body.className = isDark.value ? 'dark' : 'light';
         const savedTheme = SESSION.get(saveThemeStorageKey);
         if (savedTheme) {
             selectedTheme.value = savedTheme.selectedTheme;

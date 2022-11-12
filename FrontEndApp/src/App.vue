@@ -12,14 +12,17 @@ import {
 } from 'naive-ui';
 import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { useThemeStore } from './store/theme';
 import { menuOptions } from './AppMenuOptions';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
+import SESSION from './util/session';
 
+const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
+const isSideBarCollapse = ref(true);
 async function getVersions() {
     const versions = await window.browserWindow.versions();
     console.log(
@@ -27,7 +30,14 @@ async function getVersions() {
     );
 }
 
+function triggerSideBarCollapse(collapse: boolean) {
+    isSideBarCollapse.value = collapse;
+    SESSION.set(isMenuCollapse, collapse);
+}
+
 onBeforeMount(() => {
+    const isCollapseSideMenu = SESSION.get(isMenuCollapse);
+    isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
     getVersions();
 });
 </script>
@@ -41,6 +51,7 @@ onBeforeMount(() => {
                         <NLayout class="h-[calc(100%-25px)]" has-sider>
                             <NLayoutSider
                                 bordered
+                                :collapsed="isSideBarCollapse"
                                 show-trigger="bar"
                                 collapse-mode="width"
                                 :collapsed-width="50"
@@ -49,6 +60,7 @@ onBeforeMount(() => {
                                 :inverted="false"
                                 :default-collapsed="true"
                                 class="side-bar-menu"
+                                :on-update:collapsed="triggerSideBarCollapse"
                             >
                                 <NMenu
                                     :value="menuStore.menuSelected"
