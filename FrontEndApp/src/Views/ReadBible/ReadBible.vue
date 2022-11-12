@@ -10,7 +10,7 @@ const storageReadBibleSavedSplitPaneSizes = 'storageReadBibleSavedSplitPaneSizes
 const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 15, max: 30, size: 20 },
     { min: 30, max: 60, size: 60 },
-    { min: 15, max: 30, size: 20 },
+    { min: 15, max: 30, size: 25 },
 ]);
 
 function changeSize(sizes: Array<any>) {
