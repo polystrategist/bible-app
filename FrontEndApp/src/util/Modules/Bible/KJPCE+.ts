@@ -1,0 +1,21 @@
+export default {
+    file_name: `KJPCE+.SQLite3`,
+    description: `King James Bible 1611: Pure Cambridge Edition, ca 1900`,
+    chapter_string: `Chapter`,
+    strong_numbers: true,
+    russian_numbering: false,
+    right_to_left: false,
+    language: `en`,
+    contains_accents: true,
+    detailed_info: `<h2>The Authorized King James Version 1611:</h2> <h3>Pure Cambridge Edition, ca 1900</h3><p/> Formatted with embedded Strong's Numbers, Red letter edition`,
+    introduction_string: `About edition`,
+    chapter_string_ps: `Psalm`,
+    origin: `SC Chou <sktpman@gmail.com>​`,
+    history_of_changes: [
+        `(2020-11-06) One punctuation mismatch`,
+        `(2019-07-22) Red letters in Rev 22`,
+        `(2017-12-06) Punctuation revision to conform to the original publication of KJV Pure Cambridge Edition. `,
+        `(2017-11-30) Errors corrected`,
+        `(2017-10-02) Published`,
+    ],
+};
