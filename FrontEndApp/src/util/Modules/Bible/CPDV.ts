@@ -1,10 +1,8 @@
 export default {
     file_name: `CPDV.SQLite3`,
-    description: `Catholic Public Domain Version, 2009`,
-    chapter_string: `Chapter`,
-    russian_numbering: true,
-    right_to_left: false,
-    strong_numbers: false,
+    title: `Catholic Public Domain Version, 2009`,
+    description: '',
     language: `en`,
-    chapter_string_ps: `Psalm`,
+    language_full: `english`,
+    download_link: `https://github.com/Bible-Projects/believers-sword-next/raw/main/Modules/Bible/CPDV.SQLite3`,
 };

@@ -1,10 +1,8 @@
 export default {
     file_name: `KJ'1769.SQLite3`,
-    description: `King James Version, 1769`,
-    chapter_string: `Chapter`,
-    strong_numbers: false,
-    russian_numbering: false,
-    right_to_left: true,
+    title: `King James Version, 1769`,
+    description: ``,
     language: `en`,
-    chapter_string_ps: `Psalm`,
+    language_full: `english`,
+    download_link: `https://github.com/Bible-Projects/believers-sword-next/raw/main/Modules/Bible/KJ'1769.SQLite3`,
 };
