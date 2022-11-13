@@ -41,7 +41,8 @@
       "allowToChangeInstallationDirectory": true
     },
     "files": [
-      "dist/**/*"
+      "dist/**/*",
+      "defaults/**/*"
     ],
     "directories": {
       "buildResources": "assets",

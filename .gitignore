@@ -3,3 +3,4 @@ dist
 electron-dist
 .vscode
 dist_electron
+defaults
