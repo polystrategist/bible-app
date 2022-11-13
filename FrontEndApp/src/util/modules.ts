@@ -3,6 +3,8 @@ import ASNDCommentaries from './Modules/Commentaries/ASND.commentaries';
 import AB1978 from './Modules/Bible/AB1978';
 import ASND from './Modules/Bible/ASND';
 import ASV from './Modules/Bible/ASV+';
+import BAMD from './Modules/Bible/BAMD';
+import BAMD from './Modules/Commentaries/BAMD.commentaries';
 import CPDV from './Modules/Bible/CPDV';
 import ESV from './Modules/Bible/ESV';
 import KJ1769 from './Modules/Bible/KJ1769';
