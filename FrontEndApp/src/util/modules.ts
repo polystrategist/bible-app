@@ -4,7 +4,7 @@ import AB1978 from './Modules/Bible/AB1978';
 import ASND from './Modules/Bible/ASND';
 import ASV from './Modules/Bible/ASV+';
 import BAMD from './Modules/Bible/BAMD';
-import BAMD from './Modules/Commentaries/BAMD.commentaries';
+import BamdCommentaries from './Modules/Commentaries/BAMD.commentaries';
 import CPDV from './Modules/Bible/CPDV';
 import ESV from './Modules/Bible/ESV';
 import KJ1769 from './Modules/Bible/KJ1769';
@@ -13,5 +13,5 @@ import KJV1769 from './Modules/Bible/KJV1769+';
 import NASB from './Modules/Bible/NASB+';
 import ESVCommentaries from './Modules/Commentaries/ESV.commentaries';
 
-export const bible = [AB1978, ASND, ASV, CPDV, ESV, KJ1769, KJPCE, KJV1769, NASB];
-export const commentaries = [AB1978Commentaries, ASNDCommentaries, ESVCommentaries];
+export const bible = [AB1978, ASND, ASV, BAMD, CPDV, ESV, KJ1769, KJPCE, KJV1769, NASB];
+export const commentaries = [AB1978Commentaries, ASNDCommentaries, BamdCommentaries, ESVCommentaries];

@@ -1,8 +1,9 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+
 import path from 'path';
-import { setupDefaults } from './Database/setup';
+import { setupDefault } from './Database/setup';
 import { appConfig } from './ElectronStore/Configuration';
+import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 const isDev = process.env.IS_DEV == 'true' ? true : false;
 
@@ -52,17 +53,19 @@ async function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
     // check and setup the database
-    setupDefaults();
+    try {
+        await setupDefault
+            .then((response) => console.log(response))
+            .catch((e) => {
+                console.log(e);
+            });
+    } catch (e) {
+        throw e;
+    }
 
     // if dev
     if (isDev) {
-        await installExtension(VUEJS_DEVTOOLS)
-            .then(() => {
-                console.log('Added Extension');
-            })
-            .catch((err) => {
-                console.log('Extension Error: ', err);
-            });
+        await installExt();
     }
 
     createWindow();
