@@ -50,6 +50,7 @@
     }
   },
   "dependencies": {
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.1.0",
+    "upath": "^2.0.1"
   }
 }
