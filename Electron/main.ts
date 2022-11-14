@@ -1,11 +1,9 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
-
 import path from 'path';
+import { isDev } from './config';
 import { setupDefault } from './Database/setup';
 import { appConfig } from './ElectronStore/Configuration';
-import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
-const isDev = process.env.IS_DEV == 'true' ? true : false;
 
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -64,9 +62,13 @@ app.whenReady().then(async () => {
     }
 
     // if dev
-    if (isDev) {
-        await installExt();
-    }
+    // if (isDev) {
+    //     try {
+    //         await installExt();
+    //     } catch (e) {
+    //         console.log('Can not install extension!');
+    //     }
+    // }
 
     createWindow();
     app.on('activate', function () {
