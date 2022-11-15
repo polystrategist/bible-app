@@ -3,7 +3,9 @@ import path from 'path';
 import { isDev } from './config';
 import { setupDefault } from './Database/setup';
 import { appConfig } from './ElectronStore/Configuration';
+import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
+import BibleModules from './Modules/Bible/Bible';
 
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -26,6 +28,9 @@ async function createWindow() {
 
     // run ipcMain events before loading the window
     IpcMainEvents(mainWindow);
+
+    // Modules
+    BibleModules();
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
@@ -62,13 +67,13 @@ app.whenReady().then(async () => {
     }
 
     // if dev
-    // if (isDev) {
-    //     try {
-    //         await installExt();
-    //     } catch (e) {
-    //         console.log('Can not install extension!');
-    //     }
-    // }
+    if (isDev) {
+        try {
+            await installExt();
+        } catch (e) {
+            console.log('Can not install extension!');
+        }
+    }
 
     createWindow();
     app.on('activate', function () {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getDownloadedBible } from './util/Modules/Controller/FeBibleController';
 import {
     NConfigProvider,
     NDialogProvider,
@@ -35,10 +36,13 @@ function triggerSideBarCollapse(collapse: boolean) {
     SESSION.set(isMenuCollapse, collapse);
 }
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
     const isCollapseSideMenu = SESSION.get(isMenuCollapse);
     isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
     getVersions();
+
+    const files = await getDownloadedBible();
+    console.log(files);
 });
 </script>
 <template>

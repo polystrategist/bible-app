@@ -8,7 +8,6 @@ const isPackaged = app.isPackaged;
 
 const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
 const filePath = dataPath + `\\modules\\bible\\KJV1769+.SQLite3`;
-Log.info('Default Bible File Path:', filePath);
 
 export const setDefaultBible = new Promise((resolve, reject) => {
     if (!fs.existsSync(filePath)) {

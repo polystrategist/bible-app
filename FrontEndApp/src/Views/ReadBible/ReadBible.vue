@@ -28,12 +28,7 @@ onBeforeMount(() => {
         <Pane :size="splitPaneSizes[0].size" :min-size="splitPaneSizes[0].min" :max-size="splitPaneSizes[0].max">
             <LeftSideBar />
         </Pane>
-        <Pane
-            class="bg-gray-100 dark:bg-dark-700 p-3"
-            :size="splitPaneSizes[1].size"
-            :min-size="splitPaneSizes[1].min"
-            :max-size="splitPaneSizes[1].max"
-        >
+        <Pane class="bg-gray-100 dark:bg-dark-700 p-3">
             <ViewVerses />
         </Pane>
         <Pane :size="splitPaneSizes[2].size" :min-size="splitPaneSizes[2].min" :max-size="splitPaneSizes[2].max">
