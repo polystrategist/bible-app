@@ -1,3 +1,6 @@
+<script lang="ts" setup>
+async function getVerses() {}
+</script>
 <template>
     <div>
         read bible here Lorem ipsum dolor sit amet consectetur adipisicing elit. Officia et esse mollitia quaerat est at odit

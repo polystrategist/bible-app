@@ -1,9 +1,10 @@
+import { GetVerseArgs } from './../../../Electron/Modules/Bible/Bible';
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
 
-export const useSelectionStore = defineStore('useSelectionStore', () => {
+export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedBook = ref<BookInterface>({
         title: 'Genesis',
         short_name: 'Gen',
@@ -11,9 +12,16 @@ export const useSelectionStore = defineStore('useSelectionStore', () => {
         chapter_count: 50,
     });
 
+    const selectedBibleVersions = ref<Array<string>>([]);
     const selectedBookNumber = ref<number>(10);
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
+
+    async function getVerses() {
+        const arg = {};
+    }
+
+    onMounted(() => {});
 
     return {
         selectedBook,

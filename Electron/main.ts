@@ -1,7 +1,7 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
 import { isDev } from './config';
-import { setupDefault } from './Database/setup';
+import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
 import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';

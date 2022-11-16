@@ -1,8 +1,9 @@
 declare global {
     interface Window {
-        versions: any;
-        browserWindow: any;
+        versions: Function;
+        browserWindow: Function;
         getAvailableBibles: Function;
+        getVerses: Function;
     }
 }
 export {};

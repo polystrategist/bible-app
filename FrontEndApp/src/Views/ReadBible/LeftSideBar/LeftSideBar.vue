@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { bibleBooks } from './../books';
-import { useSelectionStore } from './../../../store/selections';
-const selectionStore = useSelectionStore();
+import { useBibleStore } from '../../../store/BibleStore';
+const selectionStore = useBibleStore();
 </script>
 <template>
     <div class="h-full pr-5px flex select-none">
