@@ -2,6 +2,7 @@
 import { onBeforeMount, ref } from 'vue';
 import { getDownloadedBible } from '../../../../util/Modules/Controller/FeBibleController';
 import { NCheckbox } from 'naive-ui';
+import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
 
 const bibleLists = ref<Array<any>>([]);
 
@@ -14,10 +15,11 @@ onBeforeMount(() => {
 });
 </script>
 <template>
-    <div class="w-full overflowing-div">
-        <h1 class="font-700">Bibles</h1>
-        <NCheckbox v-for="bible in bibleLists" class="w-full">
-            <span class="truncate">{{ bible.title }}</span>
-        </NCheckbox>
-    </div>
+    <RightSideBarContainer title="Bible List">
+        <div v-for="bible in bibleLists">
+            <NCheckbox>
+                <span class="truncate">{{ bible.title }}</span>
+            </NCheckbox>
+        </div>
+    </RightSideBarContainer>
 </template>

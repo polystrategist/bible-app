@@ -19,6 +19,7 @@ import { menuOptions } from './AppMenuOptions';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
+import FooterComponent from './components/Footer/Footer.vue';
 
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
@@ -52,7 +53,7 @@ onBeforeMount(async () => {
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
                         <TitleBar class="h-25px" />
-                        <NLayout class="h-[calc(100%-25px)]" has-sider>
+                        <NLayout class="h-[calc(100%-50px)]" has-sider>
                             <NLayoutSider
                                 bordered
                                 :collapsed="isSideBarCollapse"
@@ -86,6 +87,7 @@ onBeforeMount(async () => {
                                 </div>
                             </NLayout>
                         </NLayout>
+                        <FooterComponent class="h-25px" />
                     </NLayout>
                 </NMessageProvider>
             </NNotificationProvider>

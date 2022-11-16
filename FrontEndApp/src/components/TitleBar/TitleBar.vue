@@ -38,7 +38,7 @@ onBeforeMount(async () => {
 });
 </script>
 <template>
-    <NLayoutHeader class="flex cursor-default select-none items-center pl-8px light:bg-gray-100">
+    <NLayoutHeader bordered class="flex cursor-default select-none items-center pl-8px light:bg-gray-100">
         <div class="whitespace-nowrap flex items-center gap-1">
             <div class="w-18px">
                 <img :src="Logo" />
