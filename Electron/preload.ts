@@ -8,5 +8,5 @@ contextBridge.exposeInMainWorld('browserWindow', {
     isWindowBrowserMaximized: () => ipcRenderer.invoke('isWindowBrowserMaximized'),
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
-    getVerses: (args: GetVerseArgs) => ipcRenderer.invoke('getVerses', args),
+    getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
 });

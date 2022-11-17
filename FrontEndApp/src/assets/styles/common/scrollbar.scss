@@ -53,8 +53,7 @@
 .scroll-bar-md,
 .scroll-bar-sm {
     &::-webkit-scrollbar-thumb {
-        background-color: red;
-        border-radius: 0px;
+        border-radius: 5px;
         margin: 10px;
     }
 }

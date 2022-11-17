@@ -1,9 +1,9 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
-import { isDev } from './config';
+import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
-import { installExt } from './installDevTool';
+// import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 
@@ -17,6 +17,7 @@ async function createWindow() {
         minHeight: 600,
         webPreferences: {
             preload: __dirname + '/preload.js',
+            devTools: isNightly,
         },
         show: false,
         alwaysOnTop: true,
@@ -66,14 +67,14 @@ app.whenReady().then(async () => {
         throw e;
     }
 
-    // if dev
-    if (isDev) {
-        try {
-            await installExt();
-        } catch (e) {
-            console.log('Can not install extension!');
-        }
-    }
+    // // if dev
+    // if (isDev) {
+    //     try {
+    //         await installExt();
+    //     } catch (e) {
+    //         console.log('Can not install extension!');
+    //     }
+    // }
 
     createWindow();
     app.on('activate', function () {

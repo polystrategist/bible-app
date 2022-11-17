@@ -25,13 +25,23 @@ onBeforeMount(() => {
 
 <template>
     <Splitpanes vertical class="h-full w-full" @resized="changeSize">
-        <Pane :size="splitPaneSizes[0].size" :min-size="splitPaneSizes[0].min" :max-size="splitPaneSizes[0].max">
+        <Pane
+            class="bg-gray-100 dark:bg-dark-600"
+            :size="splitPaneSizes[0].size"
+            :min-size="splitPaneSizes[0].min"
+            :max-size="splitPaneSizes[0].max"
+        >
             <LeftSideBar />
         </Pane>
-        <Pane class="bg-gray-100 dark:bg-dark-700 p-3">
+        <Pane class="dark:bg-dark-800">
             <ViewVerses />
         </Pane>
-        <Pane :size="splitPaneSizes[2].size" :min-size="splitPaneSizes[2].min" :max-size="splitPaneSizes[2].max">
+        <Pane
+            class="bg-gray-100 dark:bg-dark-600"
+            :size="splitPaneSizes[2].size"
+            :min-size="splitPaneSizes[2].min"
+            :max-size="splitPaneSizes[2].max"
+        >
             <RightSideBar />
         </Pane>
     </Splitpanes>
