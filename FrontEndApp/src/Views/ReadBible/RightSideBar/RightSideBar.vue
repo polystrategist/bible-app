@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import { NIcon } from 'naive-ui';
-import { ref } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import { rightSideBarMenus } from './RightSideBar';
 import BibleList from './Bibles/Bibles.vue';
 import Bookmarks from './Bookmarks/Bookmarks.vue';
 import Highlights from './Highlights/Highlights.vue';
 import Search from './Search/Search.vue';
+import SESSION from '../../../util/session';
 
+const SavedRightSideBar = 'saved-right-side-bar-menu-key';
 const selectedButton = ref<string>('bible-search');
+
+function selectRightSideBarMenu(key: string) {
+    selectedButton.value = key;
+    SESSION.set(SavedRightSideBar, key);
+}
+
+onBeforeMount(() => {
+    const saveMenuKey = SESSION.get(SavedRightSideBar);
+    if (saveMenuKey) selectedButton.value = saveMenuKey;
+});
 </script>
 <template>
     <div class="h-full w-full flex">
@@ -25,7 +37,7 @@ const selectedButton = ref<string>('bible-search');
                     'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
                         selectedButton == menu.key,
                 }"
-                @click="selectedButton = menu.key"
+                @click="selectRightSideBarMenu(menu.key)"
                 :key="menu.key"
             >
                 <NIcon :component="menu.icon" />
