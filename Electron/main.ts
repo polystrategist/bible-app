@@ -3,7 +3,7 @@ import path from 'path';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
-// import { installExt } from './installDevTool';
+import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 
@@ -67,14 +67,14 @@ app.whenReady().then(async () => {
         throw e;
     }
 
-    // // if dev
-    // if (isDev) {
-    //     try {
-    //         await installExt();
-    //     } catch (e) {
-    //         console.log('Can not install extension!');
-    //     }
-    // }
+    // if dev
+    if (isDev) {
+        try {
+            await installExt();
+        } catch (e) {
+            console.log('Can not install extension!');
+        }
+    }
 
     createWindow();
     app.on('activate', function () {

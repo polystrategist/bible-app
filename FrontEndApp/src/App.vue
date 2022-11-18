@@ -14,7 +14,7 @@ import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
 import { onBeforeMount, ref } from 'vue';
 import { useThemeStore } from './store/theme';
-import { menuOptions } from './AppMenuOptions';
+import { menuOptions, bottomMenuOptions } from './AppMenuOptions';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
@@ -60,20 +60,33 @@ onBeforeMount(async () => {
                                 :native-scrollbar="false"
                                 :inverted="false"
                                 :default-collapsed="true"
-                                class="side-bar-menu"
+                                class="side-bar-menu h-full"
                                 :on-update:collapsed="triggerSideBarCollapse"
                             >
-                                <NMenu
-                                    :value="menuStore.menuSelected"
-                                    :on-update:value="(key: string, item: MenuOption) => {
+                                <div class="flex flex-col justify-between h-full">
+                                    <NMenu
+                                        :value="menuStore.menuSelected"
+                                        :on-update:value="(key: string, item: MenuOption) => {
                                         menuStore.setMenu(key);
                                     }"
-                                    :inverted="false"
-                                    :collapsed-width="48"
-                                    :collapsed-icon-size="25"
-                                    :indent="15"
-                                    :options="menuOptions"
-                                />
+                                        :inverted="false"
+                                        :collapsed-width="48"
+                                        :collapsed-icon-size="25"
+                                        :indent="15"
+                                        :options="menuOptions"
+                                    />
+                                    <NMenu
+                                        :value="menuStore.menuSelected"
+                                        :on-update:value="(key: string, item: MenuOption) => {
+                                        menuStore.setMenu(key);
+                                    }"
+                                        :inverted="false"
+                                        :collapsed-width="48"
+                                        :collapsed-icon-size="25"
+                                        :indent="15"
+                                        :options="bottomMenuOptions"
+                                    />
+                                </div>
                             </NLayoutSider>
                             <NLayout>
                                 <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
@@ -92,6 +105,9 @@ onBeforeMount(async () => {
 </template>
 <style lang="scss">
 .side-bar-menu {
+    .n-scrollbar-content {
+        height: 100%;
+    }
     .n-menu-item {
         height: 40px;
         transition: height 0.3s;

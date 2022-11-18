@@ -11,6 +11,16 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/prayer-list',
         component: PrayerList,
     },
+    {
+        name: 'ProfilePage',
+        path: '/profile',
+        component: () => import('./../Views/UserProfile/Profile.vue'),
+    },
+    {
+        name: 'AboutPage',
+        path: '/about-page',
+        component: () => import('./../Views/About/About.vue'),
+    },
 ];
 
 const router = createRouter({
