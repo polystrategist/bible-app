@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { GetVerseArgs } from './Modules/Bible/Bible';
 
 contextBridge.exposeInMainWorld('browserWindow', {
     minimizeWindow: () => ipcRenderer.invoke('minimizeWindow'),
@@ -9,4 +8,5 @@ contextBridge.exposeInMainWorld('browserWindow', {
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
+    searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
 });

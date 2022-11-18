@@ -4,6 +4,7 @@ declare global {
         browserWindow: any;
         getAvailableBibles: Function;
         getVerses: Function;
+        searchBible: Function;
     }
 }
 export {};
