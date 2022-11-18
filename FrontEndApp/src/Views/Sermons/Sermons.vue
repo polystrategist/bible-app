@@ -1,3 +1,3 @@
 <template>
-    <div>This is the sermon</div>
+    <div class="w-full h-full">This is the sermon page and still in progress</div>
 </template>

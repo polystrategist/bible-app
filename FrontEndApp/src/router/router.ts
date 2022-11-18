@@ -21,6 +21,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/about-page',
         component: () => import('./../Views/About/About.vue'),
     },
+    {
+        name: 'SettingsPage',
+        path: '/settings-page',
+        component: () => import('./../Views/Settings/Settings.vue'),
+    },
 ];
 
 const router = createRouter({

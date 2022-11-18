@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NIcon } from 'naive-ui';
+import { NIcon, NTooltip } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import { rightSideBarMenus } from './RightSideBar';
 import BibleList from './Bibles/Bibles.vue';
@@ -30,18 +30,22 @@ onBeforeMount(() => {
             <Search v-show="selectedButton == 'bible-search'" />
         </div>
         <div class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 flex flex-col items-center gap-1 pt-3 text-size-20px">
-            <div
-                v-for="menu in rightSideBarMenus"
-                class="w-27px hover:bg-orange-500 dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
-                :class="{
-                    'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
-                        selectedButton == menu.key,
-                }"
-                @click="selectRightSideBarMenu(menu.key)"
-                :key="menu.key"
-            >
-                <NIcon :component="menu.icon" />
-            </div>
+            <NTooltip v-for="menu in rightSideBarMenus" :placement="'left'">
+                <template #trigger>
+                    <div
+                        class="w-27px hover:bg-orange-500 dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
+                        :class="{
+                            'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
+                                selectedButton == menu.key,
+                        }"
+                        @click="selectRightSideBarMenu(menu.key)"
+                        :key="menu.key"
+                    >
+                        <NIcon :component="menu.icon" />
+                    </div>
+                </template>
+                {{ menu.title }}
+            </NTooltip>
         </div>
     </div>
 </template>

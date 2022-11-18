@@ -1,6 +1,6 @@
 import { Component, h } from 'vue';
 import { NIcon } from 'naive-ui';
-import { Book, MediaLibrary, UserProfile, Information } from '@vicons/carbon';
+import { Book, MediaLibrary, UserProfile, Information, Settings } from '@vicons/carbon';
 
 function renderIcon(icon: Component) {
     return () => h(NIcon, null, { default: () => h(icon) });
@@ -34,5 +34,10 @@ export const bottomMenuOptions = [
         label: 'About',
         key: '/about-page',
         icon: renderIcon(Information),
+    },
+    {
+        label: 'Settings',
+        key: '/settings-page',
+        icon: renderIcon(Settings),
     },
 ];
