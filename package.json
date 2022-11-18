@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "main": "./dist/main.js",
   "license": "gpl-3.0",
+  "icon": "",
   "scripts": {
     "build": "tsc",
     "watch": "nodemon --exec yarn serve:electron",
@@ -42,11 +43,15 @@
     "productName": "Believers Sword Nightly",
     "copyright": "Copyright © 2022 ${author}",
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": false
+    },
+    "linux": {
+      "category": "Education"
     },
     "files": [
       "dist/**/*"
