@@ -36,6 +36,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             book_number: selectedBookNumber.value,
             chapter: selectedChapter.value,
         });
+
+        SESSION.set('saved-selected-book', selectedBook.value);
     }
 
     function recallSavedChapter() {
@@ -44,6 +46,9 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             selectedBookNumber.value = chapterSaved.book_number;
             selectedChapter.value = chapterSaved.chapter;
         }
+
+        const savedSelectedBook = SESSION.get('saved-selected-book');
+        if (savedSelectedBook) selectedBook.value = savedSelectedBook;
     }
 
     onBeforeMount(() => {

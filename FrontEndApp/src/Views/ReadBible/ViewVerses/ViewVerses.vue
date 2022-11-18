@@ -22,6 +22,9 @@ onBeforeMount(() => {
 });
 
 function navigateChapter(action: 'next' | 'before') {
+    if (action == 'before' && bibleStore.selectedChapter == 1) return;
+    if (action == 'before' && bibleStore.selectedChapter == 1) return;
+
     bibleStore.selectChapter(action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1);
 }
 </script>
