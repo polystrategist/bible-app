@@ -23,7 +23,7 @@ onBeforeMount(() => {
 
 function navigateChapter(action: 'next' | 'before') {
     if (action == 'before' && bibleStore.selectedChapter == 1) return;
-    if (action == 'before' && bibleStore.selectedChapter == 1) return;
+    if (action == 'next' && bibleStore.selectedChapter == bibleStore.selectedBook.chapter_count) return;
 
     bibleStore.selectChapter(action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1);
 }
@@ -52,14 +52,14 @@ function navigateChapter(action: 'next' | 'before') {
             </div>
         </div>
         <div class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div p-3 scroll-bar-md">
-            <div class="flex flex-col gap-20px" :style="`font-size:${fontSize}px`">
+            <div class="flex flex-col gap-10px" :style="`font-size:${fontSize}px`">
                 <div v-for="verse in bibleStore.verses" class="flex items-center gap-3">
                     <div>
-                        <span class="font-900">{{ verse.verse }}</span>
+                        <span class="font-900 select-none">{{ verse.verse }}</span>
                     </div>
                     <div>
                         <div v-for="version in verse.version">
-                            <span class="font-700 opacity-100 dark:opacity-80 mr-10px text-[var(--primary-color)]">
+                            <span class="font-700 opacity-100 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
                                 {{ version.version.replace('.SQLite3', '') }}
                             </span>
                             <span v-html="version.text"></span>
