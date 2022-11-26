@@ -59,7 +59,7 @@ function navigateChapter(action: 'next' | 'before') {
                     </div>
                     <div>
                         <div v-for="version in verse.version">
-                            <span class="font-700 opacity-100 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
+                            <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
                                 {{ version.version.replace('.SQLite3', '') }}
                             </span>
                             <span v-html="version.text"></span>

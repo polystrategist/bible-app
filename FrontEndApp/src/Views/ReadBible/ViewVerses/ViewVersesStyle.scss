@@ -1,13 +1,19 @@
 .show-chapter-verses {
     s {
         text-decoration: none !important;
-        padding: 1px 2px;
-        font-size: 11px;
+        padding: 1px;
+        font-size: 9px;
         border: 1px solid rgb(48, 48, 48) !important;
-
-        margin-left: 5px;
+        color: rgb(48, 48, 48) !important;
+        margin-left: 2px;
         margin-right: 5px;
         border-radius: 3px;
+        display: none;
+    }
+
+    j {
+        color: rgb(252, 84, 84);
+        font-weight: 500;
     }
 }
 
@@ -15,6 +21,12 @@
     .show-chapter-verses {
         s {
             border: 1px solid white;
+            color: white !important;
+        }
+
+        j {
+            color: rgb(253, 155, 155);
+            font-weight: 500;
         }
     }
 }
