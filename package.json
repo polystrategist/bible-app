@@ -65,6 +65,7 @@
     }
   },
   "dependencies": {
+    "electron-dl": "^3.5.0",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "knex": "^2.3.0",

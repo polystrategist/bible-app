@@ -5,6 +5,8 @@ declare global {
         getAvailableBibles: Function;
         getVerses: Function;
         searchBible: Function;
+        download: Function;
+        downloadModule: Function;
     }
 }
 export {};

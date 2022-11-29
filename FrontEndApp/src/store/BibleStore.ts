@@ -64,6 +64,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         selectedBookNumber,
         selectedVerse,
         selectedChapter,
+        getVerses,
         selectBook(book: BookInterface) {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;

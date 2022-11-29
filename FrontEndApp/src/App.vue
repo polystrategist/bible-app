@@ -19,6 +19,7 @@ import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
 import FooterComponent from './components/Footer/Footer.vue';
+import DownloadBible from './components/DownloadBible/DownloadBible.vue';
 
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
@@ -98,6 +99,7 @@ onBeforeMount(async () => {
                         </NLayout>
                         <FooterComponent class="h-25px" />
                     </NLayout>
+                    <DownloadBible />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>

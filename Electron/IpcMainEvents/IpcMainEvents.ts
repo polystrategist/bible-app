@@ -1,6 +1,7 @@
-import { BrowserWindow } from "electron";
-import { ipcVersionEvents } from "./Versions/Versions";
-import { windowBrowserEvents } from "./WindowEvents/BrowserWindowEvents";
+import { BrowserWindow } from 'electron';
+import downloading from './downloading/downloading';
+import { ipcVersionEvents } from './Versions/Versions';
+import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -8,4 +9,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // browser window events
     windowBrowserEvents(BrowserWindow);
+
+    // download events
+    downloading(BrowserWindow);
 };

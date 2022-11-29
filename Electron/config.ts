@@ -1,2 +1,2 @@
 export const isNightly = true;
-export const isDev = true;
+export const isDev = false;
