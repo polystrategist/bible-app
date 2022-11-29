@@ -77,8 +77,12 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             saveVersesToStorage();
             getVerses();
         },
-        selectVerse(verse: number) {
+        selectVerse(book_number: number, chapter: number, verse: number) {
+            selectedBookNumber.value = book_number;
+            selectedChapter.value = chapter;
             selectedVerse.value = verse;
+            saveVersesToStorage();
+            getVerses();
         },
         getSelectedData: computed(() => {
             const bookChosen = bibleBooks[bibleBooks.findIndex((book) => book.book_number == selectedBookNumber.value)];

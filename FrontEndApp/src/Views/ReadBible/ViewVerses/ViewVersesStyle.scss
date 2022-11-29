@@ -3,12 +3,12 @@
         text-decoration: none !important;
         padding: 1px;
         font-size: 9px;
-        border: 1px solid rgb(48, 48, 48) !important;
+        border: 1px solid rgb(165, 165, 165) !important;
         color: rgb(48, 48, 48) !important;
         margin-left: 2px;
         margin-right: 5px;
         border-radius: 3px;
-        display: none;
+        cursor: pointer;
     }
 
     j {
@@ -20,7 +20,7 @@
 .dark {
     .show-chapter-verses {
         s {
-            border: 1px solid white;
+            border: 1px solid rgb(71, 71, 71) !important;
             color: white !important;
         }
 
