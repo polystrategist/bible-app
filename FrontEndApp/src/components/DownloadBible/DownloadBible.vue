@@ -29,7 +29,7 @@ const BibleVersions = computed(() => {
                     <BibleItem :version="version" />
                 </template>
             </div>
-            <div class="flex items-center justify-center h-[80vh]">It seems you have downloaded all the modules 😊</div>
+            <div v-else class="flex items-center justify-center h-[80vh]">It seems you have downloaded all the modules 😊</div>
         </NCard>
     </NModal>
 </template>
