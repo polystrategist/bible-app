@@ -1,10 +1,12 @@
+import { session } from 'electron';
 import { defineStore } from 'pinia';
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import SESSION from '../util/session';
 import { bibleBooks } from '../Views/ReadBible/books';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
 const StorageKeyOfChapterSelected = 'selected-chapter-storage';
+const StorageSelectedVersions = 'stored-selected-versions';
 
 export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedBook = ref<BookInterface>({
@@ -20,6 +22,13 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
     const verses = ref<any>(null);
+
+    watch(
+        () => selectedBibleVersions.value,
+        (newData) => {
+            SESSION.set(StorageSelectedVersions, newData);
+        }
+    );
 
     async function getVerses() {
         const arg = {
@@ -52,6 +61,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     }
 
     onBeforeMount(() => {
+        const selectedVersions = SESSION.get(StorageSelectedVersions);
+        if (selectedVersions) selectedBibleVersions.value = selectedVersions;
         recallSavedChapter();
         getVerses();
     });
