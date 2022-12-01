@@ -5,6 +5,7 @@ import knex from 'knex';
 export type SearchBibleInterface = {
     search: string;
     bible_versions: Array<string>;
+    book_number: number | string;
     page: number;
     limit: number;
 };
@@ -28,7 +29,10 @@ export default () => {
             await bibleVersion
                 .select()
                 .from('verses')
-                .where('text', 'LIKE', `%${args.search}%`)
+                .where((query) => {
+                    query.where('text', 'LIKE', `%${args.search}%`);
+                    if (args.book_number) query.where('book_number', args.book_number);
+                })
                 .limit(args.limit)
                 .offset(args.page == 1 ? 0 : args.page * args.limit - args.limit)
                 .then((row) => {
