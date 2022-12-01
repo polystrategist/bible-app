@@ -4,6 +4,7 @@ import { NInput, NForm, NButton, NPopselect, useMessage } from 'naive-ui';
 import { ref, computed } from 'vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { bibleBooks } from '../../books';
+import { highlighter } from './../../../../util/hilitor';
 
 const bibleStore = useBibleStore();
 const page = ref<number>(1);
@@ -28,6 +29,12 @@ async function submitSearch() {
     };
     const data = await window.browserWindow.searchBible(JSON.stringify(arg));
     searchedVerses.value = data;
+
+    setTimeout(() => {
+        highlighter('input-text-search', arg.search);
+    }, 50);
+
+    // document.getElementById('inputTextSearch')?.scrollTop;
 }
 
 function getBookShortName(book_number: number) {
@@ -74,7 +81,10 @@ const selectBookOptions = computed(() => {
                     </NPopselect>
                 </NForm>
             </div>
-            <div class="h-[calc(100%-85px)] overflow-y-auto overflowing-div flex flex-col gap-15px show-chapter-verses">
+            <div
+                id="inputTextSearch"
+                class="h-[calc(100%-85px)] overflow-y-auto overflowing-div flex flex-col gap-15px show-chapter-verses"
+            >
                 <div
                     v-for="verse in searchedVerses"
                     class="p-1 hover:bg-light-100 hover:bg-opacity-5 rounded-sm"
@@ -86,7 +96,7 @@ const selectBookOptions = computed(() => {
                     <div>
                         <div v-for="version in verse.version">
                             <span class="mr-7px text-[var(--primary-color)] italic">{{ version.version }}</span>
-                            <div v-html="version.text"></div>
+                            <div v-html="version.text" class="input-text-search"></div>
                         </div>
                     </div>
                 </div>
@@ -120,3 +130,11 @@ const selectBookOptions = computed(() => {
         </div>
     </RightSideBarContainer>
 </template>
+<style lang="scss">
+mark {
+    font-weight: 600;
+    padding-right: 5px;
+    padding-left: 3px;
+    border-radius: 5px;
+}
+</style>
