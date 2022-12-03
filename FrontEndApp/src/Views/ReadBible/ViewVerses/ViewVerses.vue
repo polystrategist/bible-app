@@ -52,10 +52,13 @@ function navigateChapter(action: 'next' | 'before') {
             </div>
         </div>
         <div class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div p-3 scroll-bar-md">
-            <div class="flex flex-col gap-30px" :style="`font-size:${fontSize}px`">
-                <div v-for="verse in bibleStore.verses" class="flex items-center gap-3">
+            <div class="flex flex-col gap-5px" :style="`font-size:${fontSize}px`">
+                <div
+                    v-for="verse in bibleStore.verses"
+                    class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-5px py-10px"
+                >
                     <div>
-                        <span class="font-900 select-none">{{ verse.verse }}</span>
+                        <span class="font-900 select-none text-size-30px">{{ verse.verse }}</span>
                     </div>
                     <div>
                         <div v-for="version in verse.version">

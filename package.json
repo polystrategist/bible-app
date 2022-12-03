@@ -47,8 +47,9 @@
       "hardenedRuntime": true
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": false
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "deleteAppDataOnUninstall": true
     },
     "linux": {
       "category": "Education"
