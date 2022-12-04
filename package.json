@@ -24,7 +24,7 @@
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
-    "up": "node release && yarn app:build -p always"
+    "up:win": "up_using_window.cmd"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.2",
