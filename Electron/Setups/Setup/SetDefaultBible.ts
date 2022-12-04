@@ -16,13 +16,14 @@ export const setDefaultBible = new Promise((resolve, reject) => {
 
             const defaultBiblePath = isPackaged
                 ? UPath.toUnix(UPath.join(__dirname, 'defaults', 'Modules', 'Bible', 'KJV1769+.SQLite3')).replace(
-                      'app.asar/dist/Database/Setup/',
+                      'app.asar/dist/Setups/Setup/',
                       ''
                   )
                 : './defaults/Modules/Bible/KJV1769+.SQLite3';
             Log.info('Default Bible Path:', defaultBiblePath);
 
             fs.copyFile(defaultBiblePath, dataPath + `\\modules\\bible\\KJV1769+.SQLite3`, (err) => {
+                Log.error(err);
                 if (err) reject(err);
             });
 

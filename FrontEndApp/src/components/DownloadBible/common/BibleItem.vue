@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { NButton, useMessage } from 'naive-ui';
+import { NButton } from 'naive-ui';
 import { ref } from 'vue';
+import { useBibleDownloadStore } from '../../../store/downloadBible';
 import { useModuleStore } from '../../../store/moduleStore';
 
 const props = defineProps(['version']);
 const moduleStore = useModuleStore();
-const downloading = ref(false);
 const percentage = ref(0);
-const message = useMessage();
+const downloadBibleStore = useBibleDownloadStore();
 
-async function clickDownload() {
-    downloading.value = true;
-    await window.browserWindow.downloadModule({
+function clickDownload() {
+    downloadBibleStore.isDownloading = true;
+    downloadBibleStore.downloadingVersion = props.version.file_name;
+    window.browserWindow.downloadModule({
         url: props.version.download_link,
         progress: (data: any) => {
             percentage.value = data.percent * 100;
         },
         done: async () => {
             moduleStore.getBibleLists();
-            downloading.value = false;
+            downloadBibleStore.isDownloading = false;
         },
     });
 }
@@ -32,8 +33,12 @@ async function clickDownload() {
             </span>
         </div>
         <div>
-            <NButton size="tiny" @click="clickDownload" :disabled="downloading">
-                {{ downloading ? `${percentage}%` : 'Download' }}
+            <NButton size="tiny" @click="clickDownload" :disabled="downloadBibleStore.isDownloading">
+                {{
+                    downloadBibleStore.isDownloading && downloadBibleStore.downloadingVersion == props.version.file_name
+                        ? `${percentage}%`
+                        : 'Download'
+                }}
             </NButton>
         </div>
     </div>

@@ -18,17 +18,22 @@ export default (mainWindow: BrowserWindow) => {
 
     ipcMain.on('download-module', async (event, url) => {
         try {
-            await download(mainWindow, url, {
+            download(mainWindow, url, {
                 directory: filePath,
                 onProgress: (data) => {
+                    console.log(data);
                     mainWindow.webContents.send('download-module-inprogress', data);
                 },
                 overwrite: true,
-            });
+            })
+                .then((item) => {
+                    mainWindow.webContents.send('download-module-done');
+                })
+                .catch((e) => {
+                    Log.error(e);
+                });
         } catch (e) {
             Log.warn('Download was interrupted.');
         }
-
-        mainWindow.webContents.send('download-module-done');
     });
 };

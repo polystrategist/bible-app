@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { forEach } from 'lodash';
-import { NModal, NCard, NButton } from 'naive-ui';
+import { NModal, NCard, NButton, NAlert } from 'naive-ui';
 import { computed } from 'vue';
 import { useBibleDownloadStore } from '../../store/downloadBible';
 import { useModuleStore } from '../../store/moduleStore';
@@ -24,7 +24,8 @@ function isAlreadyDownloaded(file_name: string) {
     <NModal v-model:show="bibleDownloadStore.showBibleDownloadModal">
         <NCard style="width: 600px" :bordered="false" size="small" role="dialog" aria-modal="true">
             <h1 class="font-800 select-none">Available Versions</h1>
-            <div v-if="BibleVersions.length" class="flex flex-col gap-2px select-none h-[80vh] overflow-y-auto overflowing-div">
+            <NAlert type="warning"> Can Download One Item at a Time. </NAlert>
+            <div v-if="BibleVersions.length" class="flex flex-col gap-2px select-none h-[70vh] overflow-y-auto overflowing-div">
                 <template v-for="version in BibleVersions">
                     <BibleItem v-show="isAlreadyDownloaded(version.file_name)" :version="version" />
                 </template>
