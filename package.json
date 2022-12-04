@@ -1,11 +1,10 @@
 {
-  "name": "believers-sword-nightly",
+  "name": "believers-sword",
   "description": "Believers Sword is an application for believers community, it is used to study bible, also used for praying, social or connect with other believers.",
   "author": "BroJenuel",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./dist/main.js",
-  "license": "gpl-3.0",
-  "icon": "",
+  "license": "GPL-3.0",
   "scripts": {
     "build": "tsc",
     "watch": "nodemon --exec yarn serve:electron",
@@ -24,12 +23,14 @@
     "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\" && json -I -f package.json -e \"this.build.productName='Believers Sword'\"",
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "up": "node release && yarn app:build -p always"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.2",
     "concurrently": "^7.4.0",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.0.3",
     "electron": "^22.0.0",
     "electron-builder": "^23.6.0",
     "electron-devtools-installer": "^3.2.0",
@@ -40,7 +41,7 @@
   },
   "build": {
     "appId": "com.official-believers-sword.app",
-    "productName": "Believers Sword Nightly",
+    "productName": "Believers Sword",
     "copyright": "Copyright © 2022 ${author}",
     "mac": {
       "category": "public.app-category.productivity",
