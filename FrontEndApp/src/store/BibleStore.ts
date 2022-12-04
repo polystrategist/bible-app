@@ -72,9 +72,9 @@ export const useBibleStore = defineStore('useBibleStore', () => {
 
     onMounted(() => {
         setTimeout(() => {
-            setScrollTopState('view-chapter-container', 'the-selected-chapter-element');
-            setScrollTopState('view-books-container', 'the-selected-book-element');
-            setScrollTopState('view-verses-container', 'the-selected-verse');
+            setScrollTopState('view-chapter-container', 'the-selected-chapter-element', 10);
+            setScrollTopState('view-books-container', 'the-selected-book-element', 10);
+            setScrollTopState('view-verses-container', 'the-selected-verse', 50);
         }, 300);
     });
 
