@@ -12,11 +12,12 @@ contextBridge.exposeInMainWorld('browserWindow', {
     download: (args: any) => {
         ipcRenderer.send('download', args);
     },
-    downloadModule: ({ url, progress, done }: { url: string; progress: Function; done: Function }) => {
-        ipcRenderer.send('download-module', url);
-        ipcRenderer.on('download-module-inprogress', (event, percentage) => {
-            progress(percentage);
-        });
+    downloadModule: ({ urls, progress, done }: { urls: Array<string>; progress: Function; done: Function }) => {
+        console.log(urls, 'preload');
+        ipcRenderer.send('download-module', urls);
+        // ipcRenderer.on('download-module-inprogress', (event, percentage) => {
+        //     progress(percentage);
+        // });
         ipcRenderer.on('download-module-done', (event, args) => {
             done();
         });
