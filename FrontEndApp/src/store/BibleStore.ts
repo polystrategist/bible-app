@@ -1,11 +1,12 @@
 import { session } from 'electron';
 import { defineStore } from 'pinia';
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
+import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
 import { bibleBooks } from '../Views/ReadBible/books';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
-const StorageKeyOfChapterSelected = 'selected-chapter-storage';
+const StorageKeyOfChapterVerseSelected = 'selected-chapter-verse-storage';
 const StorageSelectedVersions = 'stored-selected-versions';
 
 export const useBibleStore = defineStore('useBibleStore', () => {
@@ -41,19 +42,21 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     }
 
     function saveVersesToStorage() {
-        SESSION.set(StorageKeyOfChapterSelected, {
+        SESSION.set(StorageKeyOfChapterVerseSelected, {
             book_number: selectedBookNumber.value,
             chapter: selectedChapter.value,
+            verse: selectedVerse.value,
         });
 
         SESSION.set('saved-selected-book', selectedBook.value);
     }
 
     function recallSavedChapter() {
-        const chapterSaved = SESSION.get(StorageKeyOfChapterSelected);
+        const chapterSaved = SESSION.get(StorageKeyOfChapterVerseSelected);
         if (chapterSaved) {
             selectedBookNumber.value = chapterSaved.book_number;
             selectedChapter.value = chapterSaved.chapter;
+            selectedVerse.value = chapterSaved.verse;
         }
 
         const savedSelectedBook = SESSION.get('saved-selected-book');
@@ -65,6 +68,14 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         if (selectedVersions) selectedBibleVersions.value = selectedVersions;
         recallSavedChapter();
         getVerses();
+    });
+
+    onMounted(() => {
+        setTimeout(() => {
+            setScrollTopState('view-chapter-container', 'the-selected-chapter-element');
+            setScrollTopState('view-books-container', 'the-selected-book-element');
+            setScrollTopState('view-verses-container', 'the-selected-verse');
+        }, 300);
     });
 
     return {

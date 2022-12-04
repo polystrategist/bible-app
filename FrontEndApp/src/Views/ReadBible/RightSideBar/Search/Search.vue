@@ -60,6 +60,7 @@ const selectBookOptions = computed(() => {
                 <NForm @submit.prevent="submitSearch">
                     <NInput v-model:value="search" size="small" clearable />
                     <NPopselect
+                        trigger="click"
                         size="small"
                         v-model:value="selectedBookNumber"
                         :options="selectBookOptions"
