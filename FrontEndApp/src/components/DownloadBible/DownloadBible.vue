@@ -25,7 +25,7 @@ function clickDownload() {
     window.browserWindow.downloadModule({
         urls: urlsToDownload.value?.map((url) => url),
         progress: (data: any) => {
-            console.log(data);
+            // console.log(data);
             // percentage.value = data.percent * 100;
         },
         done: async () => {
