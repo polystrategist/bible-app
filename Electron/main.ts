@@ -1,12 +1,12 @@
-import UpdateElectronApp from 'update-electron-app';
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
-import { isDev } from './config';
+import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
 // import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
+import AppUpdater from './AutoUpdate';
 
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -36,7 +36,7 @@ async function createWindow() {
     BibleModules();
 
     // auto updated
-    if (!isDev) UpdateElectronApp();
+    if (!isDev && !isNightly) AppUpdater();
 
     // and load the index.html of the app.
     // win.loadFile("index.html");

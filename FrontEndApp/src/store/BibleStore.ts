@@ -63,6 +63,14 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         if (savedSelectedBook) selectedBook.value = savedSelectedBook;
     }
 
+    function AutoScrollSavedPosition(millisecond = 300) {
+        setTimeout(() => {
+            setScrollTopState('view-chapter-container', 'the-selected-chapter-element', 10);
+            setScrollTopState('view-books-container', 'the-selected-book-element', 10);
+            setScrollTopState('view-verses-container', 'the-selected-verse', 50);
+        }, millisecond);
+    }
+
     onBeforeMount(() => {
         const selectedVersions = SESSION.get(StorageSelectedVersions);
         if (selectedVersions) selectedBibleVersions.value = selectedVersions;
@@ -71,14 +79,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     });
 
     onMounted(() => {
-        setTimeout(() => {
-            setScrollTopState('view-chapter-container', 'the-selected-chapter-element', 10);
-            setScrollTopState('view-books-container', 'the-selected-book-element', 10);
-            setScrollTopState('view-verses-container', 'the-selected-verse', 50);
-        }, 300);
+        AutoScrollSavedPosition();
     });
 
     return {
+        AutoScrollSavedPosition,
         verses,
         DefaultSelectedVersion,
         selectedBibleVersions,

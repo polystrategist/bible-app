@@ -41,6 +41,11 @@ function getBookShortName(book_number: number) {
     return bibleBooks[bibleBooks.findIndex((book) => book.book_number == book_number)];
 }
 
+function selectAVerse(book_number: number, chapter: number, verse: number) {
+    bibleStore.selectVerse(book_number, chapter, verse);
+    bibleStore.AutoScrollSavedPosition(200);
+}
+
 const selectBookOptions = computed(() => {
     let books = bibleBooks.map((b) => ({
         label: b.title,
@@ -89,7 +94,7 @@ const selectBookOptions = computed(() => {
                 <div
                     v-for="verse in searchedVerses"
                     class="p-1 hover:bg-light-100 hover:bg-opacity-5 rounded-sm"
-                    @click="bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)"
+                    @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)"
                 >
                     <div class="font-700">
                         {{ getBookShortName(verse.book_number).short_name }} {{ verse.chapter }}:{{ verse.verse }}

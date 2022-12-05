@@ -1,2 +1,5 @@
-import UpdateElectronApp from 'update-electron-app';
-export default UpdateElectronApp();
+import { autoUpdater } from 'electron-updater';
+
+export default () => {
+    autoUpdater.checkForUpdatesAndNotify();
+};
