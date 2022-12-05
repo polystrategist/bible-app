@@ -1,6 +1,7 @@
+import UpdateElectronApp from 'update-electron-app';
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
-import { isDev, isNightly } from './config';
+import { isDev } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
 // import { installExt } from './installDevTool';
@@ -33,6 +34,9 @@ async function createWindow() {
 
     // Modules
     BibleModules();
+
+    // auto updated
+    if (!isDev) UpdateElectronApp();
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
