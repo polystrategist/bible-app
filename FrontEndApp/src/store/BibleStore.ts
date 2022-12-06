@@ -118,5 +118,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                 chapter: selectedChapter,
             };
         }),
+        getBook: (b_num: number) => {
+            return bibleBooks[bibleBooks.findIndex((book) => book.book_number == b_num)];
+        },
     };
 });

@@ -9,17 +9,17 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
-    download: (args: any) => {
-        ipcRenderer.send('download', args);
-    },
+    download: (args: any) => ipcRenderer.send('download', args),
     downloadModule: ({ urls, progress, done }: { urls: Array<string>; progress: Function; done: Function }) => {
         console.log(urls, 'preload');
         ipcRenderer.send('download-module', urls);
-        // ipcRenderer.on('download-module-inprogress', (event, percentage) => {
-        //     progress(percentage);
-        // });
         ipcRenderer.on('download-module-done', (event, args) => {
             done();
         });
     },
+
+    // Bookmarks Stuff
+    saveBookMark: (args: any) => ipcRenderer.invoke('save-bookmark', JSON.parse(args)),
+    getBookMarks: () => ipcRenderer.invoke('get-bookmarks'),
+    deleteBookmark: (args: any) => ipcRenderer.invoke('delete-bookmark', JSON.parse(args)),
 });

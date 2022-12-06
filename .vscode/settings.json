@@ -18,6 +18,7 @@
         "Oleg",
         "osafonov",
         "Phlm",
+        "Popconfirm",
         "Popselect",
         "Safonov",
         "Salita",
@@ -26,6 +27,7 @@
         "splitjs",
         "splitpanes",
         "upath",
-        "vicons"
+        "vicons",
+        "vueuse"
     ]
 }
