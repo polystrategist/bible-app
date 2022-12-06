@@ -7,6 +7,9 @@ declare global {
         searchBible: Function;
         download: Function;
         downloadModule: Function;
+        saveBookMark: Function;
+        getBookMarks: Function;
+        deleteBookmark: Function;
     }
 }
 export {};
