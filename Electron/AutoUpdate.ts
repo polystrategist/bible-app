@@ -7,13 +7,13 @@ export default () => {
         dialog
             .showMessageBox({
                 title: 'Restart Believers Sword',
-                type: 'info',
+                type: 'question',
                 message: `New version "Believers Sword ${info.version}" has been successfully downloaded.`,
-                buttons: ['Yes', 'Later'],
+                buttons: ['Yes', 'Later', 'Yes, Update'],
                 cancelId: 1,
             })
             .then(({ response }) => {
-                if (response == 0) {
+                if (response == 0 || response == 2) {
                     app.relaunch();
                     app.exit();
                 }
