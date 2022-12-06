@@ -1,4 +1,3 @@
-import { session } from 'electron';
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
@@ -17,8 +16,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         chapter_count: 50,
     });
 
-    const DefaultSelectedVersion = 'KJV1769+.SQLite3';
-    const selectedBibleVersions = ref<Array<string>>(['KJV1769+.SQLite3']);
+    const DefaultSelectedVersion = `KJ'1769.SQLite3`;
+    const selectedBibleVersions = ref<Array<string>>([`KJ'1769.SQLite3`]);
     const selectedBookNumber = ref<number>(10);
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
