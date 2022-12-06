@@ -20,15 +20,18 @@ import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
 import FooterComponent from './components/Footer/Footer.vue';
 import DownloadBible from './components/DownloadBible/DownloadBible.vue';
+import { useMainStore } from './store/main';
 
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
 const isSideBarCollapse = ref(true);
+const mainStore = useMainStore();
 async function getVersions() {
     const versions = await window.browserWindow.versions();
+    mainStore.version = versions.version;
     console.log(
-        `This app is using Chrome (v${versions.chrome}), Node.js (v${versions.node}), and Electron (v${versions.electron})`
+        `This app is using Chrome (v${versions.chrome}), Node.js (v${versions.node}), and Electron (v${versions.electron}), app version is ${versions.version}`
     );
 }
 
