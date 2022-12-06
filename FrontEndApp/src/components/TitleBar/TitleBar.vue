@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { NLayoutHeader, NIcon } from "naive-ui";
+import { NLayoutHeader, NIcon } from 'naive-ui';
 import {
     Subtract20Regular,
     SquareMultiple20Regular,
     Square20Regular,
     WeatherSunny20Regular,
     WeatherMoon20Regular,
-} from "@vicons/fluent";
-import { Close } from "@vicons/carbon";
-import { onBeforeMount, ref } from "vue";
-import Logo from "./../../assets/logo.svg";
-import { useThemeStore } from "../../store/theme";
+} from '@vicons/fluent';
+import { Close } from '@vicons/carbon';
+import { onBeforeMount, ref } from 'vue';
+import Logo from './../../assets/logo.svg';
+import { useThemeStore } from '../../store/theme';
+import { useMainStore } from '../../store/main';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
+const mainStore = useMainStore();
 
 async function minimizeWindow() {
     await window.browserWindow.minimizeWindow();
@@ -43,7 +45,9 @@ onBeforeMount(async () => {
             <div class="w-18px">
                 <img :src="Logo" />
             </div>
-            <span> Believers Sword </span>
+            <span>
+                Believers Sword <span class="text-size-10px"> {{ mainStore.version }} </span>
+            </span>
         </div>
         <div id="draggable-region" class="w-full h-full text-center cursor-move z-50"></div>
         <div class="flex items-center h-full">
