@@ -5,4 +5,3 @@ dist_electron
 defaults
 .env
 up_using_window.cmd
-Electron/config.ts

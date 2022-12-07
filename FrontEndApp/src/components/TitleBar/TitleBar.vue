@@ -45,8 +45,8 @@ onBeforeMount(async () => {
             <div class="w-18px">
                 <img :src="Logo" />
             </div>
-            <span>
-                Believers Sword <span class="text-size-10px"> {{ mainStore.version }} </span>
+            <span class="capitalize">
+                {{ mainStore.appName }} <span class="text-size-10px"> {{ mainStore.version }} </span>
             </span>
         </div>
         <div id="draggable-region" class="w-full h-full text-center cursor-move z-50"></div>

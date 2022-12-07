@@ -26,14 +26,7 @@ const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
 const isSideBarCollapse = ref(true);
-const mainStore = useMainStore();
-async function getVersions() {
-    const versions = await window.browserWindow.versions();
-    mainStore.version = versions.version;
-    console.log(
-        `This app is using Chrome (v${versions.chrome}), Node.js (v${versions.node}), and Electron (v${versions.electron}), app version is ${versions.version}`
-    );
-}
+useMainStore();
 
 function triggerSideBarCollapse(collapse: boolean) {
     isSideBarCollapse.value = collapse;
@@ -43,7 +36,6 @@ function triggerSideBarCollapse(collapse: boolean) {
 onBeforeMount(async () => {
     const isCollapseSideMenu = SESSION.get(isMenuCollapse);
     isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
-    getVersions();
 });
 </script>
 <template>

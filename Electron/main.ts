@@ -1,9 +1,9 @@
+import Log from 'electron-log';
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
-import { installExt } from './installDevTool';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
@@ -69,12 +69,14 @@ app.whenReady().then(async () => {
                 console.log(e);
             });
     } catch (e) {
-        throw e;
+        Log.error(e);
+        app.quit();
     }
 
     // if dev
     if (isDev) {
         try {
+            const { installExt } = await import('./installDevTool');
             await installExt();
         } catch (e) {
             console.log('Can not install extension!');

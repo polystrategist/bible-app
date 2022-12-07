@@ -7,6 +7,7 @@ export const ipcVersionEvents = () => {
             chrome: process.versions.chrome,
             electron: process.versions.electron,
             version: app.getVersion(),
+            name: app.getName(),
         };
     });
 };
