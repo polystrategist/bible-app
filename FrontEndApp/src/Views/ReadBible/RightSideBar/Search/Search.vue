@@ -59,7 +59,7 @@ const selectBookOptions = computed(() => {
 });
 </script>
 <template>
-    <RightSideBarContainer title="Search Bible">
+    <RightSideBarContainer :title="$t('Search Bible')">
         <div class="h-full flex flex-col">
             <div class="h-65px">
                 <NForm @submit.prevent="submitSearch">

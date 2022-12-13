@@ -22,7 +22,7 @@ async function deleteBookmark(verse: any) {
 }
 </script>
 <template>
-    <RightSideBarContainer title="Bookmarks">
+    <RightSideBarContainer :title="$t('Bookmarks')">
         <div
             v-for="(bookmark, key) in bookmarkStore.bookmarks"
             :key="key"
@@ -44,7 +44,7 @@ async function deleteBookmark(verse: any) {
                             <TrashCan />
                         </NIcon>
                     </template>
-                    Are You sure?
+                    {{ $t('Are You sure?') }}
                 </NPopconfirm>
             </div>
         </div>

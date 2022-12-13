@@ -8,7 +8,7 @@ function renderIcon(icon: Component) {
 
 export const menuOptions = [
     {
-        label: 'Read Bible',
+        label: 'read-bible',
         key: 'read-bible',
         icon: renderIcon(Book),
     },

@@ -44,7 +44,7 @@ onBeforeMount(() => {
                         <NIcon :component="menu.icon" />
                     </div>
                 </template>
-                {{ menu.title }}
+                {{ $t(menu.title) }}
             </NTooltip>
         </div>
     </div>

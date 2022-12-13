@@ -21,11 +21,14 @@ import SESSION from './util/session';
 import FooterComponent from './components/Footer/Footer.vue';
 import DownloadBible from './components/DownloadBible/DownloadBible.vue';
 import { useMainStore } from './store/main';
+import { useI18n } from 'vue-i18n';
 
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
 const isSideBarCollapse = ref(true);
+const savedLocaleKey = 'saveLanguageStorageKey';
+const { locale } = useI18n();
 useMainStore();
 
 function triggerSideBarCollapse(collapse: boolean) {
@@ -34,6 +37,9 @@ function triggerSideBarCollapse(collapse: boolean) {
 }
 
 onBeforeMount(async () => {
+    const savedLocale = SESSION.get(savedLocaleKey);
+    if (savedLocale) locale.value = savedLocale;
+
     const isCollapseSideMenu = SESSION.get(isMenuCollapse);
     isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
 });
@@ -69,7 +75,9 @@ onBeforeMount(async () => {
                                         :collapsed-width="48"
                                         :collapsed-icon-size="25"
                                         :indent="15"
-                                        :options="menuOptions"
+                                        :options="
+                                            menuOptions.map((item) => ({ label: $t(item.label), key: item.key, icon: item.icon }))
+                                        "
                                     />
                                     <NMenu
                                         :value="menuStore.menuSelected"
@@ -80,7 +88,13 @@ onBeforeMount(async () => {
                                         :collapsed-width="48"
                                         :collapsed-icon-size="25"
                                         :indent="15"
-                                        :options="bottomMenuOptions"
+                                        :options="
+                                            bottomMenuOptions.map((item) => ({
+                                                label: $t(item.label),
+                                                key: item.key,
+                                                icon: item.icon,
+                                            }))
+                                        "
                                     />
                                 </div>
                             </NLayoutSider>

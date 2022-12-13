@@ -46,7 +46,8 @@ onBeforeMount(async () => {
                 <img :src="Logo" />
             </div>
             <span class="capitalize">
-                {{ mainStore.appName }} <span class="text-size-10px"> {{ mainStore.version }} </span>
+                {{ $t('title') }} {{ mainStore.appName.includes('nightly') ? 'Nightly' : '' }}
+                <span class="text-size-10px"> {{ mainStore.version }} </span>
             </span>
         </div>
         <div id="draggable-region" class="w-full h-full text-center cursor-move z-50"></div>
@@ -63,6 +64,7 @@ onBeforeMount(async () => {
             <div
                 @click="minimizeWindow()"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
+                title="Minimize"
             >
                 <NIcon size="17">
                     <Subtract20Regular />
@@ -71,13 +73,18 @@ onBeforeMount(async () => {
             <div
                 @click="maximizeWindow()"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
+                title="Maximize"
             >
                 <NIcon size="17">
                     <SquareMultiple20Regular v-if="isMaximized" />
                     <Square20Regular v-else />
                 </NIcon>
             </div>
-            <div @click="closeWindow()" class="px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer">
+            <div
+                @click="closeWindow()"
+                class="px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer"
+                title="Close"
+            >
                 <NIcon size="20">
                     <Close />
                 </NIcon>

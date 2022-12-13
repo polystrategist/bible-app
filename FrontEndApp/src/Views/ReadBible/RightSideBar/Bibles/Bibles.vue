@@ -22,7 +22,7 @@ function handleCheckBox(bibleVersions: Array<any>) {
 }
 </script>
 <template>
-    <RightSideBarContainer title="Bible List">
+    <RightSideBarContainer :title="$t('Bible List')">
         <template #rightSide>
             <NButton quaternary size="tiny" title="Download" @click="bibleDownloadStore.showBibleDownloadModal = true">
                 <template #icon>

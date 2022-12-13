@@ -1,16 +1,23 @@
 import { defineStore } from 'pinia';
 import { onBeforeMount, ref, watch } from 'vue';
 import SESSION from '../util/session';
-import { getTheme, typeNameInterface } from '../util/themes';
+import { getTheme, themesOptions, typeNameInterface } from '../util/themes';
 
 export const useThemeStore = defineStore('useThemeStore', () => {
     const saveThemeStorageKey = 'savedThemeStorage';
     const isDark = ref(true);
     const selectedTheme = ref<typeNameInterface>('default');
-    const themeOverrides = ref<any>({
+    const themeOverrides = ref<{
+        common: {
+            primaryColor: string;
+            primaryColorHover: string;
+            primaryColorSuppl: string;
+            primaryColorPressed: string;
+        };
+    }>({
         common: {
             primaryColor: '#f2c423',
-            primaryColorHover: '#D5B33A',
+            primaryColorHover: 'rgba(238, 167, 24, 0.212)',
             primaryColorSuppl: '#E4BB2F',
             primaryColorPressed: '#E5BD1D',
         },
@@ -23,7 +30,6 @@ export const useThemeStore = defineStore('useThemeStore', () => {
                 themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
 
             document.body.className = itsDark ? 'dark' : 'light';
-
             SESSION.set(saveThemeStorageKey, {
                 selectedTheme: selectedTheme.value,
                 isDark: itsDark,
@@ -38,11 +44,26 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             selectedTheme.value = savedTheme.selectedTheme;
             isDark.value = savedTheme.isDark;
             document.body.classList.add(isDark.value ? 'dark' : 'light');
+            themeOverrides.value.common = (themesOptions as any)[selectedTheme.value][isDark.value ? 'dark' : 'light'];
+            changeTheRootProperty();
         }
     });
 
+    function changeTheRootProperty() {
+        document.documentElement.style.setProperty('--primary-color', themeOverrides.value.common.primaryColor);
+        document.documentElement.style.setProperty('--primary-color-light', themeOverrides.value.common.primaryColorHover);
+    }
+
+    function changePrimaryColor(key: typeNameInterface) {
+        selectedTheme.value = key;
+        themeOverrides.value.common = (themesOptions as any)[key][isDark.value ? 'dark' : 'light'];
+        changeTheRootProperty();
+    }
+
     return {
+        selectedTheme,
         themeOverrides,
         isDark,
+        changePrimaryColor,
     };
 });
