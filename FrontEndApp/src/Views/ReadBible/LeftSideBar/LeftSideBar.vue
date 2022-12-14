@@ -9,7 +9,7 @@ const selectionStore = useBibleStore();
             <div
                 v-for="(book, i) in bibleBooks"
                 :key="book.book_number"
-                class="px-10px py-5px hover:bg-orange-500 dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 cursor-pointer rounded-md whitespace-nowrap truncate"
+                class="px-10px py-5px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 cursor-pointer rounded-md whitespace-nowrap truncate "
                 :class="{
                     'bg-[var(--primary-color)] !hover:bg-[var(--primary-color)] text-black hover:text-black font-700':
                         selectionStore.selectedBookNumber == book.book_number,

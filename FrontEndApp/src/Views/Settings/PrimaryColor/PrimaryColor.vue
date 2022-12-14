@@ -25,7 +25,7 @@ const themeStore = useThemeStore();
             >
                 <div>
                     <span class="capitalize">{{ nameKey }}</span>
-                    <div class="flex gap-2" v-if="themeStore.isDark">
+                    <div class="flex gap-1" v-if="themeStore.isDark">
                         <div
                             v-for="common in colors.dark"
                             :key="common"

@@ -34,6 +34,8 @@ export const useThemeStore = defineStore('useThemeStore', () => {
                 selectedTheme: selectedTheme.value,
                 isDark: itsDark,
             });
+
+            changeTheRootProperty();
         }
     );
 
@@ -45,8 +47,9 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             isDark.value = savedTheme.isDark;
             document.body.classList.add(isDark.value ? 'dark' : 'light');
             themeOverrides.value.common = (themesOptions as any)[selectedTheme.value][isDark.value ? 'dark' : 'light'];
-            changeTheRootProperty();
         }
+
+        changeTheRootProperty();
     });
 
     function changeTheRootProperty() {

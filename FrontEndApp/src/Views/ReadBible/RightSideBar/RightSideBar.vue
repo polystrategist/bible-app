@@ -33,7 +33,7 @@ onBeforeMount(() => {
             <NTooltip v-for="menu in rightSideBarMenus" :placement="'left'">
                 <template #trigger>
                     <div
-                        class="w-27px hover:bg-orange-500 dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
+                        class="w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
                         :class="{
                             'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
                                 selectedButton == menu.key,
