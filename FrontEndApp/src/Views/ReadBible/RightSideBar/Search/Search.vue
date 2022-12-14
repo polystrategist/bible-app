@@ -93,7 +93,7 @@ const selectBookOptions = computed(() => {
             >
                 <div
                     v-for="verse in searchedVerses"
-                    class="p-1 hover:bg-light-100 hover:bg-opacity-5 rounded-sm"
+                    class="p-1 hover:bg-light-100 hover:bg-opacity-5 rounded-sm cursor-pointer"
                     @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)"
                 >
                     <div class="font-700">
