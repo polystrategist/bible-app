@@ -18,6 +18,8 @@ const message: InternationalMessageType = {
     'Bible Versions': '聖書のバージョン',
     Highlights: 'ハイライト',
     Nightly: '毎晩',
+    copy: 'コピー',
+    remove: '削除する',
 };
 
 export default message;

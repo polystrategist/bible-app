@@ -16,6 +16,8 @@ export interface InternationalMessageInterface {
     'Bible Versions': string;
     Highlights: string;
     Nightly: string;
+    copy: string;
+    remove: string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
