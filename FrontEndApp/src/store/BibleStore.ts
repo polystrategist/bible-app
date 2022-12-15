@@ -22,6 +22,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
     const verses = ref<any>(null);
+    const chapterHighlights = ref<Array<any>>([]);
 
     watch(
         () => selectedBibleVersions.value,
@@ -30,13 +31,21 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         }
     );
 
+    async function getChapterHighlights() {
+        const args = {
+            book_number: selectedBookNumber.value,
+            chapter: selectedChapter.value,
+        };
+        chapterHighlights.value = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
+    }
+
     async function getVerses() {
         const arg = {
             bible_versions: selectedBibleVersions.value,
             book_number: selectedBookNumber.value,
             selected_chapter: selectedChapter.value,
         };
-
+        getChapterHighlights();
         verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
     }
 
@@ -91,6 +100,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         selectedVerse,
         selectedChapter,
         getVerses,
+        chapterHighlights,
         selectBook(book: BookInterface) {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;

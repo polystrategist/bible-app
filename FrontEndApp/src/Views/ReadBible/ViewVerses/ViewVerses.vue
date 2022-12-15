@@ -80,6 +80,11 @@ function checkHere(this: HTMLElement): void {
     });
 }
 
+function checkHighlight(key: any) {
+    const highlight = bibleStore.chapterHighlights[key];
+    return highlight ? highlight.content : false;
+}
+
 onBeforeMount(() => {
     const savedFontSize = SESSION.get(fontSizeOfShowChapter);
     if (savedFontSize) fontSize.value = savedFontSize;
@@ -174,10 +179,23 @@ onMounted(() => {
                             {{ version.version.replace('.SQLite3', '') }}
                         </span>
                         <span
-                            v-html="version.text"
+                            v-html="
+                                checkHighlight(
+                                    `${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                        verse.verse
+                                    }`
+                                ) || version.text
+                            "
                             contenteditable="true"
                             class="verse-select-text"
                             spellcheck="false"
+                            :data-key="`${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                verse.verse
+                            }`"
+                            :data-bible-version="version.version"
+                            :data-book="verse.book_number"
+                            :data-chapter="verse.chapter"
+                            :data-verse="verse.verse"
                             :onfocus="checkHere"
                         ></span>
                     </div>

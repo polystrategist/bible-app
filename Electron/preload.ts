@@ -22,4 +22,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     saveBookMark: (args: any) => ipcRenderer.invoke('save-bookmark', JSON.parse(args)),
     getBookMarks: () => ipcRenderer.invoke('get-bookmarks'),
     deleteBookmark: (args: any) => ipcRenderer.invoke('delete-bookmark', JSON.parse(args)),
+
+    // Highlights
+    getChapterHighlights: (args: any) => ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
+    saveHighlight: (args: any) => ipcRenderer.invoke('saveHighlight', JSON.parse(args)),
 });

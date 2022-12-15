@@ -35,7 +35,6 @@ export const highlight = (color: string) => {
         const selected = window.getSelection();
         const selection = selected?.getRangeAt(0);
         const selectedContent = selection?.extractContents().textContent;
-        console.log(selectedContent);
         const span = document.createElement('span');
         span.style.backgroundColor = color;
         if (color != 'remove') span.style.color = '#111827';
@@ -81,9 +80,15 @@ export const highlight = (color: string) => {
             }
         }
 
-        // ipcRenderer.invoke("saveBibleVerseHighlight", { key, bibleVersion, bookNumber, chapterNumber, verseNumber, content }).then((args: any) => {
-        //     store.dispatch("setHighlights", args);
-        // });
+        console.log({ key, bibleVersion, bookNumber, chapterNumber, verseNumber, content });
+
+        saveHighlight({
+            key,
+            book_number: bookNumber,
+            chapter: chapterNumber,
+            verse: verseNumber,
+            content,
+        });
 
         // remove all selections
         window.getSelection()?.empty();
@@ -92,3 +97,13 @@ export const highlight = (color: string) => {
         // if (e instanceof Error) window.message.info("Please Select phrase/words to mark.");
     }
 };
+
+export async function getChapterHighlights(args: { book_number: number; chapter: number }) {
+    const highlights = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
+    return highlights;
+}
+
+export async function saveHighlight(args: { key: string; book_number: number; chapter: number; verse: number; content: string }) {
+    const save = await window.browserWindow.saveHighlight(JSON.stringify(args));
+    return save;
+}
