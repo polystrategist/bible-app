@@ -11,7 +11,6 @@ contextBridge.exposeInMainWorld('browserWindow', {
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
     download: (args: any) => ipcRenderer.send('download', args),
     downloadModule: ({ urls, progress, done }: { urls: Array<string>; progress: Function; done: Function }) => {
-        console.log(urls, 'preload');
         ipcRenderer.send('download-module', urls);
         ipcRenderer.on('download-module-done', (event, args) => {
             done();
@@ -22,4 +21,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
     saveBookMark: (args: any) => ipcRenderer.invoke('save-bookmark', JSON.parse(args)),
     getBookMarks: () => ipcRenderer.invoke('get-bookmarks'),
     deleteBookmark: (args: any) => ipcRenderer.invoke('delete-bookmark', JSON.parse(args)),
+
+    // Highlights
+    getChapterHighlights: (args: any) => ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
+    getHighlights: (args: any) => ipcRenderer.invoke('getHighLights', JSON.parse(args)),
+    saveHighlight: (args: any) => ipcRenderer.invoke('saveHighlight', JSON.parse(args)),
 });

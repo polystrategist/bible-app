@@ -18,5 +18,7 @@ const message: InternationalMessageType = {
     'Bible Versions': 'Bible Versions',
     Highlights: 'Highlights',
     Nightly: 'Nightly',
+    copy: 'copy',
+    remove: 'remove',
 };
 export default message;

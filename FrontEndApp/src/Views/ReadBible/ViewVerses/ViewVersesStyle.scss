@@ -16,6 +16,15 @@
         color: rgb(252, 84, 84);
         font-weight: 500;
     }
+
+    .HasHighlightSpan {
+        border-radius: 5px;
+        padding: 0 2px 0 2px;
+    }
+
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
+    }
 }
 
 .dark {

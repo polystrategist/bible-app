@@ -1,3 +1,4 @@
+import { highlight } from './../util/highlighter';
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
@@ -22,6 +23,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
     const verses = ref<any>(null);
+    const chapterHighlights = ref<Array<any>>([]);
+    const allHighlights = ref<Array<any>>([]);
+    const highlightPage = ref(1);
+    const highlightSearch = ref<string | null>(null);
+    const highlightLimit = ref<number>(2);
 
     watch(
         () => selectedBibleVersions.value,
@@ -30,13 +36,31 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         }
     );
 
+    async function getHighlights(
+        args: { page: number; search: string | null; limit: number } = {
+            page: highlightPage.value,
+            search: highlightSearch.value,
+            limit: highlightLimit.value,
+        }
+    ) {
+        allHighlights.value = await window.browserWindow.getHighlights(JSON.stringify(args));
+    }
+
+    async function getChapterHighlights() {
+        const args = {
+            book_number: selectedBookNumber.value,
+            chapter: selectedChapter.value,
+        };
+        chapterHighlights.value = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
+    }
+
     async function getVerses() {
         const arg = {
             bible_versions: selectedBibleVersions.value,
             book_number: selectedBookNumber.value,
             selected_chapter: selectedChapter.value,
         };
-
+        getChapterHighlights();
         verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
     }
 
@@ -79,9 +103,15 @@ export const useBibleStore = defineStore('useBibleStore', () => {
 
     onMounted(() => {
         AutoScrollSavedPosition();
+        getHighlights();
     });
 
     return {
+        highlightLimit,
+        highlightPage,
+        highlightSearch,
+        getHighlights,
+        allHighlights,
         AutoScrollSavedPosition,
         verses,
         DefaultSelectedVersion,
@@ -91,6 +121,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         selectedVerse,
         selectedChapter,
         getVerses,
+        chapterHighlights,
         selectBook(book: BookInterface) {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;

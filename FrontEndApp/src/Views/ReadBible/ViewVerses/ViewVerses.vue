@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
-import { NSlider, NIcon, NPopover } from 'naive-ui';
-import { ChevronRight, ChevronLeft, BookmarkFilled } from '@vicons/carbon';
+import { NSlider, NIcon, NPopover, useMessage, NButton } from 'naive-ui';
+import { ChevronRight, ChevronLeft, BookmarkFilled, Copy, Close } from '@vicons/carbon';
 import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';
 import { useBookmarkStore } from '../../../store/bookmark';
+import HighlightOptions from './../../../components/HighlightOptions/HighlightOptions.vue';
 
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
 const bibleStore = useBibleStore();
@@ -16,8 +17,9 @@ const contextMenuPositionX = ref<number>(0);
 const contextMenuPositionY = ref<number>(0);
 const contextMenuData = ref({});
 const bookmarkStore = useBookmarkStore();
-
+const showPopOver = ref(false);
 const { x, y } = useMouse();
+const message = useMessage();
 
 watch(
     () => fontSize.value,
@@ -44,9 +46,76 @@ function clickContextMenu(verse: Object) {
     }
 }
 
+const copyText = () => {
+    const selected = window.getSelection();
+    const text: string | undefined = selected?.toString();
+    if (text) {
+        navigator.clipboard.writeText(text);
+        message.success('Copied to clipboard');
+    }
+};
+
+function cancel() {
+    showPopOver.value = false;
+    if (window.getSelection) {
+        window.getSelection()?.removeAllRanges();
+    }
+}
+
+function checkHere(this: HTMLElement): void {
+    const el = this;
+    el.addEventListener('keydown', function (event: KeyboardEvent) {
+        var key = event.key;
+        var ctrl = event.ctrlKey ? true : false;
+
+        if (key.toUpperCase() == 'C' && ctrl) {
+            const selected = window.getSelection();
+            const text: string | undefined = selected?.toString();
+            if (text) {
+                message.info('Copied to Clipboard!');
+            }
+        } else {
+            event.preventDefault();
+        }
+    });
+}
+
+function checkHighlight(key: any) {
+    const highlight = bibleStore.chapterHighlights[key];
+    return highlight ? highlight.content : false;
+}
+
 onBeforeMount(() => {
     const savedFontSize = SESSION.get(fontSizeOfShowChapter);
     if (savedFontSize) fontSize.value = savedFontSize;
+});
+
+onMounted(() => {
+    // click outside to close popover
+    document.addEventListener('click', function (e) {
+        let verseView = document.getElementById('view-verses-container');
+        if (!verseView?.contains(e.target as any)) {
+            showPopOver.value = false;
+        }
+    });
+    document.getElementById('view-verses-container')?.addEventListener('mouseup', (e) => {
+        let selection = document.getSelection();
+        let selectedText = selection?.toString();
+
+        if (!selectedText) {
+            showPopOver.value = false;
+        } else {
+            contextMenuPositionX.value = e.pageX;
+            contextMenuPositionY.value = e.pageY - 20;
+        }
+    });
+    document.getElementById('view-verses-container')?.addEventListener('mouseup', () => {
+        let selection = document.getSelection();
+        let selectedText = selection?.toString();
+
+        if (selectedText != '') showPopOver.value = true;
+        else showPopOver.value = false;
+    });
 });
 </script>
 <template>
@@ -93,7 +162,7 @@ onBeforeMount(() => {
                     :class="{ '!h-full': verse.verse == bibleStore.selectedVerse }"
                     title="Selected Verse"
                 ></div>
-                <div class="flex flex-col items-center gap-2">
+                <div class="flex flex-col items-center gap-2 min-w-8">
                     <span class="font-700 select-none text-size-30px opacity-60 dark:opacity-70">{{ verse.verse }}</span>
                     <div
                         v-show="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
@@ -109,7 +178,26 @@ onBeforeMount(() => {
                         <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
                             {{ version.version.replace('.SQLite3', '') }}
                         </span>
-                        <span v-html="version.text"></span>
+                        <span
+                            v-html="
+                                checkHighlight(
+                                    `${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                        verse.verse
+                                    }`
+                                ) || version.text
+                            "
+                            contenteditable="true"
+                            class="verse-select-text"
+                            spellcheck="false"
+                            :data-key="`${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                verse.verse
+                            }`"
+                            :data-bible-version="version.version"
+                            :data-book="verse.book_number"
+                            :data-chapter="verse.chapter"
+                            :data-verse="verse.verse"
+                            :onfocus="checkHere"
+                        ></span>
                     </div>
                 </div>
             </div>
@@ -121,6 +209,26 @@ onBeforeMount(() => {
             :data="contextMenuData"
             @close="showContextMenu = false"
         />
+        <NPopover :show="showPopOver" :x="contextMenuPositionX" :y="contextMenuPositionY" trigger="click">
+            <div id="buttons" class="flex items-center gap-10px">
+                <HighlightOptions @setHighlight="showPopOver = false" />
+                <NButton size="small" @click="copyText" round strong title="Copy">
+                    <template #icon>
+                        <NIcon>
+                            <Copy />
+                        </NIcon>
+                    </template>
+                    {{ $t('copy') }}
+                </NButton>
+                <NButton size="small" @click="cancel" circle strong title="Copy">
+                    <template #icon>
+                        <NIcon>
+                            <Close />
+                        </NIcon>
+                    </template>
+                </NButton>
+            </div>
+        </NPopover>
     </div>
 </template>
 <style lang="scss" src="./ViewVersesStyle.scss"></style>

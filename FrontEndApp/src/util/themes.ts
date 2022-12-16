@@ -55,7 +55,7 @@ export const themesOptions: themeOptionsType = {
         dark: {
             primaryColor: '#59C1BD',
             primaryColorHover: '#A0E4CB',
-            primaryColorSuppl: '#0D4C92',
+            primaryColorSuppl: '#59C1BD',
             primaryColorPressed: '#CFF5E7',
         } as colorTypes,
         light: {
