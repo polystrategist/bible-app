@@ -30,15 +30,20 @@ export default () => {
                 limit: number;
             }
         ) => {
-            // let data = [];
-            return await StoreDB.select()
+            let data: Array<any> = [];
+            let offset = args.page == 1 ? 0 : args.page * args.limit - args.limit;
+
+            await StoreDB.select()
                 .from('highlights')
-                .whereLike('content', `%${args.search}%`)
+                .whereLike('content', `%${args.search ? args.search : ''}%`)
+                .orderBy('id', 'desc')
                 .limit(args.limit ? args.limit : 50)
+                .offset(offset)
                 .then((row) => {
-                    // row.forEach((row: any, index: any) => data.push(row));
-                    return row;
+                    row.forEach((row: any, index: any) => data.push(row));
                 });
+
+            return data;
         }
     );
 

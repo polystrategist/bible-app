@@ -2,13 +2,15 @@
 import { highlight, isHighlightable } from './../../util/highlighter';
 import { CircleSolid, Delete } from '@vicons/carbon';
 import { NIcon, NButton } from 'naive-ui';
+import { useBibleStore } from '../../store/BibleStore';
 
+const bibleStore = useBibleStore();
 const emit = defineEmits(['setHighlight']);
 
-function highlightSelection(color: string) {
-    console.log(color);
+async function highlightSelection(color: string) {
     if (!isHighlightable()) return;
-    highlight(color);
+    await highlight(color);
+    await bibleStore.getHighlights();
     emit('setHighlight', color);
 }
 </script>

@@ -12,6 +12,7 @@ declare global {
         deleteBookmark: Function;
         getChapterHighlights: Function;
         saveHighlight: Function;
+        getHighlights: Function;
     }
 }
 export {};

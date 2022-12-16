@@ -1,3 +1,4 @@
+import { highlight } from './../util/highlighter';
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
@@ -23,6 +24,10 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedVerse = ref<number>(1);
     const verses = ref<any>(null);
     const chapterHighlights = ref<Array<any>>([]);
+    const allHighlights = ref<Array<any>>([]);
+    const highlightPage = ref(1);
+    const highlightSearch = ref<string | null>(null);
+    const highlightLimit = ref<number>(2);
 
     watch(
         () => selectedBibleVersions.value,
@@ -30,6 +35,16 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             SESSION.set(StorageSelectedVersions, newData);
         }
     );
+
+    async function getHighlights(
+        args: { page: number; search: string | null; limit: number } = {
+            page: highlightPage.value,
+            search: highlightSearch.value,
+            limit: highlightLimit.value,
+        }
+    ) {
+        allHighlights.value = await window.browserWindow.getHighlights(JSON.stringify(args));
+    }
 
     async function getChapterHighlights() {
         const args = {
@@ -88,9 +103,15 @@ export const useBibleStore = defineStore('useBibleStore', () => {
 
     onMounted(() => {
         AutoScrollSavedPosition();
+        getHighlights();
     });
 
     return {
+        highlightLimit,
+        highlightPage,
+        highlightSearch,
+        getHighlights,
+        allHighlights,
         AutoScrollSavedPosition,
         verses,
         DefaultSelectedVersion,

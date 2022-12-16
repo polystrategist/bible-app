@@ -29,7 +29,7 @@ export function isHighlightable(): boolean {
     return false;
 }
 
-export const highlight = (color: string) => {
+export const highlight = async (color: string) => {
     console.log(color);
     try {
         const selected = window.getSelection();
@@ -80,9 +80,7 @@ export const highlight = (color: string) => {
             }
         }
 
-        console.log({ key, bibleVersion, bookNumber, chapterNumber, verseNumber, content });
-
-        saveHighlight({
+        await saveHighlight({
             key,
             book_number: bookNumber,
             chapter: chapterNumber,
@@ -90,11 +88,9 @@ export const highlight = (color: string) => {
             content,
         });
 
-        // remove all selections
         window.getSelection()?.empty();
     } catch (e) {
         console.log(e);
-        // if (e instanceof Error) window.message.info("Please Select phrase/words to mark.");
     }
 };
 
