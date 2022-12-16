@@ -27,7 +27,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const allHighlights = ref<Array<any>>([]);
     const highlightPage = ref(1);
     const highlightSearch = ref<string | null>(null);
-    const highlightLimit = ref<number>(2);
+    const highlightLimit = ref<number>(50);
 
     watch(
         () => selectedBibleVersions.value,
