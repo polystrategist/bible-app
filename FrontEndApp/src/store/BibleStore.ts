@@ -1,5 +1,4 @@
 import { useClipNoteStore } from './ClipNotes';
-import { highlight } from './../util/highlighter';
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
@@ -63,6 +62,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         };
         getChapterHighlights();
         clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
+        selectedBook.value = getBook(selectedBookNumber.value);
         verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
     }
 
@@ -94,6 +94,10 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             setScrollTopState('view-books-container', 'the-selected-book-element', 10);
             setScrollTopState('view-verses-container', 'the-selected-verse', 50);
         }, millisecond);
+    }
+
+    function getBook(b_num: number) {
+        return bibleBooks[bibleBooks.findIndex((book) => book.book_number == b_num)];
     }
 
     onBeforeMount(() => {
@@ -151,8 +155,6 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                 chapter: selectedChapter,
             };
         }),
-        getBook: (b_num: number) => {
-            return bibleBooks[bibleBooks.findIndex((book) => book.book_number == b_num)];
-        },
+        getBook,
     };
 });
