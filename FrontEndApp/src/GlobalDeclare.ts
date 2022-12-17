@@ -13,6 +13,9 @@ declare global {
         getChapterHighlights: Function;
         saveHighlight: Function;
         getHighlights: Function;
+        getClipNotes: Function;
+        storeClipNote: Function;
+        getChapterClipNotes: Function;
     }
 }
 export {};

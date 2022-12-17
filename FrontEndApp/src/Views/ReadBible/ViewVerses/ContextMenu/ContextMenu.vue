@@ -7,7 +7,7 @@ import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from './../../../../store/bookmark';
 
 const contextMenuRef = ref(null);
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close', 'create-clip-note']);
 const bookmarkStore = useBookmarkStore();
 const props = defineProps({
     showContextMenu: {
@@ -31,6 +31,8 @@ async function clickContextMenu(key: string) {
     if (key == 'add-to-bookmark') {
         const saveToBookmark = await window.browserWindow.saveBookMark(JSON.stringify(props.data));
         bookmarkStore.bookmarks = saveToBookmark;
+    } else if (key == 'create-clip-note') {
+        emits('create-clip-note', props.data);
     }
     emits('close');
 }
@@ -45,16 +47,16 @@ onClickOutside(contextMenuRef, (event) => emits('close'));
         content-style="padding: 0 !important;"
         class="!p-0 !rounded-md"
     >
-        <div ref="contextMenuRef" class="w-200px max-h-200px overflow-y-auto overflowing-div flex flex-col select-none">
+        <div ref="contextMenuRef" class="w-200px max-h-200px overflow-y-auto overflowing-div flex flex-col select-none p-5px">
             <div
                 v-for="option in ContextMenuOptions"
-                class="flex items-center p-7px cursor-pointer hover:bg-[var(--primary-color)] hover:text-dark-500"
+                class="flex items-center pt-4px pb-2px pl-7px pr-1 cursor-pointer hover:bg-[var(--primary-color)] hover:text-dark-500 rounded-sm"
                 @click="clickContextMenu(option.key)"
             >
-                <div class="w-30px">
-                    <NIcon size="20" :component="option.icon" />
+                <div class="w-25px">
+                    <NIcon size="15" :component="option.icon" />
                 </div>
-                <span class="text-size-17px">{{ option.label }}</span>
+                <span class="text-size-15px">{{ option.label }}</span>
             </div>
         </div>
     </NPopover>

@@ -1,13 +1,14 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import WindiCSS from "vite-plugin-windicss";
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import WindiCSS from 'vite-plugin-windicss';
+import path from 'path';
 
 export default defineConfig(({ mode }) => ({
     build: {
-        outDir: "./../dist",
+        outDir: './../dist',
         chunkSizeWarningLimit: 1000,
     },
-    base: mode == "development" ? "" : "./",
+    base: mode == 'development' ? '' : './',
     plugins: [vue(), WindiCSS()],
     server: {
         port: 3000,

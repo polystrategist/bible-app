@@ -26,4 +26,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getChapterHighlights: (args: any) => ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
     getHighlights: (args: any) => ipcRenderer.invoke('getHighLights', JSON.parse(args)),
     saveHighlight: (args: any) => ipcRenderer.invoke('saveHighlight', JSON.parse(args)),
+
+    // Clip Notes
+    getClipNotes: (args: any) => ipcRenderer.invoke('getClipNotes', JSON.parse(args)),
+    storeClipNote: (args: any) => ipcRenderer.invoke('storeClipNote', JSON.parse(args)),
+    getChapterClipNotes: (args: any) => ipcRenderer.invoke('getChapterClipNotes', JSON.parse(args)),
 });

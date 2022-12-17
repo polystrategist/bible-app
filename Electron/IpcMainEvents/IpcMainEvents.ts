@@ -1,5 +1,6 @@
 import { BrowserWindow } from 'electron';
 import { BookmarkEvents } from './bookmark/bookmark';
+import ClipNotes from './ClipNotes/ClipNotes';
 import downloading from './downloading/downloading';
 import highlighting from './highlights/highlighting';
 import { ipcVersionEvents } from './Versions/Versions';
@@ -20,4 +21,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // Highlighting
     highlighting();
+
+    // ClipNotes
+    ClipNotes();
 };

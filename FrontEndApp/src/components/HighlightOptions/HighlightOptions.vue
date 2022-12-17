@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { highlight, isHighlightable } from './../../util/highlighter';
+import { highlight, isHighlightable, colors } from './../../util/highlighter';
 import { CircleSolid, Delete } from '@vicons/carbon';
 import { NIcon, NButton } from 'naive-ui';
 import { useBibleStore } from '../../store/BibleStore';
@@ -17,44 +17,10 @@ async function highlightSelection(color: string) {
 <template>
     <span class="flex items-center whitespace-nowrap text-size-30px gap-7px">
         <button
-            @click="highlightSelection('#FFD26A')"
-            style="color: #ffd26a"
-            class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center"
-        >
-            <NIcon>
-                <CircleSolid />
-            </NIcon>
-        </button>
-        <button
-            @click="highlightSelection('lightpink')"
-            style="color: lightpink"
-            class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center"
-        >
-            <NIcon>
-                <CircleSolid />
-            </NIcon>
-        </button>
-        <button
-            @click="highlightSelection('lightblue')"
-            style="color: lightblue"
-            class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center"
-        >
-            <NIcon>
-                <CircleSolid />
-            </NIcon>
-        </button>
-        <button
-            @click="highlightSelection('#80ED99')"
-            style="color: #80ed99"
-            class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center"
-        >
-            <NIcon>
-                <CircleSolid />
-            </NIcon>
-        </button>
-        <button
-            @click="highlightSelection('#C2B8A3')"
-            style="color: #c2b8a3"
+            v-for="color in colors"
+            :key="color.color"
+            @click="highlightSelection(color.color)"
+            :style="`color: ${color.color}`"
             class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center"
         >
             <NIcon>

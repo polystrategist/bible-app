@@ -30,7 +30,6 @@ export function isHighlightable(): boolean {
 }
 
 export const highlight = async (color: string) => {
-    console.log(color);
     try {
         const selected = window.getSelection();
         const selection = selected?.getRangeAt(0);
@@ -103,3 +102,26 @@ export async function saveHighlight(args: { key: string; book_number: number; ch
     const save = await window.browserWindow.saveHighlight(JSON.stringify(args));
     return save;
 }
+
+export const colors = [
+    {
+        color: '#FFD26A',
+        name: 'orange',
+    },
+    {
+        color: 'lightpink',
+        name: 'lightpink',
+    },
+    {
+        color: 'lightblue',
+        name: 'lightblue',
+    },
+    {
+        color: '#80ED99',
+        name: 'green',
+    },
+    {
+        color: '#C2B8A3',
+        name: 'brown',
+    },
+];

@@ -1,3 +1,4 @@
+import { useClipNoteStore } from './ClipNotes';
 import { highlight } from './../util/highlighter';
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
@@ -16,7 +17,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         book_number: 10,
         chapter_count: 50,
     });
-
+    const clipNoteStore = useClipNoteStore();
     const DefaultSelectedVersion = `KJ'1769.SQLite3`;
     const selectedBibleVersions = ref<Array<string>>([`KJ'1769.SQLite3`]);
     const selectedBookNumber = ref<number>(10);
@@ -61,6 +62,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             selected_chapter: selectedChapter.value,
         };
         getChapterHighlights();
+        clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
         verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
     }
 

@@ -2,13 +2,16 @@
 import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
 import { NSlider, NIcon, NPopover, useMessage, NButton } from 'naive-ui';
-import { ChevronRight, ChevronLeft, BookmarkFilled, Copy, Close } from '@vicons/carbon';
+import { ChevronRight, ChevronLeft, BookmarkFilled, Copy, Close, Attachment, Edit } from '@vicons/carbon';
 import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';
 import { useBookmarkStore } from '../../../store/bookmark';
 import HighlightOptions from './../../../components/HighlightOptions/HighlightOptions.vue';
+import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
+import { useClipNoteStore } from '../../../store/ClipNotes';
 
+const cliptNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
 const bibleStore = useBibleStore();
 const fontSize = ref(15);
@@ -20,6 +23,10 @@ const bookmarkStore = useBookmarkStore();
 const showPopOver = ref(false);
 const { x, y } = useMouse();
 const message = useMessage();
+const createClipNoteRef = ref<null | { toggleClipNoteModal: Function }>(null);
+const clipNoteRender = (key: any) => {
+    return (cliptNoteStore.chapterClipNotes as any)[key] ? (cliptNoteStore.chapterClipNotes as any)[key] : false;
+};
 
 watch(
     () => fontSize.value,
@@ -146,59 +153,93 @@ onMounted(() => {
             class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div p-3 scroll-bar-md flex flex-col gap-5px"
             :style="`font-size:${fontSize}px`"
         >
-            <div
-                v-for="verse in bibleStore.verses"
-                class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5px relative"
-                :class="{ 'dark:bg-opacity-5 dark:bg-light-100': verse.verse == bibleStore.selectedVerse }"
-                :id="verse.verse == bibleStore.selectedVerse ? 'the-selected-verse' : ''"
-                :data-book="verse.book_number"
-                :data-chapter="verse.chapter"
-                :data-verse="verse.verse"
-                @click="bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)"
-                @contextmenu="clickContextMenu(verse)"
-            >
+            <div v-for="verse in bibleStore.verses" class="flex flex-col">
                 <div
-                    class="h-0 w-5px bg-[var(--primary-color)] absolute left-[-5px] top-0 opacity-60 transition-all"
-                    :class="{ '!h-full': verse.verse == bibleStore.selectedVerse }"
-                    title="Selected Verse"
-                ></div>
-                <div class="flex flex-col items-center gap-2 min-w-8">
-                    <span class="font-700 select-none text-size-30px opacity-60 dark:opacity-70">{{ verse.verse }}</span>
+                    class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5px relative"
+                    :class="{
+                        'dark:bg-opacity-5 dark:bg-light-100': verse.verse == bibleStore.selectedVerse,
+                        'rounded-t-md': clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`),
+                    }"
+                    :id="verse.verse == bibleStore.selectedVerse ? 'the-selected-verse' : ''"
+                    :data-book="verse.book_number"
+                    :data-chapter="verse.chapter"
+                    :data-verse="verse.verse"
+                    @click="bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)"
+                    @contextmenu="clickContextMenu(verse)"
+                    :style="`border: 1px solid ${
+                        clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                    }`"
+                >
                     <div
-                        v-show="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
-                        title="This is Bookmarked"
-                    >
-                        <NIcon size="20">
-                            <BookmarkFilled />
-                        </NIcon>
+                        class="h-0 w-5px bg-[var(--primary-color)] absolute left-[-5px] top-0 opacity-60 transition-all"
+                        :class="{ '!h-full': verse.verse == bibleStore.selectedVerse }"
+                        title="Selected Verse"
+                    ></div>
+                    <div class="flex flex-col items-center gap-2 min-w-8">
+                        <span class="font-700 select-none text-size-30px opacity-60 dark:opacity-70">{{ verse.verse }}</span>
+                        <div
+                            v-show="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
+                            title="This is Bookmarked"
+                        >
+                            <NIcon size="20">
+                                <BookmarkFilled />
+                            </NIcon>
+                        </div>
+                    </div>
+                    <div>
+                        <div v-for="version in verse.version">
+                            <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
+                                {{ version.version.replace('.SQLite3', '') }}
+                            </span>
+                            <span
+                                v-html="
+                                    checkHighlight(
+                                        `${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                            verse.verse
+                                        }`
+                                    ) || version.text
+                                "
+                                contenteditable="true"
+                                class="verse-select-text"
+                                spellcheck="false"
+                                :data-key="`${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
+                                    verse.verse
+                                }`"
+                                :data-bible-version="version.version"
+                                :data-book="verse.book_number"
+                                :data-chapter="verse.chapter"
+                                :data-verse="verse.verse"
+                                :onfocus="checkHere"
+                            ></span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <div v-for="version in verse.version">
-                        <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
-                            {{ version.version.replace('.SQLite3', '') }}
-                        </span>
-                        <span
-                            v-html="
-                                checkHighlight(
-                                    `${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
-                                        verse.verse
-                                    }`
-                                ) || version.text
+                <div
+                    v-if="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)"
+                    :style="`background: ${clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`"
+                    class="select-none render-clip-note relative text-dark-900 rounded-b-md mb-3"
+                >
+                    <NIcon class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600" size="30">
+                        <Attachment />
+                    </NIcon>
+                    <div class="absolute left-2 bottom-0">
+                        <NIcon
+                            class="cursor-pointer opacity-50 hover:opacity-100 transition-all"
+                            @click="
+                                createClipNoteRef &&
+                                    createClipNoteRef.toggleClipNoteModal(
+                                        clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)
+                                    )
                             "
-                            contenteditable="true"
-                            class="verse-select-text"
-                            spellcheck="false"
-                            :data-key="`${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
-                                verse.verse
-                            }`"
-                            :data-bible-version="version.version"
-                            :data-book="verse.book_number"
-                            :data-chapter="verse.chapter"
-                            :data-verse="verse.verse"
-                            :onfocus="checkHere"
-                        ></span>
+                        >
+                            <Edit />
+                        </NIcon>
                     </div>
+                    <div
+                        class="pl-55px pr-10px"
+                        :style="`font-size:${fontSize - 1}px`"
+                        v-html="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).content"
+                    ></div>
                 </div>
             </div>
         </div>
@@ -208,6 +249,7 @@ onMounted(() => {
             :y="contextMenuPositionY"
             :data="contextMenuData"
             @close="showContextMenu = false"
+            @create-clip-note="(data) => (createClipNoteRef ? createClipNoteRef.toggleClipNoteModal(data) : false)"
         />
         <NPopover :show="showPopOver" :x="contextMenuPositionX" :y="contextMenuPositionY" trigger="click">
             <div id="buttons" class="flex items-center gap-10px">
@@ -229,6 +271,7 @@ onMounted(() => {
                 </NButton>
             </div>
         </NPopover>
+        <CreateClipNoteVue ref="createClipNoteRef" />
     </div>
 </template>
 <style lang="scss" src="./ViewVersesStyle.scss"></style>
