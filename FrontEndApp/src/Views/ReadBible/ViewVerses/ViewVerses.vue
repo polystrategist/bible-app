@@ -74,7 +74,6 @@ function checkHere(this: HTMLElement): void {
     el.addEventListener('keydown', function (event: KeyboardEvent) {
         var key = event.key;
         var ctrl = event.ctrlKey ? true : false;
-
         if (key.toUpperCase() == 'C' && ctrl) {
             const selected = window.getSelection();
             const text: string | undefined = selected?.toString();
@@ -85,11 +84,6 @@ function checkHere(this: HTMLElement): void {
             event.preventDefault();
         }
     });
-}
-
-function checkHighlight(key: any) {
-    const highlight = bibleStore.chapterHighlights[key];
-    return highlight ? highlight.content : false;
 }
 
 onBeforeMount(() => {
@@ -114,14 +108,12 @@ onMounted(() => {
         } else {
             contextMenuPositionX.value = e.pageX;
             contextMenuPositionY.value = e.pageY - 20;
+            showPopOver.value = true;
         }
     });
-    document.getElementById('view-verses-container')?.addEventListener('mouseup', () => {
-        let selection = document.getSelection();
-        let selectedText = selection?.toString();
 
-        if (selectedText != '') showPopOver.value = true;
-        else showPopOver.value = false;
+    document.getElementById('view-verses-container')?.addEventListener('dragstart', (event) => {
+        event.preventDefault();
     });
 });
 </script>
@@ -153,7 +145,7 @@ onMounted(() => {
             class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div p-3 scroll-bar-md flex flex-col gap-5px"
             :style="`font-size:${fontSize}px`"
         >
-            <div v-for="verse in bibleStore.verses" class="flex flex-col">
+            <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col">
                 <div
                     class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5px relative"
                     :class="{
@@ -187,24 +179,16 @@ onMounted(() => {
                         </div>
                     </div>
                     <div>
-                        <div v-for="version in verse.version">
+                        <div v-for="version in verse.version" :key="version.key">
                             <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
                                 {{ version.version.replace('.SQLite3', '') }}
                             </span>
                             <span
-                                v-html="
-                                    checkHighlight(
-                                        `${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
-                                            verse.verse
-                                        }`
-                                    ) || version.text
-                                "
+                                v-html="version.text"
                                 contenteditable="true"
                                 class="verse-select-text"
                                 spellcheck="false"
-                                :data-key="`${version.version.replace('.SQLite3', '')}_${verse.book_number}_${verse.chapter}_${
-                                    verse.verse
-                                }`"
+                                :data-key="version.key"
                                 :data-bible-version="version.version"
                                 :data-book="verse.book_number"
                                 :data-chapter="verse.chapter"

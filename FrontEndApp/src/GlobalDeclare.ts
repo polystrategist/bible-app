@@ -1,3 +1,5 @@
+import { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider';
+
 declare global {
     interface Window {
         versions: any;
@@ -16,6 +18,7 @@ declare global {
         getClipNotes: Function;
         storeClipNote: Function;
         getChapterClipNotes: Function;
+        message: MessageApiInjection;
     }
 }
 export {};
