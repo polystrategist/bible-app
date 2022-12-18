@@ -22,12 +22,34 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedBookNumber = ref<number>(10);
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
-    const verses = ref<any>(null);
+    const verses = ref<Array<any>>([]);
     const chapterHighlights = ref<Array<any>>([]);
     const allHighlights = ref<Array<any>>([]);
     const highlightPage = ref(1);
     const highlightSearch = ref<string | null>(null);
     const highlightLimit = ref<number>(50);
+    const renderVerses = computed(() => {
+        return verses.value.map((v) => {
+            const theVersions = v.version.map((ver: any) => {
+                const key = `${ver.version.replace('.SQLite3', '')}_${v.book_number}_${v.chapter}_${v.verse}`;
+                const highlight = (chapterHighlights.value as any)[key];
+                return {
+                    text: highlight ? highlight.content : ver.text,
+                    version: ver.version,
+                    key,
+                };
+            });
+
+            console.log(theVersions);
+
+            return {
+                book_number: v.book_number,
+                chapter: v.chapter,
+                verse: v.verse,
+                version: theVersions,
+            };
+        });
+    });
 
     watch(
         () => selectedBibleVersions.value,
@@ -156,5 +178,6 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             };
         }),
         getBook,
+        renderVerses,
     };
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NIcon, NTooltip } from 'naive-ui';
+import { NIcon, NTooltip, useMessage } from 'naive-ui';
 import { ref, onBeforeMount } from 'vue';
 import { rightSideBarMenus } from './RightSideBar';
 import BibleList from './Bibles/Bibles.vue';
@@ -19,6 +19,8 @@ function selectRightSideBarMenu(key: string) {
 onBeforeMount(() => {
     const saveMenuKey = SESSION.get(SavedRightSideBar);
     if (saveMenuKey) selectedButton.value = saveMenuKey;
+
+    window.message = useMessage();
 });
 </script>
 <template>

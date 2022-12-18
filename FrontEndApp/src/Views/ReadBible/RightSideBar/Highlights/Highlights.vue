@@ -39,7 +39,9 @@ function nextPage() {
                     ></div>
                     <div class="w-full p-10px" @click="selectBookVerse(key as any, highlight)">
                         <div class="font-700">
-                            <span class="mr-1">{{ bibleStore.getBook(highlight.book_number).title }}</span>
+                            <span class="mr-1" v-if="highlight.book_number">{{
+                                bibleStore.getBook(highlight.book_number).title
+                            }}</span>
                             <span>{{ highlight.chapter }} : {{ highlight.verse }}</span>
                         </div>
                         <div>

@@ -1,12 +1,21 @@
 const getSelectionParentElement = () => {
     let parentEl = null,
         sel;
+
     if (window.getSelection) {
         sel = window.getSelection();
         if (sel?.rangeCount) {
-            parentEl = sel.getRangeAt(0).commonAncestorContainer;
-            if (parentEl.nodeType != 1) {
-                parentEl = parentEl.parentNode;
+            parentEl = sel.anchorNode?.parentElement;
+
+            let foundParent = false;
+            while (!foundParent) {
+                const hasKey = (parentEl as HTMLElement).getAttribute('data-key');
+                if (hasKey) return parentEl;
+                parentEl = parentEl?.parentNode;
+            }
+
+            if (parentEl?.nodeType != 1) {
+                parentEl = parentEl?.parentNode;
             }
         }
     }
@@ -31,6 +40,21 @@ export function isHighlightable(): boolean {
 
 export const highlight = async (color: string) => {
     try {
+        const selectedParentElement: any = getSelectionParentElement();
+
+        const Children = selectedParentElement.children;
+        if (Children.length > 0) {
+            for (const elem of Children) {
+                if (elem.textContent === '') elem.remove();
+            }
+        }
+
+        const allHighlights = (selectedParentElement.parentElement as HTMLElement).querySelectorAll('.HasHighlightSpan');
+
+        for (const elem of allHighlights as any) {
+            if (elem.textContent === '') elem.remove();
+        }
+
         const selected = window.getSelection();
         const selection = selected?.getRangeAt(0);
         const selectedContent = selection?.extractContents().textContent;
@@ -41,21 +65,19 @@ export const highlight = async (color: string) => {
         if (selectedContent) span.textContent = selectedContent;
         if (selection) selection.insertNode(span);
 
-        const selectedParentElement: any = getSelectionParentElement();
-
-        const Children = selectedParentElement.children;
-        if (Children.length > 0) {
-            for (const elem of Children) {
-                if (elem.textContent === '') elem.remove();
-            }
-        }
-
         let key = selectedParentElement.getAttribute('data-key');
         let bibleVersion = selectedParentElement.getAttribute('data-bible-version');
         let bookNumber = selectedParentElement.getAttribute('data-book');
         let chapterNumber = selectedParentElement.getAttribute('data-chapter');
         let verseNumber = selectedParentElement.getAttribute('data-verse');
         let content = selectedParentElement.innerHTML;
+
+        if (!key || !bookNumber || !chapterNumber || !verseNumber) {
+            window.message.error('Error: Cant Save Highlight.');
+            window.getSelection()?.empty();
+
+            return;
+        }
 
         if (color === 'remove') {
             const parentElem = selectedParentElement;
@@ -88,8 +110,10 @@ export const highlight = async (color: string) => {
         });
 
         window.getSelection()?.empty();
+        selectedParentElement.click();
     } catch (e) {
         console.log(e);
+        window.message.error('Their is An Error Saving Highlight.');
     }
 };
 
