@@ -40,8 +40,6 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                 };
             });
 
-            console.log(theVersions);
-
             return {
                 book_number: v.book_number,
                 chapter: v.chapter,

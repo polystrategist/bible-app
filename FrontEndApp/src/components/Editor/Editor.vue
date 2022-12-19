@@ -36,7 +36,7 @@ const editor: any = useEditor({
         Placeholder.configure({
             placeholder: 'Write Something Here 😁👍',
             emptyEditorClass:
-                'cursor-text before:content-[attr(data-placeholder)] before:absolute before:top-3 before:left-5 before:text-mauve-11 before:opacity-50 before-pointer-events-none',
+                'cursor-text before:content-[attr(data-placeholder)] before:absolute before:top-5 before:left-5 before:text-mauve-11 before:opacity-50 before-pointer-events-none',
         }),
     ],
     onUpdate: ({ editor }) => {

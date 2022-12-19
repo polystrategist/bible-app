@@ -1,5 +1,5 @@
 import { BookCoins24Regular } from '@vicons/fluent';
-import { Bookmark, PaintBrush, SearchLocate } from '@vicons/carbon';
+import { Bookmark, PaintBrush, SearchLocate, Attachment } from '@vicons/carbon';
 export const rightSideBarMenus = [
     {
         title: 'Search',
@@ -20,5 +20,10 @@ export const rightSideBarMenus = [
         title: 'Highlights',
         key: 'bible-highlights',
         icon: PaintBrush,
+    },
+    {
+        title: 'Clip Notes',
+        key: 'bible-clip-notes',
+        icon: Attachment,
     },
 ];

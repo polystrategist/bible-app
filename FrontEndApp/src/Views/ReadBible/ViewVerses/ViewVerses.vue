@@ -10,6 +10,7 @@ import { useBookmarkStore } from '../../../store/bookmark';
 import HighlightOptions from './../../../components/HighlightOptions/HighlightOptions.vue';
 import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
 import { useClipNoteStore } from '../../../store/ClipNotes';
+import { getSelectionParentElement } from '../../../util/ElementUtil';
 
 const cliptNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
@@ -102,6 +103,13 @@ onMounted(() => {
     document.getElementById('view-verses-container')?.addEventListener('mouseup', (e) => {
         let selection = document.getSelection();
         let selectedText = selection?.toString();
+
+        // check if this selected is highlightable
+        const parentElement = getSelectionParentElement('view-verse-rendered-clip-note');
+        if (parentElement) {
+            showPopOver.value = false;
+            return;
+        }
 
         if (!selectedText) {
             showPopOver.value = false;
@@ -201,7 +209,7 @@ onMounted(() => {
                 <div
                     v-if="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)"
                     :style="`background: ${clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`"
-                    class="select-none render-clip-note relative text-dark-900 rounded-b-md mb-3"
+                    class="render-clip-note relative text-dark-900 rounded-b-md mb-3"
                 >
                     <NIcon class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600" size="30">
                         <Attachment />
@@ -220,7 +228,7 @@ onMounted(() => {
                         </NIcon>
                     </div>
                     <div
-                        class="pl-55px pr-10px"
+                        class="pl-55px pr-10px view-verse-rendered-clip-note"
                         :style="`font-size:${fontSize - 1}px`"
                         v-html="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).content"
                     ></div>

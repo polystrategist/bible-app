@@ -1,7 +1,7 @@
 import { createI18n } from 'vue-i18n';
 import en from './lang/en';
 import ja from './lang/ja';
-import ja from './lang/pt';
+import pt from './lang/pt';
 
 const messages: any = {
     English: en,

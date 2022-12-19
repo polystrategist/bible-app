@@ -24,7 +24,7 @@ function nextPage() {
 </script>
 
 <template>
-    <RightSideBarContainer title="Highlights">
+    <RightSideBarContainer :title="$t('Highlights')">
         <div class="h-full flex flex-col">
             <div class="h-full overflow-y-auto overflowing-div">
                 <div

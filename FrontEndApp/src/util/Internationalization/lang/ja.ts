@@ -20,6 +20,7 @@ const message: InternationalMessageType = {
     Nightly: '毎晩',
     copy: 'コピー',
     remove: '削除する',
+    'Clip Notes': 'クリップノート',
 };
 
 export default message;

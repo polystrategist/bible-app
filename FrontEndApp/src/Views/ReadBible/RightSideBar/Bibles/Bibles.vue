@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
-import { getDownloadedBible } from '../../../../util/Modules/Controller/FeBibleController';
 import { NCheckbox, NCheckboxGroup, useMessage, NIcon, NButton } from 'naive-ui';
 import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
@@ -30,6 +28,7 @@ function handleCheckBox(bibleVersions: Array<any>) {
                         <Download />
                     </NIcon>
                 </template>
+                Download
             </NButton>
         </template>
         <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox">

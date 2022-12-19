@@ -18,6 +18,7 @@ export interface InternationalMessageInterface {
     Nightly: string;
     copy: string;
     remove: string;
+    'Clip Notes': string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

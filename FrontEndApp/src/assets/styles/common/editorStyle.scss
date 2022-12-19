@@ -1,10 +1,17 @@
 .ProseMirror {
     min-height: 300px;
     outline: none;
-    padding: 0 15px 15px 15px;
+    padding: 20px 15px 15px 15px;
     border: 1px solid rgb(151, 151, 151);
     border-radius: 10px;
+}
 
+.render-clip-note {
+    padding-top: 10px;
+}
+
+.ProseMirror,
+.render-clip-note {
     &:hover {
         &::-webkit-scrollbar-thumb {
             background-color: var(--primary-color);
@@ -23,6 +30,9 @@
     ul,
     ol {
         padding: 0 1rem;
+        p {
+            margin: 0;
+        }
     }
 
     h1,
@@ -32,6 +42,14 @@
     h5,
     h6 {
         line-height: 1.1;
+        padding: 0;
+        margin: 0;
+        margin-bottom: 15px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 800;
     }
 
     code {
@@ -80,6 +98,12 @@
     .is-empty.is-editor-empty {
         color: white;
         margin: 0;
+    }
+
+    p {
+        padding: 0;
+        margin: 0;
+        padding-bottom: 15px;
     }
 }
 

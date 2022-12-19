@@ -7,6 +7,7 @@ import Bookmarks from './Bookmarks/Bookmarks.vue';
 import Highlights from './Highlights/Highlights.vue';
 import Search from './Search/Search.vue';
 import SESSION from '../../../util/session';
+import ClipNotes from './ClipNotes/ClipNotes.vue';
 
 const SavedRightSideBar = 'saved-right-side-bar-menu-key';
 const selectedButton = ref<string>('bible-search');
@@ -30,6 +31,7 @@ onBeforeMount(() => {
             <Bookmarks v-show="selectedButton == 'bible-bookmarks'" />
             <Highlights v-show="selectedButton == 'bible-highlights'" />
             <Search v-show="selectedButton == 'bible-search'" />
+            <ClipNotes v-show="selectedButton == 'bible-clip-notes'" />
         </div>
         <div class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 flex flex-col items-center gap-1 pt-3 text-size-20px">
             <NTooltip v-for="menu in rightSideBarMenus" :placement="'left'">
@@ -46,7 +48,7 @@ onBeforeMount(() => {
                         <NIcon :component="menu.icon" />
                     </div>
                 </template>
-                {{ $t(menu.title) }}
+                <span class="capitalize">{{ $t(menu.title) }}</span>
             </NTooltip>
         </div>
     </div>

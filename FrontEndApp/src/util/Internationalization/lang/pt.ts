@@ -20,5 +20,6 @@ const message: InternationalMessageType = {
     Nightly: 'Noturno',
     copy: 'copiar',
     remove: 'remover',
+    'Clip Notes': 'notas de clipe',
 };
 export default message;
