@@ -12,6 +12,7 @@ import KJPCE from './Modules/Bible/KJPCE+';
 import KJV1769 from './Modules/Bible/KJV1769+';
 import NASB from './Modules/Bible/NASB+';
 import ESVCommentaries from './Modules/Commentaries/ESV.commentaries';
+import JFA1819 from './Modules/Bible/JFA1819';
 
-export const bible = [AB1978, ASND, ASV, BAMD, CPDV, ESV, KJ1769, KJPCE, KJV1769, NASB];
+export const bible = [AB1978, ASND, ASV, BAMD, CPDV, ESV, KJ1769, KJPCE, KJV1769, NASB, JFA1819];
 export const commentaries = [AB1978Commentaries, ASNDCommentaries, BamdCommentaries, ESVCommentaries];
