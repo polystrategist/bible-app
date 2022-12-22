@@ -42,6 +42,7 @@ export default async () => {
                     table.string('title');
                     table.string('content');
                     table.string('group');
+                    table.integer('index');
                     table.string('status').comment('ongoing,answered');
                     table.timestamps(true);
                 })

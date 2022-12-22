@@ -209,7 +209,7 @@ onMounted(() => {
                 <div
                     v-if="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)"
                     :style="`background: ${clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`"
-                    class="render-clip-note relative text-dark-900 rounded-b-md mb-3"
+                    class="prose-mirror-render-html relative text-dark-900 rounded-b-md mb-3"
                 >
                     <NIcon class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600" size="30">
                         <Attachment />

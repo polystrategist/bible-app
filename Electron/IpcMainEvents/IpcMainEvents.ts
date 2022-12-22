@@ -3,6 +3,7 @@ import { BookmarkEvents } from './bookmark/bookmark';
 import ClipNotes from './ClipNotes/ClipNotes';
 import downloading from './downloading/downloading';
 import highlighting from './highlights/highlighting';
+import PrayerList from './PrayerList/PrayerList';
 import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 
@@ -24,4 +25,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // ClipNotes
     ClipNotes();
+
+    // Prayer List
+    PrayerList();
 };

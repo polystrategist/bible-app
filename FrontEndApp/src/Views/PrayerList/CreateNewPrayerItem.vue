@@ -20,6 +20,7 @@ const SaveEditorContent = () => {
             title: null,
             content: prayerContent.value,
             group: null,
+            status: 'ongoing',
         });
         showModal.value = false;
         prayerContent.value = '';
@@ -39,7 +40,7 @@ const SaveEditorContent = () => {
         <span class="capitalize">{{ $t('new') }}</span>
     </NButton>
     <NModal :show="showModal" class="min-w-500px max-w-600px">
-        <NCard class="my-20px">
+        <NCard class="my-20px" size="small">
             <template #header>
                 <span class="capitalize">{{ $t('create') }}</span>
             </template>

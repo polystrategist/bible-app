@@ -6,12 +6,12 @@
     border-radius: 10px;
 }
 
-.render-clip-note {
+.prose-mirror-render-html {
     padding-top: 10px;
 }
 
 .ProseMirror,
-.render-clip-note {
+.prose-mirror-render-html {
     &:hover {
         &::-webkit-scrollbar-thumb {
             background-color: var(--primary-color);
@@ -29,9 +29,16 @@
 
     ul,
     ol {
-        padding: 0 1rem;
-        p {
-            margin: 0;
+        // padding: 0 0 1rem ;
+        padding-top: 0;
+        margin-top: 0;
+
+        li {
+            p {
+                padding: 0;
+                margin: 0 !important;
+                margin-bottom: 0 !important;
+            }
         }
     }
 

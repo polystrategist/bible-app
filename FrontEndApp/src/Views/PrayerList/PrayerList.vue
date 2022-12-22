@@ -23,6 +23,22 @@ const editPrayerItem = (key: string, content: any): void => {
     editPrayerModal.value?.editor?.commands.setContent(content);
 };
 
+async function changeInProgress(item: any) {
+    console.log(item);
+    const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
+}
+
+async function changeInDone(item: any) {
+    console.log(item);
+    const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
+    let theItem = JSON.parse(JSON.stringify(item[theKeyAction].element));
+
+    if (item.added) theItem['status'] = 'done';
+    else if (item.removed) theItem['status'] = 'ongoing';
+
+    await prayerListStore.savePrayerItem(theItem, theItem.key);
+}
+
 const dragOptions = {
     animation: 200,
     group: 'description',
@@ -43,11 +59,15 @@ const dragOptions = {
                 v-bind="dragOptions"
                 group="prayer-list-items"
                 itemKey="name"
+                @change="changeInProgress"
             >
                 <template #item="{ element }">
                     <div class="relative prayer-list-item">
                         <div class="group pb-0 duration-200">
-                            <div class="prayer-list-content cursor-move px-3" v-html="element.content"></div>
+                            <div
+                                class="prayer-list-content cursor-move px-3 prose-mirror-render-html"
+                                v-html="element.content"
+                            ></div>
                             <div class="bottom-10px text-size-17px flex gap-1 duration-300">
                                 <NButton size="small" round secondary @click="editPrayerItem(element.key, element.content)">
                                     <template #icon>
@@ -88,6 +108,7 @@ const dragOptions = {
                 v-bind="dragOptions"
                 group="prayer-list-items"
                 itemKey="name"
+                @change="changeInDone"
             >
                 <template #item="{ element }">
                     <div class="relative prayer-list-item">
@@ -105,7 +126,7 @@ const dragOptions = {
                                 <span class="capitalize">{{ $t('are you sure to remove this item') }}</span>
                             </NPopconfirm>
                         </div>
-                        <div class="prayer-list-content cursor-move" v-html="element.content"></div>
+                        <div class="prayer-list-content cursor-move prose-mirror-render-html" v-html="element.content"></div>
                     </div>
                 </template>
             </Draggable>

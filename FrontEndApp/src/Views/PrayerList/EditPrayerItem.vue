@@ -17,6 +17,7 @@ const SaveEditorContent = () => {
                 title: null,
                 content: prayerItemContent.value,
                 group: null,
+                status: null,
             },
             keyOfItem.value
         );
@@ -40,7 +41,7 @@ defineExpose({
 
 <template>
     <NModal v-model:show="showModal">
-        <NCard class="max-w-500px my-20px">
+        <NCard class="max-w-500px my-20px" size="small">
             <template #header>
                 <span class="capitalize">{{ $t('edit') }}</span>
             </template>

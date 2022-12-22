@@ -31,4 +31,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getClipNotes: (args: any) => ipcRenderer.invoke('getClipNotes', JSON.parse(args)),
     storeClipNote: (args: any) => ipcRenderer.invoke('storeClipNote', JSON.parse(args)),
     getChapterClipNotes: (args: any) => ipcRenderer.invoke('getChapterClipNotes', JSON.parse(args)),
+
+    // Prayer List
+    getPrayerLists: (args: any = null) => ipcRenderer.invoke('getPrayerLists'),
+    savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
+    resetPrayerListItems: (args: any) => ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
+    deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
 });

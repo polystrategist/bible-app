@@ -19,6 +19,8 @@ declare global {
         storeClipNote: Function;
         getChapterClipNotes: Function;
         message: MessageApiInjection;
+        resetPrayerListItems: Function;
+        deletePrayerListItem: Function;
     }
 }
 export {};
