@@ -29,6 +29,7 @@
         "Phlm",
         "Popconfirm",
         "Popselect",
+        "postcss",
         "prosemirror",
         "Safonov",
         "Salita",
@@ -39,6 +40,7 @@
         "tiptap",
         "upath",
         "vicons",
+        "vuedraggable",
         "vueuse"
     ]
 }

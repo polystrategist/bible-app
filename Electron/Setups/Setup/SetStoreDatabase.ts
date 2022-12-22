@@ -38,9 +38,11 @@ export default async () => {
             await StoreDB.schema
                 .createTable('prayer_lists', function (table) {
                     table.increments('id').primary();
+                    table.string('key').unique();
                     table.string('title');
                     table.string('content');
-                    table.string('status').comment('ongoing', 'answered');
+                    table.string('group');
+                    table.string('status').comment('ongoing,answered');
                     table.timestamps(true);
                 })
                 .then();

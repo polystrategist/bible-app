@@ -21,6 +21,17 @@ const message: InternationalMessageType = {
     copy: 'コピー',
     remove: '削除する',
     'Clip Notes': 'クリップノート',
+    note: 'ノート',
+    close: '近い',
+    'create new': '新しく作る',
+    'prayer list': '祈りリスト',
+    new: '新着',
+    done: '終わり',
+    edit: '編集',
+    create: '作成',
+    'save changes': '変更内容を保存',
+    cancel: 'キャンセル',
+    'are you sure to remove this item': 'このアイテムを削除してもよろしいですか',
 };
 
 export default message;

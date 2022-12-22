@@ -21,5 +21,16 @@ const message: InternationalMessageType = {
     copy: 'Copiar',
     remove: 'Remover',
     'Clip Notes': 'Notas adesivas',
+    note: 'Nota',
+    'create new': 'Crie um novo',
+    close: 'perto',
+    'prayer list': 'lista de oração',
+    new: 'nova',
+    done: 'feito',
+    edit: 'editar',
+    create: 'crio',
+    'save changes': 'salvar mudanças',
+    cancel: 'cancelar',
+    'are you sure to remove this item': 'tem certeza que deseja remover este item',
 };
 export default message;

@@ -19,6 +19,17 @@ export interface InternationalMessageInterface {
     copy: string;
     remove: string;
     'Clip Notes': string;
+    note: string;
+    close: string;
+    'create new': string;
+    'prayer list': string;
+    new: string;
+    done: string;
+    edit: string;
+    create: string;
+    'save changes': string;
+    cancel: string;
+    'are you sure to remove this item': string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

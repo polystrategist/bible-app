@@ -21,5 +21,16 @@ const message: InternationalMessageType = {
     copy: 'copy',
     remove: 'remove',
     'Clip Notes': 'Clip Notes',
+    note: 'note',
+    'create new': 'create new',
+    close: 'close',
+    'prayer list': 'prayer list',
+    new: 'new',
+    done: 'done',
+    edit: 'edit',
+    create: 'create',
+    'save changes': 'save changes',
+    cancel: 'cancel',
+    'are you sure to remove this item': 'are you sure to remove this item',
 };
 export default message;
