@@ -9,6 +9,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@supabase/supabase-js": "^2.2.1",
         "@tiptap/core": "^2.0.0-beta.209",
         "@tiptap/extension-placeholder": "^2.0.0-beta.209",
         "@tiptap/extension-underline": "^2.0.0-beta.209",
@@ -28,7 +29,8 @@
         "vue": "^3.2.37",
         "vue-i18n": "9",
         "vue-router": "4",
-        "vuedraggable": "^4.1.0"
+        "vuedraggable": "^4.1.0",
+        "youtube-vue3": "^0.1.15"
     },
     "devDependencies": {
         "@vicons/carbon": "^0.12.0",
