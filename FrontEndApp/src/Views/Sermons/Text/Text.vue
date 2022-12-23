@@ -25,10 +25,10 @@ defineExpose({
             <template #header>
                 <div class="flex justify-between items-center">
                     <span>{{ data ? data.title : '' }}</span>
-                    <NButton @click="close">Close</NButton>
+                    <NButton secondary type="error" @click="close">Close</NButton>
                 </div>
             </template>
-            <div class="relative w-full h-500px prose-mirror-render-html overflow-y-auto">
+            <div class="relative w-full prose-mirror-render-html overflow-y-auto">
                 <div v-if="data" class="text-content-sermon" v-html="data ? data.content : ''"></div>
             </div>
         </NCard>
