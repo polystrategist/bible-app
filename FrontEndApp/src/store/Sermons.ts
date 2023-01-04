@@ -4,8 +4,10 @@ import { fetchSermons } from '../util/SupaBase/Tables/Sermons';
 
 export const userSermonStore = defineStore('useSermonStore', () => {
     const sermons = ref<Array<any>>([]);
+    const loading = ref<boolean>(false);
 
     async function getSermons(search: string = '', limit: number = 50, page: number = 1) {
+        loading.value = true;
         const { data, error } = await fetchSermons(search, limit, page);
 
         if (error) {
@@ -13,6 +15,7 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         }
 
         sermons.value = data as Array<any>;
+        loading.value = false;
     }
 
     onBeforeMount(() => {
@@ -21,5 +24,6 @@ export const userSermonStore = defineStore('useSermonStore', () => {
 
     return {
         sermons,
+        loading,
     };
 });

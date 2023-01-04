@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { YoutubeVue3 } from 'youtube-vue3';
-import { NCard, NModal, NButton, NTag, NIcon } from 'naive-ui';
+import { NCard, NModal, NButton, NTag, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
 import { ref, reactive } from 'vue';
 import { LogoYoutube, TextAlignJustify } from '@vicons/carbon';
 
@@ -44,50 +44,47 @@ defineExpose({
 });
 </script>
 <template>
-    <NModal :show="showYoutubeModal" size="small">
-        <NCard class="my-20px mx-40px min-h-[90vh]">
-            <template #header>
-                <div class="flex justify-between items-center">
-                    <span>{{ data.title ? data.title : '' }}</span>
-                    <NButton secondary type="error" @click="close">Close</NButton>
-                </div>
-            </template>
-            <div v-if="play.video_id">
-                <div class="relative w-full h-500px">
-                    <YoutubeVue3
-                        class="absolute top-0 left-0 w-[100%] h-[100%]"
-                        ref="youtube"
-                        :videoid="play.video_id"
-                        :loop="play.loop"
-                        :controls="1"
-                        :width="800"
-                        :height="400"
-                        @ended="onEnded"
-                        @paused="onPaused"
-                        @played="onPlayed"
-                    />
-                </div>
-
-                <div class="mt-5 flex flex-col gap-10px">
-                    <div class="text-700 text-size-30px">{{ data.title }}</div>
-                    <div class="flex items-center mt-2 gap-2">
-                        <NTag type="primary" :bordered="false" round>{{ data.language }}</NTag>
-                        <NTag v-if="data.youtube_video_id" :color="{ color: '#FF0000' }" round :bordered="false">
-                            <template #icon>
-                                <NIcon><LogoYoutube /></NIcon>
-                            </template>
-                            Youtube
-                        </NTag>
-                        <NTag v-else :color="{ color: '#227C70' }" :bordered="false" round>
-                            <template #icon>
-                                <NIcon><TextAlignJustify /></NIcon>
-                            </template>
-                            Text
-                        </NTag>
+    <NDrawer :show="showYoutubeModal" width="100%" to="#drawer-target">
+        <NDrawerContent>
+            <div class="pr-5 h-full overflow-auto overflowing-div relative scroll-bar-md">
+                <NButton type="error" @click="close" size="large" class="sticky top-1 absolute float-right z-50">Close</NButton>
+                <div v-if="play.video_id">
+                    <div class="relative w-full h-500px">
+                        <YoutubeVue3
+                            class="absolute top-0 left-0 w-[100%] h-[100%]"
+                            ref="youtube"
+                            :videoid="play.video_id"
+                            :loop="play.loop"
+                            :controls="1"
+                            :width="800"
+                            :height="400"
+                            @ended="onEnded"
+                            @paused="onPaused"
+                            @played="onPlayed"
+                        />
                     </div>
-                    <div>{{ data.description }}</div>
+
+                    <div class="mt-5 flex flex-col gap-10px">
+                        <div class="text-700 text-size-30px">{{ data.title }}</div>
+                        <div class="flex items-center mt-2 gap-2">
+                            <NTag type="primary" :bordered="false" round>{{ data.language }}</NTag>
+                            <NTag v-if="data.youtube_video_id" :color="{ color: '#FF0000' }" round :bordered="false">
+                                <template #icon>
+                                    <NIcon><LogoYoutube /></NIcon>
+                                </template>
+                                Youtube
+                            </NTag>
+                            <NTag v-else :color="{ color: '#227C70' }" :bordered="false" round>
+                                <template #icon>
+                                    <NIcon><TextAlignJustify /></NIcon>
+                                </template>
+                                Text
+                            </NTag>
+                        </div>
+                        <div>{{ data.description }}</div>
+                    </div>
                 </div>
             </div>
-        </NCard>
-    </NModal>
+        </NDrawerContent>
+    </NDrawer>
 </template>
