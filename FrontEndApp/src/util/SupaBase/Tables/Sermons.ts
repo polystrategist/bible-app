@@ -11,13 +11,10 @@ export async function fetchSermons(search: string | null = null, limit: number =
     const { from, to } = getPagination(page, limit);
     let query = supabase.from('sermons').select().range(from, to);
 
-    if (search) {
-        query.ilike('title', `%${search}%`);
-        query.ilike('content', `%${search}%`);
-        query.ilike('description', `%${search}%`);
-        query.ilike('author', `%${search}%`);
-        query.ilike('denomination', `%${search}%`);
-        query.ilike('scripture', `%${search}%`);
+    if (search && search != '') {
+        query.or(
+            `title.ilike.*${search}*,content.ilike.*${search}*,description.ilike.*${search}*,author.ilike.*${search}*,denomination.ilike.*${search}*,scripture.ilike.*${search}*`
+        );
     }
 
     return await query;

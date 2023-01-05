@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { YoutubeVue3 } from 'youtube-vue3';
-import { NCard, NModal, NButton, NTag, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
+import { NButton, NTag, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
 import { ref, reactive } from 'vue';
 import { LogoYoutube, TextAlignJustify } from '@vicons/carbon';
+import { DAYJS } from '../../../util/dayjs';
 
 const data = ref<any>(null);
 const youtube: any = ref(null);
@@ -47,7 +48,7 @@ defineExpose({
     <NDrawer :show="showYoutubeModal" width="100%" to="#drawer-target">
         <NDrawerContent>
             <div class="pr-5 h-full overflow-auto overflowing-div relative scroll-bar-md">
-                <NButton type="error" @click="close" size="large" class="sticky top-1 absolute float-right z-50">Close</NButton>
+                <NButton type="error" @click="close" size="large" class="sticky top-0 absolute float-right z-50">Close</NButton>
                 <div v-if="play.video_id">
                     <div class="relative w-full h-500px">
                         <YoutubeVue3
@@ -80,6 +81,10 @@ defineExpose({
                                 </template>
                                 Text
                             </NTag>
+                        </div>
+                        <div>
+                            <small>{{ DAYJS(data.created_at).fromNow() }}</small> -
+                            <small>{{ DAYJS(data.created_at).format('MMMM D, YYYY') }}</small>
                         </div>
                         <div>{{ data.description }}</div>
                     </div>
