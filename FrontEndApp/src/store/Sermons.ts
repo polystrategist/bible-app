@@ -5,7 +5,7 @@ import { fetchSermons } from '../util/SupaBase/Tables/Sermons';
 export const userSermonStore = defineStore('useSermonStore', () => {
     const sermons = ref<Array<any>>([]);
     const loading = ref<boolean>(false);
-    const limit = ref(5);
+    const limit = ref(50);
     const page = ref(1);
     const search = ref<null | string>(null);
 
