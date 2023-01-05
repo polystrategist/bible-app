@@ -14,6 +14,7 @@
         "gapcursor",
         "Highlightable",
         "hilitor",
+        "ilike",
         "inputrules",
         "Jona",
         "Judg",
@@ -40,6 +41,7 @@
         "tiptap",
         "upath",
         "vicons",
+        "videoid",
         "vuedraggable",
         "vueuse"
     ]
