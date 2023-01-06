@@ -9,7 +9,7 @@ import { getPagination, supabase } from '../SupaBase';
  */
 export async function fetchSermons(search: string | null = null, limit: number = 30, page: number = 1) {
     const { from, to } = getPagination(page, limit);
-    let query = supabase.from('sermons').select().range(from, to);
+    let query = supabase.from('sermons').select().range(from, to).order('id', { ascending: false });
 
     if (search && search != '') {
         query.or(
