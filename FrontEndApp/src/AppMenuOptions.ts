@@ -30,11 +30,11 @@ export const bottomMenuOptions = [
         key: '/profile',
         icon: renderIcon(UserProfile),
     },
-    {
-        label: 'About',
-        key: '/about-page',
-        icon: renderIcon(Information),
-    },
+    // {
+    //     label: 'About',
+    //     key: '/about-page',
+    //     icon: renderIcon(Information),
+    // },
     {
         label: 'Settings',
         key: '/settings-page',

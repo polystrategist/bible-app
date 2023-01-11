@@ -1,3 +1,4 @@
+import { useMainStore } from './main';
 import { routes } from './../router/router';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
@@ -14,6 +15,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     const router = useRouter();
     const isRouter = ref<boolean>(false);
     const menuSessionKey = 'menu-session';
+    const mainStore = useMainStore();
 
     function setMenuWithNoRoute(menu: menuHasNoRoute) {
         menuSelected.value = menu;
@@ -35,6 +37,11 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     }
 
     function setMenu(menu: string) {
+        if (menu == '/settings-page') {
+            mainStore.showSettings = true;
+            return;
+        }
+
         if (menu == menuSelected.value) return;
         else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);

@@ -22,6 +22,8 @@ import FooterComponent from './components/Footer/Footer.vue';
 import DownloadBible from './components/DownloadBible/DownloadBible.vue';
 import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
+import AboutModal from './components/About/AboutModal.vue';
+import SettingsModal from './components/Settings/SettingsModal.vue';
 
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
@@ -109,6 +111,8 @@ onBeforeMount(async () => {
                         <FooterComponent class="h-25px" />
                     </NLayout>
                     <DownloadBible />
+                    <AboutModal />
+                    <SettingsModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>

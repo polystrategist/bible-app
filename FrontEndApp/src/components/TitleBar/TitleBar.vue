@@ -7,7 +7,7 @@ import {
     WeatherSunny20Regular,
     WeatherMoon20Regular,
 } from '@vicons/fluent';
-import { Close } from '@vicons/carbon';
+import { Close, Information } from '@vicons/carbon';
 import { onBeforeMount, ref } from 'vue';
 import Logo from './../../assets/logo.svg';
 import { useThemeStore } from '../../store/theme';
@@ -52,6 +52,15 @@ onBeforeMount(async () => {
         </div>
         <div id="draggable-region" class="w-full h-full text-center cursor-move z-50"></div>
         <div class="flex items-center h-full">
+            <div
+                @click="mainStore.showAbout = true"
+                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
+            >
+                <NIcon size="17">
+                    <Information />
+                </NIcon>
+                <span class="text-size-12px ml-1">About</span>
+            </div>
             <div
                 @click="changeTheme()"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-50px"

@@ -4,6 +4,8 @@ import { ref, onBeforeMount } from 'vue';
 export const useMainStore = defineStore('useMainStore', () => {
     const version = ref<string | number>('0.0.1');
     const appName = ref<string>('believers sword');
+    const showAbout = ref(false);
+    const showSettings = ref(false);
 
     async function getVersions() {
         const versions: {
@@ -28,6 +30,8 @@ export const useMainStore = defineStore('useMainStore', () => {
     });
 
     return {
+        showSettings,
+        showAbout,
         appName,
         version,
     };

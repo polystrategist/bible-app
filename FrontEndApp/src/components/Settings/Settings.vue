@@ -6,8 +6,8 @@ import PrimaryColor from './PrimaryColor/PrimaryColor.vue';
 import Theme from './Theme/Theme.vue';
 </script>
 <template>
-    <NForm class="w-full h-full p-5 pl-8 select-none">
-        <NCard size="small">
+    <NCard size="small">
+        <NForm class="w-full h-full select-none">
             <div class="text-size-20px mb-8">
                 <NIcon> <Settings /> </NIcon> Settings
             </div>
@@ -16,6 +16,6 @@ import Theme from './Theme/Theme.vue';
                 <Theme />
                 <LanguageSetting />
             </div>
-        </NCard>
-    </NForm>
+        </NForm>
+    </NCard>
 </template>
