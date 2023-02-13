@@ -34,6 +34,7 @@
     },
     "devDependencies": {
         "@vicons/carbon": "^0.12.0",
+        "@vicons/fa": "^0.12.0",
         "@vicons/fluent": "^0.12.0",
         "@vitejs/plugin-vue": "^3.1.0",
         "cross-env": "^7.0.3",

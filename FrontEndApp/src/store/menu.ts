@@ -2,8 +2,11 @@ import { useMainStore } from './main';
 import { routes } from './../router/router';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import session from './../util/session';
+import { renderIcon } from '../util/helper';
+import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
+import { Pray } from '@vicons/fa';
 
 type menuHasRoute = '/prayer-list';
 type menuHasNoRoute = 'read-bible' | 'sermons';
@@ -16,6 +19,49 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     const isRouter = ref<boolean>(false);
     const menuSessionKey = 'menu-session';
     const mainStore = useMainStore();
+
+    // tabs
+    const menuUpperTabs = ref([
+        {
+            label: 'read-bible',
+            key: 'read-bible',
+            icon: renderIcon(Book),
+        },
+        {
+            label: 'Sermons',
+            key: 'sermons',
+            icon: renderIcon(MediaLibrary),
+        },
+        {
+            label: 'Prayer List',
+            key: '/prayer-list',
+            icon: renderIcon(Pray),
+        },
+    ]);
+
+    const bottomMenuTabs = ref([
+        {
+            label: 'Profile',
+            key: '/profile',
+            icon: renderIcon(UserProfile),
+        },
+        {
+            label: 'Settings',
+            key: '/settings-page',
+            icon: renderIcon(Settings),
+        },
+    ]);
+
+    const localSavedTabsKey = 'localSavedTabsKey';
+    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page']);
+    watch(
+        () => enableTab.value,
+        (val) => {
+            setMenu('read-bible');
+            session.set(localSavedTabsKey, val);
+        },
+        { deep: true }
+    );
 
     function setMenuWithNoRoute(menu: menuHasNoRoute) {
         menuSelected.value = menu;
@@ -51,6 +97,11 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     onBeforeMount(() => {
         const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
         if (savedMenu) setMenu(savedMenu.menuSelected);
+
+        // for saved tabs
+        if (session.get(localSavedTabsKey)) {
+            enableTab.value = session.get(localSavedTabsKey);
+        }
     });
 
     return {
@@ -59,5 +110,8 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         menuWithRoute,
         menuWithNoRoute,
         setMenu,
+        menuUpperTabs,
+        bottomMenuTabs,
+        enableTab,
     };
 });

@@ -14,7 +14,6 @@ import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
 import { onBeforeMount, ref } from 'vue';
 import { useThemeStore } from './store/theme';
-import { menuOptions, bottomMenuOptions } from './AppMenuOptions';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
@@ -78,7 +77,13 @@ onBeforeMount(async () => {
                                         :collapsed-icon-size="25"
                                         :indent="15"
                                         :options="
-                                            menuOptions.map((item) => ({ label: $t(item.label), key: item.key, icon: item.icon }))
+                                            menuStore.menuUpperTabs
+                                                .filter((item) => menuStore.enableTab.includes(item.key))
+                                                .map((item) => ({
+                                                    label: $t(item.label),
+                                                    key: item.key,
+                                                    icon: item.icon,
+                                                }))
                                         "
                                     />
                                     <NMenu
@@ -91,11 +96,13 @@ onBeforeMount(async () => {
                                         :collapsed-icon-size="25"
                                         :indent="15"
                                         :options="
-                                            bottomMenuOptions.map((item) => ({
-                                                label: $t(item.label),
-                                                key: item.key,
-                                                icon: item.icon,
-                                            }))
+                                            menuStore.bottomMenuTabs
+                                                .filter((item) => menuStore.enableTab.includes(item.key))
+                                                .map((item) => ({
+                                                    label: $t(item.label),
+                                                    key: item.key,
+                                                    icon: item.icon,
+                                                }))
                                         "
                                     />
                                 </div>
