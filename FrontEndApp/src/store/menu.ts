@@ -8,7 +8,7 @@ import { renderIcon } from '../util/helper';
 import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
 import { Pray } from '@vicons/fa';
 
-type menuHasRoute = '/prayer-list';
+type menuHasRoute = '/prayer-list' | '/profile';
 type menuHasNoRoute = 'read-bible' | 'sermons';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
