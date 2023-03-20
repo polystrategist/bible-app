@@ -97,11 +97,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     onBeforeMount(() => {
         const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
         if (savedMenu) setMenu(savedMenu.menuSelected);
-
-        // for saved tabs
-        if (session.get(localSavedTabsKey)) {
-            enableTab.value = session.get(localSavedTabsKey);
-        }
     });
 
     return {
