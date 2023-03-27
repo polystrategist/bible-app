@@ -57,7 +57,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     watch(
         () => enableTab.value,
         (val) => {
-            setMenu('read-bible');
+            if (!val.includes(menuSelected.value)) setMenu('read-bible');
             session.set(localSavedTabsKey, val);
         },
         { deep: true }
@@ -95,8 +95,16 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     }
 
     onBeforeMount(() => {
+        // for saved tabs
+        if (session.get(localSavedTabsKey)) {
+            enableTab.value = session.get(localSavedTabsKey);
+        }
+
         const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
-        if (savedMenu) setMenu(savedMenu.menuSelected);
+        if (savedMenu) {
+            setMenu(savedMenu.menuSelected);
+            return;
+        }
     });
 
     return {

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { Block } from 'notiflix';
-import { NInput } from 'naive-ui';
-import { ref, watch, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { isSignedIn } from './../../util/SupaBase/Auth/Auth';
 import { useMenuStore } from '../../store/menu';
-import Login from './Modal/Login.vue';
 
 const loginModalRef = ref<{
     toggleModal: Function;
@@ -12,8 +9,6 @@ const loginModalRef = ref<{
 const menuStore = useMenuStore();
 const user = ref<any>(null);
 const loading = ref(false);
-const fullName = ref<string | null>(null);
-const aboutYourSelf = ref<string | null>(null);
 
 async function isUserAlreadySignedIn() {
     loading.value = true;
@@ -25,30 +20,16 @@ async function isUserAlreadySignedIn() {
     loading.value = false;
 }
 
-onMounted(() => {
-    if (menuStore.menuSelected === '/profile') isUserAlreadySignedIn();
-});
-
 watch(
-    () => loading.value,
-    (val) => {
-        if (val) Block.standard('#profile-page');
-        else Block.remove('#profile-page');
+    () => menuStore.menuSelected,
+    (selectedMenu) => {
+        console.log(selectedMenu);
+        if (selectedMenu === '/profile') isUserAlreadySignedIn();
     }
 );
 </script>
 <template>
-    <Login ref="loginModalRef" />
-    <div id="profile-page" class="w-full h-full p-5">
-        <div class="max-w-400px flex flex-col gap-3">
-            <div>
-                <label>Your Full Name</label>
-                <NInput v-model:value="fullName" />
-            </div>
-            <div>
-                <label>About Your Self</label>
-                <NInput v-model:value="aboutYourSelf" type="textarea" :autosize="false" />
-            </div>
-        </div>
+    <div class="h-100% w-100% p-2">
+        <RouterView />
     </div>
 </template>
