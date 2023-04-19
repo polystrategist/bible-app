@@ -1,9 +1,17 @@
 import { defineStore } from 'pinia';
-import { ref, onBeforeMount, watch, computed } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { fetchSermons } from '../util/SupaBase/Tables/Sermons';
 
+type StringNumberType = string | number | null;
 export const userSermonStore = defineStore('useSermonStore', () => {
-    const sermons = ref<Array<any>>([]);
+    const sermons = ref<Array<{
+        youtube_video_id: StringNumberType,
+        thumbnail: StringNumberType,
+        title: StringNumberType,
+        created_at: StringNumberType,
+        language: StringNumberType,
+        description: StringNumberType
+    }>>([]);
     const loading = ref<boolean>(false);
     const limit = ref(50);
     const page = ref(1);
@@ -28,13 +36,13 @@ export const userSermonStore = defineStore('useSermonStore', () => {
 
     watch(
         () => page.value,
-        (val) => {
-            getSermons();
+        async (val) => {
+            await getSermons();
         }
     );
 
-    onBeforeMount(() => {
-        getSermons();
+    onBeforeMount(async () => {
+        await getSermons();
     });
 
     return {
@@ -45,6 +53,6 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         hasPrevious: computed(() => page.value > 1),
         search,
         page,
-        limit,
+        limit
     };
 });

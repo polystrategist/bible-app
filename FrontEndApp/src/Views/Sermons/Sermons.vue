@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang='ts' setup>
 import { NButton, NIcon, NInput, NTag } from 'naive-ui';
 import { userSermonStore } from '../../store/Sermons';
 import { LogoYoutube, Reset, Search, TextAlignJustify } from '@vicons/carbon';
@@ -6,7 +6,7 @@ import Youtube from './Youtube/Youtube.vue';
 import { ref } from 'vue';
 import TextVue from './Text/Text.vue';
 import { useInfiniteScroll } from '@vueuse/core';
-import { DAYJS } from './../../util/dayjs';
+import { DAYJS } from '../../util/dayjs';
 
 const sermonItems = ref<HTMLElement | null>(null);
 const sermonStore = userSermonStore();
@@ -27,20 +27,21 @@ useInfiniteScroll(
 );
 </script>
 <template>
-    <div id="drawer-target" class="w-full h-full pl-6">
-        <Youtube ref="showYoutubeVideo" />
-        <TextVue ref="textVueContent" />
-        <div class="h-50px flex justify-between px-2 py-3 items-center">
-            <div class="font-700 text-size-25px">Sermons</div>
-            <div class="flex gap-8px">
+    <div id='drawer-target' class='w-full h-full pl-6'>
+        <Youtube ref='showYoutubeVideo' />
+        <TextVue ref='textVueContent' />
+        <div class='h-50px flex justify-between px-2 py-3 items-center'>
+            <div class='font-700 text-size-25px'>Sermons</div>
+            <div class='flex gap-8px'>
                 <NInput
-                    class="!w-300px"
-                    v-model:value="sermonStore.search"
-                    placeholder="Search Using Text"
-                    :disabled="sermonStore.loading"
-                    @keydown.enter="sermonStore.getSermons(true)"
+                    v-model:value='sermonStore.search'
+                    :disabled='sermonStore.loading'
+                    class='!w-300px'
+                    placeholder='Search Using Text'
+                    @keydown.enter='sermonStore.getSermons(true)'
                 />
-                <NButton @click="sermonStore.getSermons(true)" :disabled="sermonStore.loading" :loading="sermonStore.loading">
+                <NButton :disabled='sermonStore.loading' :loading='sermonStore.loading'
+                         @click='sermonStore.getSermons(true)'>
                     <template #icon>
                         <NIcon>
                             <Search />
@@ -49,12 +50,12 @@ useInfiniteScroll(
                     Search
                 </NButton>
                 <NButton
+                    :disabled='sermonStore.loading'
+                    :loading='sermonStore.loading'
                     @click="
                         sermonStore.search = '';
                         sermonStore.getSermons(true);
                     "
-                    :disabled="sermonStore.loading"
-                    :loading="sermonStore.loading"
                 >
                     <template #icon>
                         <NIcon>
@@ -65,47 +66,52 @@ useInfiniteScroll(
             </div>
         </div>
 
-        <div ref="sermonItems" class="h-[calc(100%-50px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
-            <div class="flex gap-7 flex-wrap">
+        <div ref='sermonItems' class='h-[calc(100%-50px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md'>
+            <div class='flex gap-7 flex-wrap'>
                 <div
-                    v-for="sermon in sermonStore.sermons"
-                    class="min-w-280px max-w-500px rounded-md overflow-hidden group flex flex-col justify-between cursor-pointer"
+                    v-for='sermon in sermonStore.sermons'
+                    class='min-w-280px max-w-500px rounded-md overflow-hidden group flex flex-col justify-between cursor-pointer'
+                    style='flex: 1 1 160px'
                     @click="showContent(sermon.youtube_video_id ? 'youtube' : 'text', sermon)"
-                    style="flex: 1 1 160px"
                 >
-                    <div class="h-150px overflow-hidden relative">
+                    <div class='h-150px overflow-hidden relative'>
                         <div
-                            v-if="sermon.thumbnail"
-                            class="transition-all top-[0px] left-[0px] !w-full absolute group-hover:top-[-20px] group-hover:left-[-20px] group-hover:w-400px group-hover:h-200px"
+                            v-if='sermon.thumbnail'
+                            class='transition-all top-[0px] left-[0px] !w-full absolute'
                         >
-                            <img class="w-full" :src="sermon.thumbnail" alt="" />
+                            <img :src='sermon.thumbnail'
+                                 alt='' class='w-full transform scale-100 group-hover:scale-120 transition-all' />
                         </div>
 
                         <div
                             v-else
-                            class="font-800 text-size-25px flex items-center justify-center h-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px"
+                            class='font-800 text-size-25px flex items-center justify-center h-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px transform scale-100 hover:scale-120 transition-all'
                         >
                             {{ sermon.title }}
                         </div>
                     </div>
-                    <div class="mt-2">
-                        <div class="font-700">{{ sermon.title }}</div>
-                        <div class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{ sermon.description }}</div>
+                    <div class='mt-2'>
+                        <div class='font-700'>{{ sermon.title }}</div>
+                        <div class='overflow-hidden overflow-ellipsis whitespace-nowrap'>{{ sermon.description }}</div>
                         <div>
                             <small>{{ DAYJS(sermon.created_at).fromNow() }}</small> -
                             <small>{{ DAYJS(sermon.created_at).format('MMMM D, YYYY') }}</small>
                         </div>
-                        <div class="flex items-center mt-2 gap-2">
-                            <NTag type="primary" :bordered="false" round>{{ sermon.language }}</NTag>
-                            <NTag v-if="sermon.youtube_video_id" :color="{ color: '#FF0000' }" round :bordered="false">
+                        <div class='flex items-center mt-2 gap-2'>
+                            <NTag :bordered='false' round type='primary'>{{ sermon.language }}</NTag>
+                            <NTag v-if='sermon.youtube_video_id' :bordered='false' :color="{ color: '#FF0000' }" round>
                                 <template #icon>
-                                    <NIcon><LogoYoutube /></NIcon>
+                                    <NIcon>
+                                        <LogoYoutube />
+                                    </NIcon>
                                 </template>
                                 Youtube
                             </NTag>
-                            <NTag v-else :color="{ color: '#227C70' }" :bordered="false" round>
+                            <NTag v-else :bordered='false' :color="{ color: '#227C70' }" round>
                                 <template #icon>
-                                    <NIcon><TextAlignJustify /></NIcon>
+                                    <NIcon>
+                                        <TextAlignJustify />
+                                    </NIcon>
                                 </template>
                                 Text
                             </NTag>
@@ -113,7 +119,7 @@ useInfiniteScroll(
                     </div>
                 </div>
             </div>
-            <div class="text-center py-4" v-show="sermonStore.loading">LOADING MORE DATA</div>
+            <div v-show='sermonStore.loading' class='text-center py-4'>LOADING MORE DATA</div>
         </div>
     </div>
 </template>
