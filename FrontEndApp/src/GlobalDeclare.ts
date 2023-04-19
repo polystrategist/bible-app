@@ -21,6 +21,7 @@ declare global {
         message: MessageApiInjection;
         resetPrayerListItems: Function;
         deletePrayerListItem: Function;
+        deleteChapterClipNotes: Function;
     }
 }
 export {};

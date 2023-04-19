@@ -50,11 +50,13 @@ async function addClipNotes() {
             showModal.value = false;
         });
 
-    clipNoteStore.getChapterClipNotes(bibleStore.selectedBookNumber, bibleStore.selectedChapter);
+    await clipNoteStore.getChapterClipNotes(bibleStore.selectedBookNumber, bibleStore.selectedChapter);
 }
 
+
+
 defineExpose({
-    toggleClipNoteModal,
+    toggleClipNoteModal
 });
 </script>
 <template>

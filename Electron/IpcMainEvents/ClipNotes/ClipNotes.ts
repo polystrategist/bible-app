@@ -1,6 +1,7 @@
 import { app, ipcMain } from 'electron';
 import knex from 'knex';
 import { isNightly } from '../../config';
+
 const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
 const filePath = dataPath + `\\StoreDB\\Store.db`;
 const StoreDB = knex({
@@ -89,6 +90,19 @@ export default () => {
                 });
 
             return data;
+        } catch (e) {
+            console.log(e);
+        }
+    });
+
+    ipcMain.handle('deleteChapterClipNotes', async (event, { book_number, chapter, verse }: { book_number: number; chapter: number, verse: number }) => {
+        try {
+            return await StoreDB('clip_notes')
+                .select()
+                .where('book_number', book_number)
+                .where('chapter', chapter)
+                .where('verse', verse)
+                .del();
         } catch (e) {
             console.log(e);
         }

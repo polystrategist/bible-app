@@ -25,15 +25,22 @@ export const useClipNoteStore = defineStore('useClipNoteStore', () => {
 
     async function storeClipNote(args: { book_number: number; chapter: number; verse: number; content: string; color: string }) {
         const stored = await window.browserWindow.storeClipNote(JSON.stringify(args));
-        getClipNotes();
+        await getClipNotes();
         return stored;
     }
 
-    onMounted(() => {
-        getClipNotes();
+    async function deleteClipNote(args: { book_number: number; chapter: number, verse: number }) {
+        const isDeleted = await window.browserWindow.deleteChapterClipNotes(JSON.stringify(args));
+        await getClipNotes();
+        return isDeleted;
+    }
+
+    onMounted(async () => {
+        await getClipNotes();
     });
 
     return {
+        deleteClipNote,
         chapterClipNotes,
         getChapterClipNotes,
         getClipNotes,
