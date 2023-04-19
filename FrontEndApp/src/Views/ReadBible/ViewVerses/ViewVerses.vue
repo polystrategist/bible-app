@@ -12,7 +12,7 @@ import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue'
 import { useClipNoteStore } from '../../../store/ClipNotes';
 import { getSelectionParentElement } from '../../../util/ElementUtil';
 
-const cliptNoteStore = useClipNoteStore();
+const clipNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
 const bibleStore = useBibleStore();
 const fontSize = ref(15);
@@ -26,7 +26,7 @@ const { x, y } = useMouse();
 const message = useMessage();
 const createClipNoteRef = ref<null | { toggleClipNoteModal: Function }>(null);
 const clipNoteRender = (key: any) => {
-    return (cliptNoteStore.chapterClipNotes as any)[key] ? (cliptNoteStore.chapterClipNotes as any)[key] : false;
+    return (clipNoteStore.chapterClipNotes as any)[key] ? (clipNoteStore.chapterClipNotes as any)[key] : false;
 };
 
 watch(
@@ -73,8 +73,8 @@ function cancel() {
 function checkHere(this: HTMLElement): void {
     const el = this;
     el.addEventListener('keydown', function (event: KeyboardEvent) {
-        var key = event.key;
-        var ctrl = event.ctrlKey ? true : false;
+        const key = event.key;
+        const ctrl = event.ctrlKey;
         if (key.toUpperCase() == 'C' && ctrl) {
             const selected = window.getSelection();
             const text: string | undefined = selected?.toString();
@@ -150,12 +150,12 @@ onMounted(() => {
         </div>
         <div
             id="view-verses-container"
-            class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div p-3 scroll-bar-md flex flex-col gap-5px"
+            class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div py-3 pl-5 pr-3 scroll-bar-md flex flex-col gap-5px"
             :style="`font-size:${fontSize}px`"
         >
             <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col">
                 <div
-                    class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5px relative"
+                    class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5 relative"
                     :class="{
                         'dark:bg-opacity-5 dark:bg-light-100': verse.verse == bibleStore.selectedVerse,
                         'rounded-t-md': clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`),
@@ -186,8 +186,8 @@ onMounted(() => {
                             </NIcon>
                         </div>
                     </div>
-                    <div>
-                        <div v-for="version in verse.version" :key="version.key">
+                    <div class='flex flex-col gap-3'>
+                        <div v-for="version in verse.version" :key="version.key" >
                             <span class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none">
                                 {{ version.version.replace('.SQLite3', '') }}
                             </span>
