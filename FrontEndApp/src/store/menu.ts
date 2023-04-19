@@ -8,7 +8,7 @@ import { renderIcon } from '../util/helper';
 import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
 import { Pray } from '@vicons/fa';
 
-type menuHasRoute = '/prayer-list';
+type menuHasRoute = '/prayer-list' | '/profile';
 type menuHasNoRoute = 'read-bible' | 'sermons';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
@@ -57,7 +57,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     watch(
         () => enableTab.value,
         (val) => {
-            setMenu('read-bible');
+            if (!val.includes(menuSelected.value)) setMenu('read-bible');
             session.set(localSavedTabsKey, val);
         },
         { deep: true }
@@ -72,14 +72,14 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         });
     }
 
-    function setMenuWithRoute(menu: menuHasRoute) {
+    async function setMenuWithRoute(menu: menuHasRoute) {
         menuSelected.value = menu;
         isRouter.value = true;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
             menuSelected: menuSelected.value,
         });
-        router.push(menu);
+        await router.push(menu);
     }
 
     function setMenu(menu: string) {
@@ -91,16 +91,18 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         if (menu == menuSelected.value) return;
         else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
-        else console.log(menu + ' was not found');
     }
 
     onBeforeMount(() => {
-        const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
-        if (savedMenu) setMenu(savedMenu.menuSelected);
-
         // for saved tabs
         if (session.get(localSavedTabsKey)) {
             enableTab.value = session.get(localSavedTabsKey);
+        }
+
+        const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
+        if (savedMenu) {
+            setMenu(savedMenu.menuSelected);
+            return;
         }
     });
 

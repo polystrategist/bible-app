@@ -17,6 +17,16 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'ProfilePage',
         path: '/profile',
         component: ProfilePage,
+        children: [
+            {
+                path: '',
+                component: () => import('./../Views/UserProfile/Pages/Login.vue'),
+            },
+            {
+                path: 'profile',
+                component: () => import('./../Views/UserProfile/Pages/Profile/Profile.vue'),
+            },
+        ],
     },
     {
         name: 'AboutPage',

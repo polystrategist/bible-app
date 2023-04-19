@@ -24,12 +24,10 @@ const editPrayerItem = (key: string, content: any): void => {
 };
 
 async function changeInProgress(item: any) {
-    console.log(item);
     const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
 }
 
 async function changeInDone(item: any) {
-    console.log(item);
     const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
     let theItem = JSON.parse(JSON.stringify(item[theKeyAction].element));
 
