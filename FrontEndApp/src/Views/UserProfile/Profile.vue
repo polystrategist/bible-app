@@ -23,7 +23,6 @@ async function isUserAlreadySignedIn() {
 watch(
     () => menuStore.menuSelected,
     (selectedMenu) => {
-        console.log(selectedMenu);
         if (selectedMenu === '/profile') isUserAlreadySignedIn();
     }
 );

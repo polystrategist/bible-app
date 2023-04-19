@@ -72,14 +72,14 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         });
     }
 
-    function setMenuWithRoute(menu: menuHasRoute) {
+    async function setMenuWithRoute(menu: menuHasRoute) {
         menuSelected.value = menu;
         isRouter.value = true;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
             menuSelected: menuSelected.value,
         });
-        router.push(menu);
+        await router.push(menu);
     }
 
     function setMenu(menu: string) {
@@ -91,7 +91,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         if (menu == menuSelected.value) return;
         else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
-        else console.log(menu + ' was not found');
     }
 
     onBeforeMount(() => {
