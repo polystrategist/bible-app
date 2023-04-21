@@ -7,7 +7,9 @@ import { ref } from 'vue';
 import TextVue from './Text/Text.vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { DAYJS } from '../../util/dayjs';
+import { useMenuStore } from '../../store/menu';
 
+const menuStore = useMenuStore();
 const sermonItems = ref<HTMLElement | null>(null);
 const sermonStore = userSermonStore();
 const showYoutubeVideo = ref<null | { toggleModal: Function }>(null);
@@ -62,6 +64,9 @@ useInfiniteScroll(
                             <Reset />
                         </NIcon>
                     </template>
+                </NButton>
+                <NButton type='primary' @click='menuStore.setMenu("/create-sermon")'>
+                    Submit Sermon
                 </NButton>
             </div>
         </div>

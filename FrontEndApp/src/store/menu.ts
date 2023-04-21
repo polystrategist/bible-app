@@ -1,5 +1,5 @@
 import { useMainStore } from './main';
-import { routes } from './../router/router';
+import { routes } from '../router/router';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { onBeforeMount, ref, watch } from 'vue';
@@ -8,7 +8,7 @@ import { renderIcon } from '../util/helper';
 import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
 import { Pray } from '@vicons/fa';
 
-type menuHasRoute = '/prayer-list' | '/profile';
+type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon';
 type menuHasNoRoute = 'read-bible' | 'sermons';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
@@ -25,39 +25,39 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'read-bible',
             key: 'read-bible',
-            icon: renderIcon(Book),
+            icon: renderIcon(Book)
         },
         {
             label: 'Sermons',
             key: 'sermons',
-            icon: renderIcon(MediaLibrary),
+            icon: renderIcon(MediaLibrary)
         },
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderIcon(Pray),
-        },
+            icon: renderIcon(Pray)
+        }
     ]);
 
     const bottomMenuTabs = ref([
         {
             label: 'Profile',
             key: '/profile',
-            icon: renderIcon(UserProfile),
+            icon: renderIcon(UserProfile)
         },
         {
             label: 'Settings',
             key: '/settings-page',
-            icon: renderIcon(Settings),
-        },
+            icon: renderIcon(Settings)
+        }
     ]);
 
     const localSavedTabsKey = 'localSavedTabsKey';
-    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page']);
+    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page', '/create-sermon']);
     watch(
         () => enableTab.value,
-        (val) => {
-            if (!val.includes(menuSelected.value)) setMenu('read-bible');
+        async (val) => {
+            if (!val.includes(menuSelected.value)) await setMenu('read-bible');
             session.set(localSavedTabsKey, val);
         },
         { deep: true }
@@ -68,7 +68,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         isRouter.value = false;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
-            menuSelected: menuSelected.value,
+            menuSelected: menuSelected.value
         });
     }
 
@@ -77,31 +77,40 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         isRouter.value = true;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
-            menuSelected: menuSelected.value,
+            menuSelected: menuSelected.value
         });
+        console.log(menu);
         await router.push(menu);
     }
 
-    function setMenu(menu: string) {
+    async function setMenu(menu: string) {
         if (menu == '/settings-page') {
             mainStore.showSettings = true;
             return;
         }
 
         if (menu == menuSelected.value) return;
-        else if (menuWithRoute.includes(menu)) setMenuWithRoute(menu as any);
+        else if (menuWithRoute.includes(menu)) await setMenuWithRoute(menu as any);
         else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
     }
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
         // for saved tabs
-        if (session.get(localSavedTabsKey)) {
+        let savedLocalTabsKey = session.get(localSavedTabsKey);
+        if (savedLocalTabsKey) {
+
+            if (!savedLocalTabsKey.includes('/create-sermon')) {
+                savedLocalTabsKey.push('/create-sermon');
+                session.set(localSavedTabsKey, savedLocalTabsKey);
+            }
+
             enableTab.value = session.get(localSavedTabsKey);
         }
 
         const savedMenu: { isRouter: boolean; menuSelected: string } | undefined | null = session.get(menuSessionKey);
+
         if (savedMenu) {
-            setMenu(savedMenu.menuSelected);
+            await setMenu(savedMenu.menuSelected);
             return;
         }
     });
@@ -114,6 +123,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         setMenu,
         menuUpperTabs,
         bottomMenuTabs,
-        enableTab,
+        enableTab
     };
 });

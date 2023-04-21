@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import PrayerList from './../Views/PrayerList/PrayerList.vue';
 import ProfilePage from './../Views/UserProfile/Profile.vue';
 import AboutPage from './../Views/About/About.vue';
-
+import CreateSermon from "./../Views/CreateSermon/CreateSermon.vue"
 export const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -33,6 +33,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/about-page',
         component: AboutPage,
     },
+    {
+        name: 'CreateSermon',
+        path: '/create-sermon',
+        component: CreateSermon
+    }
 ];
 
 const router = createRouter({
