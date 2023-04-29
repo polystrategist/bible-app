@@ -1,10 +1,11 @@
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import axios from 'axios';
 import { supabase } from '../../util/SupaBase/SupaBase';
 import { useMenuStore } from '../../store/menu';
 import Editor from '../../components/Editor/Editor.vue';
-import { NSelect } from 'naive-ui';
+import { NSelect, NInput, NButton } from 'naive-ui';
+import { DAYJS } from '../../util/dayjs';
 
 const menuStore = useMenuStore();
 const sermonId = ref(null);
@@ -14,12 +15,12 @@ const language = ref('english');
 const source = ref(null);
 const title = ref(null);
 const scripture = ref(null);
-const createdAt = ref(null);
 const author = ref(null);
 const denomination = ref(null);
 const description = ref<string>('');
 const content = ref('');
 const loading = ref(false);
+const isPublished = ref(false);
 
 const denominationOptions = [
     { label: 'Adventist' },
@@ -59,7 +60,7 @@ const denominationOptions = [
     { label: 'United Methodist' },
     { label: 'Vineyard' },
     { label: 'Wesleyan' },
-    { label: 'Others' }
+    { label: 'Others' },
 ];
 
 const getYoutubeVideoDetails = async (
@@ -71,44 +72,67 @@ const getYoutubeVideoDetails = async (
         params: {
             key,
             part,
-            id: youtubeVideoId
-        }
+            id: youtubeVideoId,
+        },
     });
 };
 
 async function submitSermon() {
     loading.value = true;
+    const session = await supabase.auth.getSession();
     if (selectedType.value == 'youtube') {
+        if (!youtubeId.value || !source.value) {
+            alert('please check fields!');
+            loading.value = false;
+            return;
+        }
         // get data from api
-        const youtubeData: any = await getYoutubeVideoDetails(youtubeId.value as any);
+        getYoutubeVideoDetails(youtubeId.value as any)
+            .then(async ({ data }) => {
+                console.log(data);
 
-        if (!youtubeData || !youtubeData.items) {
-            alert('Fetching Video Details Error');
-            return;
-        }
-        const youtubeDetails = youtubeData.items[0];
-        let dataToEnter = {
-            type: 'youtube',
-            thumbnail: youtubeDetails.snippet.thumbnails.medium.url,
-            // date_time: new Date(),
-            description: youtubeDetails.snippet.description,
-            title: youtubeDetails.snippet.title,
-            youtube_embed: `https://www.youtube.com/embed/${youtubeDetails.id}`,
-            youtube_video_id: youtubeDetails.id,
-            language: language.value,
-            source: source.value
-        };
-        const { error } = sermonId.value
-            ? await supabase.from('sermons').update(dataToEnter).match({ id: sermonId.value })
-            : await supabase.from('sermons').insert(dataToEnter);
+                if (!data || !data.items) {
+                    alert('Fetching Video Details Error');
+                    loading.value = false;
+                    return;
+                }
 
-        if (error) {
-            alert(error.message);
-            return;
-        }
+                
 
-        alert('Data Successfully Added!');
-        await menuStore.setMenu('read-bible');
+                const youtubeDetails = data.items[0];
+                let dataToEnter = {
+                    type: 'youtube',
+                    thumbnail: youtubeDetails.snippet.thumbnails.medium.url,
+                    // date_time: new Date(),
+                    description: youtubeDetails.snippet.description,
+                    title: youtubeDetails.snippet.title,
+                    youtube_embed: `https://www.youtube.com/embed/${youtubeDetails.id}`,
+                    youtube_video_id: youtubeDetails.id,
+                    language: language.value,
+                    source: source.value,
+                    added_by: session.data.session?.user.id,
+                    is_published: isPublished.value
+                };
+                const { error } = sermonId.value
+                    ? await supabase.from('sermons').update(dataToEnter).match({ id: sermonId.value })
+                    : await supabase.from('sermons').insert(dataToEnter);
+
+                if (error) {
+                    alert(error.message);
+                    loading.value = false;
+                    return;
+                }
+
+                alert('Data Successfully Added!');
+                await menuStore.setMenu('sermons');
+            })
+            .catch((e) => {
+                let message =
+                    e.response && e.response.data && e.response.data.error && e.response.data.error.message
+                        ? e.response.data.error.message
+                        : 'Their is an Error Getting Youtube Details!';
+                alert(message);
+            });
     } else if (selectedType.value == 'text') {
         let dataToInsert = {
             type: 'text',
@@ -117,11 +141,13 @@ async function submitSermon() {
             title: title.value,
             content: content.value,
             scripture: scripture.value,
-            // created_at: new Date(formValue.value.created_at),
+            created_at: DAYJS(),
             author: author.value,
             denomination: denomination.value,
             language: language.value,
-            source: source.value
+            source: source.value,
+            added_by: session.data.session?.user.id,
+            is_published: isPublished.value
         };
         const { error } = sermonId.value
             ? await supabase.from('sermons').update(dataToInsert).match({ id: sermonId.value })
@@ -129,126 +155,100 @@ async function submitSermon() {
 
         if (error) {
             alert(error.message);
+            loading.value = false;
             return;
         }
 
         alert('Data Successfully Added!');
-        await menuStore.setMenu('read-bible');
+        await menuStore.setMenu('sermons');
     }
 
     loading.value = false;
 }
+
+const selectTypeOptions = [
+    {
+        value: 'youtube',
+        label: 'Youtube',
+    },
+    {
+        value: 'text',
+        label: 'Text',
+    },
+];
 </script>
 <template>
-    <div class='h-[100%] w-[100%] p-3 pl-6'>
+    <div class="h-[100%] w-[100%] p-5 pl-10">
         <div>
-            <h2 class='font-thin text-size-23px'>Add New Sermon</h2>
-            <div class='mt-10 flex flex-col gap-5'>
+            <h2 class="font-thin text-size-23px">Add New Sermon</h2>
+            <div class="mt-10 flex flex-col gap-5">
                 <div>
-                    <label for=''>Select Type:</label><br />
-                    <NSelect v-model='selectedType' :options='[
-                        {
-                            value: "youtube",
-                            label: "Youtube"
-                        },
-                        {
-                            value: "text",
-                            label: "Text"
-                        }
-                    ]' />
+                    <label for="">Select Type:</label><br />
+                    <NSelect v-model:value="selectedType" :options="selectTypeOptions" />
                 </div>
                 <div v-if="selectedType == 'youtube'">
-                    <label for=''>Youtube ID:</label><br />
-                    <input
-                        v-model='youtubeId'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='Enter Youtube Id...'
-                        required
-                        type='text'
-                    />
+                    <label for="">Youtube ID:</label><br />
+                    <NInput v-model:value="youtubeId" placeholder="Enter Youtube Id..." required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Title:</label><br />
-                    <input
-                        v-model='title'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='enter title'
-                        required
-                        type='text'
-                    />
+                    <label for="">Title:</label><br />
+                    <NInput v-model:value="title" placeholder="enter title" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Scripture:</label><br />
-                    <input
-                        v-model='scripture'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='enter scripture'
-                        required
-                        type='text'
-                    />
+                    <label for="">Scripture:</label><br />
+                    <NInput v-model:value="scripture" placeholder="enter scripture" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Created At:</label><br />
-                    <input
-                        v-model='createdAt'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='enter created at'
-                        required
-                        type='date'
-                    />
+                    <label for="">Content Author:</label><br />
+                    <NInput v-model:value="author" placeholder="enter scripture" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Content Author:</label><br />
-                    <input
-                        v-model='author'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='enter scripture'
-                        required
-                        type='text'
-                    />
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for=''>Select Denomination:</label><br />
-                    <select v-model='denomination' class='p-2 border rounded-md min-w-200px' required>
-                        <option v-for='den in denominationOptions' :key='den.label' :value='den.label'>
+                    <label for="">Select Denomination:</label><br />
+                    <select v-model="denomination" class="p-2 rounded-md !dark:bg-dark-300 outline-none w-full" required>
+                        <option :value="null">-- Select Denomination --</option>
+                        <option v-for="den in denominationOptions" :key="den.label" :value="den.label">
                             {{ den.label }}
                         </option>
                     </select>
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Select Denomination:</label><br />
+                    <label for="">A Short Summary/Description:</label><br />
                     <textarea
-                        v-model='description'
-                        class='p-2 border rounded-md min-w-300px min-h-200px'
-                        placeholder='Enter Description Here'
+                        v-model="description"
+                        class="p-2 rounded-md min-h-200px w-full !dark:bg-dark-300 outline-none"
+                        placeholder="Enter Description Here"
                         required
                     ></textarea>
                 </div>
                 <div>
-                    <label for=''>Select Language:</label><br />
-                    <select v-model='language' class='p-2 border rounded-md min-w-200px' required>
-                        <option value='english'>English</option>
-                        <option value='tagalog'>Tagalog</option>
+                    <label for="">Select Language:</label><br />
+                    <select v-model="language" class="p-2 rounded-md min-w-200px w-full !dark:bg-dark-300 outline-none" required>
+                        <option value="english">English</option>
+                        <option value="tagalog">Tagalog</option>
                     </select>
                 </div>
                 <div>
-                    <label for=''>Enter Source:</label><br />
+                    <label for="">Enter Source:</label><br />
                     <input
-                        v-model='source'
-                        class='p-2 border rounded-md min-w-250px'
-                        placeholder='enter URL'
+                        v-model="source"
+                        class="p-2 rounded-md min-w-250px w-full !dark:bg-dark-300 outline-none"
+                        placeholder="enter URL"
                         required
-                        type='text'
+                        type="text"
                     />
                 </div>
+                <div>
+                    <label class="select-none">
+                        <input v-model="isPublished" placeholder="enter URL" type="checkbox" />
+                        Is Published?
+                    </label>
+                </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Set Content:</label><br />
-                    <Editor v-model='content' editorStyle='height: 320px' />
+                    <label for="">Set Content:</label><br />
+                    <Editor v-model="content" editorStyle="height: 320px" />
                 </div>
                 <div>
-                    <button :disabled='loading' :loading='loading' class='hover:underline' @click='submitSermon()'>
-                        Create
-                    </button>
+                    <NButton type="primary" :disabled="loading" :loading="loading" @click="submitSermon()"> Create </NButton>
                 </div>
             </div>
         </div>

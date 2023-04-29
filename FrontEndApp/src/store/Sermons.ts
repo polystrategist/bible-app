@@ -3,15 +3,19 @@ import { computed, onBeforeMount, ref, watch } from 'vue';
 import { fetchSermons } from '../util/SupaBase/Tables/Sermons';
 
 type StringNumberType = string | number | null;
+export type SERMON_TYPE = {
+    id: string | number;
+    youtube_video_id: StringNumberType;
+    thumbnail: string | undefined;
+    title: StringNumberType;
+    created_at: StringNumberType;
+    language: StringNumberType;
+    description: StringNumberType;
+    added_by: StringNumberType;
+    is_published: boolean;
+};
 export const userSermonStore = defineStore('useSermonStore', () => {
-    const sermons = ref<Array<{
-        youtube_video_id: StringNumberType,
-        thumbnail: StringNumberType,
-        title: StringNumberType,
-        created_at: StringNumberType,
-        language: StringNumberType,
-        description: StringNumberType
-    }>>([]);
+    const sermons = ref<Array<SERMON_TYPE>>([]);
     const loading = ref<boolean>(false);
     const limit = ref(50);
     const page = ref(1);
@@ -53,6 +57,6 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         hasPrevious: computed(() => page.value > 1),
         search,
         page,
-        limit
+        limit,
     };
 });

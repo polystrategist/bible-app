@@ -240,6 +240,6 @@ const editor = useEditor({
                 Redo
             </button>
         </div>
-        <editor-content v-if='editor' :editor='editor' />
+        <EditorContent v-if='editor' :editor='editor' />
     </div>
 </template>
