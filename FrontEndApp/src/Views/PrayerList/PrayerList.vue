@@ -4,7 +4,7 @@ import { NPopconfirm, NIcon, NButton } from 'naive-ui';
 import EditPrayerItem from './EditPrayerItem.vue';
 import { Edit, TrashCan } from '@vicons/carbon';
 import Draggable from 'vuedraggable';
-import { usePrayerListStore } from './../../store/prayerListStore';
+import { usePrayerListStore } from '../../store/prayerListStore';
 import NewPrayerItem from './CreateNewPrayerItem.vue';
 
 const prayerListStore = usePrayerListStore();
@@ -45,8 +45,8 @@ const dragOptions = {
 };
 </script>
 <template>
-    <div class="px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-30px pl-30px">
-        <div class="w-[100%] flex flex-col">
+    <div class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-30px pl-30px">
+        <div class="w-[100%] h-[100%] flex flex-col">
             <div class="p-10px flex justify-between items-center select-none min-h-60px">
                 <span class="font-700 text-size-20px capitalize">{{ $t('prayer list') }}</span>
                 <NewPrayerItem />
@@ -96,12 +96,12 @@ const dragOptions = {
                 </template>
             </Draggable>
         </div>
-        <div class="w-[100%] flex flex-col">
+        <div class="w-[100%] h-[100%] flex flex-col">
             <div class="p-10px flex justify-between items-center min-h-60px">
                 <span class="font-700 text-size-20px select-none capitalize">{{ $t('done') }} </span>
             </div>
             <Draggable
-                class="list-group h-[100%] overflow-y-auto overflowing-div pr-10px"
+                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div pr-10px"
                 :list="prayerListStore.donePrayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -148,6 +148,12 @@ const dragOptions = {
     }
     .list-group {
         min-height: 20px;
+    }
+}
+.prayer-list-page {
+    .list-group-done {
+        padding: 0 20px;
+        opacity: 0.5;
     }
 }
 </style>

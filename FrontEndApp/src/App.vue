@@ -12,7 +12,7 @@ import {
 } from 'naive-ui';
 import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import { useThemeStore } from './store/theme';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
@@ -23,7 +23,10 @@ import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
+import { isSignedIn } from './util/SupaBase/Auth/Auth';
+import { useUserStore } from './store/userStore';
 
+const userStore = useUserStore()
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
@@ -44,6 +47,11 @@ onBeforeMount(async () => {
     const isCollapseSideMenu = SESSION.get(isMenuCollapse);
     isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
 });
+
+onMounted(async () => {
+    const userData = await isSignedIn();
+    if (userData) userStore.user = userData;
+})
 </script>
 <template>
     <NConfigProvider :theme-overrides="themeStore.themeOverrides" :theme="themeStore.isDark ? darkTheme : null">
@@ -110,7 +118,7 @@ onBeforeMount(async () => {
                             <NLayout>
                                 <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
                                 <Sermons v-show="menuStore.isRouter == false && menuStore.menuSelected == 'sermons'" />
-                                <div v-show="menuStore.isRouter == true">
+                                <div class='h-[100%]' v-show="menuStore.isRouter == true">
                                     <RouterView />
                                 </div>
                             </NLayout>
