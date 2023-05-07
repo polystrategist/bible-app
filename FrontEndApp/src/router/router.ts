@@ -3,6 +3,7 @@ import PrayerList from './../Views/PrayerList/PrayerList.vue';
 import ProfilePage from './../Views/UserProfile/Profile.vue';
 import AboutPage from './../Views/About/About.vue';
 import CreateSermon from "./../Views/CreateSermon/CreateSermon.vue"
+import DonatePage from "./../Views/DonatePage/DonatePage.vue"
 export const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -37,6 +38,11 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'CreateSermon',
         path: '/create-sermon',
         component: CreateSermon
+    },
+    {
+        name: "DonatePage",
+        path: '/donate-page',
+        component: DonatePage
     }
 ];
 

@@ -12,10 +12,12 @@ import { onBeforeMount, ref } from 'vue';
 import Logo from './../../assets/logo.svg';
 import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
+import { useMenuStore } from '../../store/menu';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
 const mainStore = useMainStore();
+const menuStore = useMenuStore();
 
 async function minimizeWindow() {
     await window.browserWindow.minimizeWindow();
@@ -60,6 +62,15 @@ onBeforeMount(async () => {
                     <Information />
                 </NIcon>
                 <span class="text-size-12px ml-1">About</span>
+            </div>
+            <div
+                @click="menuStore.setMenu('/donate-page')"
+                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
+            >
+                <NIcon size="17">
+                    <Information />
+                </NIcon>
+                <span class="text-size-12px ml-1">Donate</span>
             </div>
             <div
                 @click="changeTheme()"

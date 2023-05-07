@@ -8,7 +8,7 @@ import { renderIcon } from '../util/helper';
 import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
 import { Pray } from '@vicons/fa';
 
-type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon';
+type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
 type menuHasNoRoute = 'read-bible' | 'sermons';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
@@ -53,7 +53,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     ]);
 
     const localSavedTabsKey = 'localSavedTabsKey';
-    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page', '/create-sermon']);
+    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page', '/create-sermon', '/donate-page']);
     watch(
         () => enableTab.value,
         async (val) => {
