@@ -6,6 +6,7 @@ import {
     Square20Regular,
     WeatherSunny20Regular,
     WeatherMoon20Regular,
+Heart24Filled,
 } from '@vicons/fluent';
 import { Close, Information } from '@vicons/carbon';
 import { onBeforeMount, ref } from 'vue';
@@ -68,7 +69,7 @@ onBeforeMount(async () => {
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
             >
                 <NIcon size="17">
-                    <Information />
+                    <Heart24Filled />
                 </NIcon>
                 <span class="text-size-12px ml-1">Donate</span>
             </div>
