@@ -17,6 +17,9 @@ If you like to support my simple ministry, you can do by one of this ways:
 
 For The features, I am adding what I know it can be useful when browsing or reading the bible. And also going to get ideas from any submitted issues/feature requests. This list will be Updated every time new feature is added or modified.
 
+## Sponsors
+<img src="https://believers-sword.brojenuel.com/images/sponsors/Navicat_landscape.png" width="300" />
+
 #### Pages
 
 -   [x] Read Bible
