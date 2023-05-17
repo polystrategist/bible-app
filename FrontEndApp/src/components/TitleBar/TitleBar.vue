@@ -1,12 +1,12 @@
-<script setup lang="ts">
-import { NLayoutHeader, NIcon } from 'naive-ui';
+<script lang='ts' setup>
+import { NIcon, NLayoutHeader } from 'naive-ui';
 import {
-    Subtract20Regular,
-    SquareMultiple20Regular,
+    Heart24Filled,
     Square20Regular,
-    WeatherSunny20Regular,
+    SquareMultiple20Regular,
+    Subtract20Regular,
     WeatherMoon20Regular,
-Heart24Filled,
+    WeatherSunny20Regular
 } from '@vicons/fluent';
 import { Close, Information } from '@vicons/carbon';
 import { onBeforeMount, ref } from 'vue';
@@ -19,6 +19,7 @@ const isMaximized = ref(false);
 const themeStore = useThemeStore();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
+const isElectron = window.isElectron;
 
 async function minimizeWindow() {
     await window.browserWindow.minimizeWindow();
@@ -37,85 +38,91 @@ function changeTheme() {
     themeStore.isDark = !themeStore.isDark;
 }
 
+
 onBeforeMount(async () => {
-    const isWindowBrowserMaximized: boolean = await window.browserWindow.isWindowBrowserMaximized();
-    isMaximized.value = isWindowBrowserMaximized;
+    isMaximized.value = await window.browserWindow.isWindowBrowserMaximized();
 });
 </script>
 <template>
-    <NLayoutHeader bordered class="flex cursor-default select-none items-center pl-8px light:bg-gray-100">
-        <div class="whitespace-nowrap flex items-center gap-1">
-            <div class="w-18px">
-                <img :src="Logo" />
+    <NLayoutHeader bordered class='flex cursor-default select-none items-center pl-8px light:bg-gray-100'>
+        <div class='whitespace-nowrap flex items-center gap-1'>
+            <div class='w-18px'>
+                <img :src='Logo' alt='believers sword logo' />
             </div>
-            <span class="capitalize">
+            <span class='capitalize'>
                 {{ $t('title') }} {{ mainStore.appName.includes('nightly') ? 'Nightly' : '' }}
-                <span class="text-size-10px"> {{ mainStore.version }} </span>
+                <span class='text-size-10px'> {{ mainStore.version }} </span>
             </span>
         </div>
-        <div id="draggable-region" class="w-full h-full text-center cursor-move z-50"></div>
-        <div class="flex items-center h-full">
+        <div id='draggable-region' class='w-full h-full text-center cursor-move z-50'></div>
+        <div class='flex items-center h-full'>
             <div
-                @click="mainStore.showAbout = true"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                @click='mainStore.showAbout = true'
             >
-                <NIcon size="17">
+                <NIcon size='17'>
                     <Information />
                 </NIcon>
-                <span class="text-size-12px ml-1">About</span>
+                <span class='text-size-12px ml-1'>About</span>
             </div>
             <div
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
                 @click="menuStore.setMenu('/donate-page')"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
             >
-                <NIcon size="17">
+                <NIcon size='17'>
                     <Heart24Filled />
                 </NIcon>
-                <span class="text-size-12px ml-1">Donate</span>
+                <span class='text-size-12px ml-1'>Donate</span>
             </div>
             <div
-                @click="changeTheme()"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-50px"
+                :class='{"mr-50px": isElectron}'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-10px'
+                @click='changeTheme()'
             >
-                <NIcon size="17">
-                    <WeatherMoon20Regular v-if="themeStore.isDark" />
+                <NIcon size='17'>
+                    <WeatherMoon20Regular v-if='themeStore.isDark' />
                     <WeatherSunny20Regular v-else />
                 </NIcon>
+                <span class='text-size-12px ml-1' v-if='themeStore.isDark'>Dark</span>
+                <span class='text-size-12px ml-1' v-else>Light</span>
             </div>
             <div
-                @click="minimizeWindow()"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
-                title="Minimize"
+                v-show='isElectron'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                title='Minimize'
+                @click='minimizeWindow()'
             >
-                <NIcon size="17">
+                <NIcon size='17'>
                     <Subtract20Regular />
                 </NIcon>
             </div>
             <div
-                @click="maximizeWindow()"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer"
-                title="Maximize"
+                v-show='isElectron'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                title='Maximize'
+                @click='maximizeWindow()'
             >
-                <NIcon size="17">
-                    <SquareMultiple20Regular v-if="isMaximized" />
+                <NIcon size='17'>
+                    <SquareMultiple20Regular v-if='isMaximized' />
                     <Square20Regular v-else />
                 </NIcon>
             </div>
             <div
-                @click="closeWindow()"
-                class="px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer"
-                title="Close"
+                v-show='isElectron'
+                class='px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer'
+                title='Close'
+                @click='closeWindow()'
             >
-                <NIcon size="20">
+                <NIcon size='20'>
                     <Close />
                 </NIcon>
             </div>
         </div>
     </NLayoutHeader>
 </template>
-<style lang="scss">
+<style lang='scss'>
 #draggable-region {
-    -webkit-app-region: drag;
-    cursor: move;
+  -webkit-app-region: drag;
+  cursor: move;
 }
 </style>

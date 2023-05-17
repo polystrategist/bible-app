@@ -9,7 +9,8 @@
         margin-right: 5px;
         border-radius: 3px;
         cursor: pointer;
-        user-select: none;
+        user-select: none !important;
+        display: none;
     }
 
     j {
@@ -23,7 +24,7 @@
     }
 
     [contenteditable]:focus {
-        outline: 0px solid transparent;
+        outline: 0 solid transparent;
     }
 }
 

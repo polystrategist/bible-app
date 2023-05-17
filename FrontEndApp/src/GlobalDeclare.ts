@@ -2,6 +2,7 @@ import { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider';
 
 declare global {
     interface Window {
+        isElectron: Boolean,
         versions: any;
         browserWindow: any;
         getAvailableBibles: Function;

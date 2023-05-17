@@ -1,0 +1,24 @@
+{
+  "name": "belivers-sword-backend",
+  "version": "1.0.0",
+  "description": "This is the believers sword backend for accessing bible version sqlite items.",
+  "main": "dist/index.js",
+  "author": "BroJenuel",
+  "license": "MIT",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.1.7",
+    "concurrently": "^8.0.1",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.0.4"
+  }
+}

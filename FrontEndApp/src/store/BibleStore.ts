@@ -80,8 +80,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             book_number: selectedBookNumber.value,
             selected_chapter: selectedChapter.value,
         };
-        getChapterHighlights();
-        clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
+        await getChapterHighlights();
+        await clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
         selectedBook.value = getBook(selectedBookNumber.value);
         verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
     }
@@ -120,16 +120,16 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         return bibleBooks[bibleBooks.findIndex((book) => book.book_number == b_num)];
     }
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
         const selectedVersions = SESSION.get(StorageSelectedVersions);
         if (selectedVersions) selectedBibleVersions.value = selectedVersions;
         recallSavedChapter();
-        getVerses();
+        await getVerses();
     });
 
-    onMounted(() => {
+    onMounted(async () => {
         AutoScrollSavedPosition();
-        getHighlights();
+        await getHighlights();
     });
 
     return {
@@ -148,25 +148,25 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         selectedChapter,
         getVerses,
         chapterHighlights,
-        selectBook(book: BookInterface) {
+        async selectBook(book: BookInterface) {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;
             if (book.chapter_count < selectedChapter.value) selectedChapter.value = book.chapter_count;
             selectedVerse.value = 1;
             saveVersesToStorage();
-            getVerses();
+            await getVerses();
         },
-        selectChapter(chapter: number) {
+        async selectChapter(chapter: number) {
             selectedChapter.value = chapter;
             saveVersesToStorage();
-            getVerses();
+            await getVerses();
         },
-        selectVerse(book_number: number, chapter: number, verse: number) {
+        async selectVerse(book_number: number, chapter: number, verse: number) {
             selectedBookNumber.value = book_number;
             selectedChapter.value = chapter;
             selectedVerse.value = verse;
             saveVersesToStorage();
-            getVerses();
+            await getVerses();
         },
         getSelectedData: computed(() => {
             const bookChosen = bibleBooks[bibleBooks.findIndex((book) => book.book_number == selectedBookNumber.value)];

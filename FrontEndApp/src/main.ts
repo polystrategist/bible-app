@@ -8,4 +8,8 @@ import './GlobalDeclare';
 import './assets/styles/main.scss';
 import 'splitpanes/dist/splitpanes.css';
 
+window.isElectron = true;
+const userAgent = navigator.userAgent.toLowerCase();
+if (userAgent.indexOf(' electron/') < 0) window.isElectron = false;
+
 createApp(App).use(createPinia()).use(router).use(Internationalization).mount('#app');
