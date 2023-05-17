@@ -67,7 +67,7 @@ onBeforeMount(async () => {
             </div>
             <div
                 class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
-                @click="menuStore.setMenu('/donate-page')"
+                @click="mainStore.showDonateModal = true"
             >
                 <NIcon size='17'>
                     <Heart24Filled />

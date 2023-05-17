@@ -25,6 +25,7 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { isSignedIn } from './util/SupaBase/Auth/Auth';
 import { useUserStore } from './store/userStore';
+import DonateModal from './components/Donate/DonateModal.vue';
 
 const userStore = useUserStore()
 const isMenuCollapse = 'is-menu-collapse';
@@ -128,6 +129,7 @@ onMounted(async () => {
                     <DownloadBible />
                     <AboutModal />
                     <SettingsModal />
+                    <DonateModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>
