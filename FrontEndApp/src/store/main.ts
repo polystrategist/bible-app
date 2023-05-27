@@ -6,7 +6,7 @@ export const useMainStore = defineStore('useMainStore', () => {
     const appName = ref<string>('believers sword');
     const showAbout = ref(false);
     const showSettings = ref(false);
-    const showDonateModal = ref<Boolean>(false);
+    const showDonateModal = ref(false);
 
     async function getVersions() {
         const versions: {
