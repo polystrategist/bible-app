@@ -79,7 +79,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             isRouter: isRouter.value,
             menuSelected: menuSelected.value
         });
-        console.log(menu);
         await router.push(menu);
     }
 

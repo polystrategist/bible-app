@@ -21,7 +21,6 @@ const content = ref('');
 const selectedColor = ref('#FFD26A');
 
 function toggleClipNoteModal(data: any) {
-    // console.log(data);
     content.value = '';
     selectedColor.value = '#FFD26A';
     if (data.content) content.value = data.content;

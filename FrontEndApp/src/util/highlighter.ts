@@ -112,7 +112,6 @@ export const highlight = async (color: string) => {
         window.getSelection()?.empty();
         selectedParentElement.click();
     } catch (e) {
-        console.log(e);
         window.message.error('Their is An Error Saving Highlight.');
     }
 };

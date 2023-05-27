@@ -89,8 +89,6 @@ async function submitSermon() {
         // get data from api
         getYoutubeVideoDetails(youtubeId.value as any)
             .then(async ({ data }) => {
-                console.log(data);
-
                 if (!data || !data.items) {
                     alert('Fetching Video Details Error');
                     loading.value = false;

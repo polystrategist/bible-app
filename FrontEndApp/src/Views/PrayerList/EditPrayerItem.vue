@@ -28,7 +28,6 @@ const SaveEditorContent = () => {
 };
 
 function modalTrigger(content: string, key: string) {
-    console.log(key);
     prayerItemContent.value = content;
     keyOfItem.value = key;
     showModal.value = !showModal.value;
