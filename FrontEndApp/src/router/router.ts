@@ -14,12 +14,13 @@ export const routes: Array<RouteRecordRaw> = [
         component: PrayerList,
     },
     {
-        name: 'ProfilePage',
+
         path: '/profile',
         component: ProfilePage,
         children: [
             {
                 path: '',
+                name: 'ProfilePage',
                 component: () => import('./../Views/UserProfile/Pages/Login.vue'),
             },
             {
