@@ -4,7 +4,12 @@ declare global {
     interface Window {
         isElectron: Boolean,
         versions: any;
-        browserWindow: any;
+        browserWindow: {
+            isWindowBrowserMaximized: () => Promise<boolean>;
+            closeWindow: () => Promise<void>;
+            maximizeWindow: () => Promise<void>;
+            minimizeWindow: () => Promise<void>;
+        };
         getAvailableBibles: Function;
         getVerses: Function;
         searchBible: Function;

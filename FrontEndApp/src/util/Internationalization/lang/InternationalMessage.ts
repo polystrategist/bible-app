@@ -30,6 +30,10 @@ export interface InternationalMessageInterface {
     'save changes': string;
     cancel: string;
     'are you sure to remove this item': string;
+    about: string;
+    donate: string;
+    dark: string;
+    light: string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

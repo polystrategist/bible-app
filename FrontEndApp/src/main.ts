@@ -12,4 +12,8 @@ window.isElectron = true;
 const userAgent = navigator.userAgent.toLowerCase();
 if (userAgent.indexOf(' electron/') < 0) window.isElectron = false;
 
-createApp(App).use(createPinia()).use(router).use(Internationalization).mount('#app');
+createApp(App)
+    .use(createPinia())
+    .use(router)
+    .use(Internationalization)
+    .mount('#app');

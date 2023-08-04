@@ -32,5 +32,9 @@ const message: InternationalMessageType = {
     'save changes': 'save changes',
     cancel: 'cancel',
     'are you sure to remove this item': 'are you sure to remove this item',
+    about: 'about',
+    donate: 'donate',
+    dark: 'dark',
+    light: 'light'
 };
 export default message;

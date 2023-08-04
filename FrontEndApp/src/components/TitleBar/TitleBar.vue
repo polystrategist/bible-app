@@ -13,12 +13,10 @@ import { onBeforeMount, ref } from 'vue';
 import Logo from './../../assets/logo.svg';
 import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
-import { useMenuStore } from '../../store/menu';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
 const mainStore = useMainStore();
-const menuStore = useMenuStore();
 const isElectron = window.isElectron;
 
 async function minimizeWindow() {
@@ -40,7 +38,8 @@ function changeTheme() {
 
 
 onBeforeMount(async () => {
-    isMaximized.value = await window.browserWindow.isWindowBrowserMaximized();
+    if (window.isElectron)
+        isMaximized.value = await window.browserWindow.isWindowBrowserMaximized();
 });
 </script>
 <template>
@@ -63,16 +62,16 @@ onBeforeMount(async () => {
                 <NIcon size='17'>
                     <Information />
                 </NIcon>
-                <span class='text-size-12px ml-1'>About</span>
+                <span class='text-size-12px ml-1 capitalize whitespace-nowrap'>{{ $t('about') }}</span>
             </div>
             <div
                 class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
-                @click="mainStore.showDonateModal = true"
+                @click='mainStore.showDonateModal = true'
             >
                 <NIcon size='17'>
                     <Heart24Filled />
                 </NIcon>
-                <span class='text-size-12px ml-1'>Donate</span>
+                <span class='text-size-12px ml-1 capitalize whitespace-nowrap'>{{ $t('donate') }}</span>
             </div>
             <div
                 :class='{"mr-50px": isElectron}'
@@ -83,8 +82,8 @@ onBeforeMount(async () => {
                     <WeatherMoon20Regular v-if='themeStore.isDark' />
                     <WeatherSunny20Regular v-else />
                 </NIcon>
-                <span class='text-size-12px ml-1' v-if='themeStore.isDark'>Dark</span>
-                <span class='text-size-12px ml-1' v-else>Light</span>
+                <span v-if='themeStore.isDark' class='text-size-12px ml-1 capitalize whitespace-nowrap'>{{ $t('dark') }}</span>
+                <span v-else class='text-size-12px ml-1 capitalize whitespace-nowrap'>{{ $t('light') }}</span>
             </div>
             <div
                 v-show='isElectron'
@@ -122,7 +121,7 @@ onBeforeMount(async () => {
 </template>
 <style lang='scss'>
 #draggable-region {
-  -webkit-app-region: drag;
-  cursor: move;
+    -webkit-app-region: drag;
+    cursor: move;
 }
 </style>

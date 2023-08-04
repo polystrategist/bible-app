@@ -32,6 +32,10 @@ const message: InternationalMessageType = {
     'save changes': '変更内容を保存',
     cancel: 'キャンセル',
     'are you sure to remove this item': 'このアイテムを削除してもよろしいですか',
+    about: 'だいたい',
+    donate: '寄付',
+    dark: '暗い',
+    light: 'ライト'
 };
 
 export default message;

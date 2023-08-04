@@ -137,6 +137,24 @@ onMounted(() => {
     document.getElementById('view-verses-container')?.addEventListener('dragstart', (event) => {
         event.preventDefault();
     });
+    const scrollArea = document.getElementById('view-verses-container');
+
+    scrollArea?.addEventListener('wheel', (event) => {
+        if (event.ctrlKey) {
+            if (event.deltaY > 0) {
+                // Ctrl + Scroll Down
+                fontSize.value--
+                // Do something else you want
+            } else if (event.deltaY < 0) {
+                // Ctrl + Scroll Up
+                fontSize.value++
+                // Do something else you want
+            }
+            // Prevent the default scroll behavior when Ctrl is pressed
+            event.preventDefault();
+        }
+    });
+
 });
 </script>
 <template>
@@ -165,7 +183,7 @@ onMounted(() => {
         <div
             id="view-verses-container"
             :style="`font-size:${fontSize}px`"
-            class="w-full h-[calc(100%-30px)] overflow-y-auto overflowing-div py-3 pl-5 pr-3 scroll-bar-md flex flex-col gap-5px"
+            class="w-full max-w-700px mx-auto h-[calc(100%-30px)] overflow-y-auto overflowing-div py-3 pl-5 pr-3 scroll-bar-md flex flex-col gap-5px"
         >
             <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col">
                 <div
