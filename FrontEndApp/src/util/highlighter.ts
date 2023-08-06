@@ -122,8 +122,7 @@ export async function getChapterHighlights(args: { book_number: number; chapter:
 }
 
 export async function saveHighlight(args: { key: string; book_number: number; chapter: number; verse: number; content: string }) {
-    const save = await window.browserWindow.saveHighlight(JSON.stringify(args));
-    return save;
+    return await window.browserWindow.saveHighlight(JSON.stringify(args));
 }
 
 export const colors = [

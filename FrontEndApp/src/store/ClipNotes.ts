@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, onMounted } from 'vue';
+import { SAVED_CLIP_NOTE_TYPE } from '../GlobalTypes';
 
 export const useClipNoteStore = defineStore('useClipNoteStore', () => {
     const clipNotes = ref<Array<any>>([]);
-    const chapterClipNotes = ref({});
+    const chapterClipNotes = ref<SAVED_CLIP_NOTE_TYPE>({});
 
     const clipNotesPage = ref(1);
     const clipNotesSearch = ref<null | string>(null);

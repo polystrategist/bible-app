@@ -1,15 +1,16 @@
 <script lang="ts" setup>
 import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
-import { NInput, NForm, NButton, NPopselect, useMessage } from 'naive-ui';
-import { ref, computed } from 'vue';
+import { NButton, NForm, NInput, NPopselect, useMessage } from 'naive-ui';
+import { computed, ref } from 'vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { bibleBooks } from '../../books';
-import { highlighter } from './../../../../util/hilitor';
+import { highlighter } from '../../../../util/hilitor';
+import { searchBibleType } from '../../../../GlobalTypes';
 
 const bibleStore = useBibleStore();
 const page = ref<number>(1);
 const search = ref<null | string>(null);
-const searchedVerses: any = ref([]);
+const searchedVerses = ref<searchBibleType>([]);
 const limit = ref(20);
 const selectedBookNumber = ref<null | number>(null);
 const message = useMessage();
@@ -27,8 +28,7 @@ async function submitSearch() {
         limit: limit.value,
         book_number: selectedBookNumber.value,
     };
-    const data = await window.browserWindow.searchBible(JSON.stringify(arg));
-    searchedVerses.value = data;
+    searchedVerses.value = await window.browserWindow.searchBible(JSON.stringify(arg));
 
     setTimeout(() => {
         highlighter('input-text-search', arg.search);

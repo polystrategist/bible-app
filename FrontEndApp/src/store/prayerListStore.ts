@@ -10,6 +10,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
      */
     async function getPrayerLists() {
         const lists = await window.browserWindow.getPrayerLists();
+        console.log('Prayer List',lists)
         for (const list of lists) {
             if (list.status == 'done') donePrayerList.value.push(list);
             else prayerList.value.push(list);
@@ -21,7 +22,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
      * @param status
      */
     async function resetPrayerItemList(status: 'ongoing' | 'done') {
-        const lists = await window.browserWindow.resetPrayerListItems(
+        await window.browserWindow.resetPrayerListItems(
             JSON.stringify({
                 status,
                 data: status == 'ongoing' ? prayerList.value : donePrayerList.value,
