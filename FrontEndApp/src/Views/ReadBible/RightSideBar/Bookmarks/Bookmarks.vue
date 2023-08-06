@@ -18,7 +18,7 @@ function selectBookVerse(key: string, { book_number, chapter, verse }: { book_nu
 
 async function deleteBookmark(verse: any) {
     const delItem = await window.browserWindow.deleteBookmark(JSON.stringify(verse));
-    bookmarkStore.getBookmarks();
+    await bookmarkStore.getBookmarks();
 }
 </script>
 <template>

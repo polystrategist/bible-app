@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { NPopover, NButton, NIcon } from 'naive-ui';
+import { NIcon, NPopover } from 'naive-ui';
 import { onClickOutside } from '@vueuse/core';
 import { ref } from 'vue';
-import { BookmarkAdd } from '@vicons/carbon';
 import { ContextMenuOptions } from './ContextMenuOptions';
-import { useBookmarkStore } from './../../../../store/bookmark';
+import { useBookmarkStore } from '../../../../store/bookmark';
 
 const contextMenuRef = ref(null);
 const emits = defineEmits(['close', 'create-clip-note']);
@@ -29,8 +28,7 @@ const props = defineProps({
 });
 async function clickContextMenu(key: string) {
     if (key == 'add-to-bookmark') {
-        const saveToBookmark = await window.browserWindow.saveBookMark(JSON.stringify(props.data));
-        bookmarkStore.bookmarks = saveToBookmark;
+        bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(JSON.stringify(props.data));
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
     }
