@@ -10,7 +10,6 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
      */
     async function getPrayerLists() {
         const lists = await window.browserWindow.getPrayerLists();
-        console.log('Prayer List',lists)
         for (const list of lists) {
             if (list.status == 'done') donePrayerList.value.push(list);
             else prayerList.value.push(list);
@@ -76,14 +75,14 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
             const doneIndex = donePrayerList.value.findIndex((item) => item.key == key);
             if (doneIndex > -1) donePrayerList.value.splice(findIndex, 1);
 
-            deletePrayerItem(key as string);
+            await deletePrayerItem(key as string);
         } catch (e) {
             console.log('removePrayerItem', e);
         }
     }
 
-    onBeforeMount(() => {
-        getPrayerLists();
+    onBeforeMount(async () => {
+        await getPrayerLists();
     });
 
     return {

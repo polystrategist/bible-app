@@ -13,12 +13,12 @@ function clickDownload() {
     downloadBibleStore.isDownloading = true;
     downloadBibleStore.downloadingVersion = props.version.file_name;
     window.browserWindow.downloadModule({
-        url: props.version.download_link,
+        url: props.version.download_link as any,
         progress: (data: any) => {
             percentage.value = data.percent * 100;
         },
         done: async () => {
-            moduleStore.getBibleLists();
+            await moduleStore.getBibleLists();
             downloadBibleStore.isDownloading = false;
         },
     });

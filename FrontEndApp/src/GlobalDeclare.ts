@@ -28,14 +28,16 @@ declare global {
              * Downloads Modules
              */
             downloadModule: (args: {
-                urls: Array<string>;
+                url?: string;
+                urls?: Array<string>;
                 done: () => void;
+                progress?: (data: any) => void;
             }) => void;
 
             /**
              * Save A Bookmark
              */
-            saveBookMark: (args: string) => Promise<Array<any>>;
+            saveBookMark: (args: string) => Promise<any>;
             /**
              * Get Bookmarks
              */
