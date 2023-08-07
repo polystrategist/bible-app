@@ -6,7 +6,7 @@ import { useMainStore } from '../../store/main';
 
 const mainStore = useMainStore();
 const bibleStore = useBibleStore();
-const downloadPercentage = ref<number>(30);
+const downloadPercentage = ref<number>(0);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];
 
