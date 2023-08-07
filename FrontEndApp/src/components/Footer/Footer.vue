@@ -6,7 +6,7 @@ import { useMainStore } from '../../store/main';
 
 const mainStore = useMainStore();
 const bibleStore = useBibleStore();
-const downloadPercentage = ref<number>(0);
+const downloadPercentage = ref<number>(30);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];
 
@@ -38,7 +38,8 @@ onMounted(() => {
             {{ bibleStore.getSelectedData.chapter }}
         </div>
         <div class='flex items-center h-full w-full max-w-300px justify-end pr-2'>
-            <div v-if='downloadPercentage > 0' class='w-100px'>
+            <div v-if='downloadPercentage > 0' class='w-150px flex items-center gap-1'>
+                <span class='text-size-10px'>Updating</span>
                 <NProgress :percentage='downloadPercentage' type='line' />
             </div>
             <div>{{ selectedFaceForToday }}</div>
