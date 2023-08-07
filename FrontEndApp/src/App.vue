@@ -26,6 +26,7 @@ import SettingsModal from './components/Settings/SettingsModal.vue';
 import { isSignedIn } from './util/SupaBase/Auth/Auth';
 import { useUserStore } from './store/userStore';
 import DonateModal from './components/Donate/DonateModal.vue';
+import SearchBar from './components/SearchBar.vue';
 
 const userStore = useUserStore()
 const isMenuCollapse = 'is-menu-collapse';
@@ -60,8 +61,8 @@ onMounted(async () => {
             <NNotificationProvider>
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
-                        <TitleBar class="h-25px" />
-                        <NLayout class="h-[calc(100%-50px)]" has-sider>
+                        <TitleBar class="h-50px" />
+                        <NLayout class="h-[calc(100%-75px)]" has-sider>
                             <NLayoutSider
                                 bordered
                                 :collapsed="isSideBarCollapse"

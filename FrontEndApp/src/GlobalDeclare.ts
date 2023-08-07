@@ -1,11 +1,10 @@
 import { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider';
 import { SAVED_CLIP_NOTE_TYPE, searchBibleType } from './GlobalTypes';
 
-
-
 declare global {
     interface Window {
-        isElectron: Boolean,
+        searchTheBibleTimeOut: any;
+        isElectron: Boolean;
         message: MessageApiInjection;
         browserWindow: {
             versions: () => Promise<{

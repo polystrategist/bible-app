@@ -1,11 +1,11 @@
 import { BookCoins24Regular } from '@vicons/fluent';
 import { Bookmark, PaintBrush, SearchLocate, Attachment } from '@vicons/carbon';
 export const rightSideBarMenus = [
-    {
-        title: 'Search',
-        key: 'bible-search',
-        icon: SearchLocate,
-    },
+    // {
+    //     title: 'Search',
+    //     key: 'bible-search',
+    //     icon: SearchLocate,
+    // },
     {
         title: 'Bible Versions',
         key: 'bible-lists',

@@ -13,6 +13,7 @@ import { onBeforeMount, ref } from 'vue';
 import Logo from './../../assets/logo.svg';
 import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
+import SearchBar from '../SearchBar.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
@@ -43,8 +44,8 @@ onBeforeMount(async () => {
 });
 </script>
 <template>
-    <NLayoutHeader bordered class='flex cursor-default select-none items-center pl-8px light:bg-gray-100'>
-        <div class='whitespace-nowrap flex items-center gap-1'>
+    <NLayoutHeader bordered class='flex cursor-default select-none items-center pl-8px light:bg-gray-100 justify-between'>
+        <div class='whitespace-nowrap flex items-center gap-1 w-200px'>
             <div class='w-18px'>
                 <img :src='Logo' alt='believers sword logo' />
             </div>
@@ -53,8 +54,12 @@ onBeforeMount(async () => {
                 <span class='text-size-10px'> {{ mainStore.version }} </span>
             </span>
         </div>
-        <div id='draggable-region' class='w-full h-full text-center cursor-move z-50'></div>
-        <div class='flex items-center h-full'>
+        <div class='flex items-center w-full h-full  z-50 justify-between'>
+            <div class='draggable-region flex-grow cursor-move opacity-0'>draggable region</div>
+            <SearchBar />
+            <div class='draggable-region flex-grow cursor-move opacity-0'>draggable region</div>
+        </div>
+        <div class='flex items-center h-full justify-end'>
             <div
                 class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
                 @click='mainStore.showAbout = true'
@@ -120,7 +125,7 @@ onBeforeMount(async () => {
     </NLayoutHeader>
 </template>
 <style lang='scss'>
-#draggable-region {
+.draggable-region {
     -webkit-app-region: drag;
     cursor: move;
 }
