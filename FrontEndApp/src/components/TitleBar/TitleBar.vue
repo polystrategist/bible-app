@@ -51,7 +51,7 @@ onBeforeMount(async () => {
             </div>
             <span class='capitalize'>
                 {{ $t('title') }} {{ mainStore.appName.includes('nightly') ? 'Nightly' : '' }}
-                <span class='text-size-10px'> {{ mainStore.version }} </span>
+
             </span>
         </div>
         <div class='flex items-center w-full h-full  z-50 justify-between'>

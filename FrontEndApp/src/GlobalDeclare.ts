@@ -105,6 +105,8 @@ declare global {
              * Save Prayer List Item
              */
             savePrayerItem: (args: string) => Promise<any>;
+
+            updateDownloadProgress: (progress: { percentage: Function, done: Function }) => void;
         };
     }
 }

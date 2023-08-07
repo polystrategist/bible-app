@@ -19,7 +19,7 @@ async function createWindow() {
 
         webPreferences: {
             preload: __dirname + '/preload.js',
-            devTools: isNightly,
+            devTools: isNightly || true,
         },
         show: false,
         alwaysOnTop: true,
@@ -36,7 +36,7 @@ async function createWindow() {
     BibleModules();
 
     // auto updated
-    if (!isDev && !isNightly) AppUpdater();
+    if (!isDev && !isNightly) AppUpdater(mainWindow);
 
     // and load the index.html of the app.
     // win.loadFile("index.html");

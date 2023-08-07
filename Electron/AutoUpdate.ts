@@ -1,7 +1,7 @@
-import { app, dialog } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 
-export default () => {
+export default (mainWindow: BrowserWindow) => {
     if (app.isPackaged) {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
@@ -22,7 +22,17 @@ export default () => {
             });
         });
 
+        autoUpdater.on('download-progress', (progressObj) => {
+            // Calculate the download progress percentage
+            const downloadPercentage = Math.floor(progressObj.percent);
+
+            // Update UI with progress percentage
+            mainWindow.webContents.send('download-progress', downloadPercentage);
+        });
+
         autoUpdater.addListener('update-downloaded', (info: UpdateInfo) => {
+            // Update UI with progress percentage
+            mainWindow.webContents.send('update-downloaded');
             dialog
                 .showMessageBox({
                     type: 'info',

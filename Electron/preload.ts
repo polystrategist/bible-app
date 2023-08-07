@@ -38,4 +38,16 @@ contextBridge.exposeInMainWorld('browserWindow', {
     savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
     resetPrayerListItems: (args: any) => ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
+    updateDownloadProgress: (progress: { percentage: Function, done: Function }) => {
+        // Listen for the event from the main process
+        ipcRenderer.on('download-progress', (event, percentage) => {
+            progress.percentage(percentage);
+        });
+
+        ipcRenderer.on('update-downloaded', () => {
+            progress.done();
+        });
+    }
 });
+
+
