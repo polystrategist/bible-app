@@ -1,8 +1,8 @@
 {
-  "name": "believers-sword-nightly",
+  "name": "believers-sword",
   "description": "Believers Sword is an application for believers community, it is used to study bible, also used for praying, social or connect with other believers.",
   "author": "BroJenuel",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "main": "./dist/main.js",
   "license": "GPL-3.0",
   "scripts": {
@@ -27,8 +27,8 @@
     "up:win": "up_using_window.cmd"
   },
   "build": {
-    "appId": "com.official-believers-sword-nightly.app",
-    "productName": "Believers Sword Nightly",
+    "appId": "com.official-believers-sword.app",
+    "productName": "Believers Sword",
     "copyright": "Copyright © 2022 ${author}",
     "publish": [
       {
