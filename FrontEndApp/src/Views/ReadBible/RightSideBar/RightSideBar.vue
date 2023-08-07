@@ -5,7 +5,6 @@ import { rightSideBarMenus } from './RightSideBar';
 import BibleList from './Bibles/Bibles.vue';
 import Bookmarks from './Bookmarks/Bookmarks.vue';
 import Highlights from './Highlights/Highlights.vue';
-import Search from './Search/Search.vue';
 import SESSION from '../../../util/session';
 import ClipNotes from './ClipNotes/ClipNotes.vue';
 
@@ -30,7 +29,6 @@ onBeforeMount(() => {
             <BibleList v-show="selectedButton == 'bible-lists'" />
             <Bookmarks v-show="selectedButton == 'bible-bookmarks'" />
             <Highlights v-show="selectedButton == 'bible-highlights'" />
-            <Search v-show="selectedButton == 'bible-search'" />
             <ClipNotes v-show="selectedButton == 'bible-clip-notes'" />
         </div>
         <div class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 flex flex-col items-center gap-1 pt-3 text-size-20px">
