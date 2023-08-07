@@ -36,7 +36,7 @@ async function createWindow() {
     BibleModules();
 
     // auto updated
-    if (!isDev && !isNightly) AppUpdater();
+    if (!isDev && !isNightly) await AppUpdater();
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
@@ -61,7 +61,7 @@ async function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-    // check and setup the database
+    // check and set up the database
     try {
         await setupDefault
             .then((response) => console.log(response))
@@ -83,9 +83,9 @@ app.whenReady().then(async () => {
         }
     }
 
-    createWindow();
+    await createWindow();
     app.on('activate', function () {
-        // On macOS it's common to re-create a window in the app when the
+        // On macOS, it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });

@@ -1,10 +1,10 @@
 import { dialog, app } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 
-export default () => {
+export default async () => {
     if (app.isPackaged) {
         autoUpdater.autoInstallOnAppQuit = true;
-        autoUpdater.checkForUpdates();
+        await autoUpdater.checkForUpdatesAndNotify();
         autoUpdater.addListener('update-downloaded', (info: UpdateInfo) => {
             dialog
                 .showMessageBox({
