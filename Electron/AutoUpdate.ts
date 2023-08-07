@@ -1,11 +1,11 @@
 import { app, dialog } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 
-export default async () => {
+export default () => {
     if (app.isPackaged) {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
-        await autoUpdater.checkForUpdates();
+        autoUpdater.checkForUpdates();
 
         autoUpdater.on('update-available', () => {
             // Show a dialog to the user indicating that an update is available

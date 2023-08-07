@@ -36,7 +36,7 @@ async function createWindow() {
     BibleModules();
 
     // auto updated
-    if (!isDev && !isNightly) await AppUpdater();
+    if (!isDev && !isNightly) AppUpdater();
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
