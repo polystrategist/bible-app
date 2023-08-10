@@ -7,4 +7,9 @@ export default defineNuxtConfig({
         "~/assets/style/main.scss",
         "vue3-carousel/dist/carousel.css",
     ],
+    windicss: {
+        scan: {
+            exclude: ["node_modules", "public/app", "dist", ".git"],
+        },
+    },
 });

@@ -24,7 +24,9 @@
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
-    "up:win": "up_using_window.cmd"
+    "up:win": "up_using_window.cmd",
+    "build:web": "cd FrontEndApp && yarn build-for-web",
+    "web:dev": "cd web && yarn dev"
   },
   "build": {
     "appId": "com.official-believers-sword.app",

@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vue-tsc --noEmit && cross-env ELECTRON=true vite build --emptyOutDir",
+        "build-for-web": "vue-tsc --noEmit && cross-env ELECTRON=true vite build --mode web --emptyOutDir",
         "preview": "vite preview"
     },
     "dependencies": {

@@ -5,7 +5,7 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => ({
     build: {
-        outDir: './../dist',
+        outDir: mode == 'web' ? './../web/public/app' : './../dist',
         chunkSizeWarningLimit: 1000,
     },
     base: mode == 'development' ? '' : './',
