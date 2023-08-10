@@ -1,0 +1,29 @@
+:root {
+    --nav-height: 50px;
+    --primaryColor: rgba(217, 119, 6);
+    --primaryColorInDark: rgba(245, 158, 11);
+}
+
+body {
+    background-image: url(~/assets/images/star-bg.svg), linear-gradient(#d6d6d6, #ffffff 15%);
+    background-repeat: repeat-x;
+    background-position: center 0, 0 0, 0 0;
+
+    &.dark {
+        background-image: url(~/assets/images/star-bg.svg), linear-gradient(#191c20, #24292e 15%) !important;
+    }
+}
+
+.header-nav {
+    .nav-active {
+        color: white;
+        background-color: var(--primaryColor);
+    }
+
+    .nav-inactive,
+    .nav-active {
+        padding: 3px 5px;
+        border-radius: 5px;
+        // background-color: rgba(255, 255, 255, 0);
+    }
+}
