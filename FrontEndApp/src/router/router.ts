@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw } from 'vue-router';
 import PrayerList from './../Views/PrayerList/PrayerList.vue';
 import ProfilePage from './../Views/UserProfile/Profile.vue';
 import AboutPage from './../Views/About/About.vue';
-import CreateSermon from "./../Views/CreateSermon/CreateSermon.vue"
+import CreateSermon from './../Views/CreateSermon/CreateSermon.vue';
 export const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -14,7 +14,6 @@ export const routes: Array<RouteRecordRaw> = [
         component: PrayerList,
     },
     {
-
         path: '/profile',
         component: ProfilePage,
         children: [
@@ -37,12 +36,12 @@ export const routes: Array<RouteRecordRaw> = [
     {
         name: 'CreateSermon',
         path: '/create-sermon',
-        component: CreateSermon
+        component: CreateSermon,
     },
 ];
-
+const mode = import.meta.env.MODE == 'web' ? '/app/' : undefined;
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(mode),
     routes,
 });
 

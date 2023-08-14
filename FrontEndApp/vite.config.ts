@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
         outDir: mode == 'web' ? './../web/public/app' : './../dist',
         chunkSizeWarningLimit: 1000,
     },
-    base: mode == 'development' ? '' : './',
+    base: mode == 'web' ? '/app/' : mode == 'development' ? '' : './',
     plugins: [vue(), WindiCSS()],
     server: {
         port: 3000,

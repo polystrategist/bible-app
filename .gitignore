@@ -6,3 +6,4 @@ defaults
 .env
 up_using_window.cmd
 .idea
+web/public/app
