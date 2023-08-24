@@ -39,7 +39,7 @@
       }
     ],
     "nsis": {
-      "oneClick": true,
+      "oneClick": false,
       "allowToChangeInstallationDirectory": false,
       "deleteAppDataOnUninstall": true
     },
@@ -66,7 +66,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.2",
     "concurrently": "^7.4.0",
-    "electron": "^25.4.0",
+    "electron": "^26.1.0",
     "electron-builder": "^24.6.3",
     "electron-devtools-installer": "^3.2.0",
     "json": "^11.0.0",
