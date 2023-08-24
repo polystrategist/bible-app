@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 
+let errorAlreadyShown = false;
 export default (mainWindow: BrowserWindow) => {
     if (app.isPackaged) {
         autoUpdater.autoDownload = false;
@@ -48,19 +49,24 @@ export default (mainWindow: BrowserWindow) => {
         });
     }
 
+
     autoUpdater.on('error', (error) => {
         // Handle update error
-        dialog
-            .showMessageBox({
-                type: 'error',
-                buttons: ['OK'],
-                title: 'Error Updating!',
-                message: 'Their is an Error Updating, the developer is working on a fix right now.'
-            })
-            .then(({ response }) => {
-                if (response == 0 || response == 2) {
-                    autoUpdater.quitAndInstall();
-                }
-            });
+        if (!errorAlreadyShown) {
+            errorAlreadyShown = true;
+            dialog
+                .showMessageBox({
+                    type: 'error',
+                    buttons: ['OK'],
+                    title: 'Error Updating!',
+                    message: 'Their is an Error Updating, the developer is working on a fix right now.'
+                })
+                .then(({ response }) => {
+                    if (response == 0 || response == 2) {
+                        autoUpdater.quitAndInstall();
+                    }
+                });
+        }
+
     });
 };

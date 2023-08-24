@@ -3,7 +3,9 @@ import { NLayoutFooter, NProgress } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import { useBibleStore } from '../../store/BibleStore';
 import { useMainStore } from '../../store/main';
+import { useNetwork } from "@vueuse/core"
 
+const network = useNetwork();
 const mainStore = useMainStore();
 const bibleStore = useBibleStore();
 const downloadPercentage = ref<number>(0);
@@ -13,6 +15,8 @@ const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(�
 onBeforeMount(() => {
     const randomIndex = Math.floor(Math.random() * faceForToday.length);
     selectedFaceForToday.value = faceForToday[randomIndex];
+
+
 });
 
 onMounted(() => {
@@ -26,6 +30,12 @@ onMounted(() => {
             downloadPercentage.value = 0;
         }
     });
+
+    if (network.isSupported) {
+        console.log('online')
+    } else {
+        console.log('Offline')
+    }
 });
 </script>
 <template>

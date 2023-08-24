@@ -33,7 +33,7 @@ function handleCheckBox(bibleVersions: Array<any>) {
         </template>
         <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox">
             <template v-for="bible in moduleStore.bibleLists">
-                <NCheckbox :value="bible.file_name" :label="`${bible.title} (${bible.file_name.replace('.SQLite3', '')})`" />
+                <NCheckbox :value="bible.file_name" :label="`${bible.title}`" />
             </template>
         </NCheckboxGroup>
     </RightSideBarContainer>
