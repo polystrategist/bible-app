@@ -3,6 +3,7 @@ import { TextAlignJustify } from '@vicons/carbon';
 import { NButton, NTag, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
 import { ref } from 'vue';
 import { DAYJS } from '../../../util/dayjs';
+import { Icon } from "@iconify/vue"
 
 const data = ref<any>(null);
 const showYoutubeModal = ref(false);
@@ -34,8 +35,11 @@ defineExpose({
                             {{ data.title }}
                         </div>
                         <div class="flex items-center mt-2 gap-2">
-                            <NTag type="primary" :bordered="false" round>{{ data ? data.language : '' }}</NTag>
-                            <NTag :color="{ color: '#227C70' }" :bordered="false" round>
+                            <NTag type="primary" :bordered="false" round>
+                                <template #icon><Icon icon='mdi:language' /></template>
+                                {{ data ? data.language : '' }}
+                            </NTag>
+                            <NTag type='info' :bordered="false" round>
                                 <template #icon>
                                     <NIcon><TextAlignJustify /></NIcon>
                                 </template>

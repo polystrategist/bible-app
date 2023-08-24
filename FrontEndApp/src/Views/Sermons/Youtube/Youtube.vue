@@ -4,6 +4,7 @@ import { NButton, NTag, NIcon, NDrawer, NDrawerContent } from 'naive-ui';
 import { ref, reactive } from 'vue';
 import { LogoYoutube, TextAlignJustify } from '@vicons/carbon';
 import { DAYJS } from '../../../util/dayjs';
+import { Icon } from '@iconify/vue';
 
 const data = ref<any>(null);
 const youtube: any = ref(null);
@@ -68,14 +69,17 @@ defineExpose({
                     <div class="mt-5 flex flex-col gap-10px">
                         <div class="text-700 text-size-30px">{{ data.title }}</div>
                         <div class="flex items-center mt-2 gap-2">
-                            <NTag type="primary" :bordered="false" round>{{ data.language }}</NTag>
-                            <NTag v-if="data.youtube_video_id" :color="{ color: '#FF0000' }" round :bordered="false">
+                            <NTag type="primary" :bordered="false" round>
+                                <template #icon><Icon icon='mdi:language' /></template>
+                                {{ data ? data.language : '' }}
+                            </NTag>
+                            <NTag v-if="data.youtube_video_id" type='error' round :bordered="false">
                                 <template #icon>
                                     <NIcon><LogoYoutube /></NIcon>
                                 </template>
                                 Youtube
                             </NTag>
-                            <NTag v-else :color="{ color: '#227C70' }" :bordered="false" round>
+                            <NTag v-else :bordered="false" round type="info">
                                 <template #icon>
                                     <NIcon><TextAlignJustify /></NIcon>
                                 </template>

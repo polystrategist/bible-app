@@ -1,5 +1,5 @@
 <script lang='ts' setup>
-import { NButton, NInput, useMessage, NCheckboxGroup, NCheckbox } from 'naive-ui';
+import { NButton, NCheckbox, NCheckboxGroup, NInput, useMessage } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { searchBibleType } from '../GlobalTypes';
 import { highlighter } from '../util/hilitor';
@@ -96,6 +96,7 @@ const selectedBooksForSearchString = computed(() => {
     <div class='w-330px flex justify-center top-0 z-999999999 relative'>
         <NInput
             v-model:value='search'
+            :autofocus='false'
             :on-focus='() => focused = true'
             class='w-300px focus:w-330px transition-all'
             clearable

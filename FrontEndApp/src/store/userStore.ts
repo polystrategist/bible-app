@@ -6,9 +6,11 @@ export const useUserStore = defineStore('useUserStore', () => {
     const user_id = computed(() => {
         return user.value?.user?.id ?? null;
     });
+    const syncData = ref<boolean>(false)
 
     return {
         user,
-        user_id
+        user_id,
+        syncData
     };
 });
