@@ -17,8 +17,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         chapter_count: 50
     });
     const clipNoteStore = useClipNoteStore();
-    const DefaultSelectedVersion = `KJ'1769.SQLite3`;
-    const selectedBibleVersions = ref<Array<string>>([`KJ'1769.SQLite3`]);
+    const DefaultSelectedVersion = `King James Version - 1769.SQLite3`;
+    const selectedBibleVersions = ref<Array<string>>([`King James Version - 1769.SQLite3`]);
     const selectedBookNumber = ref<number>(10);
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);

@@ -1,18 +1,34 @@
 import AB1978Commentaries from './Modules/Commentaries/AB1978.commentaries';
 import ASNDCommentaries from './Modules/Commentaries/ASND.commentaries';
-import AB1978 from './Modules/Bible/AB1978';
-import ASND from './Modules/Bible/ASND';
-import ASV from './Modules/Bible/ASV+';
-import BAMD from './Modules/Bible/BAMD';
 import BamdCommentaries from './Modules/Commentaries/BAMD.commentaries';
-import CPDV from './Modules/Bible/CPDV';
-import ESV from './Modules/Bible/ESV';
-import KJ1769 from './Modules/Bible/KJ1769';
-import KJPCE from './Modules/Bible/KJPCE+';
-import KJV1769 from './Modules/Bible/KJV1769+';
-import NASB from './Modules/Bible/NASB+';
 import ESVCommentaries from './Modules/Commentaries/ESV.commentaries';
-import JFA1819 from './Modules/Bible/JFA1819';
+import americanStandardVersion1901 from './Modules/Bible/american-standard-version-1901';
+import angBiblia1978 from './Modules/Bible/ang-biblia-1978';
+import angSalitaNgDios2015 from './Modules/Bible/ang-salita-ng-dios-2015';
+import bibliaAveMaria1959 from './Modules/Bible/biblia-ave-maria-1959';
+import bibliaDeJoaoFerreiraDeAlmeidaEdicaoDe1819
+    from './Modules/Bible/biblia-de-joao-ferreira-de-almeida-edicao-de-1819';
+import catholicPublicDomainVersion2009 from './Modules/Bible/catholic-public-domain-version-2009';
+import englishStandardVersion20012016 from './Modules/Bible/english-standard-version-2001-2016';
+import kingJamesBible1611PureCambridgeEdition1900
+    from './Modules/Bible/king-james-bible-1611-pure-cambridge-edition-1900';
+import kingJamesVersion1769 from './Modules/Bible/king-james-version-1769';
+import kingJamesVersionOf1611Or1769 from './Modules/Bible/king-james-version-of-1611-or-1769';
+import magandangBalitaBiblia from './Modules/Bible/magandang-balita-biblia';
+import newAmericanStandardBible from './Modules/Bible/new-american-standard-bible';
 
-export const bible = [AB1978, ASND, ASV, BAMD, CPDV, ESV, KJ1769, KJPCE, KJV1769, NASB, JFA1819];
+export const bible = [
+    americanStandardVersion1901,
+    angBiblia1978,
+    angSalitaNgDios2015,
+    bibliaAveMaria1959,
+    bibliaDeJoaoFerreiraDeAlmeidaEdicaoDe1819,
+    catholicPublicDomainVersion2009,
+    englishStandardVersion20012016,
+    kingJamesBible1611PureCambridgeEdition1900,
+    kingJamesVersion1769,
+    kingJamesVersionOf1611Or1769,
+    magandangBalitaBiblia,
+    newAmericanStandardBible
+];
 export const commentaries = [AB1978Commentaries, ASNDCommentaries, BamdCommentaries, ESVCommentaries];

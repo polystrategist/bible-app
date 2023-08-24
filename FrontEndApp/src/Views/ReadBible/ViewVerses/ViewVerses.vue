@@ -223,11 +223,13 @@ onMounted(() => {
                     </div>
                     <div class='flex flex-col gap-3'>
                         <div v-for='version in verse.version' :key='version.key'>
-                            <span
-                                class='font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none'>
+                            <div
+                                class='font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none'
+                                :style="`font-size: ${fontSize-5}px`"
+                            >
                                 {{ version.version.replace('.SQLite3', '') }}
-                            </span>
-                            <span
+                            </div>
+                            <div
                                 :data-bible-version='version.version'
                                 :data-book='verse.book_number'
                                 :data-chapter='verse.chapter'
@@ -238,7 +240,7 @@ onMounted(() => {
                                 contenteditable='true'
                                 spellcheck='false'
                                 v-html='version.text'
-                            ></span>
+                            ></div>
                         </div>
                     </div>
                 </div>

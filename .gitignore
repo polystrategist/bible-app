@@ -2,7 +2,6 @@ node_modules
 dist
 electron-dist
 dist_electron
-defaults
 .env
 up_using_window.cmd
 .idea
