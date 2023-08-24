@@ -1,7 +1,7 @@
-<script lang="ts" setup>
+<script lang='ts' setup>
 import { NButton, NIcon, NInput, NTag, useDialog, useMessage } from 'naive-ui';
-import { userSermonStore, SERMON_TYPE } from '../../store/Sermons';
-import { LogoYoutube, Reset, Search, TextAlignJustify, Delete } from '@vicons/carbon';
+import { SERMON_TYPE, userSermonStore } from '../../store/Sermons';
+import { Delete, LogoYoutube, Reset, Search, TextAlignJustify } from '@vicons/carbon';
 import Youtube from './Youtube/Youtube.vue';
 import { ref } from 'vue';
 import TextVue from './Text/Text.vue';
@@ -10,7 +10,10 @@ import { DAYJS } from '../../util/dayjs';
 import { useMenuStore } from '../../store/menu';
 import { useUserStore } from './../../store/userStore';
 import { supabase } from '../../util/SupaBase/SupaBase';
+import { useThemeStore } from '../../store/theme';
+import { Icon } from '@iconify/vue';
 
+const themeStore = useThemeStore();
 const message = useMessage();
 const dialog = useDialog();
 const userStore = useUserStore();
@@ -28,7 +31,8 @@ function showContent(from: 'youtube' | 'text', sermon: any) {
 useInfiniteScroll(
     sermonItems,
     () => {
-        sermonStore.page++;
+        if (sermonStore.sermons.length)
+            sermonStore.page++;
     },
     { distance: sermonStore.limit }
 );
@@ -49,11 +53,11 @@ function publishSermon(sermon: SERMON_TYPE, publish = true) {
             }
 
             message.success('Published!');
-            sermonStore.getSermons(true);
+            await sermonStore.getSermons(true);
         },
         onNegativeClick: () => {
             message.info('Canceled.');
-        },
+        }
     });
 }
 
@@ -73,29 +77,30 @@ function deleteSermon(sermon: SERMON_TYPE) {
             }
 
             message.success('Sermon Deleted!');
-            sermonStore.getSermons(true);
+            await sermonStore.getSermons(true);
         },
         onNegativeClick: () => {
             message.info('Canceled.');
-        },
+        }
     });
 }
 </script>
 <template>
-    <div id="drawer-target" class="w-full h-full pl-6">
-        <Youtube ref="showYoutubeVideo" />
-        <TextVue ref="textVueContent" />
-        <div class="h-50px flex justify-between px-2 py-3 items-center">
-            <div class="font-700 text-size-25px">Sermons</div>
-            <div class="flex gap-8px">
+    <div id='drawer-target' class='w-full h-full pl-6'>
+        <Youtube ref='showYoutubeVideo' />
+        <TextVue ref='textVueContent' />
+        <div class='h-50px flex justify-between px-2 py-3 items-center'>
+            <div class='font-700 text-size-25px'>Sermons</div>
+            <div class='flex gap-8px'>
                 <NInput
-                    v-model:value="sermonStore.search"
-                    :disabled="sermonStore.loading"
-                    class="!w-300px"
-                    placeholder="Search Using Text"
-                    @keydown.enter="sermonStore.getSermons(true)"
+                    v-model:value='sermonStore.search'
+                    :disabled='sermonStore.loading'
+                    class='!w-300px'
+                    placeholder='Search Using Text'
+                    @keydown.enter='sermonStore.getSermons(true)'
                 />
-                <NButton :disabled="sermonStore.loading" :loading="sermonStore.loading" @click="sermonStore.getSermons(true)">
+                <NButton :disabled='sermonStore.loading' :loading='sermonStore.loading'
+                         @click='sermonStore.getSermons(true)'>
                     <template #icon>
                         <NIcon>
                             <Search />
@@ -104,8 +109,8 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     Search
                 </NButton>
                 <NButton
-                    :disabled="sermonStore.loading"
-                    :loading="sermonStore.loading"
+                    :disabled='sermonStore.loading'
+                    :loading='sermonStore.loading'
                     @click="
                         sermonStore.search = '';
                         sermonStore.getSermons(true);
@@ -117,50 +122,52 @@ function deleteSermon(sermon: SERMON_TYPE) {
                         </NIcon>
                     </template>
                 </NButton>
-                <NButton type="primary" @click="menuStore.setMenu('/create-sermon')"> Submit Sermon </NButton>
+                <NButton type='primary' @click="menuStore.setMenu('/create-sermon')"> Submit Sermon</NButton>
             </div>
         </div>
 
-        <div ref="sermonItems" class="h-[calc(100%-50px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
-            <div class="flex gap-7 flex-wrap">
+        <div ref='sermonItems' class='h-[calc(100%-50px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md'>
+            <div class='flex gap-7 flex-wrap'>
                 <div
-                    v-for="sermon in sermonStore.sermons"
-                    class="min-w-280px max-w-500px rounded-md overflow-hidden group flex flex-col justify-between cursor-pointer"
-                    style="flex: 1 1 160px"
+                    v-for='sermon in sermonStore.sermons'
+                    class='min-w-280px max-w-500px rounded-md overflow-hidden group flex flex-col justify-between cursor-pointer'
+                    style='flex: 1 1 160px'
                     @click="showContent(sermon.youtube_video_id ? 'youtube' : 'text', sermon)"
                 >
-                    <div class="h-150px overflow-hidden relative">
-                        <div v-if="sermon.thumbnail" class="transition-all top-[0px] left-[0px] !w-full absolute">
+                    <div class='h-150px overflow-hidden relative'>
+                        <div v-if='sermon.thumbnail' class='transition-all top-[0px] left-[0px] !w-full absolute'>
                             <img
-                                :src="sermon.thumbnail"
-                                alt=""
-                                class="w-full transform scale-100 group-hover:scale-120 transition-all"
+                                :src='sermon.thumbnail'
+                                alt=''
+                                class='w-full transform scale-100 group-hover:scale-120 transition-all'
                             />
                         </div>
 
                         <div
                             v-else
-                            class="font-800 text-size-25px flex items-center justify-center h-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px transform scale-100 hover:scale-120 transition-all"
+                            class='font-800 text-size-25px flex items-center justify-center h-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px transform scale-100 hover:scale-120 transition-all'
                         >
                             {{ sermon.title }}
                         </div>
 
-                        <div v-if="userStore.user_id == sermon.added_by" class="absolute top-1 left-1 flex flex-col gap-1">
+                        <div v-if='userStore.user_id == sermon.added_by'
+                             class='absolute top-1 left-1 flex flex-col gap-1'>
                             <div
-                                v-if="!sermon.is_published"
-                                class="bg-orange-700 px-2 rounded-md select-none text-white"
-                                @click.stop="publishSermon(sermon)"
+                                v-if='!sermon.is_published'
+                                class='bg-orange-700 px-2 rounded-md select-none text-white'
+                                @click.stop='publishSermon(sermon)'
                             >
                                 Not Published
                             </div>
                             <div
-                                v-if="sermon.is_published"
-                                class="bg-green-700 px-2 rounded-md select-none text-white"
-                                @click.stop="publishSermon(sermon, false)"
+                                v-if='sermon.is_published'
+                                class='bg-green-700 px-2 rounded-md select-none text-white'
+                                @click.stop='publishSermon(sermon, false)'
                             >
                                 Published
                             </div>
-                            <div class="bg-red-600 px-2 rounded-md select-none text-white" @click.stop="deleteSermon(sermon)">
+                            <div class='bg-red-600 px-2 rounded-md select-none text-white'
+                                 @click.stop='deleteSermon(sermon)'>
                                 <NIcon>
                                     <Delete />
                                 </NIcon>
@@ -168,16 +175,19 @@ function deleteSermon(sermon: SERMON_TYPE) {
                             </div>
                         </div>
                     </div>
-                    <div class="mt-2">
-                        <div class="font-700">{{ sermon.title }}</div>
-                        <div class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{ sermon.description }}</div>
+                    <div class='mt-2'>
+                        <div class='font-700'>{{ sermon.title }}</div>
+                        <div class='overflow-hidden overflow-ellipsis whitespace-nowrap'>{{ sermon.description }}</div>
                         <div>
                             <small>{{ DAYJS(sermon.created_at).fromNow() }}</small> -
                             <small>{{ DAYJS(sermon.created_at).format('MMMM D, YYYY') }}</small>
                         </div>
-                        <div class="flex items-center mt-2 gap-2">
-                            <NTag :bordered="false" round type="primary">{{ sermon.language }}</NTag>
-                            <NTag v-if="sermon.youtube_video_id" :bordered="false" :color="{ color: '#FF0000' }" round>
+                        <div class='flex items-center mt-2 gap-2'>
+                            <NTag :bordered='false' round type='primary'>
+                                <template #icon><Icon icon='mdi:language' /></template>
+                                {{ sermon.language }}
+                            </NTag>
+                            <NTag v-if='sermon.youtube_video_id' :bordered='false' type='error' round>
                                 <template #icon>
                                     <NIcon>
                                         <LogoYoutube />
@@ -185,7 +195,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
                                 </template>
                                 Youtube
                             </NTag>
-                            <NTag v-else :bordered="false" :color="{ color: '#227C70' }" round>
+                            <NTag v-else :bordered='false' type='info' round>
                                 <template #icon>
                                     <NIcon>
                                         <TextAlignJustify />
@@ -197,7 +207,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     </div>
                 </div>
             </div>
-            <div v-show="sermonStore.loading" class="text-center py-4">LOADING MORE DATA</div>
+            <div v-show='sermonStore.loading' class='text-center py-4'>LOADING MORE DATA</div>
         </div>
     </div>
 </template>

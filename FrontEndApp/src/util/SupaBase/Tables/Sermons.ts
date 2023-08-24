@@ -4,6 +4,7 @@ import { getPagination, supabase } from '../SupaBase';
  * Get sermons
  * @param search
  * @param limit
+ * @param page
  * @returns Array<array>
  * @throws error
  */
@@ -17,5 +18,5 @@ export async function fetchSermons(search: string | null = null, limit: number =
         );
     }
 
-    return await query;
+    return query;
 }

@@ -20,27 +20,41 @@ export const userSermonStore = defineStore('useSermonStore', () => {
     const limit = ref(50);
     const page = ref(1);
     const search = ref<null | string>(null);
+    const NoMoreData = ref(false);
 
-    async function getSermons(isReplace = false) {
+    async function getSermons(isFresh = false) {
+        if (isFresh) {
+            NoMoreData.value = false;
+            sermons.value = [];
+            page.value = 1;
+            loading.value = false;
+        }
+
+        if (loading.value == true || NoMoreData.value) return;
         loading.value = true;
 
-        if (isReplace) page.value = 1;
+        const { data, error } = await fetchSermons(search.value, limit.value, page.value);
 
-        setTimeout(async () => {
-            const { data, error } = await fetchSermons(search.value, limit.value, page.value);
-
-            if (error) throw error.message;
-
-            if (!isReplace) sermons.value = [...sermons.value, ...(data as Array<any>)];
-            else sermons.value = data as Array<any>;
-
+        if (error) {
+            alert('Their  is a problem getting the data, because of poor connection or no internet connection');
             loading.value = false;
-        }, 1000);
+            return;
+        }
+
+        if (!data.length) {
+            NoMoreData.value = true;
+            loading.value = false;
+            return;
+        }
+
+        if (!isFresh) sermons.value = [...sermons.value, ...(data as Array<any>)];
+        else sermons.value = data as Array<any>;
+        loading.value = false;
     }
 
     watch(
         () => page.value,
-        async (val) => {
+        async () => {
             await getSermons();
         }
     );
@@ -57,6 +71,6 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         hasPrevious: computed(() => page.value > 1),
         search,
         page,
-        limit,
+        limit
     };
 });
