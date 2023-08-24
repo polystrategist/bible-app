@@ -93,13 +93,14 @@ function deleteSermon(sermon: SERMON_TYPE) {
             <div class='font-700 text-size-25px'>Sermons</div>
             <div class='flex gap-8px'>
                 <NInput
+                    size='small'
                     v-model:value='sermonStore.search'
                     :disabled='sermonStore.loading'
                     class='!w-300px'
                     placeholder='Search Using Text'
                     @keydown.enter='sermonStore.getSermons(true)'
                 />
-                <NButton :disabled='sermonStore.loading' :loading='sermonStore.loading'
+                <NButton size='small' :disabled='sermonStore.loading' :loading='sermonStore.loading'
                          @click='sermonStore.getSermons(true)'>
                     <template #icon>
                         <NIcon>
@@ -109,6 +110,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     Search
                 </NButton>
                 <NButton
+                    size='small'
                     :disabled='sermonStore.loading'
                     :loading='sermonStore.loading'
                     @click="
@@ -121,8 +123,14 @@ function deleteSermon(sermon: SERMON_TYPE) {
                             <Reset />
                         </NIcon>
                     </template>
+                    Reset
                 </NButton>
-                <NButton type='primary' @click="menuStore.setMenu('/create-sermon')"> Submit Sermon</NButton>
+                <NButton size='small' type='primary' @click="menuStore.setMenu('/create-sermon')">
+                    <template #icon>
+                        <Icon icon='iconoir:submit-document' />
+                    </template>
+                    Submit Sermon
+                </NButton>
             </div>
         </div>
 
