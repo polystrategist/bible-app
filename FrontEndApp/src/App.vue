@@ -61,8 +61,8 @@ onMounted(async () => {
             <NNotificationProvider>
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
-                        <TitleBar class="h-50px" />
-                        <NLayout class="h-[calc(100%-75px)]" has-sider>
+                        <TitleBar class="h-40px" />
+                        <NLayout class="h-[calc(100%-65px)]" has-sider>
                             <NLayoutSider
                                 bordered
                                 :collapsed="isSideBarCollapse"

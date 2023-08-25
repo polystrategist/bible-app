@@ -12,9 +12,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     download: (args: any) => ipcRenderer.send('download', args),
     downloadModule: ({ urls, progress, done }: { urls: Array<string>; progress: Function; done: Function }) => {
         ipcRenderer.send('download-module', urls);
-        ipcRenderer.on('download-module-done', (event, args) => {
+        ipcRenderer.on('download-module-done', () => {
             done();
         });
+        progress()
     },
 
     // Bookmarks Stuff
@@ -34,13 +35,13 @@ contextBridge.exposeInMainWorld('browserWindow', {
     deleteChapterClipNotes: (args: any) => ipcRenderer.invoke('deleteChapterClipNotes', JSON.parse(args)),
 
     // Prayer List
-    getPrayerLists: (args: any = null) => ipcRenderer.invoke('getPrayerLists'),
+    getPrayerLists: () => ipcRenderer.invoke('getPrayerLists'),
     savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
     resetPrayerListItems: (args: any) => ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
     updateDownloadProgress: (progress: { percentage: Function, done: Function }) => {
         // Listen for the event from the main process
-        ipcRenderer.on('download-progress', (event, percentage) => {
+        ipcRenderer.on('download-progress', (_, percentage) => {
             progress.percentage(percentage);
         });
 

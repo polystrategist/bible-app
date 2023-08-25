@@ -1,5 +1,5 @@
 <script lang='ts' setup>
-import { NIcon, NLayoutHeader } from 'naive-ui';
+import { NIcon, NLayoutHeader, NTooltip } from 'naive-ui';
 import {
     Heart24Filled,
     Square20Regular,
@@ -45,23 +45,24 @@ onBeforeMount(async () => {
 </script>
 <template>
     <NLayoutHeader bordered class='flex cursor-default select-none items-center pl-8px light:bg-gray-100 justify-between'>
-        <div class='whitespace-nowrap flex items-center gap-1 w-200px'>
-            <div class='w-18px'>
-                <img :src='Logo' alt='believers sword logo' />
-            </div>
-            <span class='capitalize'>
-                {{ $t('title') }} {{ mainStore.appName.includes('nightly') ? 'Nightly' : '' }}
-
-            </span>
+        <div class='whitespace-nowrap flex items-center gap-1 w-200px pl-1'>
+            <NTooltip placement='right'>
+                <template #trigger>
+                    <div class='w-18px'>
+                        <img :src='Logo' alt='believers sword logo' />
+                    </div>
+                </template>
+                Believers Sword
+            </NTooltip>
         </div>
         <div class='flex items-center w-full h-full  z-50 justify-between'>
             <div class='draggable-region flex-grow cursor-move opacity-0'>draggable region</div>
             <SearchBar />
             <div class='draggable-region flex-grow cursor-move opacity-0'>draggable region</div>
         </div>
-        <div class='flex items-center h-full justify-end'>
+        <div class='flex items-center h-full justify-end pr-6px h-30px'>
             <div
-                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md'
                 @click='mainStore.showAbout = true'
             >
                 <NIcon size='17'>
@@ -70,7 +71,7 @@ onBeforeMount(async () => {
                 <span class='text-size-12px ml-1 capitalize whitespace-nowrap'>{{ $t('about') }}</span>
             </div>
             <div
-                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md'
                 @click='mainStore.showDonateModal = true'
             >
                 <NIcon size='17'>
@@ -80,7 +81,7 @@ onBeforeMount(async () => {
             </div>
             <div
                 :class='{"mr-50px": isElectron}'
-                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-10px'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-5px rounded-md'
                 @click='changeTheme()'
             >
                 <NIcon size='17'>
@@ -92,7 +93,7 @@ onBeforeMount(async () => {
             </div>
             <div
                 v-show='isElectron'
-                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md'
                 title='Minimize'
                 @click='minimizeWindow()'
             >
@@ -102,7 +103,7 @@ onBeforeMount(async () => {
             </div>
             <div
                 v-show='isElectron'
-                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer'
+                class='px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md'
                 title='Maximize'
                 @click='maximizeWindow()'
             >
@@ -113,7 +114,7 @@ onBeforeMount(async () => {
             </div>
             <div
                 v-show='isElectron'
-                class='px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer'
+                class='px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer rounded-md'
                 title='Close'
                 @click='closeWindow()'
             >
