@@ -95,6 +95,7 @@ const selectedBooksForSearchString = computed(() => {
     ></div>
     <div class='w-330px flex justify-center top-0 z-999999999 relative'>
         <NInput
+            size='small'
             v-model:value='search'
             :autofocus='false'
             :on-focus='() => focused = true'
