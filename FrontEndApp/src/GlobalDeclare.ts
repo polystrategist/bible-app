@@ -3,6 +3,7 @@ import { SAVED_CLIP_NOTE_TYPE, searchBibleType } from './GlobalTypes';
 
 declare global {
     interface Window {
+        syncDataOnline: any;
         searchTheBibleTimeOut: any;
         isElectron: Boolean;
         message: MessageApiInjection;

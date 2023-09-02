@@ -8,12 +8,10 @@ import TextVue from './Text/Text.vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { DAYJS } from '../../util/dayjs';
 import { useMenuStore } from '../../store/menu';
-import { useUserStore } from './../../store/userStore';
+import { useUserStore } from '../../store/userStore';
 import { supabase } from '../../util/SupaBase/SupaBase';
-import { useThemeStore } from '../../store/theme';
 import { Icon } from '@iconify/vue';
 
-const themeStore = useThemeStore();
 const message = useMessage();
 const dialog = useDialog();
 const userStore = useUserStore();
@@ -93,14 +91,14 @@ function deleteSermon(sermon: SERMON_TYPE) {
             <div class='font-700 text-size-25px'>Sermons</div>
             <div class='flex gap-8px'>
                 <NInput
-                    size='small'
                     v-model:value='sermonStore.search'
                     :disabled='sermonStore.loading'
                     class='!w-300px'
                     placeholder='Search Using Text'
+                    size='small'
                     @keydown.enter='sermonStore.getSermons(true)'
                 />
-                <NButton size='small' :disabled='sermonStore.loading' :loading='sermonStore.loading'
+                <NButton :disabled='sermonStore.loading' :loading='sermonStore.loading' size='small'
                          @click='sermonStore.getSermons(true)'>
                     <template #icon>
                         <NIcon>
@@ -110,9 +108,9 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     Search
                 </NButton>
                 <NButton
-                    size='small'
                     :disabled='sermonStore.loading'
                     :loading='sermonStore.loading'
+                    size='small'
                     @click="
                         sermonStore.search = '';
                         sermonStore.getSermons(true);
@@ -192,10 +190,12 @@ function deleteSermon(sermon: SERMON_TYPE) {
                         </div>
                         <div class='flex items-center mt-2 gap-2'>
                             <NTag :bordered='false' round type='primary'>
-                                <template #icon><Icon icon='mdi:language' /></template>
+                                <template #icon>
+                                    <Icon icon='mdi:language' />
+                                </template>
                                 {{ sermon.language }}
                             </NTag>
-                            <NTag v-if='sermon.youtube_video_id' :bordered='false' type='error' round>
+                            <NTag v-if='sermon.youtube_video_id' :bordered='false' round type='error'>
                                 <template #icon>
                                     <NIcon>
                                         <LogoYoutube />
@@ -203,7 +203,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
                                 </template>
                                 Youtube
                             </NTag>
-                            <NTag v-else :bordered='false' type='info' round>
+                            <NTag v-else :bordered='false' round type='info'>
                                 <template #icon>
                                     <NIcon>
                                         <TextAlignJustify />
