@@ -8,17 +8,20 @@ export const useUserStore = defineStore('useUserStore', () => {
     });
     const syncData = ref<boolean>(false);
 
-    function syncData () {
-        window.syncDataOnline = setTimeout()
+    function syncDataOnline() {
+        window.syncDataOnline = setTimeout(() => {
+            console.log('sync');
+        }, 1000);
     }
 
-    watch(() => syncData.value, (isSyncData) => {
-
-    });
+    watch(
+        () => syncData.value,
+        (isSyncData) => {}
+    );
 
     return {
         user,
         user_id,
-        syncData
+        syncData,
     };
 });
