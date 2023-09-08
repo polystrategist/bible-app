@@ -16,7 +16,6 @@ async function createWindow() {
         minWidth: 900,
         height: 750,
         minHeight: 600,
-
         webPreferences: {
             preload: __dirname + '/preload.js',
             devTools: isNightly || true,
