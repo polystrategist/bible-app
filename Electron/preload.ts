@@ -10,12 +10,11 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
     download: (args: any) => ipcRenderer.send('download', args),
-    downloadModule: ({ urls, progress, done }: { urls: Array<string>; progress: Function; done: Function }) => {
+    downloadModule: ({ urls, done }: { urls: Array<string>; done: Function }) => {
         ipcRenderer.send('download-module', urls);
         ipcRenderer.on('download-module-done', () => {
             done();
         });
-        progress()
     },
 
     // Bookmarks Stuff
@@ -39,7 +38,7 @@ contextBridge.exposeInMainWorld('browserWindow', {
     savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
     resetPrayerListItems: (args: any) => ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
-    updateDownloadProgress: (progress: { percentage: Function, done: Function }) => {
+    updateDownloadProgress: (progress: { percentage: Function; done: Function }) => {
         // Listen for the event from the main process
         ipcRenderer.on('download-progress', (_, percentage) => {
             progress.percentage(percentage);
@@ -48,7 +47,5 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.on('update-downloaded', () => {
             progress.done();
         });
-    }
+    },
 });
-
-

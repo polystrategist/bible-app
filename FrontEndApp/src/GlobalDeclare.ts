@@ -27,12 +27,7 @@ declare global {
             /**
              * Downloads Modules
              */
-            downloadModule: (args: {
-                url?: string;
-                urls?: Array<string>;
-                done: () => void;
-                progress?: (data: any) => void;
-            }) => void;
+            downloadModule: (args: { url?: string; urls?: Array<string>; done: () => void }) => void;
 
             /**
              * Save A Bookmark
@@ -46,7 +41,7 @@ declare global {
                     book_number: number;
                     chapter: number;
                     verse: number;
-                }
+                };
             }>;
             /**
              * Delete The Bookmark
@@ -90,8 +85,8 @@ declare global {
             /**
              * Get Prayer List
              */
-            getPrayerLists: () => Promise<Array<
-                {
+            getPrayerLists: () => Promise<
+                Array<{
                     content: string;
                     created_at: any;
                     group: any;
@@ -100,14 +95,15 @@ declare global {
                     status: string;
                     title: any;
                     updated_at: any;
-                }>>
+                }>
+            >;
 
             /**
              * Save Prayer List Item
              */
             savePrayerItem: (args: string) => Promise<any>;
 
-            updateDownloadProgress: (progress: { percentage: Function, done: Function }) => void;
+            updateDownloadProgress: (progress: { percentage: Function; done: Function }) => void;
         };
     }
 }

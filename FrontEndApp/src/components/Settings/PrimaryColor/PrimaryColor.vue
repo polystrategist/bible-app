@@ -15,7 +15,7 @@ const themeStore = useThemeStore();
             </NIcon>
             Primary Colors
         </div>
-        <div class="flex gap-5">
+        <div class="flex flex-wrap gap-5">
             <div
                 v-for="(colors, nameKey) in themesOptions"
                 :key="nameKey"

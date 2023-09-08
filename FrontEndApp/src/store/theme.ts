@@ -23,18 +23,21 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         },
     });
 
+    function saveThemeSelected(itsDark = isDark.value) {
+        if (themeOverrides.value.common)
+            themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
+
+        document.body.className = itsDark ? 'dark' : 'light';
+        SESSION.set(saveThemeStorageKey, {
+            selectedTheme: selectedTheme.value,
+            isDark: itsDark,
+        });
+    }
+
     watch(
         () => isDark.value,
         (itsDark) => {
-            if (themeOverrides.value.common)
-                themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
-
-            document.body.className = itsDark ? 'dark' : 'light';
-            SESSION.set(saveThemeStorageKey, {
-                selectedTheme: selectedTheme.value,
-                isDark: itsDark,
-            });
-
+            saveThemeSelected();
             changeTheRootProperty();
         }
     );
@@ -60,6 +63,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     function changePrimaryColor(key: typeNameInterface) {
         selectedTheme.value = key;
         themeOverrides.value.common = (themesOptions as any)[key][isDark.value ? 'dark' : 'light'];
+        saveThemeSelected();
         changeTheRootProperty();
     }
 
