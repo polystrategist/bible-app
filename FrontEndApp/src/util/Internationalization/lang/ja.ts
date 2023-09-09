@@ -106,6 +106,13 @@ const message: InternationalMessageType = {
     '3 John': 'ヨハネの手紙3',
     Jude: 'ユダの手紙',
     Revelation: ' 黙示録',
+    "1 Maccabees": 'マッカベエ人への手紙',
+    "2 Maccabees": 'マッカベエ人への手紙2',
+    Baruch: 'バルチ',
+    Judith: 'ジュディタ',
+    Sirach: 'シラク',
+    Tobit: 'トビ',
+    Wisdom: 'ウィスギー',
 };
 
 export default message;

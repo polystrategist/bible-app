@@ -106,5 +106,12 @@ const message: InternationalMessageType = {
     '3 John': '3 João',
     Jude: 'Judas',
     Revelation: 'Apocalipse',
+    '1 Maccabees': '1 Maccabeus',
+    '2 Maccabees': '2 Maccabeus',
+    Baruch: 'Baruc',
+    Judith: 'Judite',
+    Sirach: 'Sirach',
+    Tobit: 'Tobit',
+    Wisdom: 'Sabiduría',
 };
 export default message;
