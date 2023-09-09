@@ -17,7 +17,7 @@ const selectionStore = useBibleStore();
                 :id="book.book_number == selectionStore.selectedBookNumber ? 'the-selected-book-element' : ''"
                 @click="selectionStore.selectBook(book)"
             >
-                {{ book.title }}
+                {{ $t(book.title) }}
             </div>
         </div>
         <div id="view-chapter-container" class="pl-5px py-10px h-full overflow-x-auto overflowing-div min-w-60px text-center">

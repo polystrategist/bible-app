@@ -165,7 +165,7 @@ onMounted(() => {
                     @click="navigateChapter('before')"
                 >
                     <NIcon :component="ChevronLeft" size="20" />
-                    <span>Before</span>
+                    <span>{{ $t('Before') }}</span>
                 </div>
             </div>
             <div class="flex justify-center items-center gap-5px w-full">
@@ -174,7 +174,7 @@ onMounted(() => {
             </div>
             <div>
                 <div class="flex items-center hover:text-[var(--primary-color)] cursor-pointer" @click="navigateChapter('next')">
-                    <span>Next</span>
+                    <span>{{ $t('Next') }}</span>
                     <NIcon :component="ChevronRight" size="20" />
                 </div>
             </div>
