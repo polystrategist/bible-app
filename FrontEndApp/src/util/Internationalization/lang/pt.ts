@@ -35,7 +35,7 @@ const message: InternationalMessageType = {
     about: 'sobre',
     donate: 'doar',
     dark: 'escuro',
-    light: 'luz',
+    light: 'claro',
 
     /**
      * Bible Versions
@@ -61,7 +61,7 @@ const message: InternationalMessageType = {
     Psalms: 'Salmos',
     Proverbs: 'Provérbios',
     Ecclesiastes: 'Eclesiastes',
-    'Song of Solomon': 'Cantares de Salomão',
+    'Song of Solomon': 'Cântico dos cânticos',
     Isaiah: 'Isaías',
     Jeremiah: 'Jeremias',
     Lamentations: 'Lamentações',
@@ -74,7 +74,7 @@ const message: InternationalMessageType = {
     Jonah: 'Jonas',
     Micah: 'Miquéias',
     Nahum: 'Naum',
-    Habakkuk: 'Habacuque',
+    Habakkuk: 'Habacuc',
     Zephaniah: 'Sofonias',
     Haggai: 'Ageu',
     Zechariah: 'Zacarias',
@@ -96,7 +96,7 @@ const message: InternationalMessageType = {
     '1 Timothy': '1 Timóteo',
     '2 Timothy': '2 Timóteo',
     Titus: 'Tito',
-    Philemon: 'Filemom',
+    Philemon: 'Filêmom',
     Hebrews: 'Hebreus',
     James: 'Tiago',
     '1 Peter': '1 Pedro',
@@ -106,12 +106,12 @@ const message: InternationalMessageType = {
     '3 John': '3 João',
     Jude: 'Judas',
     Revelation: 'Apocalipse',
-    '1 Maccabees': '1 Maccabeus',
-    '2 Maccabees': '2 Maccabeus',
+    '1 Maccabees': '1 Macabeus',
+    '2 Maccabees': '2 Macabeus',
     Baruch: 'Baruc',
     Judith: 'Judite',
-    Sirach: 'Sirach',
-    Tobit: 'Tobit',
-    Wisdom: 'Sabiduría',
+    Sirach: 'Sirácida',
+    Tobit: 'Tobias',
+    Wisdom: 'Sabedoria',
 };
 export default message;
