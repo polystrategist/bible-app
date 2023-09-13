@@ -8,7 +8,6 @@ export const useSettingStore = defineStore('settingStore', () => {
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
-        console.log(showDeuterocanonicalStored);
         if (showDeuterocanonicalStored) showDeuterocanonical.value = showDeuterocanonicalStored;
         else SESSION.set(showDeuterocanonicalStorageKey, showDeuterocanonical.value);
     });

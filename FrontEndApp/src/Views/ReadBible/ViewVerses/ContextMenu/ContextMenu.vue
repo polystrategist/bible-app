@@ -54,7 +54,7 @@ onClickOutside(contextMenuRef, (event) => emits('close'));
                 <div class="w-25px">
                     <NIcon size="15" :component="option.icon" />
                 </div>
-                <span class="text-size-15px">{{ option.label }}</span>
+                <span class="text-size-15px whitespace-nowrap">{{ $t(option.label) }}</span>
             </div>
         </div>
     </NPopover>

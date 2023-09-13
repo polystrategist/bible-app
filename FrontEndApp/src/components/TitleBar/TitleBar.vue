@@ -55,7 +55,7 @@ onBeforeMount(async () => {
                         <LogoComponent />
                     </div>
                 </template>
-                Believers Sword
+                {{ $t('Believers Sword') }}
             </NTooltip>
         </div>
         <div class="flex items-center w-full h-full z-50 justify-between">
@@ -97,7 +97,7 @@ onBeforeMount(async () => {
             <div
                 v-show="isElectron"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md"
-                title="Minimize"
+                :title="$t('minimize')"
                 @click="minimizeWindow()"
             >
                 <NIcon size="17">
@@ -107,7 +107,7 @@ onBeforeMount(async () => {
             <div
                 v-show="isElectron"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md"
-                title="Maximize"
+                :title="$t('maximize')"
                 @click="maximizeWindow()"
             >
                 <NIcon size="17">
@@ -118,7 +118,7 @@ onBeforeMount(async () => {
             <div
                 v-show="isElectron"
                 class="px-1 flex h-full items-center hover:bg-opacity-80 hover:bg-red-600 cursor-pointer rounded-md"
-                title="Close"
+                :title="$t('close')"
                 @click="closeWindow()"
             >
                 <NIcon size="20">

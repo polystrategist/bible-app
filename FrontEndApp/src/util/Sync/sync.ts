@@ -14,7 +14,7 @@ export async function syncData() {
 
 
     // set data
-    console.log('bookmarks', bookmarks);
-    console.log('highlights', highlights);
-    console.log('clipNotes', clipNotes);
+    console.info('bookmarks', bookmarks);
+    console.info('highlights', highlights);
+    console.info('clipNotes', clipNotes);
 }

@@ -39,9 +39,9 @@ function nextPage() {
                     ></div>
                     <div class="w-full p-10px" @click="selectBookVerse(key as any, highlight)">
                         <div class="font-700">
-                            <span class="mr-1" v-if="highlight.book_number">{{
-                                bibleStore.getBook(highlight.book_number).title
-                            }}</span>
+                            <span class="mr-1" v-if="highlight.book_number">
+                                {{ $t(bibleStore.getBook(highlight.book_number).title) }}
+                            </span>
                             <span>{{ highlight.chapter }} : {{ highlight.verse }}</span>
                         </div>
                         <div>
@@ -51,9 +51,13 @@ function nextPage() {
                 </div>
             </div>
             <div class="flex justify-between select-none">
-                <div @click="beforePage" class="cursor-pointer hover:text-[var(--primary-color)]">Before</div>
+                <div @click="beforePage" class="cursor-pointer hover:text-[var(--primary-color)]">
+                    {{ $t('Before') }}
+                </div>
                 <div>{{ bibleStore.highlightPage }}</div>
-                <div @click="nextPage" class="cursor-pointer hover:text-[var(--primary-color)]">Next</div>
+                <div @click="nextPage" class="cursor-pointer hover:text-[var(--primary-color)]">
+                    {{ $t('Next') }}
+                </div>
             </div>
         </div>
     </RightSideBarContainer>

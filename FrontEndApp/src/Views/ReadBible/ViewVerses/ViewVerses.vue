@@ -11,6 +11,8 @@ import HighlightOptions from './../../../components/HighlightOptions/HighlightOp
 import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
 import { useClipNoteStore } from '../../../store/ClipNotes';
 import { getSelectionParentElement } from '../../../util/ElementUtil';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 const dialog = useDialog();
 const clipNoteStore = useClipNoteStore();
@@ -90,10 +92,10 @@ function checkHere(this: HTMLElement): void {
 
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
     dialog.warning({
-        title: 'Confirm',
-        content: 'Are You Sure You want to remove?',
-        positiveText: 'Yes',
-        negativeText: 'No',
+        title: t('Confirm'),
+        content: t('Are You Sure You want to remove?'),
+        positiveText: t('Yes'),
+        negativeText: t('No'),
         onPositiveClick: async () => {
             await clipNoteStore.deleteClipNote(args);
             await clipNoteStore.getChapterClipNotes(args.book_number, args.chapter);

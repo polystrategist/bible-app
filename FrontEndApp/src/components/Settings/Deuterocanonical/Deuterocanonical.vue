@@ -10,12 +10,12 @@ const settings = useSettingStore();
     <div>
         <div class="flex gap-1">
             <Icon class="text-size-16px" icon="fluent:save-sync-20-filled" />
-            Deuterocanonical
+            {{ $t('Deuterocanonical') }}
         </div>
         <div class="flex items-center">
             <NSwitch v-model:value="settings.showDeuterocanonical">
-                <template #checked> Yes</template>
-                <template #unchecked> No</template>
+                <template #checked> {{ $t('Yes') }}</template>
+                <template #unchecked> {{ $t('No') }}</template>
             </NSwitch>
         </div>
     </div>
