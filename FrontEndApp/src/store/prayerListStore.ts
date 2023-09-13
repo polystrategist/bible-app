@@ -77,7 +77,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
 
             await deletePrayerItem(key as string);
         } catch (e) {
-            console.log('removePrayerItem', e);
+            console.error('removePrayerItem', e);
         }
     }
 

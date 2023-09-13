@@ -5,7 +5,9 @@ import { searchBibleType } from '../GlobalTypes';
 import { highlighter } from '../util/hilitor';
 import { useBibleStore } from '../store/BibleStore';
 import { bibleBooks } from '../Views/ReadBible/books';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const focused = ref(false);
 const bibleStore = useBibleStore();
 const page = ref<number>(1);
@@ -79,7 +81,7 @@ const selectedBooksForSearchCount = computed(() => {
 const selectedBooksForSearchString = computed(() => {
     return bibleBooks
         .filter((book) => selectedBookNumbers.value.includes(book.book_number))
-        .map((book) => book.title)
+        .map((book) => t(book.title))
         .join(', ');
 });
 </script>
@@ -94,7 +96,7 @@ const selectedBooksForSearchString = computed(() => {
             :on-focus="() => (focused = true)"
             class="w-300px focus:w-330px transition-all"
             clearable
-            placeholder="Search Bible..."
+            :placeholder="$t('Search Bible') + '...'"
             round
         />
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
@@ -136,7 +138,9 @@ const selectedBooksForSearchString = computed(() => {
                 id="inputTextSearch"
                 class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses dark:bg-dark-500 bg-gray-50 w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div"
             >
-                <div v-if="!searchedVerses.length || !search" class="flex justify-center items-center mt-10">Search Bible</div>
+                <div v-if="!searchedVerses.length || !search" class="flex justify-center items-center mt-10">
+                    {{ $t('Search Bible') }}
+                </div>
                 <template v-else>
                     <template v-for="(verse, tabIndex) in searchedVerses">
                         <div
@@ -169,7 +173,7 @@ const selectedBooksForSearchString = computed(() => {
                             submitSearch();
                         "
                     >
-                        Before
+                        {{ $t('Before') }}
                     </span>
                 </div>
                 <div>
@@ -181,7 +185,7 @@ const selectedBooksForSearchString = computed(() => {
                             submitSearch();
                         "
                     >
-                        Next
+                        {{ $t('Next') }}
                     </span>
                 </div>
             </div>

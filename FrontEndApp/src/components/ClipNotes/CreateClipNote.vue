@@ -52,10 +52,8 @@ async function addClipNotes() {
     await clipNoteStore.getChapterClipNotes(bibleStore.selectedBookNumber, bibleStore.selectedChapter);
 }
 
-
-
 defineExpose({
-    toggleClipNoteModal
+    toggleClipNoteModal,
 });
 </script>
 <template>
@@ -64,11 +62,11 @@ defineExpose({
             <template #header>
                 <div class="flex justify-between">
                     <div>
-                        <NIcon><Attachment /></NIcon> Create Clip Note
+                        <NIcon><Attachment /></NIcon> {{ $t('Clip Note') }}
                     </div>
                     <div class="flex gap-1 items-center">
                         <div class="w-40px h-20px rounded-md" :style="`background-color: ${selectedColor}`"></div>
-                        <span> Select Color:</span>
+                        <span> {{ $t('Select Color') }}:</span>
                         <button
                             v-for="color in colors"
                             :key="color.color"
@@ -84,8 +82,8 @@ defineExpose({
             </div>
             <template #footer>
                 <div class="flex gap-2">
-                    <NButton class="w-[70%]" type="primary" @click="addClipNotes">Save</NButton>
-                    <NButton class="w-[30%]" @click="showModal = false">Cancel</NButton>
+                    <NButton class="w-[70%]" type="primary" @click="addClipNotes">{{ $t('Save') }}</NButton>
+                    <NButton class="w-[30%]" @click="showModal = false">{{ $t('Cancel') }}</NButton>
                 </div>
             </template>
         </NCard>

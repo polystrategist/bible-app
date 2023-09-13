@@ -37,7 +37,7 @@ function clickDownload() {
                 {{
                     downloadBibleStore.isDownloading && downloadBibleStore.downloadingVersion == props.version.file_name
                         ? `${percentage}%`
-                        : 'Download'
+                        : $t('download')
                 }}
             </NButton>
         </div>

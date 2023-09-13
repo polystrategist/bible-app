@@ -15,7 +15,7 @@ const name = ref('General');
     <NCard size="small">
         <div class="w-full select-none">
             <div class="text-size-20px mb-3">
-                <NIcon> <Settings /> </NIcon> Settings
+                <NIcon> <Settings /> </NIcon> {{ $t('Settings') }}
             </div>
             <NTabs v-model:value="name" type="card" size="small" class="h-[70vh] min-h-100px">
                 <NTabPane class="h-full overflow-y-auto overflowing-div" name="General">
@@ -24,7 +24,7 @@ const name = ref('General');
                             <NIcon>
                                 <SettingsAdjust />
                             </NIcon>
-                            General
+                            {{ $t('General') }}
                         </span>
                     </template>
                     <div class="flex flex-col gap-5 py-3">
@@ -41,7 +41,7 @@ const name = ref('General');
                             <NIcon>
                                 <DataBin />
                             </NIcon>
-                            Tabs
+                            {{ $t('Tabs') }}
                         </span>
                     </template>
                     <TabSetting />

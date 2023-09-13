@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { NPopconfirm, NIcon, NButton } from 'naive-ui';
+import { NPopconfirm, NIcon, NButton, useMessage } from 'naive-ui';
 import EditPrayerItem from './EditPrayerItem.vue';
 import { Edit, TrashCan } from '@vicons/carbon';
 import Draggable from 'vuedraggable';
 import { usePrayerListStore } from '../../store/prayerListStore';
 import NewPrayerItem from './CreateNewPrayerItem.vue';
 
+const message = useMessage();
 const prayerListStore = usePrayerListStore();
 const editPrayerModal = ref<any>(null);
 
@@ -14,7 +15,7 @@ const removePrayerItem = (key: string) => {
     try {
         prayerListStore.removePrayerItem(key);
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        if (e instanceof Error) message.error(e.message);
     }
 };
 

@@ -10,7 +10,7 @@ export const useUserStore = defineStore('useUserStore', () => {
 
     function syncDataOnline() {
         window.syncDataOnline = setTimeout(() => {
-            console.log('sync');
+            console.info('sync');
         }, 1000);
     }
 

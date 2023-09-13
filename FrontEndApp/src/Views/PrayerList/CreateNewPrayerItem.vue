@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { NButton, NModal, NIcon, NCard } from 'naive-ui';
+import { NButton, NModal, NIcon, NCard, useMessage } from 'naive-ui';
 import initialContent from './initialContent';
 import { Close, Add, Save } from '@vicons/carbon';
 import Editor from '../../components/Editor/Editor.vue';
 import { usePrayerListStore } from '../../store/prayerListStore';
 
+const message = useMessage();
 const showModal = ref(false);
 const prayerContent = ref('');
 const closeCreateNewModal = () => {
@@ -25,7 +26,7 @@ const SaveEditorContent = () => {
         showModal.value = false;
         prayerContent.value = '';
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        if (e instanceof Error) message.error(e.message);
     }
 };
 </script>

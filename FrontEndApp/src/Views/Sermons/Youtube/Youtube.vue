@@ -26,14 +26,13 @@ function stopCurrentVideo() {
 }
 
 function onEnded() {
-    console.log('## OnEnded');
     stopCurrentVideo();
 }
 function onPaused() {
-    console.log('## OnPaused');
+    console.info('## OnPaused');
 }
 function onPlayed() {
-    console.log('## OnPlayed');
+    console.info('## OnPlayed');
 }
 
 function close() {
@@ -70,10 +69,10 @@ defineExpose({
                         <div class="text-700 text-size-30px">{{ data.title }}</div>
                         <div class="flex items-center mt-2 gap-2">
                             <NTag type="primary" :bordered="false" round>
-                                <template #icon><Icon icon='mdi:language' /></template>
+                                <template #icon><Icon icon="mdi:language" /></template>
                                 {{ data ? data.language : '' }}
                             </NTag>
-                            <NTag v-if="data.youtube_video_id" type='error' round :bordered="false">
+                            <NTag v-if="data.youtube_video_id" type="error" round :bordered="false">
                                 <template #icon>
                                     <NIcon><LogoYoutube /></NIcon>
                                 </template>

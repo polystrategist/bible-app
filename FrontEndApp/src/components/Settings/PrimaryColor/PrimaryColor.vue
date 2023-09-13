@@ -13,7 +13,7 @@ const themeStore = useThemeStore();
             <NIcon>
                 <ColorPalette />
             </NIcon>
-            Primary Colors
+            {{ $t('Primary Colors') }}
         </div>
         <div class="flex flex-wrap gap-5">
             <div
@@ -24,7 +24,7 @@ const themeStore = useThemeStore();
                 :class="{ 'dark:bg-gray-50 dark:bg-opacity-20 bg-gray-500 bg-opacity-20': themeStore.selectedTheme == nameKey }"
             >
                 <div>
-                    <span class="capitalize">{{ nameKey }}</span>
+                    <span class="capitalize">{{ $t(nameKey) }}</span>
                     <div class="flex gap-1" v-if="themeStore.isDark">
                         <div
                             v-for="common in colors.dark"

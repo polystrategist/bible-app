@@ -111,6 +111,44 @@ export interface InternationalMessageInterface {
     '3 John': string;
     Jude: string;
     Revelation: string;
+    version: string;
+    download: string;
+    'Available Versions': string;
+    'Believers Sword': string;
+    minimize: string;
+    maximize: string;
+    Reset: string;
+    General: string;
+    Tabs: string;
+
+    // Colors
+    'Primary Colors': string;
+    default: string;
+    nature: string;
+    Nature: string;
+    sky: string;
+    Sky: string;
+    ocean: string;
+    reds: string;
+    themes: string;
+    Themes: string;
+
+    Language: string;
+    Yes: string;
+    No: string;
+    Deuterocanonical: string;
+    'Submit Sermon': string;
+    Submit: string;
+
+    "Create Clip Note": string;
+    Save: string;
+    "Select Color": string;
+    "Update Clip Note": string;
+    Cancel: string;
+    "Clip Note": string;
+    Confirm: string;
+    "Are You Sure You want to remove?": string;
+    'Add to Bookmark': string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

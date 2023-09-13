@@ -44,9 +44,9 @@ function nextPage() {
                         :style="`background-color:${clipNote.color}`"
                     >
                         <div class="font-700">
-                            <span class="mr-1" v-if="clipNote.book_number">{{
-                                bibleStore.getBook(clipNote.book_number).title
-                            }}</span>
+                            <span class="mr-1" v-if="clipNote.book_number">
+                                {{ $t(bibleStore.getBook(clipNote.book_number).title+'') }}
+                            </span>
                             <span>{{ clipNote.chapter }} : {{ clipNote.verse }}</span>
                         </div>
                         <div>{{ clipNote.content.replace(/(<([^>]+)>)/gi, ' ').slice(0, 40) }}...</div>
@@ -54,9 +54,13 @@ function nextPage() {
                 </div>
             </div>
             <div class="flex justify-between select-none">
-                <div @click="beforePage" class="cursor-pointer hover:text-[var(--primary-color)]">Before</div>
+                <div @click="beforePage" class="cursor-pointer hover:text-[var(--primary-color)]">
+                    {{ $t('Before') }}
+                </div>
                 <div>{{ clipNoteStore.clipNotesPage }}</div>
-                <div @click="nextPage" class="cursor-pointer hover:text-[var(--primary-color)]">Next</div>
+                <div @click="nextPage" class="cursor-pointer hover:text-[var(--primary-color)]">
+                    {{ $t('Next') }}
+                </div>
             </div>
         </div>
     </RightSideBarContainer>
