@@ -4,8 +4,8 @@ import { computed, ref, watch } from 'vue';
 import { searchBibleType } from '../GlobalTypes';
 import { highlighter } from '../util/hilitor';
 import { useBibleStore } from '../store/BibleStore';
-import { bibleBooks } from '../Views/ReadBible/books';
 import { useI18n } from 'vue-i18n';
+import { bibleBooks } from '../util/books';
 
 const { t } = useI18n();
 const focused = ref(false);
@@ -192,3 +192,4 @@ const selectedBooksForSearchString = computed(() => {
         </div>
     </div>
 </template>
+../store/books

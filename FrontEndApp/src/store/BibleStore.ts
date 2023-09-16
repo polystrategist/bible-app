@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
-import { bibleBooks } from '../Views/ReadBible/books';
+import { bibleBooks } from '../util/books';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
 const StorageKeyOfChapterVerseSelected = 'selected-chapter-verse-storage';
