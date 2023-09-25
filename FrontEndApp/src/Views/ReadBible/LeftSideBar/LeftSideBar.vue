@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { bibleBooks } from './../books';
 import { useBibleStore } from '../../../store/BibleStore';
 import { useSettingStore } from '../../../store/settingStore';
+import { bibleBooks } from '../../../util/books';
 const selectionStore = useBibleStore();
 const settings = useSettingStore();
 </script>
@@ -40,3 +40,4 @@ const settings = useSettingStore();
         </div>
     </div>
 </template>
+../../../store/books

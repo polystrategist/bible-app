@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { computed, onBeforeMount, ref } from 'vue';
 import { getDownloadedBible } from '../util/Modules/Controller/FeBibleController';
 import SESSION from '../util/session';
-import { bibleBooks } from '../Views/ReadBible/books';
+import { bibleBooks } from '../util/books';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
 const StorageKeyOfChapterSelected = 'selected-chapter-storage';
