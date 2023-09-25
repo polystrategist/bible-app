@@ -12,15 +12,10 @@ export const useSettingStore = defineStore('settingStore', () => {
         else SESSION.set(showDeuterocanonicalStorageKey, showDeuterocanonical.value);
     });
 
-    function changeShowDeuterocanonical() {
-        showDeuterocanonical.value = !showDeuterocanonical.value;
-        SESSION.set(showDeuterocanonicalStorageKey, showDeuterocanonical.value);
-    }
-
     watch(
         () => showDeuterocanonical.value,
         (newData, oldData) => {
-            if (newData !== oldData) SESSION.set(showDeuterocanonicalStorageKey, showDeuterocanonical.value);
+            if (newData !== oldData) SESSION.set(showDeuterocanonicalStorageKey, newData);
         }
     );
 

@@ -66,13 +66,6 @@ const copyText = () => {
     }
 };
 
-function cancel() {
-    showPopOver.value = false;
-    if (window.getSelection) {
-        window.getSelection()?.removeAllRanges();
-    }
-}
-
 function checkHere(this: HTMLElement): void {
     const el = this;
     el.addEventListener('keydown', function (event: KeyboardEvent) {
@@ -301,13 +294,6 @@ onMounted(() => {
                         </NIcon>
                     </template>
                     {{ $t('copy') }}
-                </NButton>
-                <NButton circle size="small" strong title="Copy" @click="cancel">
-                    <template #icon>
-                        <NIcon>
-                            <Close />
-                        </NIcon>
-                    </template>
                 </NButton>
             </div>
         </NPopover>
