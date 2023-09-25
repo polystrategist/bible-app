@@ -1,4 +1,4 @@
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue';
 import { isSignedIn } from '../../../../util/SupaBase/Auth/Auth';
 import { useUserStore } from '../../../../store/userStore';
@@ -17,6 +17,12 @@ onMounted(async () => {
         const data = await isSignedIn();
         if (data) {
             userStore.user = data;
+
+            if (userStore.profile_data) {
+                let getProfile = await supabase.from('profile').select('*').eq('id', userStore.user.user.id).single();
+                if (getProfile.data) userStore.profile_data = getProfile.data;
+            }
+
             await router.push('/profile/profile');
         } else {
             await router.push('/profile');
@@ -40,20 +46,18 @@ async function logout() {
 
             userStore.user = null;
             await router.push('/profile');
-        }
+        },
     });
 }
 </script>
 
 <template>
-    <div class='flex justify-center items-center h-[80vh]'>
-        <div class='flex flex-col items-center gap-3'>
+    <div class="flex justify-center items-center h-[80vh]">
+        <div class="flex flex-col items-center gap-3">
             <div>You are Logged.</div>
             <div>{{ userStore.user ? userStore.user.user.email : '--' }}</div>
             <div>
-                <NButton :disabled='loading' :loading='loading' secondary strong type='warning' @click='logout'>
-                    Logout
-                </NButton>
+                <NButton :disabled="loading" :loading="loading" secondary strong type="warning" @click="logout"> Logout </NButton>
             </div>
         </div>
     </div>
