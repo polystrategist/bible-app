@@ -15,6 +15,7 @@ import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
 import LogoComponent from './../LogoComponent.vue';
+import ProfileDropdown from './Partials/ProfileDropdown.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
@@ -94,6 +95,9 @@ onBeforeMount(async () => {
                 <span class="text-size-12px ml-1 capitalize whitespace-nowrap">
                     {{ themeStore.isDark ? $t('dark') : $t('light') }}
                 </span>
+            </div>
+            <div class='mr-3'>
+                <ProfileDropdown />
             </div>
             <div
                 v-show="isElectron"

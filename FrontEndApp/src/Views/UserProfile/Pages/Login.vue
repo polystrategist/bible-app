@@ -104,7 +104,7 @@ onMounted(async () => {
             <NInput v-model:value="form.email" placeholder="Email" />
             Password:
             <NInput v-model:value="form.password" placeholder="Password" type="password" />
-            Retype Password:
+            <span v-if="isRegister">Retype Password:</span>
             <NInput v-if="isRegister" v-model:value="form.retypePassword" placeholder="Retype Password" type="password" />
             <NButton :disabled="loading" :loading="loading" type="primary" @click="submit" @keydown.enter="submit">
                 {{ isRegister ? 'Sign Me Up' : 'Sign In' }}

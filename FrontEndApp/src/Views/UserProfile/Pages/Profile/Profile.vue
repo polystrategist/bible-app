@@ -5,6 +5,7 @@ import { useUserStore } from '../../../../store/userStore';
 import { useRouter } from 'vue-router';
 import { supabase } from '../../../../util/SupaBase/SupaBase';
 import { NButton, useDialog, useMessage } from 'naive-ui';
+import ProfilePage from './../../../../components/ProfilePage/ProfilePage.vue';
 
 const loading = ref(false);
 const userStore = useUserStore();
@@ -52,13 +53,9 @@ async function logout() {
 </script>
 
 <template>
-    <div class="flex justify-center items-center h-[80vh]">
-        <div class="flex flex-col items-center gap-3">
-            <div>You are Logged.</div>
-            <div>{{ userStore.user ? userStore.user.user.email : '--' }}</div>
-            <div>
-                <NButton :disabled="loading" :loading="loading" secondary strong type="warning" @click="logout"> Logout </NButton>
-            </div>
+    <div class="h-full w-full">
+        <div class="max-w-700px mx-auto py-3 px-3 mt-5">
+            <ProfilePage v-if='userStore.user' :user_id="userStore.user.user.id" />
         </div>
     </div>
 </template>
