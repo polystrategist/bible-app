@@ -117,8 +117,7 @@ export const highlight = async (color: string) => {
 };
 
 export async function getChapterHighlights(args: { book_number: number; chapter: number }) {
-    const highlights = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
-    return highlights;
+    return await window.browserWindow.getChapterHighlights(JSON.stringify(args));
 }
 
 export async function saveHighlight(args: { key: string; book_number: number; chapter: number; verse: number; content: string }) {

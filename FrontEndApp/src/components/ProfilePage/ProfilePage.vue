@@ -1,10 +1,12 @@
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { supabase } from '../../util/SupaBase/SupaBase';
-import { useMessage } from 'naive-ui';
+import { NButton, NCard, NForm, NFormItem, NInput, useMessage } from 'naive-ui';
 import { onMounted, ref } from 'vue';
 import SESSION from '../../util/session';
 import { useUserStore } from '../../store/userStore';
+import { Icon } from '@iconify/vue';
 
+const loading = ref(false);
 const userStore = useUserStore();
 const message = useMessage();
 const props = defineProps(['user_id']);
@@ -25,19 +27,80 @@ async function getProfileData() {
     userStore.profile_data = data;
 }
 
+async function updateProfile() {
+    loading.value = true;
+    const { data, error } = await supabase
+        .from('profile')
+        .update(JSON.parse(JSON.stringify(userStore.profile_data)))
+        .eq('user_id', props.user_id)
+        .select()
+        .single();
+    loading.value = false;
+
+    if (error) message.error(error.message);
+    
+    message.success('Profile Updated!');
+    userStore.profile_data = data;
+}
+
 onMounted(() => getProfileData());
 </script>
 <template>
     <div>
-        <div class='flex gap-10px'>
-            <img class='rounded-full h-100px w-100px'
-                 height='100'
-                 src='https://images.ctfassets.net/h6goo9gw1hh6/2sNZtFAWOdP1lmQ33VwRN3/24e953b920a9cd0ff2e1d587742a2472/1-intro-photo-final.jpg?w=1200&h=992&fl=progressive&q=70&fm=jpg' width='100' />
-            <div class='profile-image'>
-                <div>@Brian936</div>
-                <div class='opacity-70'>"Life is all about this"</div>
-                <div>lorem ipsom dolor sit amet lorem ipsom dolor sit amet lorem ipsom dolor sit amet lorem ipsom dolor sit amet</div>
-            </div>
-        </div>
+        <NCard size="small">
+            <NForm v-if="userStore.profile_data" :disabled="loading" @keypress.enter="updateProfile">
+                <h3 class="text-lg flex gap-2 items-center mb-2 font-700">
+                    <Icon icon="mdi:account-circle" />
+                    <span>Profile</span>
+                </h3>
+                <NFormItem label="Username">
+                    <NInput v-model:value="userStore.profile_data.username"  placeholder="ex. brojenuel" />
+                </NFormItem>
+                <NFormItem label="About">
+                    <NInput v-model:value="userStore.profile_data.about" type="textarea" placeholder="Introduce yourself" />
+                </NFormItem>
+                <NFormItem label="First Name">
+                    <NInput v-model:value="userStore.profile_data.first_name" placeholder="ex. John" />
+                </NFormItem>
+                <NFormItem label="Last Name">
+                    <NInput v-model:value="userStore.profile_data.last_name" placeholder="ex. Delacruz" />
+                </NFormItem>
+
+                <h3 class="text-lg flex gap-2 items-center mb-2 font-700">
+                    <Icon icon="mdi:account-group" />
+                    <span>Social</span>
+                </h3>
+                <NFormItem label="Facebook Url">
+                    <NInput
+                        v-model:value="userStore.profile_data.facebook_url"
+                        placeholder="ex. https://www.facebook.com/brojenuel"
+                    />
+                </NFormItem>
+                <NFormItem label="Instagram Url">
+                    <NInput
+                        v-model:value="userStore.profile_data.instagram_url"
+                        placeholder="ex. https://www.instagram.com/brojenuel"
+                    />
+                </NFormItem>
+                <NFormItem label="Tiktok Url">
+                    <NInput
+                        v-model:value="userStore.profile_data.tiktok_url"
+                        placeholder="ex. https://www.tiktok.com/@brojenuel"
+                    />
+                </NFormItem>
+                <NFormItem label="Twitter Url">
+                    <NInput
+                        v-model:value="userStore.profile_data.twitter_url"
+                        placeholder="ex. https://www.twitter.com/brojenuel"
+                    />
+                </NFormItem>
+                <NButton type="primary" @click="updateProfile" :disabled="loading" :loading="loading">
+                    <template #icon>
+                        <Icon icon="mdi:content-save" />
+                    </template>
+                    Save
+                </NButton>
+            </NForm>
+        </NCard>
     </div>
 </template>
