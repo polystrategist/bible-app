@@ -3,6 +3,9 @@ import PrayerList from './../Views/PrayerList/PrayerList.vue';
 import ProfilePage from './../Views/UserProfile/Profile.vue';
 import AboutPage from './../Views/About/About.vue';
 import CreateSermon from './../Views/CreateSermon/CreateSermon.vue';
+import LoginPage from './../Views/UserProfile/Pages/Login.vue';
+import ProfileAccountPage from './../Views/UserProfile/Pages/Profile/Profile.vue';
+
 export const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
@@ -20,11 +23,11 @@ export const routes: Array<RouteRecordRaw> = [
             {
                 path: '',
                 name: 'ProfilePage',
-                component: () => import('./../Views/UserProfile/Pages/Login.vue'),
+                component: LoginPage,
             },
             {
                 path: 'profile',
-                component: () => import('./../Views/UserProfile/Pages/Profile/Profile.vue'),
+                component: ProfileAccountPage,
             },
         ],
     },

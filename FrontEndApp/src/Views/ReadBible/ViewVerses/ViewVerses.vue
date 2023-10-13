@@ -78,6 +78,7 @@ function checkHere(this: HTMLElement): void {
                 message.info('Copied to Clipboard!');
             }
         } else {
+            console.log('prevent');
             event.preventDefault();
         }
     });
@@ -176,10 +177,24 @@ onMounted(() => {
         </div>
         <div
             id="view-verses-container"
-            :style="`font-size:${fontSize}px`"
-            class="w-full h-[calc(100%-30px)] py-3 pl-5 pr-3 scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div"
+            class="w-full h-[calc(100%-30px)] scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div"
+            :class="{}"
         >
-            <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col w-full max-w-700px mx-auto">
+            <div
+                v-if="
+                    bibleStore.renderVerses[0] &&
+                    bibleStore.renderVerses[0].version &&
+                    bibleStore.renderVerses[0].version.length <= 3
+                "
+                class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 px-10 z-9 py-1"
+            >
+                <div v-for="version in bibleStore.renderVerses[0].version" :key="version.key" class="w-full text-center">
+                    <div class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none">
+                        {{ version.version.replace('.SQLite3', '') }}
+                    </div>
+                </div>
+            </div>
+            <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col w-full max-w-1100px mx-auto">
                 <div
                     :id="verse.verse == bibleStore.selectedVerse ? 'the-selected-verse' : ''"
                     :class="{
@@ -202,7 +217,12 @@ onMounted(() => {
                         title="Selected Verse"
                     ></div>
                     <div class="flex flex-col items-center gap-2 min-w-8">
-                        <span class="font-700 select-none text-size-30px opacity-60 dark:opacity-70">{{ verse.verse }}</span>
+                        <span
+                            v-show="verse.version.length > 3"
+                            class="font-700 select-none text-size-30px opacity-60 dark:opacity-70"
+                        >
+                            {{ verse.verse }}
+                        </span>
                         <div
                             v-show="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
                             title="This is Bookmarked"
@@ -212,26 +232,32 @@ onMounted(() => {
                             </NIcon>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-3">
-                        <div v-for="version in verse.version" :key="version.key">
+                    <div class="flex flex-row gap-3 w-full" :class="{ '!flex-col': verse.version.length > 3 }">
+                        <div v-for="version in verse.version" :key="version.key" class="w-full">
                             <div
+                                v-if="verse.version.length > 3"
                                 class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none"
                                 :style="`font-size: ${fontSize - 2}px`"
                             >
                                 {{ version.version.replace('.SQLite3', '') }}
                             </div>
-                            <div
-                                :data-bible-version="version.version"
-                                :data-book="verse.book_number"
-                                :data-chapter="verse.chapter"
-                                :data-key="version.key"
-                                :data-verse="verse.verse"
-                                :onfocus="checkHere"
-                                class="verse-select-text"
-                                contenteditable="true"
-                                spellcheck="false"
-                                v-html="version.text"
-                            ></div>
+                            <div :style="`font-size:${fontSize}px`">
+                                <span v-show="verse.version.length <= 3" class="font-bold select-none italic">
+                                    {{ verse.verse }}.
+                                </span>
+                                <span
+                                    :data-bible-version="version.version"
+                                    :data-book="verse.book_number"
+                                    :data-chapter="verse.chapter"
+                                    :data-key="version.key"
+                                    :data-verse="verse.verse"
+                                    :onfocus="checkHere"
+                                    class="verse-select-text"
+                                    contenteditable="true"
+                                    spellcheck="false"
+                                    v-html="version.text"
+                                ></span>
+                            </div>
                         </div>
                     </div>
                 </div>

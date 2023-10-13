@@ -7,6 +7,7 @@ export const useUserStore = defineStore('useUserStore', () => {
         return user.value?.user?.id ?? null;
     });
     const syncData = ref<boolean>(false);
+    const profile_data = ref<any>(null);
 
     function syncDataOnline() {
         window.syncDataOnline = setTimeout(() => {
@@ -23,5 +24,6 @@ export const useUserStore = defineStore('useUserStore', () => {
         user,
         user_id,
         syncData,
+        profile_data,
     };
 });

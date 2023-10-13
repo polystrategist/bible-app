@@ -60,14 +60,14 @@
 
 .scroll-bar-sm {
     &::-webkit-scrollbar {
-        width: 10px !important;
-        height: 10px !important;
+        width: 3px !important;
+        height: 3px !important;
     }
 }
 
 .scroll-bar-md {
     &::-webkit-scrollbar {
-        width: 20px !important;
-        height: 20px !important;
+        width: 10px !important;
+        height: 10px !important;
     }
 }

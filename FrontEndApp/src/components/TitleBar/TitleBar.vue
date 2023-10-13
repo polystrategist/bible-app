@@ -15,6 +15,7 @@ import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
 import LogoComponent from './../LogoComponent.vue';
+import ProfileDropdown from './Partials/ProfileDropdown.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
@@ -91,8 +92,12 @@ onBeforeMount(async () => {
                     <WeatherMoon20Regular v-if="themeStore.isDark" />
                     <WeatherSunny20Regular v-else />
                 </NIcon>
-                <span v-if="themeStore.isDark" class="text-size-12px ml-1 capitalize whitespace-nowrap">{{ $t('dark') }}</span>
-                <span v-else class="text-size-12px ml-1 capitalize whitespace-nowrap">{{ $t('light') }}</span>
+                <span class="text-size-12px ml-1 capitalize whitespace-nowrap">
+                    {{ themeStore.isDark ? $t('dark') : $t('light') }}
+                </span>
+            </div>
+            <div class='mr-3'>
+                <ProfileDropdown />
             </div>
             <div
                 v-show="isElectron"
@@ -111,7 +116,7 @@ onBeforeMount(async () => {
                 @click="maximizeWindow()"
             >
                 <NIcon size="17">
-                    <SquareMultiple20Regular v-if="isMaximized" />
+                    <SquareMultiple20Regular v-if="!isMaximized" />
                     <Square20Regular v-else />
                 </NIcon>
             </div>
