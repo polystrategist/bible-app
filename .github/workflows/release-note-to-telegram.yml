@@ -1,0 +1,25 @@
+name: Release Notes
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Send Release Notes to Telegram
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      run: |
+        # You can use a script or a programming language to format the release notes
+        # and send them to your Telegram channel or group.
+
+        # Example using Python and python-telegram-bot:
+        python3 -m pip install python-telegram-bot
+        python3 -c "from telegram import Bot, Update; bot = Bot(token='$TELEGRAM_BOT_TOKEN'); bot.send_message(chat_id='1001976459367_34', text='New release: ${{ github.event.release.tag_name }}')"
