@@ -17,9 +17,10 @@ jobs:
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       run: |
-        # You can use a script or a programming language to format the release notes
-        # and send them to your Telegram channel or group.
-
-        # Example using Python and python-telegram-bot:
-        python3 -m pip install python-telegram-bot
-        python3 -c "from telegram import Bot, Update; bot = Bot(token='$TELEGRAM_BOT_TOKEN'); bot.send_message(chat_id='1001976459367_34', text='New release: ${{ github.event.release.tag_name }}')"
+        release_name="${GITHUB_EVENT.client_payload.release_name}"
+        release_url="${GITHUB_EVENT.client_payload.release_url}"
+        message="New release available: [$release_name]($release_url)"
+        curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+          --data "chat_id=1001976459367_34" \
+          --data "text=$message" \
+          --data "parse_mode=markdown"
