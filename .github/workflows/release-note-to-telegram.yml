@@ -21,6 +21,6 @@ jobs:
         release_url="${GITHUB_EVENT.client_payload.release_url}"
         message="New release available: [$release_name]($release_url)"
         curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-          --data "chat_id=1001976459367_34" \
+          --data "chat_id=/a/#-1001976459367_34" \
           --data "text=$message" \
           --data "parse_mode=markdown"
