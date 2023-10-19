@@ -25,35 +25,43 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'read-bible',
             key: 'read-bible',
-            icon: renderIcon(Book)
+            icon: renderIcon(Book),
         },
         {
             label: 'Sermons',
             key: 'sermons',
-            icon: renderIcon(MediaLibrary)
+            icon: renderIcon(MediaLibrary),
         },
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderIcon(Pray)
-        }
+            icon: renderIcon(Pray),
+        },
     ]);
 
     const bottomMenuTabs = ref([
         {
             label: 'Profile',
             key: '/profile',
-            icon: renderIcon(UserProfile)
+            icon: renderIcon(UserProfile),
         },
         {
             label: 'Settings',
             key: '/settings-page',
-            icon: renderIcon(Settings)
-        }
+            icon: renderIcon(Settings),
+        },
     ]);
 
     const localSavedTabsKey = 'localSavedTabsKey';
-    const enableTab = ref(['read-bible', 'sermons', '/prayer-list', '/profile', '/settings-page', '/create-sermon', '/donate-page']);
+    const enableTab = ref([
+        'read-bible',
+        'sermons',
+        '/prayer-list',
+        '/profile',
+        '/settings-page',
+        '/create-sermon',
+        '/donate-page',
+    ]);
     watch(
         () => enableTab.value,
         async (val) => {
@@ -68,7 +76,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         isRouter.value = false;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
-            menuSelected: menuSelected.value
+            menuSelected: menuSelected.value,
         });
     }
 
@@ -77,7 +85,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         isRouter.value = true;
         session.set(menuSessionKey, {
             isRouter: isRouter.value,
-            menuSelected: menuSelected.value
+            menuSelected: menuSelected.value,
         });
         await router.push(menu);
     }
@@ -97,7 +105,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         // for saved tabs
         let savedLocalTabsKey = session.get(localSavedTabsKey);
         if (savedLocalTabsKey) {
-
             if (!savedLocalTabsKey.includes('/create-sermon')) {
                 savedLocalTabsKey.push('/create-sermon');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
@@ -122,6 +129,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         setMenu,
         menuUpperTabs,
         bottomMenuTabs,
-        enableTab
+        enableTab,
     };
 });

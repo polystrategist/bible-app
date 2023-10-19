@@ -13,11 +13,11 @@ const themeStore = useThemeStore();
                 <Moon v-if="themeStore.isDark" />
                 <Sun v-else />
             </NIcon>
-            Theme
+            {{ $t('themes') }}
         </div>
         <NSwitch v-model:value="themeStore.isDark">
-            <template #checked> Dark </template>
-            <template #unchecked> Light </template>
+            <template #checked> {{ $t('dark') }} </template>
+            <template #unchecked> {{ $t('light') }} </template>
         </NSwitch>
     </div>
 </template>

@@ -5,6 +5,7 @@ import RightSideBarContainer from './../../../../components/ReadBible/RightSideB
 import { TrashCan } from '@vicons/carbon';
 import { NIcon, NPopconfirm } from 'naive-ui';
 import { ref } from 'vue';
+import { bookmarksType } from '../../../../GlobalTypes';
 
 const bookmarkStore = useBookmarkStore();
 const bibleStore = useBibleStore();
@@ -24,7 +25,7 @@ async function deleteBookmark(verse: any) {
 <template>
     <RightSideBarContainer :title="$t('Bookmarks')">
         <div
-            v-for="(bookmark, key) in bookmarkStore.bookmarks"
+            v-for="(bookmark, key) in (bookmarkStore.bookmarks as bookmarksType)"
             :key="key"
             class="relative dark:hover:bg-light-50 dark:hover:bg-opacity-20 hover:bg-gray-800 hover:bg-opacity-20 cursor-pointer flex justify-between items-center"
             :class="{ 'dark:bg-light-50 dark:bg-opacity-10 bg-gray-800 bg-opacity-10': selectedBookmarkKey == key }"
@@ -34,7 +35,7 @@ async function deleteBookmark(verse: any) {
                 :class="{ '!h-full': selectedBookmarkKey == key }"
             ></div>
             <div class="w-full p-10px" @click="selectBookVerse(key as string, bookmark)">
-                <span class="mr-1">{{ bibleStore.getBook(bookmark.book_number).title }}</span>
+                <span class="mr-1">{{ $t(bibleStore.getBook(bookmark.book_number).title) }}</span>
                 <span>{{ bookmark.chapter }} : {{ bookmark.verse }}</span>
             </div>
             <div class="dark:hover:text-red-400 hover:text-red-500 opacity-40 hover:opacity-100 pr-10px" @click.stop>

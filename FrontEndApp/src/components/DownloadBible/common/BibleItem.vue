@@ -14,9 +14,9 @@ function clickDownload() {
     downloadBibleStore.downloadingVersion = props.version.file_name;
     window.browserWindow.downloadModule({
         url: props.version.download_link as any,
-        progress: (data: any) => {
-            percentage.value = data.percent * 100;
-        },
+        // progress: (data: any) => {
+        //     percentage.value = data.percent * 100;
+        // },
         done: async () => {
             await moduleStore.getBibleLists();
             downloadBibleStore.isDownloading = false;
@@ -37,7 +37,7 @@ function clickDownload() {
                 {{
                     downloadBibleStore.isDownloading && downloadBibleStore.downloadingVersion == props.version.file_name
                         ? `${percentage}%`
-                        : 'Download'
+                        : $t('download')
                 }}
             </NButton>
         </div>

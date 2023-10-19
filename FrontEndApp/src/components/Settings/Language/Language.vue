@@ -18,7 +18,7 @@ watch(locale, (lang) => {
             <NIcon>
                 <Language />
             </NIcon>
-            Language
+            {{ $t('Language') }}
         </div>
         <NSelect
             class="max-w-300px"

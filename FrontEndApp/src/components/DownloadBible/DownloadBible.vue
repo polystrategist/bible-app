@@ -40,7 +40,7 @@ function clickDownload(downloadLink: string) {
     <NModal v-model:show="bibleDownloadStore.showBibleDownloadModal">
         <NCard style="width: 600px" :bordered="false" size="small" role="dialog" aria-modal="true">
             <div class="flex justify-between items-center">
-                <h1 class="font-800 select-none">Available Versions</h1>
+                <h1 class="font-800 select-none">{{ $t('Available Versions') }}</h1>
             </div>
             <div v-if="BibleVersions.length" class="select-none h-[70vh] overflow-y-auto overflowing-div">
                 <div
@@ -68,7 +68,7 @@ function clickDownload(downloadLink: string) {
                         <NIcon>
                             <Download />
                         </NIcon>
-                        Download
+                        <span class="capitalize">{{ $t('download') }}</span>
                     </NButton>
                 </div>
             </div>

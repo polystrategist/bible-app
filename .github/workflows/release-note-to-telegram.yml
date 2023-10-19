@@ -1,0 +1,26 @@
+name: Release Notes
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Send Release Notes to Telegram
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      run: |
+        release_name="${GITHUB_EVENT.client_payload.release_name}"
+        release_url="${GITHUB_EVENT.client_payload.release_url}"
+        message="New release available: [$release_name]($release_url)"
+        curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+          --data "chat_id=/a/#-1001976459367_34" \
+          --data "text=$message" \
+          --data "parse_mode=markdown"

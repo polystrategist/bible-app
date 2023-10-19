@@ -19,7 +19,7 @@ export const useMainStore = defineStore('useMainStore', () => {
         version.value = versions.version;
         appName.value = versions.name.replaceAll('-', ' ');
 
-        console.log(
+        console.info(
             `This app is using Chrome (v${versions.chrome}), Node.js (v${versions.node}), and Electron (v${
                 versions.electron
             }), app version is ${versions.version}. The name is ${versions.name.replaceAll('-', ' ')}`
@@ -35,6 +35,6 @@ export const useMainStore = defineStore('useMainStore', () => {
         showAbout,
         appName,
         version,
-        showDonateModal
+        showDonateModal,
     };
 });

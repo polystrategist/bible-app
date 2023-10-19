@@ -3,18 +3,20 @@ import { defineStore } from 'pinia';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
-import { bibleBooks } from '../Views/ReadBible/books';
+import { bibleBooks } from '../util/books';
+import { useSettingStore } from './settingStore';
 
 type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
 const StorageKeyOfChapterVerseSelected = 'selected-chapter-verse-storage';
 const StorageSelectedVersions = 'stored-selected-versions';
 
 export const useBibleStore = defineStore('useBibleStore', () => {
+    const settingStore = useSettingStore();
     const selectedBook = ref<BookInterface>({
         title: 'Genesis',
         short_name: 'Gen',
         book_number: 10,
-        chapter_count: 50
+        chapter_count: 50,
     });
     const clipNoteStore = useClipNoteStore();
     const DefaultSelectedVersion = `King James Version - 1769.SQLite3`;
@@ -36,7 +38,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                 return {
                     text: highlight ? highlight.content : ver.text,
                     version: ver.version,
-                    key
+                    key,
                 };
             });
 
@@ -44,7 +46,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                 book_number: v.book_number,
                 chapter: v.chapter,
                 verse: v.verse,
-                version: theVersions
+                version: theVersions,
             };
         });
     });
@@ -60,7 +62,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         args: { page: number; search: string | null; limit: number } = {
             page: highlightPage.value,
             search: highlightSearch.value,
-            limit: highlightLimit.value
+            limit: highlightLimit.value,
         }
     ) {
         allHighlights.value = await window.browserWindow.getHighlights(JSON.stringify(args));
@@ -69,7 +71,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     async function getChapterHighlights() {
         const args = {
             book_number: selectedBookNumber.value,
-            chapter: selectedChapter.value
+            chapter: selectedChapter.value,
         };
         chapterHighlights.value = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
     }
@@ -78,7 +80,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         const arg = {
             bible_versions: selectedBibleVersions.value,
             book_number: selectedBookNumber.value,
-            selected_chapter: selectedChapter.value
+            selected_chapter: selectedChapter.value,
         };
         await getChapterHighlights();
         await clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
@@ -90,7 +92,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         SESSION.set(StorageKeyOfChapterVerseSelected, {
             book_number: selectedBookNumber.value,
             chapter: selectedChapter.value,
-            verse: selectedVerse.value
+            verse: selectedVerse.value,
         });
 
         SESSION.set('saved-selected-book', selectedBook.value);
@@ -152,6 +154,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;
             if (book.chapter_count < selectedChapter.value) selectedChapter.value = book.chapter_count;
+            if (book.title == 'Daniel' && settingStore.showDeuterocanonical) selectedBook.value.chapter_count = 14;
             selectedVerse.value = 1;
             saveVersesToStorage();
             await getVerses();
@@ -172,18 +175,17 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             const bookChosen = bibleBooks[bibleBooks.findIndex((book) => book.book_number == selectedBookNumber.value)];
             return {
                 book: bookChosen.title,
-                chapter: selectedChapter
+                chapter: selectedChapter,
             };
         }),
         getBook,
         renderVerses,
         isBookExist: (book_number: number) => {
-            const findBookIndex = bibleBooks
-                .findIndex((book) => book.book_number == book_number);
+            const findBookIndex = bibleBooks.findIndex((book) => book.book_number == book_number);
             return findBookIndex > -1;
         },
         getBookShortName: (book_number: number) => {
             return bibleBooks[bibleBooks.findIndex((book) => book.book_number == book_number)];
-        }
+        },
     };
 });
