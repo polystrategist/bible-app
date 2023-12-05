@@ -6,16 +6,8 @@ import { useMainStore } from '../../store/main';
 const mainStore = useMainStore();
 const donationLinks = [
     {
-        label: 'Debit/Credit',
-        link: 'https://www.paypal.com/donate?hosted_button_id=DCZYF7KWPUVB4',
-    },
-    {
         label: 'GCash',
         link: 'https://i.ibb.co/kJGg32y/GCash-My-QR-06102021230745.png',
-    },
-    {
-        label: 'BuyMeCoffee.com',
-        link: 'https://www.buymeacoffee.com/BroJenuel',
     },
     {
         label: 'Ko-Fi.com',
@@ -47,7 +39,7 @@ const donationLinks = [
                     <NIcon>
                         <ArrowRight />
                     </NIcon>
-                    <a :href="donationLink.link" class="outline-none hover:underline">{{ donationLink.label }}</a>
+                    <a :href="donationLink.link" target="_blank" class="outline-none hover:underline">{{ donationLink.label }}</a>
                 </li>
             </ul>
         </div>

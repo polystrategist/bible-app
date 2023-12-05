@@ -186,7 +186,7 @@ onMounted(() => {
                     bibleStore.renderVerses[0].version &&
                     bibleStore.renderVerses[0].version.length <= 3
                 "
-                class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 px-10 z-9 py-1"
+                class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 bg-white px-10 z-9 py-1"
             >
                 <div v-for="version in bibleStore.renderVerses[0].version" :key="version.key" class="w-full text-center">
                     <div class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none">
