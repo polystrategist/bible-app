@@ -1,15 +1,28 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { NPopconfirm, NIcon, NButton, useMessage } from 'naive-ui';
+import { NIcon, NButton, useMessage, NDropdown, useDialog } from 'naive-ui';
 import EditPrayerItem from './EditPrayerItem.vue';
-import { Edit, TrashCan } from '@vicons/carbon';
+import { Edit, TrashCan, OverflowMenuVertical } from '@vicons/carbon';
 import Draggable from 'vuedraggable';
 import { usePrayerListStore } from '../../store/prayerListStore';
 import NewPrayerItem from './CreateNewPrayerItem.vue';
+import type { Component } from 'vue';
+import { h } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 const message = useMessage();
 const prayerListStore = usePrayerListStore();
 const editPrayerModal = ref<any>(null);
+const dialog = useDialog();
+const { t } = useI18n();
+
+const renderIcon = (icon: Component) => {
+    return () => {
+        return h(NIcon, null, {
+            default: () => h(icon),
+        });
+    };
+};
 
 const removePrayerItem = (key: string) => {
     try {
@@ -44,16 +57,33 @@ const dragOptions = {
     disabled: false,
     ghostClass: 'ghost',
 };
+
+function selectItemFromMenuElement(key: any, element: any) {
+    if (key === 'edit') editPrayerItem(element.key, element.content);
+    else if (key === 'remove') {
+        dialog.warning({
+            title: t('Confirm'),
+            content: t('Are You Sure You want to remove?'),
+            positiveText: t('Yes'),
+            negativeText: t('No'),
+            onPositiveClick: () => {
+                removePrayerItem(element.key);
+            },
+        });
+    }
+}
 </script>
 <template>
-    <div class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-30px pl-30px">
-        <div class="w-[100%] h-[100%] flex flex-col">
-            <div class="p-10px flex justify-between items-center select-none min-h-60px">
-                <span class="font-700 text-size-20px capitalize">{{ $t('prayer list') }}</span>
+    <div
+        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-10px pl-30px bg-dark-800"
+    >
+        <div class="w-full max-w-250px h-[100%] flex flex-col">
+            <div class="p-10px flex justify-between items-end select-none min-h-60px">
+                <span class="font-700 capitalize">{{ $t('prayer list') }}</span>
                 <NewPrayerItem />
             </div>
             <Draggable
-                class="list-group h-[100%] overflow-y-auto overflowing-div pr-10px"
+                class="list-group h-[100%] overflow-y-auto overflowing-div bg-dark-900 p-2"
                 :list="prayerListStore.prayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -61,48 +91,47 @@ const dragOptions = {
                 @change="changeInProgress"
             >
                 <template #item="{ element }">
-                    <div class="relative prayer-list-item">
-                        <div class="group pb-0 duration-200">
+                    <div class="relative prayer-list-item group">
+                        <div class="pb-0 duration-200">
                             <div
-                                class="prayer-list-content cursor-move px-3 prose-mirror-render-html"
+                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
                                 v-html="element.content"
                             ></div>
-                            <div class="bottom-10px text-size-17px flex gap-1 duration-300">
-                                <NButton size="small" round secondary @click="editPrayerItem(element.key, element.content)">
+                            <NDropdown
+                                trigger="click"
+                                :options="[
+                                    {
+                                        label: $t('edit'),
+                                        key: 'edit',
+                                        icon: renderIcon(Edit),
+                                    },
+                                    {
+                                        label: $t('remove'),
+                                        key: 'remove',
+                                        icon: renderIcon(TrashCan),
+                                    },
+                                ]"
+                                @select="(key: string) => selectItemFromMenuElement(key, element)"
+                            >
+                                <NButton type="primary" size="tiny" class="absolute top-1 right-1 invisible group-hover:visible">
                                     <template #icon>
                                         <NIcon>
-                                            <Edit />
+                                            <OverflowMenuVertical />
                                         </NIcon>
                                     </template>
-                                    <span class="capitalize">{{ $t('edit') }}</span>
                                 </NButton>
-                                <div>
-                                    <NPopconfirm @positive-click="removePrayerItem(element.key)">
-                                        <template #trigger>
-                                            <NButton size="small" round secondary type="error">
-                                                <template #icon>
-                                                    <NIcon>
-                                                        <TrashCan />
-                                                    </NIcon>
-                                                </template>
-                                                <span class="capitalize">{{ $t('remove') }}</span>
-                                            </NButton>
-                                        </template>
-                                        <span class="capitalize">{{ $t('are you sure to remove this item') }}</span>
-                                    </NPopconfirm>
-                                </div>
-                            </div>
+                            </NDropdown>
                         </div>
                     </div>
                 </template>
             </Draggable>
         </div>
-        <div class="w-[100%] h-[100%] flex flex-col">
-            <div class="p-10px flex justify-between items-center min-h-60px">
-                <span class="font-700 text-size-20px select-none capitalize">{{ $t('done') }} </span>
+        <div class="w-full max-w-250px h-[100%] flex flex-col">
+            <div class="p-10px flex justify-between items-end min-h-60px">
+                <span class="font-700 select-none capitalize">{{ $t('done') }} </span>
             </div>
             <Draggable
-                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div pr-10px"
+                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div bg-dark-900 p-2"
                 :list="prayerListStore.donePrayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -110,22 +139,35 @@ const dragOptions = {
                 @change="changeInDone"
             >
                 <template #item="{ element }">
-                    <div class="relative prayer-list-item">
-                        <div class="absolute top-10px right-10px text-size-17px flex">
-                            <NPopconfirm @positive-click="removePrayerItem(element.key)">
-                                <template #trigger>
-                                    <NButton size="small" circle type="error" secondary>
-                                        <template #icon>
-                                            <NIcon>
-                                                <TrashCan />
-                                            </NIcon>
-                                        </template>
-                                    </NButton>
+                    <div class="group relative prayer-list-item">
+                        <div
+                            class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
+                            v-html="element.content"
+                        ></div>
+                        <NDropdown
+                            trigger="click"
+                            :options="[
+                                {
+                                    label: $t('edit'),
+                                    key: 'edit',
+                                    icon: renderIcon(Edit),
+                                },
+                                {
+                                    label: $t('remove'),
+                                    key: 'remove',
+                                    icon: renderIcon(TrashCan),
+                                },
+                            ]"
+                            @select="(key: string) => selectItemFromMenuElement(key, element)"
+                        >
+                            <NButton type="primary" size="tiny" class="absolute top-1 right-1 invisible group-hover:visible">
+                                <template #icon>
+                                    <NIcon>
+                                        <OverflowMenuVertical />
+                                    </NIcon>
                                 </template>
-                                <span class="capitalize">{{ $t('are you sure to remove this item') }}</span>
-                            </NPopconfirm>
-                        </div>
-                        <div class="prayer-list-content cursor-move prose-mirror-render-html" v-html="element.content"></div>
+                            </NButton>
+                        </NDropdown>
                     </div>
                 </template>
             </Draggable>
@@ -134,9 +176,9 @@ const dragOptions = {
     <EditPrayerItem ref="editPrayerModal" />
 </template>
 
-<style lang="postcss">
+<style lang="scss">
 .prayer-list-item {
-    @apply my-10px dark:bg-opacity-50 dark:bg-gray-800 dark:hover:bg-gray-800 bg-gray-300 hover:bg-gray-400 p-10px rounded-md relative overflow-hidden cursor-move;
+    @apply dark:bg-opacity-50 dark:bg-gray-800 dark:hover:bg-gray-800 bg-gray-300 hover:bg-gray-400 rounded-md relative overflow-hidden cursor-move mb-2 p-1;
 
     .flip-list-move {
         transition: transform 0.5s;
@@ -149,12 +191,6 @@ const dragOptions = {
     }
     .list-group {
         min-height: 20px;
-    }
-}
-.prayer-list-page {
-    .list-group-done {
-        padding: 0 20px;
-        opacity: 0.5;
     }
 }
 </style>
