@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
 import ListItem from './ListItem.vue';
 import {
     NavigationMenu,
@@ -49,12 +48,17 @@ const components: { title: string; href: string; description: string }[] = [
 </script>
 
 <template>
-    <div class="hidden items-center justify-between px-4 h-[50px] md:flex">
+    <div class="hidden items-center justify-between px-10 h-[70px] md:flex">
         <div>
-            <NuxtLink to="/"> Logo </NuxtLink>
+            <NuxtLink to="/">
+                <Icon size="40" name="pepicons-pop:sword-shield-circle-filled" />
+            </NuxtLink>
         </div>
         <NavigationMenu>
             <NavigationMenuList>
+                <NavigationMenuItem>
+                    <NuxtLink to="/" :class="navigationMenuTriggerStyle()"> Home </NuxtLink>
+                </NavigationMenuItem>
                 <NavigationMenuItem>
                     <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -103,23 +107,29 @@ const components: { title: string; href: string; description: string }[] = [
                 <NavigationMenuItem>
                     <NuxtLink to="/sermons" :class="navigationMenuTriggerStyle()"> Sermons </NuxtLink>
                 </NavigationMenuItem>
-                <NavigationMenuItem>
-                    <div
-                        @click="colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'"
-                        :class="navigationMenuTriggerStyle()"
-                    >
-                        <Icon
-                            icon="radix-icons:moon"
-                            class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-                        />
-                        <Icon
-                            icon="radix-icons:sun"
-                            class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-                        />
-                    </div>
-                </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
-        <div>User</div>
+        <div class="flex items-center gap-5">
+            <Button size="sm">Login</Button>
+            <div
+                @click="colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'"
+                class="cursor-pointer flex items-center justify-center"
+            >
+                <Icon
+                    name="radix-icons:moon"
+                    class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+                />
+                <Icon
+                    name="radix-icons:sun"
+                    class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+                />
+            </div>
+        </div>
     </div>
 </template>
+
+<style lang="scss">
+.router-link-exact-active {
+    @apply bg-accent/50;
+}
+</style>

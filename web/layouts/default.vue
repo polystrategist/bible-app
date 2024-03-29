@@ -1,4 +1,6 @@
 <template>
-    <BelieverNavigation />
-    <slot />
+    <ScrollArea>
+        <BelieverNavigation />
+        <slot />
+    </ScrollArea>
 </template>

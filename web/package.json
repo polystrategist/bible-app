@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@nuxt/ui": "^2.15.0",
+    "@radix-icons/vue": "^1.0.0",
+    "@vueuse/core": "^10.9.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-vue-next": "^0.363.0",
