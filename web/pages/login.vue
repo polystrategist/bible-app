@@ -1,3 +1,8 @@
+<script setup lang="ts">
+useHead({
+    title: 'Login - Believers Sword',
+});
+</script>
 <template>
     <Card class="mx-auto max-w-sm mt-10 mb-10">
         <CardHeader>

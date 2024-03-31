@@ -33,8 +33,8 @@ useHead({
             data-brr="1"
             style="display: inline-block; vertical-align: top; text-decoration: inherit; text-wrap: initial; max-width: 568px"
         >
-            Beautifully designed components that you can copy and paste into your apps. Accessible. Customizable. Open
-            Source.</span
+            Praise be to God! Welcome to 'Believers Sword,' a haven for refining the faith of believers. Sharing and Learning from
+            different believers.</span
         >
         <section class="flex w-full items-center justify-center space-x-4 py-4 md:pb-10">
             <Button size="sm">Create Account</Button>
