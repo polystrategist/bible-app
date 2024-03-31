@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^3.3.3",
+    "@nuxtjs/supabase": "^1.2.0",
     "@nuxtjs/tailwindcss": "^6.11.4",
     "nuxt-icon": "^0.6.10",
     "sass": "^1.72.0",

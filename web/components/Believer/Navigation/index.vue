@@ -110,7 +110,9 @@ const components: { title: string; href: string; description: string }[] = [
             </NavigationMenuList>
         </NavigationMenu>
         <div class="flex items-center gap-5">
-            <Button size="sm">Login</Button>
+            <NuxtLink to="/login">
+                <Button size="sm">Login</Button>
+            </NuxtLink>
             <div
                 @click="colorMode.preference = colorMode.preference === 'dark' ? 'light' : 'dark'"
                 class="cursor-pointer flex items-center justify-center"
