@@ -59,7 +59,7 @@ const components: { title: string; href: string; description: string }[] = [
                 <NavigationMenuItem>
                     <NuxtLink to="/" :class="navigationMenuTriggerStyle()"> Home </NuxtLink>
                 </NavigationMenuItem>
-                <NavigationMenuItem>
+                <!-- <NavigationMenuItem>
                     <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
                     <NavigationMenuContent>
                         <ul class="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[minmax(0,.75fr)_minmax(0,1fr)]">
@@ -103,7 +103,7 @@ const components: { title: string; href: string; description: string }[] = [
                             </ListItem>
                         </ul>
                     </NavigationMenuContent>
-                </NavigationMenuItem>
+                </NavigationMenuItem> -->
                 <NavigationMenuItem>
                     <NuxtLink to="/sermons" :class="navigationMenuTriggerStyle()"> Sermons </NuxtLink>
                 </NavigationMenuItem>
