@@ -21,7 +21,6 @@ import { Button } from '@/components/ui/button';
     <div>
         <Button>Button</Button>
     </div>
-
     <RouterView />
 </template>
 
