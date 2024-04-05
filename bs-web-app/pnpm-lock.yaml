@@ -32,6 +32,9 @@ dependencies:
   radix-vue:
     specifier: ^1.6.2
     version: 1.6.2(vue@3.4.21)
+  snap-storage:
+    specifier: ^0.2.5
+    version: 0.2.5
   tailwind-merge:
     specifier: ^2.2.2
     version: 2.2.2
@@ -1506,6 +1509,10 @@ packages:
   /signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
+
+  /snap-storage@0.2.5:
+    resolution: {integrity: sha512-U/NctjGFq6mOI04XtavXEDZiDC/sat80VPTfsUCHvxTfMMsrvidm6kkWDVG1+RWSeI9FPDSxnJs5PaSkiTYJsA==}
+    dev: false
 
   /source-map-js@1.2.0:
     resolution: {integrity: sha512-itJW8lvSA0TXEphiRoawsCksnlf8SyvmFzIhltqAHluXd88pkCd+cXJVHTDwdCr0IzwptSm035IHQktUu1QUMg==}

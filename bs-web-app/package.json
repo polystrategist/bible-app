@@ -20,6 +20,7 @@
     "embla-carousel-vue": "^8.0.1",
     "pinia": "^2.1.7",
     "radix-vue": "^1.6.2",
+    "snap-storage": "^0.2.5",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "v-calendar": "^3.1.2",
