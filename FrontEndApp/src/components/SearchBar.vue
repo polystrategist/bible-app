@@ -2,7 +2,7 @@
 import { NButton, NCheckbox, NCheckboxGroup, NInput, useMessage } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { searchBibleType } from '../GlobalTypes';
-import { highlighter } from '../util/hilitor';
+import { highlighter, removeHighlight } from '../util/hilitor';
 import { useBibleStore } from '../store/BibleStore';
 import { useI18n } from 'vue-i18n';
 import { bibleBooks } from '../util/books';
@@ -25,12 +25,17 @@ watch(
             search.value = null;
             searchedVerses.value = [];
             page.value = 1;
+            window.searchTheBibleTimeOut = setTimeout(() => {
+                removeHighlight();
+            }, 500);
             return;
         }
 
         clearTimeout(window.searchTheBibleTimeOut);
+
         window.searchTheBibleTimeOut = setTimeout(() => {
-            if (val) submitSearch(val);
+            if (val && val != '') submitSearch(val);
+            else removeHighlight();
         }, 500);
     }
 );
@@ -52,6 +57,12 @@ function selectAVerse(book_number: number, chapter: number, verse: number) {
     bibleStore.selectVerse(book_number, chapter, verse);
     bibleStore.AutoScrollSavedPosition(200);
     focused.value = false;
+
+    removeHighlight();
+
+    setTimeout(() => {
+        highlighter('input-text-search', search.value as string), 100;
+    }, 500);
 }
 
 async function submitSearch(searchStr: string | null = search.value) {

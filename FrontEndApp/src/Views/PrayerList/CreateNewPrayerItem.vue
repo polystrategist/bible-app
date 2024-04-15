@@ -32,9 +32,9 @@ const SaveEditorContent = () => {
 </script>
 
 <template>
-    <NButton @click="showModal = true" round secondary>
+    <NButton @click="showModal = true" round secondary size='tiny'>
         <template #icon>
-            <NIcon size="20" class="-mt-3px -ml-3px">
+            <NIcon>
                 <Add />
             </NIcon>
         </template>
@@ -45,8 +45,7 @@ const SaveEditorContent = () => {
             <template #header>
                 <span class="capitalize">{{ $t('create') }}</span>
             </template>
-            <Editor v-model="prayerContent" />
-
+            <Editor v-model="prayerContent" :button-actions="['bold', 'italic', 'underline', 'strike', 'clearFormat']" />
             <div class="p-10px flex flex-row justify-end gap-15px dark:bg-black dark:bg-opacity-10">
                 <NButton ghost @click="closeCreateNewModal()">
                     <NIcon>

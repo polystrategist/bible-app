@@ -45,7 +45,7 @@ defineExpose({
             <template #header>
                 <span class="capitalize">{{ $t('edit') }}</span>
             </template>
-            <Editor v-model="prayerItemContent" />
+            <Editor v-model="prayerItemContent" :button-actions="['bold', 'italic', 'underline', 'strike', 'clearFormat']" />
 
             <div class="p-10px flex flex-row justify-end gap-15px">
                 <NButton class="flex-grow" type="info" @click="SaveEditorContent()">

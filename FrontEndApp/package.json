@@ -55,6 +55,7 @@
     },
     "devDependencies": {
         "@iconify/vue": "^4.1.1",
+        "@types/vue": "^2.0.0",
         "@vicons/carbon": "^0.12.0",
         "@vicons/fa": "^0.12.0",
         "@vicons/fluent": "^0.12.0",
