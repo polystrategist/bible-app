@@ -6,6 +6,11 @@
   src: url("./fonts/Mulish-Regular.ttf");
 }
 
+@font-face {
+  font-family: "Poppins";
+  src: url("./fonts/poppins/Poppins-Regular.ttf");
+}
+
 @tailwind utilities;
 
 @layer base {
@@ -73,7 +78,7 @@
 
 @layer base {
   * {
-    @apply border-border font-mulish;
+    @apply border-border font-poppins;
   }
   body {
     @apply bg-background text-foreground;

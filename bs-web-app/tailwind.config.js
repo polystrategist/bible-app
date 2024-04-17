@@ -89,6 +89,7 @@ module.exports = {
             },
             fontFamily: {
                 mulish: ["Mulish Regular"],
+                poppins: ["Poppins"],
             },
         },
     },
