@@ -71,7 +71,7 @@ function menuClicked(link: LinkProp) {
                     v-else
                     :key="`2-${index}`"
                     @click="menuClicked(link)"
-                    class="cursor-pointer"
+                    class="cursor-pointer h-[28px]"
                     :class="
                         cn(
                             buttonVariants({

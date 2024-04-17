@@ -1,5 +1,11 @@
 @tailwind base;
 @tailwind components;
+
+@font-face {
+  font-family: "Mulish Regular";
+  src: url("./fonts/Mulish-Regular.ttf");
+}
+
 @tailwind utilities;
 
 @layer base {
@@ -13,7 +19,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 346.8 77.2% 49.8%;
+    --primary: 142.1 76.2% 36.3%;
     --primary-foreground: 355.7 100% 97.3%;
 
     --secondary: 240 4.8% 95.9%;
@@ -30,7 +36,7 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 346.8 77.2% 49.8%;
+    --ring: 142.1 76.2% 36.3%;
     --radius: 0.5rem;
   }
 
@@ -44,8 +50,8 @@
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 346.8 77.2% 49.8%;
-    --primary-foreground: 355.7 100% 97.3%;
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
 
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
@@ -61,13 +67,13 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 346.8 77.2% 49.8%;
+    --ring: 142.4 71.8% 29.2%;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-mulish;
   }
   body {
     @apply bg-background text-foreground;

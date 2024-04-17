@@ -22,14 +22,14 @@ const sideBarMaxSizeSnapKey = "sideBarMaxSize";
 
 const links: LinkProp[] = [
     {
-        title: "Read Bible",
+        title: "Bible",
         icon: "mdi:book-open-page-variant",
         variant: "default",
         path: "/",
         key: "read-bible",
     },
     {
-        title: "Prayer List",
+        title: "Pray",
         icon: "mdi:hands-pray",
         variant: "ghost",
         path: "/prayer-list",
@@ -169,7 +169,7 @@ onBeforeMount(() => {
                             class="size-5"
                             :class="cn(isCollapsed && '!size-8')"
                         />
-                        <span :class="cn(isCollapsed && 'hidden')">Believers Sword</span>
+                        <span class="font-bold" :class="cn(isCollapsed && 'hidden')">Believers Sword</span>
                     </div>
                     <Separator />
                     <div class="h-full overflow-y-auto">
