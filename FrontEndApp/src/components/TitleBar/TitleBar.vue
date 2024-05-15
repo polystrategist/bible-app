@@ -116,7 +116,7 @@ onBeforeMount(async () => {
                 @click="maximizeWindow()"
             >
                 <NIcon size="17">
-                    <SquareMultiple20Regular v-if="!isMaximized" />
+                    <SquareMultiple20Regular v-if="isMaximized" />
                     <Square20Regular v-else />
                 </NIcon>
             </div>
