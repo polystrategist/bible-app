@@ -6,30 +6,18 @@ import { useMainStore } from '../../store/main';
 const mainStore = useMainStore();
 const donationLinks = [
     {
-        label: 'GCash',
-        link: 'https://i.ibb.co/kJGg32y/GCash-My-QR-06102021230745.png',
-    },
-    {
-        label: 'Ko-Fi.com',
-        link: 'https://ko-fi.com/brojenuel',
+        label: 'Buy Me a Coffee',
+        link: 'https://buymeacoffee.com/jenuel.dev',
     },
 ];
 </script>
 <template>
     <NCard size="small">
-        <div class="text-size-20px font-800">{{ $t('title') }} {{ mainStore.version }}</div>
+        <div class="text-size-20px font-800 mb-2">{{ $t('title') }} {{ mainStore.version }}</div>
         <div class="mb-2">
-            Believers Sword App is an application to help you study the bible. I built this apps specifically from my taste of
-            view. I just really want to create an application including the features that I like to have in the application. Im so
-            thankful to God for giving me time to create this application and also to share to others. Im not recommending this
-            application, but I am encouraging you to try the application I built, and hoping that you may like it. I hope we learn
-            to study the bible better.
+            Believers Sword App is an application to help you study the Bible. I'm so thankful to God for giving me the time to create this application and to share it with others. I'm not recommending this application, but I am encouraging you to try it, and I hope you may like it. I hope we learn to study the Bible better together.
         </div>
         <div class="mb-2">
-            The reason why I recreate the application is to apply good practice, because the old code base was made for me to
-            learn electron development and how to implement in real world, I just realize some people are actually using the
-            application, As the project grows, I realized that it can become a problem in the future because it was made without
-            planning. So for now I recreated this application to make sure that adding feature will be easy to implement.
         </div>
         <div>
             <div class="font-800">Support</div>

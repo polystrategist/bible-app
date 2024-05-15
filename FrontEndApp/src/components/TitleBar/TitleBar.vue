@@ -40,7 +40,7 @@ function changeTheme() {
 }
 
 function openDonationInBrowser() {
-    window.open('https://ko-fi.com/brojenuel', '_blank');
+    window.open('https://buymeacoffee.com/jenuel.dev', '_blank');
 }
 
 onBeforeMount(async () => {
