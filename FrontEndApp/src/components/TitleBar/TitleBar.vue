@@ -10,7 +10,6 @@ import {
 } from '@vicons/fluent';
 import { Close, Information } from '@vicons/carbon';
 import { onBeforeMount, ref } from 'vue';
-import Logo from './../../assets/logo.svg';
 import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
@@ -96,7 +95,7 @@ onBeforeMount(async () => {
                     {{ themeStore.isDark ? $t('dark') : $t('light') }}
                 </span>
             </div>
-            <div class='mr-3'>
+            <div class="mr-3">
                 <ProfileDropdown />
             </div>
             <div
