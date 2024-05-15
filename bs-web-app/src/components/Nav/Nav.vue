@@ -86,12 +86,7 @@ function menuClicked(link: LinkProp) {
                     {{ link.title }}
                     <span
                         v-if="link.label"
-                        :class="
-                            cn(
-                                'ml-auto',
-                                link.variant === 'default' && 'text-background dark:text-white'
-                            )
-                        "
+                        :class="cn('ml-auto', link.variant === 'default' && 'text-background ')"
                     >
                         {{ link.label }}
                     </span>
