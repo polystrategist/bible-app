@@ -12,16 +12,26 @@
   "dependencies": {
     "@nuxt/ui": "^2.15.0",
     "@radix-icons/vue": "^1.0.0",
-    "@vueuse/core": "^10.9.0",
+    "@unovis/ts": "^1.4.1",
+    "@unovis/vue": "^1.4.1",
+    "@vee-validate/zod": "^4.13.1",
+    "@vueuse/core": "^10.11.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "embla-carousel": "^8.1.5",
+    "embla-carousel-vue": "^8.1.5",
     "lucide-vue-next": "^0.363.0",
     "nuxt": "^3.11.1",
     "radix-vue": "^1.5.3",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "v-calendar": "^3.1.2",
+    "vaul-vue": "^0.1.2",
+    "vee-validate": "^4.13.1",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue-sonner": "^1.1.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^3.3.3",
