@@ -10,8 +10,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^4.10.3",
     "@astrojs/check": "^0.7.0",
+    "astro": "^4.10.3",
     "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "@unocss/reset": "^0.61.0",
+    "unocss": "^0.61.0"
   }
 }
