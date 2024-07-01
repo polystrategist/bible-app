@@ -42,22 +42,22 @@ function menuClicked(link: LinkProp) {
             <template v-for="(link, index) of links">
                 <Tooltip v-if="isCollapsed" :key="`1-${index}`" :delay-duration="0">
                     <TooltipTrigger as-child>
-                        <div
+                        <a
+                            href="#"
                             @click="menuClicked(link)"
                             class="cursor-pointer"
                             :class="
                                 cn(
-                                    buttonVariants({
-                                        variant: route.path === link.path ? 'default' : 'ghost',
-                                        size: 'icon',
-                                    }),
-                                    'h-9 w-9'
+                                    buttonVariants({ variant: link.variant, size: 'icon' }),
+                                    'h-9 w-9',
+                                    route.path === link.path &&
+                                        'dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white'
                                 )
                             "
                         >
                             <Icon :icon="link.icon" class="size-4" />
                             <span class="sr-only">{{ link.title }}</span>
-                        </div>
+                        </a>
                     </TooltipTrigger>
                     <TooltipContent side="right" class="flex items-center gap-4">
                         {{ link.title }}
@@ -67,17 +67,17 @@ function menuClicked(link: LinkProp) {
                     </TooltipContent>
                 </Tooltip>
 
-                <div
+                <a
                     v-else
+                    href="#"
                     :key="`2-${index}`"
                     @click="menuClicked(link)"
                     class="cursor-pointer"
                     :class="
                         cn(
-                            buttonVariants({
-                                variant: route.path === link.path ? 'default' : 'ghost',
-                                size: 'sm',
-                            }),
+                            buttonVariants({ variant: link.variant, size: 'sm' }),
+                            route.path === link.path &&
+                                'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
                             'justify-start'
                         )
                     "
@@ -90,7 +90,7 @@ function menuClicked(link: LinkProp) {
                     >
                         {{ link.label }}
                     </span>
-                </div>
+                </a>
             </template>
         </nav>
     </div>

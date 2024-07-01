@@ -24,7 +24,7 @@ const links: LinkProp[] = [
     {
         title: "Bible",
         icon: "mdi:book-open-page-variant",
-        variant: "default",
+        variant: "ghost",
         path: "/",
         key: "read-bible",
     },
@@ -169,7 +169,9 @@ onBeforeMount(() => {
                             class="size-5"
                             :class="cn(isCollapsed && '!size-8')"
                         />
-                        <span class="font-bold" :class="cn(isCollapsed && 'hidden')">Believers Sword</span>
+                        <span class="font-bold" :class="cn(isCollapsed && 'hidden')"
+                            >Believers Sword</span
+                        >
                     </div>
                     <Separator />
                     <div class="h-full overflow-y-auto">
