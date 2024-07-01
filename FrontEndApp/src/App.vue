@@ -28,7 +28,7 @@ import { useUserStore } from './store/userStore';
 import DonateModal from './components/Donate/DonateModal.vue';
 import SearchBar from './components/SearchBar.vue';
 
-const userStore = useUserStore()
+const userStore = useUserStore();
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
@@ -53,7 +53,7 @@ onBeforeMount(async () => {
 onMounted(async () => {
     const userData = await isSignedIn();
     if (userData) userStore.user = userData;
-})
+});
 </script>
 <template>
     <NConfigProvider :theme-overrides="themeStore.themeOverrides" :theme="themeStore.isDark ? darkTheme : null">
@@ -120,7 +120,7 @@ onMounted(async () => {
                             <NLayout>
                                 <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
                                 <Sermons v-show="menuStore.isRouter == false && menuStore.menuSelected == 'sermons'" />
-                                <div class='h-[100%]' v-show="menuStore.isRouter == true">
+                                <div class="h-[100%]" v-show="menuStore.isRouter == true">
                                     <RouterView />
                                 </div>
                             </NLayout>

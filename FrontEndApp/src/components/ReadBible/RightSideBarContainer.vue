@@ -8,7 +8,7 @@ defineProps({
 <template>
     <div class="w-full h-full">
         <div class="h-30px select-none flex justify-between">
-            <h1 class="font-700 capitalize">{{ $props.title }}</h1>
+            <div class="font-700 capitalize">{{ $props.title }}</div>
             <slot name="rightSide">
                 <div></div>
             </slot>

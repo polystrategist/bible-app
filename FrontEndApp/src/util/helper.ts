@@ -1,7 +1,6 @@
-import { NIcon } from 'naive-ui';
-import { Component, h } from 'vue';
+import { h } from 'vue';
 import { Icon } from '@iconify/vue';
 
-export function renderIcon(icon: Component) {
-    return () => h(NIcon, null, { default: () => h(icon) });
+export function renderIcon(icon: string) {
+    return () => h(Icon, { icon: icon });
 }

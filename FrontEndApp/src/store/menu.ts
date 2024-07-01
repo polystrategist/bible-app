@@ -5,8 +5,6 @@ import { useRouter } from 'vue-router';
 import { onBeforeMount, ref, watch } from 'vue';
 import session from './../util/session';
 import { renderIcon } from '../util/helper';
-import { Book, MediaLibrary, Settings, UserProfile } from '@vicons/carbon';
-import { Pray } from '@vicons/fa';
 
 type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
 type menuHasNoRoute = 'read-bible' | 'sermons';
@@ -25,17 +23,17 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'read-bible',
             key: 'read-bible',
-            icon: renderIcon(Book),
+            icon: renderIcon('tabler:book'),
         },
         {
             label: 'Sermons',
             key: 'sermons',
-            icon: renderIcon(MediaLibrary),
+            icon: renderIcon('tabler:file-stack'),
         },
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderIcon(Pray),
+            icon: renderIcon('tabler:pray'),
         },
     ]);
 
@@ -43,12 +41,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'Profile',
             key: '/profile',
-            icon: renderIcon(UserProfile),
+            icon: renderIcon('tabler:user'),
         },
         {
             label: 'Settings',
             key: '/settings-page',
-            icon: renderIcon(Settings),
+            icon: renderIcon('tabler:settings-2'),
         },
     ]);
 

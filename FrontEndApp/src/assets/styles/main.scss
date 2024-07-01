@@ -6,3 +6,12 @@
 @import './common/scrollbar.scss';
 @import './common/splitjs.scss';
 @import './common/editorStyle.scss';
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('./fonts/poppins/Poppins-Regular.ttf');
+}
+
+* {
+    font-family: Poppins;
+}
