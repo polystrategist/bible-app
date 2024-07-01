@@ -27,7 +27,7 @@ const donationLinks = [
                     <NIcon>
                         <ArrowRight />
                     </NIcon>
-                    <a :href="donationLink.link" target="_blank" class="outline-none hover:underline">{{ donationLink.label }}</a>
+                    <a :href="donationLink.link" target="_blank" class="outline-none hover:underline decoration-none dark:text-light">{{ donationLink.label }}</a>
                 </li>
             </ul>
         </div>
