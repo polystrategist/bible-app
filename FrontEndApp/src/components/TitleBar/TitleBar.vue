@@ -49,14 +49,10 @@ onBeforeMount(async () => {
 <template>
     <NLayoutHeader bordered class="flex cursor-default select-none items-center pl-8px light:bg-gray-100 justify-between">
         <div class="whitespace-nowrap flex items-center gap-1 w-200px pl-0px">
-            <NTooltip placement="right">
-                <template #trigger>
-                    <div class="w-28px">
-                        <LogoComponent />
-                    </div>
-                </template>
-                {{ $t('Believers Sword') }}
-            </NTooltip>
+            <div class="w-20px h-20px">
+                <LogoComponent />
+            </div>
+            {{ $t('Believers Sword') }}
         </div>
         <div class="flex items-center w-full h-full z-50 justify-between">
             <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>

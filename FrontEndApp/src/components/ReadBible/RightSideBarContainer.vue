@@ -13,7 +13,7 @@ defineProps({
                 <div></div>
             </slot>
         </div>
-        <div class="w-full h-[calc(100%-30px)] overflow-auto overflowing-div">
+        <div class="w-full h-[calc(100%-40px)] overflow-auto overflowing-div">
             <slot />
         </div>
     </div>

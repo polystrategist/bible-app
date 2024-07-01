@@ -112,7 +112,7 @@ const selectedBooksForSearchString = computed(() => {
         />
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
             <div
-                class="w-full whitespace-nowrap overflow-hidden overflow-ellipsis p-1 dark:bg-dark-500 hover:text-[var(--primary-color)] cursor-pointer"
+                class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500 hover:text-[var(--primary-color)] cursor-pointer"
                 @click="showBookSelection = true"
             >
                 ({{ selectedBooksForSearchCount }})Book Selected : {{ selectedBooksForSearchString }}

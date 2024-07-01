@@ -62,7 +62,7 @@
         "@vicons/fluent": "^0.12.0",
         "@vitejs/plugin-vue": "^4.3.4",
         "cross-env": "^7.0.3",
-        "naive-ui": "^2.34.4",
+        "naive-ui": "^2.38.2",
         "sass": "^1.66.1",
         "typescript": "^5.2.2",
         "unocss": "^0.61.0",

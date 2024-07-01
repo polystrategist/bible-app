@@ -75,15 +75,15 @@ function selectItemFromMenuElement(key: any, element: any) {
 </script>
 <template>
     <div
-        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-10px pl-30px bg-dark-800"
+        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-20px pl-30px dark:bg-dark-800"
     >
         <div class="w-full max-w-250px h-[100%] flex flex-col">
-            <div class="p-10px flex justify-between items-end select-none min-h-60px">
+            <div class="py-10px flex justify-between items-end select-none min-h-40px">
                 <span class="font-700 capitalize">{{ $t('prayer list') }}</span>
                 <NewPrayerItem />
             </div>
             <Draggable
-                class="list-group h-[100%] overflow-y-auto overflowing-div bg-dark-900 p-2"
+                class="list-group h-[100%] overflow-y-auto overflowing-div dark:bg-dark-900 p-2"
                 :list="prayerListStore.prayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -94,7 +94,7 @@ function selectItemFromMenuElement(key: any, element: any) {
                     <div class="relative prayer-list-item group">
                         <div class="pb-0 duration-200">
                             <div
-                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
+                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1 m-2"
                                 v-html="element.content"
                             ></div>
                             <NDropdown
@@ -127,11 +127,11 @@ function selectItemFromMenuElement(key: any, element: any) {
             </Draggable>
         </div>
         <div class="w-full max-w-250px h-[100%] flex flex-col">
-            <div class="p-10px flex justify-between items-end min-h-60px">
+            <div class="py-10px flex justify-between items-end min-h-40px">
                 <span class="font-700 select-none capitalize">{{ $t('done') }} </span>
             </div>
             <Draggable
-                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div bg-dark-900 p-2"
+                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div dark:bg-dark-900 p-2"
                 :list="prayerListStore.donePrayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"

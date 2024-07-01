@@ -42,7 +42,8 @@ function nextPage() {
                             <span class="mr-1" v-if="highlight.book_number">
                                 {{ $t(bibleStore.getBook(highlight.book_number).title) }}
                             </span>
-                            <span>{{ highlight.chapter }} : {{ highlight.verse }}</span>
+                            <span class="mr-2">{{ highlight.chapter }} : {{ highlight.verse }}</span>
+                            <span class="text-sm opacity-70">{{ highlight.key.split('_')[0] }}</span>
                         </div>
                         <div>
                             <span v-html="highlight.content"></span>
