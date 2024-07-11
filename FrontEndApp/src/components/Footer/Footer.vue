@@ -37,11 +37,11 @@ onMounted(() => {
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
-        <div class="w-full h-full text-center z-50 font-700">
-            {{ $t(bibleStore.getSelectedData.book) }}
+        <div class="w-full text-center z-50 font-700">
+            {{ $t(bibleStore.getSelectedData.book) }} Chapter
             {{ bibleStore.getSelectedData.chapter }}
         </div>
-        <div class="flex items-center h-full w-full max-w-300px justify-end pr-2">
+        <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">
                 <span class="text-size-10px">Updating</span>
                 <NProgress :percentage="downloadPercentage" type="line" />

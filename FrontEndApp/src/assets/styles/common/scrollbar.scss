@@ -38,7 +38,10 @@
 }
 
 .overflowing-div {
+    transition: all 0.3s;
     &:hover {
+        scrollbar-color: var(--primary-color) #22222200;
+
         &::-webkit-scrollbar-thumb {
             background-color: var(--primary-color);
             opacity: 1;
@@ -47,6 +50,14 @@
                 background-color: var(--primary-color);
             }
         }
+    }
+}
+
+.dark .overflowing-div {
+    scrollbar-color: #333 #222;
+
+    &:hover {
+        scrollbar-color: var(--primary-color) #222;
     }
 }
 
@@ -59,6 +70,8 @@
 }
 
 .scroll-bar-sm {
+    scrollbar-width: thin;
+
     &::-webkit-scrollbar {
         width: 3px !important;
         height: 3px !important;
@@ -66,6 +79,8 @@
 }
 
 .scroll-bar-md {
+    scrollbar-width: auto;
+
     &::-webkit-scrollbar {
         width: 10px !important;
         height: 10px !important;
