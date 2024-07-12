@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import UnoCSS from 'unocss/astro';
+import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,4 +10,5 @@ export default defineConfig({
             injectReset: true,
         }),
     ],
+    adapter: netlify(),
 });
