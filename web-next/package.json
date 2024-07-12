@@ -13,7 +13,10 @@
     "@astrojs/check": "^0.8.1",
     "@astrojs/netlify": "^5.4.0",
     "@astrojs/node": "^8.3.2",
+    "@supabase/supabase-js": "^2.44.3",
     "astro": "^4.11.5",
+    "dayjs": "^1.11.11",
+    "sass": "^1.77.8",
     "typescript": "^5.5.3"
   },
   "devDependencies": {
