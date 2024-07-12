@@ -11,4 +11,5 @@ export default defineConfig({
         }),
     ],
     adapter: netlify(),
+    base: '/dist/',
 });
