@@ -10,7 +10,9 @@ import kingJamesVersion1769 from './Modules/Bible/king-james-version-1769';
 import kingJamesVersionOf1611Or1769 from './Modules/Bible/king-james-version-of-1611-or-1769';
 import magandangBalitaBiblia from './Modules/Bible/magandang-balita-biblia';
 import newAmericanStandardBible from './Modules/Bible/new-american-standard-bible';
+import newAmericanStandardVersion2020 from './Modules/Bible/new-american-standard-version-2020';
 import newInternationalVersion from './Modules/Bible/new-international-version';
+import newAmericanStandardVersion2020Commentaries from './Modules/Commentaries/new-american-standard-version-2020-commentaries';
 import newInternationalVersionCommentaries from './Modules/Commentaries/new-international-version.commentaries';
 
 export const bible = [
@@ -27,5 +29,6 @@ export const bible = [
     magandangBalitaBiblia,
     newAmericanStandardBible,
     newInternationalVersion,
+    newAmericanStandardVersion2020,
 ];
-export const commentaries = [newInternationalVersionCommentaries];
+export const commentaries = [newInternationalVersionCommentaries, newAmericanStandardVersion2020Commentaries];
