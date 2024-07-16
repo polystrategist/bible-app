@@ -49,7 +49,7 @@ defineExpose({
         <NDrawerContent>
             <div class="pr-5 h-full overflow-auto overflowing-div relative scroll-bar-md">
                 <NButton type="error" @click="close" size="large" class="sticky top-0 absolute float-right z-50">Close</NButton>
-                <div v-if="play.video_id">
+                <div v-if="play.video_id" class="w-full max-w-4xl mx-auto">
                     <div class="relative w-full h-500px">
                         <YoutubeVue3
                             class="absolute top-0 left-0 w-[100%] h-[100%]"

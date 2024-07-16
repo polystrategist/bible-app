@@ -24,14 +24,11 @@ defineExpose({
 <template>
     <NDrawer :show="showYoutubeModal" size="small" width="100%" to="#drawer-target">
         <NDrawerContent>
-            <div class="pr-5 h-full overflow-auto overflowing-div scroll-bar-md">
-                <NButton type="error" @click="close" class="fixed top-3 right-5 absolute z-50">Close</NButton>
-
+            <div class="pr-5 h-full overflow-auto overflowing-div scroll-bar-md relative">
+                <NButton type="error" @click="close" class="top-3 right-5 sticky z-50">Close</NButton>
                 <div class="relative w-full max-w-4xl prose-mirror-render-html overflow-y-auto mx-auto">
-                    <div class="flex flex-col gap-2 items-center">
-                        <div
-                            class="font-800 text-size-40px flex items-center justify-center h-250px w-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px rounded-md"
-                        >
+                    <div class="flex flex-col gap-2">
+                        <div class="font-900 text-size-35px">
                             {{ data.title }}
                         </div>
                         <div class="flex items-center mt-2 gap-2">
@@ -47,14 +44,10 @@ defineExpose({
                             </NTag>
                         </div>
                         <div>
-                            <small>{{ DAYJS(data.created_at).fromNow() }}</small> -
-                            <small>{{ DAYJS(data.created_at).format('MMMM D, YYYY') }}</small>
+                            <small>Added {{ DAYJS(data.created_at).fromNow() }}</small>
                         </div>
                     </div>
-
-                    <div class="pt-10 max-w-600px mx-auto">
-                        <div class="text-content-sermon" v-html="data ? data.content : ''"></div>
-                    </div>
+                    <div class="text-content-sermon ProseMirror" v-html="data ? data.content : ''"></div>
                 </div>
             </div>
         </NDrawerContent>

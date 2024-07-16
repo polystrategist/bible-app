@@ -86,9 +86,9 @@ function deleteSermon(sermon: SERMON_TYPE) {
     <div id="drawer-target" class="w-full h-full overflowing-div relative">
         <Youtube ref="showYoutubeVideo" />
         <TextVue ref="textVueContent" />
-        <div class="!h-50px flex justify-between px-2 py-3 items-center z-99 w-full">
-            <div class="font-700 text-size-25px">{{ $t('Sermons') }}</div>
-            <div class="flex gap-8px pr-5">
+        <div class="!h-50px flex justify-between items-center z-99 w-full">
+            <div class="font-700 text-size-25px pl-5">{{ $t('Sermons') }}</div>
+            <div class="flex gap-8px pr-8">
                 <NInput
                     v-model:value="sermonStore.search"
                     :disabled="sermonStore.loading"
@@ -136,7 +136,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
         </div>
 
         <div ref="sermonItems" class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
-            <div class="flex gap-7 flex-wrap">
+            <div class="flex gap-7 flex-wrap px-5 justify-center">
                 <div
                     v-for="sermon in sermonStore.sermons"
                     class="min-w-280px max-w-300px rounded-md overflow-hidden group flex flex-col justify-between cursor-pointer"
