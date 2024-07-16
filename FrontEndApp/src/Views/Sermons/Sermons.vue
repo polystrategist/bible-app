@@ -135,7 +135,7 @@ function deleteSermon(sermon: SERMON_TYPE) {
             </div>
         </div>
 
-        <div ref="sermonItems" class="h-[calc(100%-130px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
+        <div ref="sermonItems" class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
             <div class="flex gap-7 flex-wrap">
                 <div
                     v-for="sermon in sermonStore.sermons"
