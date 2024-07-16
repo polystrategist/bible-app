@@ -117,7 +117,7 @@ onMounted(async () => {
                                     />
                                 </div>
                             </NLayoutSider>
-                            <NLayout>
+                            <NLayout class="h-full">
                                 <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
                                 <Sermons v-show="menuStore.isRouter == false && menuStore.menuSelected == 'sermons'" />
                                 <div class="h-[100%]" v-show="menuStore.isRouter == true">
