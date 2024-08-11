@@ -1,0 +1,4 @@
+<template>
+    <HeaderHome />
+    <slot />
+</template>
