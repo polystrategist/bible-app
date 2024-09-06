@@ -13,6 +13,7 @@
     "@nuxt/fonts": "^0.7.1",
     "@primevue/themes": "^4.0.4",
     "nuxt": "^3.12.4",
+    "primeicons": "^7.0.0",
     "vue": "latest"
   },
   "devDependencies": {
