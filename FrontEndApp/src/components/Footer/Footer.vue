@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NLayoutFooter, NProgress } from 'naive-ui';
+import { NLayoutFooter, NProgress, NButton } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import { useBibleStore } from '../../store/BibleStore';
 import { useMainStore } from '../../store/main';
@@ -38,8 +38,10 @@ onMounted(() => {
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
         <div class="w-full text-center z-50 font-700">
-            {{ $t(bibleStore.getSelectedData.book) }} Chapter
-            {{ bibleStore.getSelectedData.chapter }}
+            <NButton>
+                {{ $t(bibleStore.getSelectedData.book) }} Chapter
+                {{ bibleStore.getSelectedData.chapter }}
+            </NButton>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">

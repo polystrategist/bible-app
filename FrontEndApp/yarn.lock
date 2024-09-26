@@ -548,7 +548,7 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@css-render/plugin-bem@^0.15.12":
+"@css-render/plugin-bem@^0.15.14":
   version "0.15.14"
   resolved "https://registry.yarnpkg.com/@css-render/plugin-bem/-/plugin-bem-0.15.14.tgz#de13fc9f59299c2b646119851763dfa08929b3c1"
   integrity sha512-QK513CJ7yEQxm/P3EwsI+d+ha8kSOcjGvD6SevM41neEMxdULE+18iuQK6tEChAWMOQNQPLG/Rw3Khb69r5neg==
@@ -558,7 +558,7 @@
   resolved "https://registry.yarnpkg.com/@css-render/vue3-ssr/-/vue3-ssr-0.15.12.tgz#798d8dffadecd2bf8c80cbaab64e9df10be5626e"
   integrity sha512-AQLGhhaE0F+rwybRCkKUdzBdTEM/5PZBYy+fSYe1T9z9+yxMuV/k7ZRqa4M69X+EI1W8pa4kc9Iq2VjQkZx4rg==
 
-"@css-render/vue3-ssr@^0.15.12":
+"@css-render/vue3-ssr@^0.15.14":
   version "0.15.14"
   resolved "https://registry.yarnpkg.com/@css-render/vue3-ssr/-/vue3-ssr-0.15.14.tgz#a2f4dedc3e86211a3ce1445555265095b7736491"
   integrity sha512-//8027GSbxE9n3QlD73xFY6z4ZbHbvrOVB7AO6hsmrEzGbg+h2A09HboUyDgu+xsmj7JnvJD39Irt+2D0+iV8g==
@@ -2044,7 +2044,7 @@ css-render@^0.15.10:
     "@emotion/hash" "~0.8.0"
     csstype "~3.0.5"
 
-css-render@^0.15.12:
+css-render@^0.15.14:
   version "0.15.14"
   resolved "https://registry.yarnpkg.com/css-render/-/css-render-0.15.14.tgz#c23d8c8b9c0b44cd20b426f5e9de7ef7bade69b8"
   integrity sha512-9nF4PdUle+5ta4W5SyZdLCCmFd37uVimSjg1evcTqKJCyvCEEj12WKzOSBNak6r4im4J4iYXKH1OWpUV5LBYFg==
@@ -2088,17 +2088,15 @@ dash-get@^1.0.2:
   resolved "https://registry.yarnpkg.com/dash-get/-/dash-get-1.0.2.tgz#4c9e9ad5ef04c4bf9d3c9a451f6f7997298dcc7c"
   integrity sha512-4FbVrHDwfOASx7uQVxeiCTo7ggSdYZbqs8lH+WU6ViypPlDbe9y6IP5VVUDQBv9DcnyaiPT5XT0UWHgJ64zLeQ==
 
-date-fns-tz@^2.0.0:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/date-fns-tz/-/date-fns-tz-2.0.1.tgz#0a9b2099031c0d74120b45de9fd23192e48ea495"
-  integrity sha512-fJCG3Pwx8HUoLhkepdsP7Z5RsucUi+ZBOxyM5d0ZZ6c4SdYustq0VMmOu6Wf7bli+yS/Jwp91TOCqn9jMcVrUA==
+date-fns-tz@^3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/date-fns-tz/-/date-fns-tz-3.1.3.tgz#643dfc7157008a3873cd717973e4074bb802f962"
+  integrity sha512-ZfbMu+nbzW0mEzC8VZrLiSWvUIaI3aRHeq33mTe7Y38UctKukgqPR4nTDwcwS4d64Gf8GghnVsroBuMY3eiTeA==
 
-date-fns@^2.30.0:
-  version "2.30.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
-  integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
-  dependencies:
-    "@babel/runtime" "^7.21.0"
+date-fns@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.6.0.tgz#f20ca4fe94f8b754951b24240676e8618c0206bf"
+  integrity sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==
 
 dayjs@^1.11.7:
   version "1.11.9"
@@ -2845,21 +2843,21 @@ muggle-string@^0.3.1:
   resolved "https://registry.yarnpkg.com/muggle-string/-/muggle-string-0.3.1.tgz#e524312eb1728c63dd0b2ac49e3282e6ed85963a"
   integrity sha512-ckmWDJjphvd/FvZawgygcUeQCxzvohjFO5RxTjj4eq8kw359gFF3E1brjfI+viLMxss5JrHTDRHZvu2/tuy0Qg==
 
-naive-ui@^2.38.2:
-  version "2.38.2"
-  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.38.2.tgz#d7c8bdbe9319ea3dd2c24c4f6741090650eae24a"
-  integrity sha512-WhZ+6DW61aYSmFyfH7evcSGFmd2xR68Yq1mNRrVdJwBhZsnNdAUsMN9IeNCVEPMCND/jzYZghkStoNoR5Xa09g==
+naive-ui@^2.40.1:
+  version "2.40.1"
+  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.40.1.tgz#64d9570dae4286b89979a582713f6f824c25230b"
+  integrity sha512-3NkL+vLRQZKQxCHXa+7xiD6oM74OrQELaehDkGYRYpr6kjT+JJB+Z7h+5LC70gn8VkbgCAETv0+uRWF+6MLlgQ==
   dependencies:
-    "@css-render/plugin-bem" "^0.15.12"
-    "@css-render/vue3-ssr" "^0.15.12"
+    "@css-render/plugin-bem" "^0.15.14"
+    "@css-render/vue3-ssr" "^0.15.14"
     "@types/katex" "^0.16.2"
     "@types/lodash" "^4.14.198"
     "@types/lodash-es" "^4.17.9"
     async-validator "^4.2.5"
-    css-render "^0.15.12"
+    css-render "^0.15.14"
     csstype "^3.1.3"
-    date-fns "^2.30.0"
-    date-fns-tz "^2.0.0"
+    date-fns "^3.6.0"
+    date-fns-tz "^3.1.3"
     evtd "^0.2.4"
     highlight.js "^11.8.0"
     lodash "^4.17.21"
@@ -2868,7 +2866,7 @@ naive-ui@^2.38.2:
     treemate "^0.3.11"
     vdirs "^0.1.8"
     vooks "^0.2.12"
-    vueuc "^0.4.58"
+    vueuc "^0.4.63"
 
 nanoid@^2.1.0:
   version "2.1.11"
@@ -3760,10 +3758,10 @@ vuedraggable@^4.1.0:
   dependencies:
     sortablejs "1.14.0"
 
-vueuc@^0.4.58:
-  version "0.4.58"
-  resolved "https://registry.yarnpkg.com/vueuc/-/vueuc-0.4.58.tgz#03ee2ea6febf360ca9cbe490841fce91742eea12"
-  integrity sha512-Wnj/N8WbPRSxSt+9ji1jtDHPzda5h2OH/0sFBhvdxDRuyCZbjGg3/cKMaKqEoe+dErTexG2R+i6Q8S/Toq1MYg==
+vueuc@^0.4.63:
+  version "0.4.63"
+  resolved "https://registry.yarnpkg.com/vueuc/-/vueuc-0.4.63.tgz#00870b9f189db0aa78512c8619eacdf2b8781a24"
+  integrity sha512-QJT0z9yYWXdKpUq6f6IrAgJ83e34iTYMCVHjcAP8lCjldG0JzHnDfJYMpPWkNuLB5SdBZCbYGmYTKnTR+ff7CQ==
   dependencies:
     "@css-render/vue3-ssr" "^0.15.10"
     "@juggle/resize-observer" "^3.3.1"
