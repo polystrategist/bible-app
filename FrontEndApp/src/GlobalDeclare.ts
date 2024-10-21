@@ -21,6 +21,7 @@ declare global {
             minimizeWindow: () => Promise<void>;
             getAvailableBibles: () => Promise<Array<any>>;
             getVerses: (args: string) => Promise<Array<any>>;
+            getVersesCount: (args: string) => Promise<number>;
             getChapterHighlights: (args: string) => Promise<Array<any>>;
             getHighlights: (args: string) => Promise<Array<any>>;
             searchBible: (args: string) => Promise<searchBibleType>;
@@ -104,6 +105,7 @@ declare global {
             savePrayerItem: (args: string) => Promise<any>;
 
             updateDownloadProgress: (progress: { percentage: Function; done: Function }) => void;
+            
         };
     }
 }

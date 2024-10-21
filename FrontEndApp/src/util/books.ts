@@ -1,4 +1,4 @@
-type BookInfo = {
+export type BookInfo = {
     title: string;
     short_name: string;
     book_number: number;

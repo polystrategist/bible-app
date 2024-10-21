@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld('browserWindow', {
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
+    getVersesCount: (args: string) => ipcRenderer.invoke('getVersesCount', JSON.parse(args)),
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
     download: (args: any) => ipcRenderer.send('download', args),
     downloadModule: ({ urls, done }: { urls: Array<string>; done: Function }) => {

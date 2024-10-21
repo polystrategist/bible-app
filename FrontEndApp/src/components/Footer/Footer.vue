@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { NLayoutFooter, NProgress, NButton } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
-import { useBibleStore } from '../../store/BibleStore';
 import { useMainStore } from '../../store/main';
 import { useNetwork } from '@vueuse/core';
+import VerseSelector from './VerseSelector/VerseSelector.vue';
+import { useMenuStore } from '../../store/menu';
 
 const network = useNetwork();
 const mainStore = useMainStore();
-const bibleStore = useBibleStore();
+const menuStore = useMenuStore();
 const downloadPercentage = ref<number>(0);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];
@@ -38,10 +39,7 @@ onMounted(() => {
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
         <div class="w-full text-center z-50 font-700">
-            <NButton>
-                {{ $t(bibleStore.getSelectedData.book) }} Chapter
-                {{ bibleStore.getSelectedData.chapter }}
-            </NButton>
+            <VerseSelector v-if="menuStore.menuSelected === 'read-bible'" />
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">
