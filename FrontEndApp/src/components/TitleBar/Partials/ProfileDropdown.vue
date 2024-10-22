@@ -28,11 +28,11 @@ const options = [
         key: 'profile',
         icon: renderIcon(UserIcon),
     },
-    {
-        label: 'Edit Profile',
-        key: 'editProfile',
-        icon: renderIcon(EditIcon),
-    },
+    // {
+    //     label: 'Edit Profile',
+    //     key: 'editProfile',
+    //     icon: renderIcon(EditIcon),
+    // },
     {
         label: 'Logout',
         key: 'logout',

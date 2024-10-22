@@ -12,6 +12,8 @@ const message = useMessage();
 const props = defineProps(['user_id']);
 
 async function getProfileData() {
+    if (userStore.profile_data) return;
+
     const { data, error } = await supabase.from('profile').select().eq('user_id', props.user_id).single();
     if (error) {
         if (error.code == 'PGRST116') {

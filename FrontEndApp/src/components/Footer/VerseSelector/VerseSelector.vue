@@ -43,7 +43,7 @@ function selectVerse(verse: number) {
 }
 </script>
 <template>
-    <NButton @click="showOuter = true">
+    <NButton @click="showOuter = true" quaternary>
         {{ $t(bibleStore.getSelectedData.book) }} Chapter
         {{ bibleStore.getSelectedData.chapter }}
     </NButton>
@@ -58,6 +58,7 @@ function selectVerse(verse: number) {
                     >
                         {{ $t(book.title) }}
                     </NButton>
+                    <div v-if="book.title == 'Malachi'" class="w-full py-3"></div>
                 </template>
             </div>
         </NDrawerContent>

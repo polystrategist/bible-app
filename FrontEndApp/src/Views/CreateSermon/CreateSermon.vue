@@ -1,4 +1,4 @@
-<script lang='ts' setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import axios from 'axios';
 import { supabase } from '../../util/SupaBase/SupaBase';
@@ -64,7 +64,7 @@ const denominationOptions = [
     { label: 'United Methodist' },
     { label: 'Vineyard' },
     { label: 'Wesleyan' },
-    { label: 'Others' }
+    { label: 'Others' },
 ];
 
 const getYoutubeVideoDetails = async (
@@ -76,8 +76,8 @@ const getYoutubeVideoDetails = async (
         params: {
             key,
             part,
-            id: youtubeVideoId
-        }
+            id: youtubeVideoId,
+        },
     });
 };
 
@@ -99,7 +99,6 @@ async function submitSermon() {
                     return;
                 }
 
-
                 const youtubeDetails = data.items[0];
                 let dataToEnter = {
                     type: 'youtube',
@@ -112,7 +111,7 @@ async function submitSermon() {
                     language: language.value,
                     source: source.value,
                     added_by: session.data.session?.user.id,
-                    is_published: isPublished.value
+                    is_published: isPublished.value,
                 };
                 const { error } = sermonId.value
                     ? await supabase.from('sermons').update(dataToEnter).match({ id: sermonId.value })
@@ -149,7 +148,7 @@ async function submitSermon() {
             language: language.value,
             source: source.value,
             added_by: session.data.session?.user.id,
-            is_published: isPublished.value
+            is_published: isPublished.value,
         };
         const { error } = sermonId.value
             ? await supabase.from('sermons').update(dataToInsert).match({ id: sermonId.value })
@@ -171,12 +170,12 @@ async function submitSermon() {
 const selectTypeOptions = [
     {
         value: 'youtube',
-        label: 'Youtube'
+        label: 'Youtube',
     },
     {
         value: 'text',
-        label: 'Text'
-    }
+        label: 'Text',
+    },
 ];
 
 function resetForm() {
@@ -196,88 +195,88 @@ function resetForm() {
 }
 </script>
 <template>
-    <div class='h-[100%] w-[100%] p-5 pl-10 overflow-y-auto overflowing-div'>
-        <div class='w-full max-w-700px mx-auto'>
-            <h2 class='font-thin text-size-23px'>Add New Sermon</h2>
-            <div class='mt-10 flex flex-col gap-5'>
+    <div class="h-[100%] w-[100%] p-5 pl-10 py-5">
+        <div class="w-full max-w-700px mx-auto">
+            <h2 class="font-thin text-size-23px">Add New Sermon</h2>
+            <div class="mt-10 flex flex-col gap-5">
                 <div>
-                    <label for=''>Select Type:</label><br />
-                    <NSelect v-model:value='selectedType' :options='selectTypeOptions' />
+                    <label for="">Select Type:</label><br />
+                    <NSelect v-model:value="selectedType" :options="selectTypeOptions" />
                 </div>
                 <div v-if="selectedType == 'youtube'">
-                    <label for=''>Youtube ID:</label><br />
-                    <NInput v-model:value='youtubeId' placeholder='Enter Youtube Id...' required type='text' />
+                    <label for="">Youtube ID:</label><br />
+                    <NInput v-model:value="youtubeId" placeholder="Enter Youtube Id..." required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Title:</label><br />
-                    <NInput v-model:value='title' placeholder='enter title' required type='text' />
+                    <label for="">Title:</label><br />
+                    <NInput v-model:value="title" placeholder="enter title" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Scripture:</label><br />
-                    <NInput v-model:value='scripture' placeholder='enter scripture' required type='text' />
+                    <label for="">Scripture:</label><br />
+                    <NInput v-model:value="scripture" placeholder="enter scripture" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Content Author:</label><br />
-                    <NInput v-model:value='author' placeholder='enter scripture' required type='text' />
+                    <label for="">Content Author:</label><br />
+                    <NInput v-model:value="author" placeholder="enter scripture" required type="text" />
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Select Denomination:</label><br />
-                    <select v-model='denomination' class='p-2 rounded-md !dark:bg-dark-300 outline-none w-full'
-                            required>
-                        <option :value='null'>-- Select Denomination --</option>
-                        <option v-for='den in denominationOptions' :key='den.label' :value='den.label'>
+                    <label for="">Select Denomination:</label><br />
+                    <select
+                        v-model="denomination"
+                        class="p-2 rounded-md !dark:bg-dark-300 dark:text-gray-200 outline-none w-full"
+                        required
+                    >
+                        <option :value="null">-- Select Denomination --</option>
+                        <option v-for="den in denominationOptions" :key="den.label" :value="den.label">
                             {{ den.label }}
                         </option>
                     </select>
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>A Short Summary/Description:</label><br />
+                    <label for="">A Short Summary/Description:</label><br />
                     <textarea
-                        v-model='description'
-                        class='p-2 rounded-md min-h-200px w-full !dark:bg-dark-300 outline-none'
-                        placeholder='Enter Description Here'
+                        v-model="description"
+                        class="p-2 rounded-md min-h-200px w-full !dark:bg-dark-300 dark:text-gray-200 outline-none"
+                        placeholder="Enter Description Here"
                         required
                     ></textarea>
                 </div>
                 <div>
-                    <label for=''>Select Language:</label><br />
-                    <select v-model='language' class='p-2 rounded-md min-w-200px w-full !dark:bg-dark-300 outline-none'
-                            required>
-                        <option value='english'>English</option>
-                        <option value='tagalog'>Tagalog</option>
+                    <label for="">Select Language:</label><br />
+                    <select
+                        v-model="language"
+                        class="p-2 rounded-md min-w-200px w-full !dark:bg-dark-300 dark:text-gray-200 outline-none"
+                        required
+                    >
+                        <option value="english">English</option>
+                        <option value="tagalog">Tagalog</option>
                     </select>
                 </div>
                 <div>
-                    <label for=''>Enter Source:</label><br />
+                    <label for="">Enter Source:</label><br />
                     <input
-                        v-model='source'
-                        class='p-2 rounded-md min-w-250px w-full !dark:bg-dark-300 outline-none'
-                        placeholder='enter URL'
+                        v-model="source"
+                        class="p-2 rounded-md min-w-250px w-full !dark:bg-dark-300 dark:text-gray-200 outline-none"
+                        placeholder="enter URL"
                         required
-                        type='text'
+                        type="text"
                     />
                 </div>
                 <div>
-                    <label class='select-none'>
-                        <input v-model='isPublished' placeholder='enter URL' type='checkbox' />
+                    <label class="select-none">
+                        <input v-model="isPublished" placeholder="enter URL" type="checkbox" />
                         Is Published?
                     </label>
                 </div>
                 <div v-if="selectedType == 'text'">
-                    <label for=''>Set Content:</label><br />
-                    <Editor v-model='content' editorStyle='height: 320px' />
+                    <label for="">Set Content:</label><br />
+                    <Editor v-model="content" editorStyle="height: 320px" />
                 </div>
-                <div>
-                    <NButton v-if='userStore.user' :disabled='loading' :loading='loading' type='primary'
-                             @click='submitSermon()'>
+                <div class="mb-10">
+                    <NButton v-if="userStore.user" :disabled="loading" :loading="loading" type="primary" @click="submitSermon()">
                         Create
                     </NButton>
-                    <NButton
-                        v-else
-                        :disabled='loading'
-                        :loading='loading' type='primary'
-                        @click='router.push("/profile")'
-                    >
+                    <NButton v-else :disabled="loading" :loading="loading" type="primary" @click="router.push('/profile')">
                         Login First
                     </NButton>
                 </div>
