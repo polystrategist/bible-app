@@ -19,8 +19,17 @@ export default defineNuxtConfig({
                 options: {
                     prefix: 'p',
                     darkModeSelector: '.my-app-dark',
-                    cssLayer: false
-                }
+                    cssLayer: false,
+                },
+            },
+        },
+    },
+    vite: {
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    api: 'modern-compiler', // or "modern"
+                },
             },
         },
     },
