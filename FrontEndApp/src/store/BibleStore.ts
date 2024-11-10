@@ -110,11 +110,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         if (savedSelectedBook) selectedBook.value = savedSelectedBook;
     }
 
-    function AutoScrollSavedPosition(millisecond = 300) {
+    function AutoScrollSavedPosition(millisecond = 500) {
         setTimeout(() => {
             setScrollTopState('view-chapter-container', 'the-selected-chapter-element', 10);
             setScrollTopState('view-books-container', 'the-selected-book-element', 10);
-            setScrollTopState('view-verses-container', 'the-selected-verse', 50);
+            setScrollTopState('view-verses-container', 'the-selected-verse', 100);
         }, millisecond);
     }
 

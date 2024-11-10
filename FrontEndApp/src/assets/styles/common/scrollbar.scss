@@ -79,8 +79,6 @@
 }
 
 .scroll-bar-md {
-    scrollbar-width: auto;
-
     &::-webkit-scrollbar {
         width: 10px !important;
         height: 10px !important;

@@ -3,9 +3,11 @@ import { NLayoutFooter, NProgress, NButton } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import { useMainStore } from '../../store/main';
 import { useNetwork } from '@vueuse/core';
-import VerseSelector from './VerseSelector/VerseSelector.vue';
+import VerseSelectorButton from './../VerseSelector.vue';
 import { useMenuStore } from '../../store/menu';
+import { useBibleStore } from '../../store/BibleStore';
 
+const bibleStore = useBibleStore();
 const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
@@ -39,7 +41,10 @@ onMounted(() => {
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
         <div class="w-full text-center z-50 font-700">
-            <VerseSelector v-if="menuStore.menuSelected === 'read-bible'" />
+            <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="small">
+                {{ $t(bibleStore.getSelectedData.book) }} Chapt.
+                {{ bibleStore.getSelectedData.chapter }}
+            </VerseSelectorButton>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">

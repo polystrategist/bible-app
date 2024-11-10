@@ -2,7 +2,7 @@
 import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
 import { NButton, NIcon, NPopover, NSlider, useDialog, useMessage } from 'naive-ui';
-import { Attachment, BookmarkFilled, ChevronLeft, ChevronRight, Close, Copy, Delete, Edit } from '@vicons/carbon';
+import { Attachment, BookmarkFilled, ChevronLeft, ChevronRight, Close, Copy, Delete, Edit, SearchLocate } from '@vicons/carbon';
 import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';
@@ -11,7 +11,9 @@ import HighlightOptions from './../../../components/HighlightOptions/HighlightOp
 import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
 import { useClipNoteStore } from '../../../store/ClipNotes';
 import { getSelectionParentElement } from '../../../util/ElementUtil';
+import VerseSelector from '../../../components/VerseSelector.vue';
 import { useI18n } from 'vue-i18n';
+import { FastForward20Regular } from '@vicons/fluent';
 const { t } = useI18n();
 
 const dialog = useDialog();
@@ -139,6 +141,8 @@ onMounted(() => {
         if (event.ctrlKey) {
             if (event.deltaY > 0) {
                 // Ctrl + Scroll Down
+                if (fontSize.value <= 10) return;
+                
                 fontSize.value--;
                 // Do something else you want
             } else if (event.deltaY < 0) {
@@ -154,24 +158,29 @@ onMounted(() => {
 </script>
 <template>
     <div class="w-full h-full show-chapter-verses">
-        <div class="h-30px dark:bg-dark-400 flex items-center px-10px select-none">
+        <div class="h-30px dark:bg-dark-400 flex items-center pb-10px pt-10px select-none px-10px">
             <div>
                 <div
                     class="flex items-center hover:text-[var(--primary-color)] cursor-pointer"
                     @click="navigateChapter('before')"
                 >
-                    <NIcon :component="ChevronLeft" size="20" />
+                    <NIcon :component="FastForward20Regular" size="20" class="rotate-180" />
                     <span>{{ $t('Before') }}</span>
                 </div>
             </div>
             <div class="flex justify-center items-center gap-5px w-full">
-                <NSlider v-model:value="fontSize" :max="35" :min="10" class="max-w-150px" />
-                {{ fontSize }}
+                <div class="flex justify-center items-center gap-5px w-full max-w-200px">
+                    <NSlider v-model:value="fontSize" :max="35" :min="10" class="max-w-150px" />
+                    {{ fontSize }}
+                </div>
+                <VerseSelector circle>
+                    <NIcon size="18" :component="SearchLocate" />
+                </VerseSelector>
             </div>
             <div>
                 <div class="flex items-center hover:text-[var(--primary-color)] cursor-pointer" @click="navigateChapter('next')">
                     <span>{{ $t('Next') }}</span>
-                    <NIcon :component="ChevronRight" size="20" />
+                    <NIcon :component="FastForward20Regular" size="20" />
                 </div>
             </div>
         </div>
@@ -189,7 +198,7 @@ onMounted(() => {
                 class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 bg-white z-9 py-2"
             >
                 <div v-for="version in bibleStore.renderVerses[0].version" :key="version.key" class="w-full text-center">
-                    <div class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none">
+                    <div class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none font-700">
                         {{ version.version.replace('.SQLite3', '') }}
                     </div>
                 </div>
