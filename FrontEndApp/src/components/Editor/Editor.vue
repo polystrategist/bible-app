@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { EditorContent, useEditor } from '@tiptap/vue-3';
-import { NIcon } from 'naive-ui';
+import { NIcon, NButton, NPopselect } from 'naive-ui';
+import { FileCodeRegular } from '@vicons/fa';
 import {
     Code as CodeIcon,
     ListBulleted,
@@ -15,6 +16,7 @@ import {
     TextStrikethrough,
     TextUnderline,
     Undo,
+    ChevronDown,
 } from '@vicons/carbon';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -37,7 +39,7 @@ import Youtube from '@tiptap/extension-youtube';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import CodeBlock from '@tiptap/extension-code-block';
-import { NButton } from 'naive-ui';
+import { ref } from 'vue';
 
 const props = defineProps({
     modelValue: {
@@ -52,8 +54,6 @@ const props = defineProps({
             'underline',
             'strike',
             'code',
-            'clearFormat',
-            'clearNodes',
             'paragraph',
             'heading1',
             'heading2',
@@ -107,11 +107,69 @@ const editor = useEditor({
         emits('update:modelValue', editor.getHTML());
     },
 });
+
+const selectedHeading = ref(null);
+function toggleHeading(level: number | any) {
+    editor?.value?.chain().focus().toggleHeading({ level: level }).run();
+}
 </script>
 
 <template>
     <div>
         <div v-if="editor" class="editor-buttons">
+            <NPopselect
+                v-model:value="selectedHeading"
+                trigger="click"
+                @update:value="toggleHeading"
+                :options="[
+                    {
+                        label: 'Heading 1',
+                        value: 1,
+                        disabled: editor.isActive('heading', { level: 1 }),
+                    },
+                    {
+                        label: 'Heading 2',
+                        value: 2,
+                        disabled: editor.isActive('heading', { level: 2 }),
+                    },
+                    {
+                        label: 'Heading 3',
+                        value: 3,
+                        disabled: editor.isActive('heading', { level: 3 }),
+                    },
+                    {
+                        label: 'Heading 4',
+                        value: 4,
+                        disabled: editor.isActive('heading', { level: 4 }),
+                    },
+                    {
+                        label: 'Heading 5',
+                        value: 5,
+                        disabled: editor.isActive('heading', { level: 5 }),
+                    },
+                    {
+                        label: 'Heading 6',
+                        value: 6,
+                        disabled: editor.isActive('heading', { level: 6 }),
+                    },
+                ]"
+            >
+                <NButton
+                    quaternary
+                    icon-placement="right"
+                    :class="{
+                        'is-active': [1, 2, 3, 4, 5, 6].some((level) => editor?.isActive('heading', { level })),
+                    }"
+                    size="small"
+                >
+                    <template #icon>
+                        <NIcon>
+                            <ChevronDown />
+                        </NIcon>
+                    </template>
+                    <span class="!font-900">H</span>
+                </NButton>
+            </NPopselect>
             <NButton
                 v-if="buttonActions.includes('bold')"
                 :class="{ 'is-active': editor.isActive('bold') }"
@@ -215,60 +273,6 @@ const editor = useEditor({
                 </NIcon>
             </NButton>
             <NButton
-                v-if="buttonActions.includes('heading1')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()"
-                quaternary
-                size="small"
-            >
-                H1
-            </NButton>
-            <NButton
-                v-if="buttonActions.includes('heading2')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()"
-                quaternary
-                size="small"
-            >
-                H2
-            </NButton>
-            <NButton
-                v-if="buttonActions.includes('heading3')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()"
-                quaternary
-                size="small"
-            >
-                H3
-            </NButton>
-            <NButton
-                v-if="buttonActions.includes('heading4')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 4 }).run()"
-                quaternary
-                size="small"
-            >
-                H4
-            </NButton>
-            <NButton
-                v-if="buttonActions.includes('heading5')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 5 }).run()"
-                quaternary
-                size="small"
-            >
-                H5
-            </NButton>
-            <NButton
-                v-if="buttonActions.includes('heading6')"
-                :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }"
-                @click="editor?.chain().focus().toggleHeading({ level: 6 }).run()"
-                quaternary
-                size="small"
-            >
-                H6
-            </NButton>
-            <NButton
                 v-if="buttonActions.includes('bulletList')"
                 :class="{ 'is-active': editor.isActive('bulletList') }"
                 @click="editor?.chain().focus().toggleBulletList().run()"
@@ -291,6 +295,16 @@ const editor = useEditor({
                 </NIcon>
             </NButton>
             <NButton
+                v-if="buttonActions.includes('hardBreak')"
+                @click="editor?.chain().focus().setHardBreak().run()"
+                quaternary
+                size="small"
+            >
+                <NIcon>
+                    <TextNewLine />
+                </NIcon>
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('codeBlock')"
                 :class="{ 'is-active': editor.isActive('codeBlock') }"
                 @click="editor?.chain().focus().toggleCodeBlock().run()"
@@ -298,7 +312,7 @@ const editor = useEditor({
                 size="small"
             >
                 <NIcon>
-                    <CodeIcon />
+                    <FileCodeRegular />
                 </NIcon>
                 Code Block
             </NButton>
@@ -320,19 +334,9 @@ const editor = useEditor({
                 quaternary
                 size="small"
             >
-                Horizontal Rule
+                Line Break
             </NButton>
-            <NButton
-                v-if="buttonActions.includes('hardBreak')"
-                @click="editor?.chain().focus().setHardBreak().run()"
-                quaternary
-                size="small"
-            >
-                <NIcon>
-                    <TextNewLine />
-                </NIcon>
-                Hard Break
-            </NButton>
+
             <NButton
                 v-if="buttonActions.includes('undo')"
                 :disabled="!editor.can().chain().focus().undo().run()"
@@ -343,7 +347,6 @@ const editor = useEditor({
                 <NIcon>
                     <Undo />
                 </NIcon>
-                Undo
             </NButton>
             <NButton
                 v-if="buttonActions.includes('redo')"
@@ -355,7 +358,6 @@ const editor = useEditor({
                 <NIcon>
                     <Redo />
                 </NIcon>
-                Redo
             </NButton>
         </div>
         <EditorContent v-if="editor" :editor="editor" />

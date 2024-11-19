@@ -60,7 +60,7 @@ defineExpose({
     <NModal :show="showModal">
         <NCard class="max-w-700px my-30px" size="small">
             <template #header>
-                <div class="flex justify-between mb-5">
+                <div class="flex justify-between mb-4">
                     <div>
                         <NIcon><Attachment /></NIcon> {{ $t('Clip Note') }}
                     </div>
