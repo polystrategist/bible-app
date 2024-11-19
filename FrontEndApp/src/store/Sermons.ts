@@ -36,7 +36,6 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         const { data, error } = await fetchSermons(search.value, limit.value, page.value);
 
         if (error) {
-            alert('Their  is a problem getting the data, because of poor connection or no internet connection');
             loading.value = false;
             return;
         }

@@ -37,6 +37,7 @@ import Youtube from '@tiptap/extension-youtube';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import CodeBlock from '@tiptap/extension-code-block';
+import { NButton } from 'naive-ui';
 
 const props = defineProps({
     modelValue: {
@@ -99,7 +100,7 @@ const editor = useEditor({
         Placeholder.configure({
             placeholder: 'Write Something Here 😁👍',
             emptyEditorClass:
-                'cursor-text before:content-[attr(data-placeholder)] before:absolute before:top-5 before:left-5 before:text-mauve-11 before:opacity-50 before-pointer-events-none',
+                'cursor-text before:content-[attr(data-placeholder)] before:absolute before:text-mauve-11 before:opacity-50 before-pointer-events-none p-0',
         }),
     ],
     onUpdate: ({ editor }) => {
@@ -111,187 +112,251 @@ const editor = useEditor({
 <template>
     <div>
         <div v-if="editor" class="editor-buttons">
-            <button
+            <NButton
                 v-if="buttonActions.includes('bold')"
                 :class="{ 'is-active': editor.isActive('bold') }"
                 :disabled="!editor.can().chain().focus().toggleBold().run()"
                 @click="editor?.chain().focus().toggleBold().run()"
+                quaternary
+                size="small"
             >
-                <NIcon size="20">
-                    <TextBold />
-                </NIcon>
-            </button>
-            <button
+                <template #icon>
+                    <NIcon size="20">
+                        <TextBold />
+                    </NIcon>
+                </template>
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('underline')"
                 :class="{ 'is-active': editor.isActive('underline') }"
                 :disabled="!editor.can().chain().focus().toggleUnderline().run()"
                 @click="editor?.chain().focus().toggleUnderline().run()"
+                quaternary
+                size="small"
             >
-                <NIcon size="20">
-                    <TextUnderline />
-                </NIcon>
-            </button>
-            <button
+                <template #icon>
+                    <NIcon size="20">
+                        <TextUnderline />
+                    </NIcon>
+                </template>
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('italic')"
                 :class="{ 'is-active': editor.isActive('italic') }"
                 :disabled="!editor.can().chain().focus().toggleItalic().run()"
                 @click="editor?.chain().focus().toggleItalic().run()"
+                quaternary
+                size="small"
             >
-                <NIcon size="20">
-                    <TextItalic />
-                </NIcon>
-            </button>
-            <button
+                <template #icon>
+                    <NIcon size="20">
+                        <TextItalic />
+                    </NIcon>
+                </template>
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('strike')"
                 :class="{ 'is-active': editor.isActive('strike') }"
                 :disabled="!editor.can().chain().focus().toggleStrike().run()"
                 @click="editor?.chain().focus().toggleStrike().run()"
+                quaternary
+                size="small"
             >
-                <NIcon size="20">
-                    <TextStrikethrough />
-                </NIcon>
-            </button>
-            <button
+                <template #icon>
+                    <NIcon size="20">
+                        <TextStrikethrough />
+                    </NIcon>
+                </template>
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('code')"
                 :class="{ 'is-active': editor.isActive('code') }"
                 :disabled="!editor.can().chain().focus().toggleCode().run()"
                 @click="editor?.chain().focus().toggleCode().run()"
+                quaternary
+                size="small"
             >
                 <NIcon size="20">
                     <CodeIcon />
                 </NIcon>
                 Code
-            </button>
-            <button v-if="buttonActions.includes('clearFormat')" @click="editor?.chain().focus().unsetAllMarks().run()">
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('clearFormat')"
+                @click="editor?.chain().focus().unsetAllMarks().run()"
+                quaternary
+                size="small"
+            >
                 <NIcon size="20">
                     <TextClearFormat />
                 </NIcon>
                 Clear Mark
-            </button>
-            <button v-if="buttonActions.includes('clearNodes')" @click="editor?.chain().focus().clearNodes().run()">
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('clearNodes')"
+                @click="editor?.chain().focus().clearNodes().run()"
+                quaternary
+                size="small"
+            >
                 <NIcon size="20">
                     <TextClearFormat />
                 </NIcon>
                 Clear Nodes
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('paragraph')"
                 :class="{ 'is-active': editor.isActive('paragraph') }"
                 @click="editor?.chain().focus().setParagraph().run()"
+                quaternary
+                size="small"
             >
                 <NIcon size="20">
                     <ParagraphIcon />
                 </NIcon>
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading1')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 1 }).run()"
+                quaternary
+                size="small"
             >
                 H1
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading2')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()"
+                quaternary
+                size="small"
             >
                 H2
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading3')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()"
+                quaternary
+                size="small"
             >
                 H3
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading4')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 4 }).run()"
+                quaternary
+                size="small"
             >
                 H4
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading5')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 5 }).run()"
+                quaternary
+                size="small"
             >
                 H5
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('heading6')"
                 :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }"
                 @click="editor?.chain().focus().toggleHeading({ level: 6 }).run()"
+                quaternary
+                size="small"
             >
                 H6
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('bulletList')"
                 :class="{ 'is-active': editor.isActive('bulletList') }"
                 @click="editor?.chain().focus().toggleBulletList().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <ListBulleted />
                 </NIcon>
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('orderedList')"
                 :class="{ 'is-active': editor.isActive('orderedList') }"
                 @click="editor?.chain().focus().toggleOrderedList().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <ListNumbered />
                 </NIcon>
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('codeBlock')"
                 :class="{ 'is-active': editor.isActive('codeBlock') }"
                 @click="editor?.chain().focus().toggleCodeBlock().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <CodeIcon />
                 </NIcon>
                 Code Block
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('blockquote')"
                 :class="{ 'is-active': editor.isActive('blockquote') }"
                 @click="editor?.chain().focus().toggleBlockquote().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <Quotes />
                 </NIcon>
                 Quote
-            </button>
-            <button v-if="buttonActions.includes('horizontalRule')" @click="editor?.chain().focus().setHorizontalRule().run()">
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('horizontalRule')"
+                @click="editor?.chain().focus().setHorizontalRule().run()"
+                quaternary
+                size="small"
+            >
                 Horizontal Rule
-            </button>
-            <button v-if="buttonActions.includes('hardBreak')" @click="editor?.chain().focus().setHardBreak().run()">
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('hardBreak')"
+                @click="editor?.chain().focus().setHardBreak().run()"
+                quaternary
+                size="small"
+            >
                 <NIcon>
                     <TextNewLine />
                 </NIcon>
                 Hard Break
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('undo')"
                 :disabled="!editor.can().chain().focus().undo().run()"
                 @click="editor?.chain().focus().undo().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <Undo />
                 </NIcon>
                 Undo
-            </button>
-            <button
+            </NButton>
+            <NButton
                 v-if="buttonActions.includes('redo')"
                 :disabled="!editor.can().chain().focus().redo().run()"
                 @click="editor?.chain().focus().redo().run()"
+                quaternary
+                size="small"
             >
                 <NIcon>
                     <Redo />
                 </NIcon>
                 Redo
-            </button>
+            </NButton>
         </div>
         <EditorContent v-if="editor" :editor="editor" />
     </div>

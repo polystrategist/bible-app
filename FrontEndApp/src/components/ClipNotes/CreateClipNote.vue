@@ -60,19 +60,21 @@ defineExpose({
     <NModal :show="showModal">
         <NCard class="max-w-700px my-30px" size="small">
             <template #header>
-                <div class="flex justify-between">
+                <div class="flex justify-between mb-5">
                     <div>
                         <NIcon><Attachment /></NIcon> {{ $t('Clip Note') }}
                     </div>
                     <div class="flex gap-1 items-center">
-                        <div class="w-40px h-20px rounded-md" :style="`background-color: ${selectedColor}`"></div>
                         <span> {{ $t('Select Color') }}:</span>
                         <button
                             v-for="color in colors"
                             :key="color.color"
                             @click="selectedColor = color.color"
                             :style="`background-color: ${color.color}`"
-                            class="border-1 border-opacity-0 border-light-50 hover:border-[var(--primaryColor)] rounded-1 flex items-center justify-center h-30px w-30px rounded-full"
+                            class="h-30px w-30px cursor-pointer rounded-full"
+                            :class="{
+                                'border-3 border-gray-50': selectedColor == color.color,
+                            }"
                         ></button>
                     </div>
                 </div>
