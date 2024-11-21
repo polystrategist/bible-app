@@ -4,7 +4,18 @@ import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { onBeforeMount, ref, watch } from 'vue';
 import session from './../util/session';
-import { renderIcon } from '../util/helper';
+import { renderIcon, renderNIcon } from '../util/helper';
+import {
+    Bible as BibleIcon
+} from '@vicons/fa';
+
+import {
+    Book24Filled,
+    DocumentQueueMultiple24Filled,
+    TaskListSquareLtr24Filled,
+    Person24Filled,
+    Settings24Filled
+} from '@vicons/fluent'
 
 type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
 type menuHasNoRoute = 'read-bible' | 'sermons';
@@ -23,17 +34,17 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'read-bible',
             key: 'read-bible',
-            icon: renderIcon('tabler:book'),
+            icon: renderNIcon(Book24Filled),
         },
         {
             label: 'Sermons',
             key: 'sermons',
-            icon: renderIcon('tabler:file-stack'),
+            icon: renderNIcon(DocumentQueueMultiple24Filled),
         },
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderIcon('tabler:pray'),
+            icon: renderNIcon(TaskListSquareLtr24Filled),
         },
     ]);
 
@@ -41,12 +52,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'Profile',
             key: '/profile',
-            icon: renderIcon('tabler:user'),
+            icon: renderNIcon(Person24Filled),
         },
         {
             label: 'Settings',
             key: '/settings-page',
-            icon: renderIcon('tabler:settings-2'),
+            icon: renderNIcon(Settings24Filled),
         },
     ]);
 

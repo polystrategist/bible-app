@@ -105,10 +105,12 @@ const selectedBooksForSearchString = computed(() => {
             v-model:value="search"
             :autofocus="false"
             :on-focus="() => (focused = true)"
-            class="w-300px focus:w-330px transition-all"
+            :on-blur="() => (focused = false)"
+            class="transition-all"
+            :class="focused ? '!w-330px' : '!w-300px'"
             clearable
             :placeholder="$t('Search Bible') + '...'"
-            round
+            :round="!focused"
         />
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
             <div

@@ -83,8 +83,7 @@ onMounted(async () => {
                                         menuStore.setMenu(key);
                                     }"
                                         :inverted="false"
-                                        :collapsed-width="48"
-                                        :collapsed-icon-size="25"
+                                        :collapsed-icon-size="20"
                                         :indent="15"
                                         :options="
                                             menuStore.menuUpperTabs
@@ -102,8 +101,7 @@ onMounted(async () => {
                                         menuStore.setMenu(key);
                                     }"
                                         :inverted="false"
-                                        :collapsed-width="48"
-                                        :collapsed-icon-size="25"
+                                        :collapsed-icon-size="20"
                                         :indent="15"
                                         :options="
                                             menuStore.bottomMenuTabs
