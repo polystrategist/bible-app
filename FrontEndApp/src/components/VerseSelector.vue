@@ -24,6 +24,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    title: {
+        type: String,
+        default: 'Find Verse',
+    },
 });
 
 const selectedBook = ref<BookInfo | null>(null);
@@ -57,7 +61,13 @@ function selectVerse(verse: number) {
 }
 </script>
 <template>
-    <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size" :circle="props.circle">
+    <NButton
+        @click="showOuter = true"
+        :quaternary="props.quaternary"
+        :size="props.size"
+        :circle="props.circle"
+        :title="title"
+    >
         <slot />
     </NButton>
     <NModal v-model:show="showOuter">

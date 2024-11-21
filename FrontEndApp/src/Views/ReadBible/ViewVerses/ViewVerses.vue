@@ -14,6 +14,8 @@ import { getSelectionParentElement } from '../../../util/ElementUtil';
 import VerseSelector from '../../../components/VerseSelector.vue';
 import { useI18n } from 'vue-i18n';
 import { FastForward20Regular } from '@vicons/fluent';
+import { SlideSearch28Filled } from "@vicons/fluent"
+
 const { t } = useI18n();
 
 const dialog = useDialog();
@@ -174,7 +176,7 @@ onMounted(() => {
                     {{ fontSize }}
                 </div>
                 <VerseSelector circle>
-                    <NIcon size="18" :component="SearchLocate" />
+                    <NIcon size="25" :component="SlideSearch28Filled" />
                 </VerseSelector>
             </div>
             <div>

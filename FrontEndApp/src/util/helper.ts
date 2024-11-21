@@ -9,5 +9,5 @@ export function renderIcon(icon: string) {
 export function renderNIcon(icon: any, size?: number|null) {
     return () => h(NIcon, {
         ...(size && { size: size }),
-    }, [h(icon)]);
+    }, () => h(icon));
 }

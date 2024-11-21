@@ -105,19 +105,21 @@ const selectedBooksForSearchString = computed(() => {
             v-model:value="search"
             :autofocus="false"
             :on-focus="() => (focused = true)"
-            :on-blur="() => (focused = false)"
             class="transition-all"
             :class="focused ? '!w-330px' : '!w-300px'"
             clearable
             :placeholder="$t('Search Bible') + '...'"
             :round="!focused"
+            @keyup="(key: any) => {
+                if (key.key == 'Escape') {
+                    focused = false
+                }
+            }"
         />
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
-            <div
-                class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500 hover:text-[var(--primary-color)] cursor-pointer"
-                @click="showBookSelection = true"
-            >
-                ({{ selectedBooksForSearchCount }})Book Selected : {{ selectedBooksForSearchString }}
+            <div class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500">
+                <NButton @click="showBookSelection = true" size="small" tertiary round>Select Book</NButton>
+                {{ selectedBooksForSearchString }}
             </div>
             <!-- Select Book Section -->
             <div v-show="showBookSelection" class="fixed top-0 left-0 bg-dark-800 bg-opacity-60 w-full h-full z-9999999999">
