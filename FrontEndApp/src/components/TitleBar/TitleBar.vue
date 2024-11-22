@@ -70,15 +70,6 @@ onBeforeMount(async () => {
                 <span class="text-size-12px ml-1 capitalize whitespace-nowrap">{{ $t('about') }}</span>
             </div>
             <div
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md"
-                @click="openDonationInBrowser"
-            >
-                <NIcon size="17">
-                    <Heart24Filled />
-                </NIcon>
-                <span class="text-size-12px ml-1 capitalize whitespace-nowrap">{{ $t('donate') }}</span>
-            </div>
-            <div
                 :class="{ 'mr-50px': isElectron }"
                 class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-5px rounded-md"
                 @click="changeTheme()"

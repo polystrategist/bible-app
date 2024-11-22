@@ -49,4 +49,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
             progress.done();
         });
     },
+
+
+
+    // WINDOW OPENERS
+    openDonateWindow: () => ipcRenderer.invoke('open-donate-window'),
 });

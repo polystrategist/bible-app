@@ -10,11 +10,12 @@ import {
     DocumentQueueMultiple24Filled,
     TaskListSquareLtr24Filled,
     Person24Filled,
-    Settings24Filled
-} from '@vicons/fluent'
+    Settings24Filled,
+    HeartCircle24Filled,
+} from '@vicons/fluent';
 
 type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
-type menuHasNoRoute = 'read-bible' | 'sermons';
+type menuHasNoRoute = 'read-bible' | 'sermons' | 'donate-modal';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
     const menuWithRoute: Array<menuHasRoute | string> = routes.map((route) => route.path);
@@ -49,6 +50,11 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             label: 'Profile',
             key: '/profile',
             icon: renderNIcon(Person24Filled),
+        },
+        {
+            label: 'Donate',
+            key: 'donate-modal',
+            icon: renderNIcon(HeartCircle24Filled),
         },
         {
             label: 'Settings',
@@ -98,6 +104,18 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     async function setMenu(menu: string) {
         if (menu == '/settings-page') {
             mainStore.showSettings = true;
+            return;
+        }
+
+        if (menu == 'donate-modal') {
+            // const screenHeight = window.screen.height;
+            // const height = Math.round(screenHeight * 0.7); // 70% of the screen height
+            // window.open(
+            //     'https://buymeacoffee.com/jenuel.dev',
+            //     '_blank',
+            //     `width=700,height=${height},resizable=no,scrollbars=yes,menubar=no`
+            // );
+            window.browserWindow.openDonateWindow();
             return;
         }
 

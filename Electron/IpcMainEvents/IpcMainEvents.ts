@@ -6,6 +6,7 @@ import highlighting from './highlights/highlighting';
 import PrayerList from './PrayerList/PrayerList';
 import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
+import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -28,4 +29,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // Prayer List
     PrayerList();
+
+    // window opener events
+    WindowOpenerIpcEvents(BrowserWindow);
 };

@@ -106,6 +106,7 @@ declare global {
 
             updateDownloadProgress: (progress: { percentage: Function; done: Function }) => void;
             
+            openDonateWindow: () =>void;
         };
     }
 }

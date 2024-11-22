@@ -25,8 +25,6 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { isSignedIn } from './util/SupaBase/Auth/Auth';
 import { useUserStore } from './store/userStore';
-import DonateModal from './components/Donate/DonateModal.vue';
-import SearchBar from './components/SearchBar.vue';
 
 const userStore = useUserStore();
 const isMenuCollapse = 'is-menu-collapse';
@@ -97,15 +95,15 @@ onMounted(async () => {
                                     />
                                     <NMenu
                                         :value="menuStore.menuSelected"
-                                        :on-update:value="(key: string, item: MenuOption) => {
-                                        menuStore.setMenu(key);
-                                    }"
+                                        :on-update:value="
+                                        (key: string, item: MenuOption) => {
+                                            menuStore.setMenu(key);
+                                        }"
                                         :inverted="false"
                                         :collapsed-icon-size="20"
                                         :indent="15"
                                         :options="
                                             menuStore.bottomMenuTabs
-                                                .filter((item) => menuStore.enableTab.includes(item.key))
                                                 .map((item) => ({
                                                     label: $t(item.label),
                                                     key: item.key,
@@ -128,7 +126,6 @@ onMounted(async () => {
                     <DownloadBible />
                     <AboutModal />
                     <SettingsModal />
-                    <DonateModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>
