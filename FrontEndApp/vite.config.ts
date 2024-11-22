@@ -5,7 +5,7 @@ import UnoCSS from 'unocss/vite';
 export default defineConfig(({ mode }) => ({
     build: {
         outDir: mode == 'web' ? './../web/public/app' : './../dist',
-        chunkSizeWarningLimit: 1000,
+        chunkSizeWarningLimit: 2000,
     },
     base: mode == 'web' ? '/app/' : mode == 'development' ? '' : './',
     plugins: [vue(), UnoCSS()],

@@ -2,7 +2,7 @@
 import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
 import { NButton, NIcon, NPopover, NSlider, useDialog, useMessage } from 'naive-ui';
-import { Attachment, BookmarkFilled, ChevronLeft, ChevronRight, Close, Copy, Delete, Edit, SearchLocate } from '@vicons/carbon';
+import { Attachment, BookmarkFilled, Copy, Delete, Edit } from '@vicons/carbon';
 import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';

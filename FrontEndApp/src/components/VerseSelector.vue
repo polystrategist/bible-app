@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NButton, NDrawer, NDrawerContent, NModal, NCard } from 'naive-ui';
+import { NButton, NModal, NCard } from 'naive-ui';
 import { useBibleStore } from './../store/BibleStore';
 import { bibleBooks, BookInfo } from '../util/books';
 import { ref } from 'vue';

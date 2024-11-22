@@ -4,11 +4,7 @@ import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { onBeforeMount, ref, watch } from 'vue';
 import session from './../util/session';
-import { renderIcon, renderNIcon } from '../util/helper';
-import {
-    Bible as BibleIcon
-} from '@vicons/fa';
-
+import { renderNIcon } from '../util/helper';
 import {
     Book24Filled,
     DocumentQueueMultiple24Filled,

@@ -17,6 +17,7 @@ const limit = ref(20);
 const message = useMessage();
 const selectedBookNumbers = ref<Array<number>>(bibleBooks.map((book) => book.book_number));
 const showBookSelection = ref(false);
+const SearchInputRef = ref();
 
 watch(
     () => search.value,
@@ -101,6 +102,7 @@ const selectedBooksForSearchString = computed(() => {
     <div v-if="focused" class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40" @click="focused = false"></div>
     <div class="w-330px flex justify-center top-0 z-999999999 relative">
         <NInput
+            ref="SearchInputRef"
             size="small"
             v-model:value="search"
             :autofocus="false"
@@ -112,7 +114,9 @@ const selectedBooksForSearchString = computed(() => {
             :round="!focused"
             @keyup="(key: any) => {
                 if (key.key == 'Escape') {
-                    focused = false
+                    focused = false;
+                    if (SearchInputRef) 
+                        SearchInputRef.blur();
                 }
             }"
         />
