@@ -34,6 +34,14 @@ async function createWindow() {
     if (appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
     const mainWindow = new BrowserWindow(BrowserWindowOptions);
 
+    // Ensure a single instance of the app
+    const gotTheLock = app.requestSingleInstanceLock();
+
+    if (!gotTheLock) {
+        // Quit if another instance is already running
+        app.quit();
+    }
+
     // run ipcMain events before loading the window
     IpcMainEvents(mainWindow);
 
@@ -54,6 +62,7 @@ async function createWindow() {
     // this will turn off always on top after opening the application
     setTimeout(() => {
         mainWindow.setAlwaysOnTop(false);
+        mainWindow.focus();
     }, 1000);
 
     // Open the DevTools.
