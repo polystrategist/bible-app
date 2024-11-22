@@ -12,8 +12,24 @@ If you like to support my simple ministry, you can do by one of these ways:
 -   [Ko-Fi.com](https://ko-fi.com/brojenuel)
 
 ## Features
+The app is its beginning state, it is still under development. more features will come later.
+- Read Bible
+- read or watch sermons on sermons page
+- search bible
+- bookmark verses
+- create or edit clip notes
+- color highlights
+- select your app themes
 
-For The features, I am adding what I know it can be useful when browsing or reading the bible. And also going to get ideas from any submitted issues/feature requests. This list will be updated every time a new feature is added or modified.
+## How to contribute
+Clone this on your machine. Currently, I am using windows OS for development. So I am not sure if this is going to work for MAC.
+
+1. Clone the repo by running `git clone https://github.com/Bible-Projects/believers-sword-next.git`
+2. run `yarn setup` to setup your electron and front end app.
+
+To run the app, run `yarn start`
+
+Note: if you don't have yarn installed, run `npm install -g yarn`
 
 ## Sponsors
 [<img src="https://believers-sword.brojenuel.com/images/sponsors/navicat.png" width="300" />](https://www.navicat.com)

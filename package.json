@@ -11,7 +11,7 @@
     "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn watch\"",
     "front:setup": "cd FrontEndApp && yarn",
     "electron:setup": "yarn",
-    "setup": "yarn front:setup && yarn electron:setup",
+    "setup": "yarn electron:setup && yarn front:setup",
     "serve:front": "cd FrontEndApp && yarn dev",
     "serve:electron": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=yes && yarn build && wait-on tcp:3000 && electron .",
     "build:front": "cd FrontEndApp && yarn build",
