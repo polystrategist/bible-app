@@ -11,11 +11,17 @@ import AppUpdater from './AutoUpdate';
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const appBounds: any = appConfig.get('setting.appBounds');
+
+    let iconPath = path.join(__dirname, 'assets', 'icon.ico');
+
+    if (isDev || isNightly) iconPath = path.join('assets', 'icon.ico');
+
     const BrowserWindowOptions: BrowserWindowConstructorOptions = {
         width: 1200,
         minWidth: 900,
         height: 750,
         minHeight: 600,
+        icon: iconPath,
         webPreferences: {
             preload: __dirname + '/preload.js',
             devTools: isNightly || true,
