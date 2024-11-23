@@ -1,5 +1,5 @@
 export default {
-    file_name: `New American Standard Bible`,
+    file_name: `New American Standard Bible.SQLite3`,
     language: `en`,
     language_full: `english`,
     title: `New American Standard Bible`,
