@@ -17,8 +17,12 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
             await download(mainWindow, url, {
                 directory: filePath,
                 onProgress: (data) => {
-                    // console.log(data);
+                    console.log(data);
                     // mainWindow.webContents.send('download-module-inprogress', data);
+                },
+                onCompleted: (data) => {
+                    console.log(data);
+                    // mainWindow.webContents.send('download-module-completed', data);
                 },
                 overwrite: true,
                 saveAs: false,
