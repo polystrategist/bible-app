@@ -28,8 +28,6 @@ const name = ref('General');
                         </span>
                     </template>
                     <div class="flex flex-col gap-5 py-3">
-                        <PrimaryColor />
-                        <Theme />
                         <LanguageSetting />
                         <SyncData />
                         <Deuterocanonical />

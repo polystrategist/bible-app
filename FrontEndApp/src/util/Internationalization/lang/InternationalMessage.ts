@@ -149,6 +149,11 @@ export interface InternationalMessageInterface {
     Confirm: string;
     "Are You Sure You want to remove?": string;
     'Add to Bookmark': string;
+    'night': string;
+    customize: string;
+    'Pick a style and color for you': string;
+    color: string;
+    theme: string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

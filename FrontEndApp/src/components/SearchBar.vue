@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { NButton, NCheckbox, NCheckboxGroup, NInput, useMessage } from 'naive-ui';
+import { NButton, NCheckbox, NCheckboxGroup, NIcon, NInput, useMessage } from 'naive-ui';
 import { computed, ref, watch } from 'vue';
 import { searchBibleType } from '../GlobalTypes';
 import { highlighter, removeHighlight } from '../util/hilitor';
 import { useBibleStore } from '../store/BibleStore';
 import { useI18n } from 'vue-i18n';
 import { bibleBooks } from '../util/books';
+import { Search24Filled } from '@vicons/fluent';
 
 const { t } = useI18n();
 const focused = ref(false);
@@ -100,7 +101,7 @@ const selectedBooksForSearchString = computed(() => {
 
 <template>
     <div v-if="focused" class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40" @click="focused = false"></div>
-    <div class="w-330px flex justify-center top-0 z-999999999 relative">
+    <div class="w-400px flex justify-center top-0 z-999999999 relative">
         <NInput
             ref="SearchInputRef"
             size="small"
@@ -108,7 +109,7 @@ const selectedBooksForSearchString = computed(() => {
             :autofocus="false"
             :on-focus="() => (focused = true)"
             class="transition-all"
-            :class="focused ? '!w-330px' : '!w-300px'"
+            :class="focused ? '!w-400px' : '!w-300px'"
             clearable
             :placeholder="$t('Search Bible') + '...'"
             :round="!focused"
@@ -119,7 +120,13 @@ const selectedBooksForSearchString = computed(() => {
                         SearchInputRef.blur();
                 }
             }"
-        />
+        >
+        <template #prefix>
+            <NIcon>
+                <Search24Filled />
+            </NIcon>
+        </template>
+        </NInput>
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
             <div class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500">
                 <NButton @click="showBookSelection = true" size="small" tertiary round>Select Book</NButton>

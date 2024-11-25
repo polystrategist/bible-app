@@ -3,6 +3,7 @@ type colorTypes = {
     primaryColorHover: string;
     primaryColorSuppl: string;
     primaryColorPressed: string;
+    [key: string]: string;
 };
 
 type themeOptionsType = {

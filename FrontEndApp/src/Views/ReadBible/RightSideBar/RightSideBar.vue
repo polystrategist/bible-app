@@ -7,7 +7,9 @@ import Bookmarks from './Bookmarks/Bookmarks.vue';
 import Highlights from './Highlights/Highlights.vue';
 import SESSION from '../../../util/session';
 import ClipNotes from './ClipNotes/ClipNotes.vue';
+import { useThemeStore } from '../../../store/theme';
 
+const themeStore = useThemeStore();
 const SavedRightSideBar = 'saved-right-side-bar-menu-key';
 const selectedButton = ref<string>('bible-search');
 
@@ -44,7 +46,7 @@ onBeforeMount(() => {
                         class="w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
                         @click="selectRightSideBarMenu(menu.key)"
                     >
-                        <NIcon :component="menu.icon" />
+                        <NIcon :component="themeStore.isDark ? menu.iconDark : menu.icon" />
                     </div>
                 </template>
                 <span class="capitalize">{{ $t(menu.title) }}</span>

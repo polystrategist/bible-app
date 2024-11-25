@@ -4,6 +4,7 @@ import SESSION from '../util/session';
 import { getTheme, themesOptions, typeNameInterface } from '../util/themes';
 
 export const useThemeStore = defineStore('useThemeStore', () => {
+    const showThemeChangerDrawer = ref(false);
     const saveThemeStorageKey = 'savedThemeStorage';
     const isDark = ref(true);
     const selectedTheme = ref<typeNameInterface>('default');
@@ -72,5 +73,6 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         themeOverrides,
         isDark,
         changePrimaryColor,
+        showThemeChangerDrawer
     };
 });

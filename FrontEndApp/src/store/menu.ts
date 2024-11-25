@@ -12,12 +12,20 @@ import {
     Person24Filled,
     Settings24Filled,
     HeartCircle24Filled,
+    Book24Regular,
+    DocumentQueueMultiple24Regular,
+    TaskListSquareLtr24Regular,
+    Person24Regular,
+    HeartCircle24Regular,
+    Settings24Regular,
 } from '@vicons/fluent';
+import { useThemeStore } from './theme';
 
 type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
 type menuHasNoRoute = 'read-bible' | 'sermons' | 'donate-modal';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
+    const themeStore = useThemeStore();
     const menuWithRoute: Array<menuHasRoute | string> = routes.map((route) => route.path);
     const menuWithNoRoute: Array<menuHasNoRoute> = ['read-bible', 'sermons'];
     const menuSelected = ref<menuHasRoute | menuHasNoRoute>('read-bible');
@@ -31,17 +39,20 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'read-bible',
             key: 'read-bible',
-            icon: renderNIcon(Book24Filled),
+            icon: renderNIcon(Book24Regular),
+            iconDark: renderNIcon(Book24Filled),
         },
         {
             label: 'Sermons',
             key: 'sermons',
-            icon: renderNIcon(DocumentQueueMultiple24Filled),
+            icon: renderNIcon(DocumentQueueMultiple24Regular),
+            iconDark: renderNIcon(DocumentQueueMultiple24Filled),
         },
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderNIcon(TaskListSquareLtr24Filled),
+            icon: renderNIcon(TaskListSquareLtr24Regular),
+            iconDark: renderNIcon(TaskListSquareLtr24Filled),
         },
     ]);
 
@@ -49,17 +60,20 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'Profile',
             key: '/profile',
-            icon: renderNIcon(Person24Filled),
+            icon: renderNIcon(Person24Regular),
+            iconDark: renderNIcon(Person24Filled),
         },
         {
             label: 'Donate',
             key: 'donate-modal',
-            icon: renderNIcon(HeartCircle24Filled),
+            icon: renderNIcon(HeartCircle24Regular),
+            iconDark: renderNIcon(HeartCircle24Filled),
         },
         {
             label: 'Settings',
             key: '/settings-page',
-            icon: renderNIcon(Settings24Filled),
+            icon: renderNIcon(Settings24Regular),
+            iconDark: renderNIcon(Settings24Filled),
         },
     ]);
 
