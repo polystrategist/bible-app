@@ -36,7 +36,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <NLayoutFooter bordered class="flex cursor-default select-none items-center pl-8px light:bg-gray-100">
+    <NLayoutFooter bordered class="flex cursor-default select-none items-center pl-8px light:bg-white">
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>

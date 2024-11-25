@@ -13,11 +13,12 @@ import { useClipNoteStore } from '../../../store/ClipNotes';
 import { getSelectionParentElement } from '../../../util/ElementUtil';
 import VerseSelector from '../../../components/VerseSelector.vue';
 import { useI18n } from 'vue-i18n';
-import { FastForward20Regular } from '@vicons/fluent';
-import { SlideSearch28Filled } from "@vicons/fluent"
+import { FastForward20Regular, SlideSearch28Regular } from '@vicons/fluent';
+import { SlideSearch28Filled } from '@vicons/fluent';
+import { useThemeStore } from '../../../store/theme';
 
 const { t } = useI18n();
-
+const themeStore = useThemeStore();
 const dialog = useDialog();
 const clipNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
@@ -144,7 +145,7 @@ onMounted(() => {
             if (event.deltaY > 0) {
                 // Ctrl + Scroll Down
                 if (fontSize.value <= 10) return;
-                
+
                 fontSize.value--;
                 // Do something else you want
             } else if (event.deltaY < 0) {
@@ -176,7 +177,7 @@ onMounted(() => {
                     {{ fontSize }}
                 </div>
                 <VerseSelector circle>
-                    <NIcon size="25" :component="SlideSearch28Filled" />
+                    <NIcon size="25" :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular" />
                 </VerseSelector>
             </div>
             <div>

@@ -150,5 +150,10 @@ const message: InternationalMessageType = {
     Confirm: 'Confirmar',
     "Are You Sure You want to remove?": 'Tem certeza que deseja remover?',
     "Add to Bookmark": 'Adicionar ao marcador',
+    night: 'noite',
+    customize: 'personalizar',
+    'Pick a style and color for you': 'Escolha um estilo e cor para você',
+    color: 'cor',
+    theme: 'tema',
 };
 export default message;

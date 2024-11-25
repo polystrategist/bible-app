@@ -150,6 +150,11 @@ const message: InternationalMessageType = {
     Confirm: '確認',
     "Are You Sure You want to remove?": '削除してもよろしいですか?',
     "Add to Bookmark": 'ブックマークに追加する',
+    night: '夜',
+    customize: 'カスタマイズ',
+    'Pick a style and color for you': 'スタイルと色を選びます',
+    color: '色',
+    theme: 'テーマ',
 };
 
 export default message;

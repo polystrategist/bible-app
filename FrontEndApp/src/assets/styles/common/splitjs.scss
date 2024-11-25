@@ -9,7 +9,7 @@
     transition: opacity 0.4s;
     background-color: var(--primary-color);
     opacity: 0;
-    z-index: 999999999;
+    z-index: 10;
 }
 .splitpanes__splitter:hover:before {
     opacity: 0.2;

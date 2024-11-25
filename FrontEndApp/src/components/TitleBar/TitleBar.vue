@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NIcon, NLayoutHeader, NTooltip } from 'naive-ui';
+import { NIcon, NLayoutHeader, NTooltip, NButton } from 'naive-ui';
 import {
     Heart24Filled,
     Square20Regular,
@@ -15,6 +15,8 @@ import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
 import LogoComponent from './../LogoComponent.vue';
 import ProfileDropdown from './Partials/ProfileDropdown.vue';
+import { PaintBucket24Filled } from '@vicons/fluent';
+import ThemeChangerDrawer from '../ThemeChanger/ThemeChangerDrawer.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
@@ -47,8 +49,8 @@ onBeforeMount(async () => {
 });
 </script>
 <template>
-    <NLayoutHeader bordered class="flex cursor-default select-none items-center pl-8px light:bg-gray-100 justify-between">
-        <div class="whitespace-nowrap flex items-center gap-1 w-200px pl-0px">
+    <NLayoutHeader bordered class="flex cursor-default select-none items-center pl-8px justify-between">
+        <div class="whitespace-nowrap flex items-center gap-1 pl-0px">
             <div class="w-20px h-20px">
                 <LogoComponent />
             </div>
@@ -60,27 +62,15 @@ onBeforeMount(async () => {
             <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>
         </div>
         <div class="flex items-center h-full justify-end pr-6px h-30px">
-            <div
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer rounded-md"
-                @click="mainStore.showAbout = true"
-            >
-                <NIcon size="17">
-                    <Information />
-                </NIcon>
-                <span class="text-size-12px ml-1 capitalize whitespace-nowrap">{{ $t('about') }}</span>
+            <div class="mr-1">
+                <NButton round size="tiny" tertiary @click="mainStore.showAbout = true" title="About">
+                    <NIcon size="17">
+                        <Information />
+                    </NIcon>
+                </NButton>
             </div>
-            <div
-                :class="{ 'mr-50px': isElectron }"
-                class="px-1 flex h-full items-center hover:bg-opacity-20 hover:bg-gray-200 cursor-pointer mr-5px rounded-md"
-                @click="changeTheme()"
-            >
-                <NIcon size="17">
-                    <WeatherMoon20Regular v-if="themeStore.isDark" />
-                    <WeatherSunny20Regular v-else />
-                </NIcon>
-                <span class="text-size-12px ml-1 capitalize whitespace-nowrap">
-                    {{ themeStore.isDark ? $t('dark') : $t('light') }}
-                </span>
+            <div class="mr-1">
+                <ThemeChangerDrawer />
             </div>
             <div class="mr-3">
                 <ProfileDropdown />

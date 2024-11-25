@@ -89,7 +89,7 @@ onMounted(async () => {
                                                 .map((item) => ({
                                                     label: $t(item.label),
                                                     key: item.key,
-                                                    icon: item.icon,
+                                                    icon: themeStore.isDark ? item.iconDark : item.icon,
                                                 }))
                                         "
                                     />
@@ -103,12 +103,11 @@ onMounted(async () => {
                                         :collapsed-icon-size="20"
                                         :indent="15"
                                         :options="
-                                            menuStore.bottomMenuTabs
-                                                .map((item) => ({
-                                                    label: $t(item.label),
-                                                    key: item.key,
-                                                    icon: item.icon,
-                                                }))
+                                            menuStore.bottomMenuTabs.map((item) => ({
+                                                label: $t(item.label),
+                                                key: item.key,
+                                                icon: item.icon,
+                                            }))
                                         "
                                     />
                                 </div>
