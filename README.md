@@ -3,13 +3,7 @@
 Believers Sword App is an application to help you study the bible. Engage in learning the word of God. I am creating this application because this is one way of offering my time to the Lord. I'm so thankful to God for giving me time to create this application and share it with others. I'm not recommending this application, but I am encouraging you to try the one I built, hoping you may like it.
 
 ### Support
-
-If you like to support my simple ministry, you can do by one of these ways:
-
--   [Debit/Credit](https://www.paypal.com/donate?hosted_button_id=DCZYF7KWPUVB4)
--   [GCash](https://i.ibb.co/kJGg32y/GCash-My-QR-06102021230745.png)
 -   [BuyMeCoffee.com](https://www.buymeacoffee.com/BroJenuel)
--   [Ko-Fi.com](https://ko-fi.com/brojenuel)
 
 ## Features
 The app is its beginning state, it is still under development. more features will come later.
