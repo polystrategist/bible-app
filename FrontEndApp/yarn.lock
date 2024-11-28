@@ -2843,10 +2843,10 @@ muggle-string@^0.3.1:
   resolved "https://registry.yarnpkg.com/muggle-string/-/muggle-string-0.3.1.tgz#e524312eb1728c63dd0b2ac49e3282e6ed85963a"
   integrity sha512-ckmWDJjphvd/FvZawgygcUeQCxzvohjFO5RxTjj4eq8kw359gFF3E1brjfI+viLMxss5JrHTDRHZvu2/tuy0Qg==
 
-naive-ui@^2.40.1:
-  version "2.40.1"
-  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.40.1.tgz#64d9570dae4286b89979a582713f6f824c25230b"
-  integrity sha512-3NkL+vLRQZKQxCHXa+7xiD6oM74OrQELaehDkGYRYpr6kjT+JJB+Z7h+5LC70gn8VkbgCAETv0+uRWF+6MLlgQ==
+naive-ui@^2.40.2:
+  version "2.40.2"
+  resolved "https://registry.yarnpkg.com/naive-ui/-/naive-ui-2.40.2.tgz#4329539b55c2bf2aa0c2890543bdee56ce7579a0"
+  integrity sha512-iOpk9/SdAxOPnbFDiN9c0N6vzRJiyC+xgs8rqeaulLvxg0ix39xA3noordy9wyq0YUbqS3ID6jPdld/kW4KSEg==
   dependencies:
     "@css-render/plugin-bem" "^0.15.14"
     "@css-render/vue3-ssr" "^0.15.14"
