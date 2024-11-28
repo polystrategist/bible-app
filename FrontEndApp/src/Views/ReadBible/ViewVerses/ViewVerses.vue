@@ -92,7 +92,7 @@ function checkHere(this: HTMLElement): void {
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
     dialog.warning({
         title: t('Confirm'),
-        content: t('Are You Sure You want to remove?'),
+        content: t('Are You Sure You want to remove? If you delete this clip note, you will not be able to undo it!'),
         positiveText: t('Yes'),
         negativeText: t('No'),
         onPositiveClick: async () => {
@@ -281,9 +281,31 @@ onMounted(() => {
                     <NIcon class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600" size="30">
                         <Attachment />
                     </NIcon>
-                    <div class="absolute left-2 bottom-0 flex flex-col gap-3">
-                        <NIcon
-                            class="cursor-pointer opacity-50 hover:opacity-100 transition-all"
+                    <div class="absolute flex gap-2 -top-5 right-3">
+                        <NButton
+                            class="shadow-md"
+                            :style="`background: ${
+                                clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                            }`"
+                            size="tiny"
+                            @click="
+                                createClipNoteRef &&
+                                    createClipNoteRef.toggleClipNoteModal(
+                                        clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)
+                                    )
+                            "
+                            title="Edit"
+                        >
+                            <NIcon class="text-dark-9">
+                                <Edit />
+                            </NIcon>
+                        </NButton>
+                        <NButton
+                            class="shadow-md"
+                            :style="`background: ${
+                                clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                            }`"
+                            size="tiny"
                             @click="
                                 deleteClipNote({
                                     book_number: verse.book_number,
@@ -291,20 +313,12 @@ onMounted(() => {
                                     verse: verse.verse,
                                 })
                             "
+                            title="Delete"
                         >
-                            <Delete />
-                        </NIcon>
-                        <NIcon
-                            class="cursor-pointer opacity-50 hover:opacity-100 transition-all"
-                            @click="
-                                createClipNoteRef &&
-                                    createClipNoteRef.toggleClipNoteModal(
-                                        clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)
-                                    )
-                            "
-                        >
-                            <Edit />
-                        </NIcon>
+                            <NIcon class="text-dark-9">
+                                <Delete />
+                            </NIcon>
+                        </NButton>
                     </div>
                     <div
                         :style="`font-size:${fontSize - 1}px`"
