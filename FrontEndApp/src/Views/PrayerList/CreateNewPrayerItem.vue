@@ -64,7 +64,7 @@ const SaveEditorContent = () => {
     </NModal>
 </template>
 
-<style lang="postcss">
+<style lang="scss">
 .create-new-prayer-list-editor {
     @apply dark:bg-gray-800 bg-gray-200 rounded-md overflow-hidden;
 
