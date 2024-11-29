@@ -155,6 +155,7 @@ const message: InternationalMessageType = {
     'Pick a style and color for you': 'スタイルと色を選びます',
     color: '色',
     theme: 'テーマ',
+    Donate: '寄付',
 };
 
 export default message;
