@@ -154,6 +154,7 @@ export interface InternationalMessageInterface {
     'Pick a style and color for you': string;
     color: string;
     theme: string;
+    Donate: string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

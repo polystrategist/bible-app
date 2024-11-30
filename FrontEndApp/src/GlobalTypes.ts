@@ -13,10 +13,6 @@ export type bookmarksType = {
         book_number: number;
         chapter: number;
         verse: number;
-        version: Array<{
-            version: string;
-            text: string;
-        }>
     }
 }
 

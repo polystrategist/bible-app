@@ -1,5 +1,18 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow, app } from 'electron';
 import { bookmarkStore } from '../../ElectronStore/bookmarkStore';
+import { isNightly } from '../../config';
+import UPath from 'upath';
+import knex from 'knex';
+
+const dataPath = UPath.join(app.getPath('appData'), !isNightly ? 'believers-sword' : 'believers-sword-nightly');
+const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
+const StoreDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: filePath,
+    },
+});
 
 const saveVersesInBookmark = async ({
     book_number,
@@ -13,9 +26,20 @@ const saveVersesInBookmark = async ({
     version: Array<any> | null | undefined;
 }) => {
     try {
-        const key = `${book_number}_${chapter}_${verse}`;
-        bookmarkStore.set(`bookmarks.${key}`, { book_number, chapter, verse, version: version ? version : [] });
-        return bookmarkStore.get('bookmarks');
+        const existingBookmark = await StoreDB('bookmarks').where({ book_number, chapter, verse }).first();
+
+        if (!existingBookmark) {
+            await StoreDB('bookmarks').insert({
+                key: `${book_number}_${chapter}_${verse}`,
+                book_number,
+                chapter,
+                verse,
+                updated_at: new Date(),
+                created_at: new Date(),
+            });
+        }
+
+        return await getVersesSavedBookmarks();
     } catch (e) {
         if (e instanceof Error) console.log(e.message);
     }
@@ -23,7 +47,14 @@ const saveVersesInBookmark = async ({
 
 const getVersesSavedBookmarks = async () => {
     try {
-        return await bookmarkStore.get('bookmarks');
+        const data = await StoreDB('bookmarks').select();
+
+        const result: any = {};
+        for (const item of data) {
+            result[item.key] = item;
+        }
+
+        return result;
     } catch (e) {
         if (e instanceof Error) console.log(e.message);
     }
@@ -39,7 +70,12 @@ const deleteVerseInSavedBookmarks = async ({
     verse: number;
 }) => {
     try {
-        await bookmarkStore.delete(`bookmarks.${book_number}_${chapter}_${verse}` as any);
+        await StoreDB('bookmarks')
+            .where('book_number', book_number)
+            .andWhere('chapter', chapter)
+            .andWhere('verse', verse)
+            .delete();
+
         return true;
     } catch (e) {
         return false;
