@@ -287,7 +287,7 @@ onMounted(() => {
                             :style="`background: ${
                                 clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
                             }`"
-                            size="tiny"
+                            size="small"
                             @click="
                                 createClipNoteRef &&
                                     createClipNoteRef.toggleClipNoteModal(
@@ -305,7 +305,7 @@ onMounted(() => {
                             :style="`background: ${
                                 clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
                             }`"
-                            size="tiny"
+                            size="small"
                             @click="
                                 deleteClipNote({
                                     book_number: verse.book_number,
