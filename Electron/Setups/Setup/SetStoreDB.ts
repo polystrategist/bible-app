@@ -7,12 +7,14 @@ import { isNightly } from '../../config';
 const isPackaged = app.isPackaged;
 
 const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
-const filePath = dataPath + `\\StoreDB\\Store.db`;
+const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 
 export const setStoreDB = new Promise((resolve, reject) => {
     if (!fs.existsSync(filePath)) {
-        fs.mkdir(dataPath + '/StoreDB/', { recursive: true }, (err) => {
-            if (err) reject(err);
+        fs.mkdir(UPath.join(dataPath, 'StoreDB'), { recursive: true }, (err) => {
+            if (err) {
+                reject(err);
+            }
 
             const defaultBiblePath = isPackaged
                 ? UPath.toUnix(UPath.join(__dirname, 'defaults', 'Main', `Store.db`)).replace('app.asar/dist/Setups/Setup/', '')
@@ -21,13 +23,15 @@ export const setStoreDB = new Promise((resolve, reject) => {
             Log.info('Default Bible Path:', defaultBiblePath);
 
             fs.copyFile(defaultBiblePath, filePath, (err) => {
-                Log.error(err);
-                if (err) reject(err);
+                if (err) {
+                    Log.error(err);
+                    reject(err);
+                }
             });
 
             resolve('Setup StoreDB Successful!');
         });
     } else {
-        resolve('Database file already exist');
+        resolve(` ${filePath} Database file already exist`);
     }
 });

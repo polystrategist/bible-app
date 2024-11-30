@@ -30,6 +30,6 @@ export const setDefaultBible = new Promise((resolve, reject) => {
             resolve('Setup Successful!');
         });
     } else {
-        resolve('Database file already exist');
+        resolve(`${defaultBibleFile} Database file already exist`);
     }
 });
