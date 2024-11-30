@@ -6,7 +6,7 @@ import { isNightly } from '../../config';
 
 const isPackaged = app.isPackaged;
 
-const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
+const dataPath = UPath.join(app.getPath('appData'), !isNightly ? 'believers-sword' : 'believers-sword-nightly');
 const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 
 export const setStoreDB = new Promise((resolve, reject) => {
