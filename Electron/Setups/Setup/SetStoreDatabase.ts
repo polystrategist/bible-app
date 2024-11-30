@@ -49,4 +49,20 @@ export default async () => {
                 .then();
         }
     });
+
+    // setup bookmark
+    await StoreDB.schema.hasTable('bookmarks').then(async (exists) => {
+        if (!exists) {
+            await StoreDB.schema
+                .createTable('bookmarks', function (table) {
+                    table.increments('id').primary();
+                    table.string('key').unique();
+                    table.integer('book_number');
+                    table.integer('chapter');
+                    table.integer('verse');
+                    table.timestamps(true);
+                })
+                .then();
+        }
+    })
 };
