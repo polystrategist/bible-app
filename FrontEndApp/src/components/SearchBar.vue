@@ -121,11 +121,11 @@ const selectedBooksForSearchString = computed(() => {
                 }
             }"
         >
-        <template #prefix>
-            <NIcon>
-                <Search24Filled />
-            </NIcon>
-        </template>
+            <template #prefix>
+                <NIcon>
+                    <Search24Filled />
+                </NIcon>
+            </template>
         </NInput>
         <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
             <div class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500">
@@ -148,13 +148,12 @@ const selectedBooksForSearchString = computed(() => {
                     </div>
                     <div class="max-h-90vh overflow-auto overflowing-div">
                         <NCheckboxGroup v-model:value="selectedBookNumbers">
-                            <div class="flex flex-wrap gap-3">
-                                <NCheckbox
-                                    v-for="book in bibleBooks"
-                                    :key="book.book_number"
-                                    :label="book.title"
-                                    :value="book.book_number"
-                                />
+                            <div>
+                                <template v-for="book in bibleBooks" :key="book.book_number">
+                                    <div v-if="book.title == 'Matthew'" class="w-full py-3 font-bold">New Testament</div>
+                                    <div v-else-if="book.title == 'Genesis'" class="w-full py-3 font-bold">Old Testament</div>
+                                    <NCheckbox class="p-1" :label="book.title" :value="book.book_number" />
+                                </template>
                             </div>
                         </NCheckboxGroup>
                     </div>
@@ -176,7 +175,7 @@ const selectedBooksForSearchString = computed(() => {
                             @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)"
                         >
                             <div class="font-700">
-                                {{ bibleStore.getBookShortName(verse.book_number).short_name }}
+                                {{ bibleStore.getBookShortName(verse.book_number).title }}
                                 {{ verse.chapter }}:{{ verse.verse }}
                             </div>
                             <div>
