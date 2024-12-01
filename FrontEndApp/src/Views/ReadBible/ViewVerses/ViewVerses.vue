@@ -322,7 +322,7 @@ onMounted(() => {
                         </div>
                         <div
                             :style="`font-size:${fontSize - 1}px`"
-                            class="pl-55px pr-10px view-verse-rendered-clip-note"
+                            class="px-10px pb-1 view-verse-rendered-clip-note"
                             v-html="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).content"
                         ></div>
                     </div>

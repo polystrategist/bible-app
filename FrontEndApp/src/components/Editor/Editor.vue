@@ -108,7 +108,6 @@ const editor = useEditor({
     },
 });
 
-const selectedHeading = ref(null);
 function toggleHeading(level: number | any) {
     editor?.value?.chain().focus().toggleHeading({ level: level }).run();
 }
@@ -118,41 +117,19 @@ function toggleHeading(level: number | any) {
     <div>
         <div v-if="editor" class="editor-buttons">
             <NPopselect
-                v-model:value="selectedHeading"
                 trigger="click"
                 @update:value="toggleHeading"
-                :options="[
-                    {
-                        label: 'Heading 1',
-                        value: 1,
-                        disabled: editor.isActive('heading', { level: 1 }),
-                    },
-                    {
-                        label: 'Heading 2',
-                        value: 2,
-                        disabled: editor.isActive('heading', { level: 2 }),
-                    },
-                    {
-                        label: 'Heading 3',
-                        value: 3,
-                        disabled: editor.isActive('heading', { level: 3 }),
-                    },
-                    {
-                        label: 'Heading 4',
-                        value: 4,
-                        disabled: editor.isActive('heading', { level: 4 }),
-                    },
-                    {
-                        label: 'Heading 5',
-                        value: 5,
-                        disabled: editor.isActive('heading', { level: 5 }),
-                    },
-                    {
-                        label: 'Heading 6',
-                        value: 6,
-                        disabled: editor.isActive('heading', { level: 6 }),
-                    },
-                ]"
+                :options="
+                    [1, 2, 3, 4, 5, 6].map((level) => {
+                        const isActive = editor?.isActive('heading', { level: level });
+
+                        return {
+                            label: ` ${isActive ? '✅' : ''} Heading ${level}`,
+                            value: level,
+                            disabled: isActive,
+                        };
+                    })
+                "
             >
                 <NButton
                     quaternary
