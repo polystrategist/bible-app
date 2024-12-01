@@ -60,13 +60,7 @@
     }
 
     h1 {
-        font-size: 2rem;
         font-weight: 800;
-    }
-
-    code {
-        background-color: rgba(#616161, 0.1);
-        color: #616161;
     }
 
     pre {
@@ -112,9 +106,13 @@
     }
 
     p {
-        font-size: 18px;
+        // font-size: 14px;
         margin: 0;
-        padding: 0 0 15px;
+        padding: 0 0 15px 0;
+
+        code {
+            background-color: rgba(#616161, 0.1);
+        }
     }
 }
 
@@ -122,11 +120,6 @@
     .ProseMirror {
         hr {
             border-top: 2px solid rgba(#ffffff, 0.3);
-        }
-
-        code {
-            color: rgb(172, 172, 172);
-            background-color: #4949492f;
         }
     }
 }
