@@ -7,7 +7,6 @@ export const useBookmarkStore = defineStore('useBookmarkStore', () => {
 
     async function getBookmarks() {
         const savedBookmarks = await window.browserWindow.getBookMarks();
-        console.log(savedBookmarks);
         bookmarks.value = savedBookmarks ? savedBookmarks : {};
     }
 
