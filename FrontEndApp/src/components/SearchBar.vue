@@ -7,8 +7,10 @@ import { useBibleStore } from '../store/BibleStore';
 import { useI18n } from 'vue-i18n';
 import { bibleBooks } from '../util/books';
 import { Search24Filled } from '@vicons/fluent';
+import { useMenuStore } from '../store/menu';
 
 const { t } = useI18n();
+const menuStore = useMenuStore();
 const focused = ref(false);
 const bibleStore = useBibleStore();
 const page = ref<number>(1);
@@ -56,6 +58,10 @@ function handleSelectedBook() {
 }
 
 function selectAVerse(book_number: number, chapter: number, verse: number) {
+    if (menuStore.menuSelected != 'read-bible') {
+        menuStore.setMenu('read-bible');
+    }
+
     bibleStore.selectVerse(book_number, chapter, verse);
     bibleStore.AutoScrollSavedPosition(200);
     focused.value = false;
@@ -88,9 +94,6 @@ async function submitSearch(searchStr: string | null = search.value) {
     }, 100);
 }
 
-const selectedBooksForSearchCount = computed(() => {
-    return bibleBooks.filter((book) => selectedBookNumbers.value.includes(book.book_number)).length;
-});
 const selectedBooksForSearchString = computed(() => {
     return bibleBooks
         .filter((book) => selectedBookNumbers.value.includes(book.book_number))
@@ -104,7 +107,7 @@ const selectedBooksForSearchString = computed(() => {
     <div class="w-400px flex justify-center top-0 z-999999999 relative">
         <NInput
             ref="SearchInputRef"
-            size="small"
+            size="tiny"
             v-model:value="search"
             :autofocus="false"
             :on-focus="() => (focused = true)"

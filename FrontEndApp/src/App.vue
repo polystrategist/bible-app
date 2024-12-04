@@ -59,8 +59,8 @@ onMounted(async () => {
             <NNotificationProvider>
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
-                        <TitleBar class="h-40px" />
-                        <NLayout class="h-[calc(100%-80px)]" has-sider>
+                        <TitleBar class="h-30px" />
+                        <NLayout class="h-[calc(100%-60px)]" has-sider>
                             <NLayoutSider
                                 bordered
                                 :collapsed="isSideBarCollapse"
@@ -120,7 +120,7 @@ onMounted(async () => {
                                 </div>
                             </NLayout>
                         </NLayout>
-                        <FooterComponent class="h-40px" />
+                        <FooterComponent class="h-30px" size="tiny" />
                     </NLayout>
                     <DownloadBible />
                     <AboutModal />
