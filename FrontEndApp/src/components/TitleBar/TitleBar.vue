@@ -62,21 +62,15 @@ onBeforeMount(async () => {
             <SearchBar />
             <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>
         </div>
-        <div class="flex items-center h-full justify-end pr-6px h-30px">
-            <div class="mr-1">
-                <NButton round size="tiny" quaternary  @click="mainStore.showAbout = true" title="About">
-                    <NIcon size="17">
-                        <Information />
-                    </NIcon>
-                </NButton>
-            </div>
-            <div class="mr-1">
-                <ThemeChangerDrawer />
-            </div>
-            <div class="mr-3">
-                <ProfileDropdown />
-            </div>
-            <NButton v-show="isElectron" size="tiny" quaternary :title="$t('minimize')" @click="minimizeWindow()">
+        <div class="flex items-center h-full justify-end pr-6px">
+            <NButton round size="tiny" quaternary @click="mainStore.showAbout = true" title="About">
+                <NIcon size="17">
+                    <Information />
+                </NIcon>
+            </NButton>
+            <ThemeChangerDrawer />
+            <ProfileDropdown />
+            <NButton v-show="isElectron" size="tiny" quaternary :title="$t('minimize')" @click="minimizeWindow()" class="ml-5">
                 <NIcon size="17">
                     <Subtract20Regular />
                 </NIcon>

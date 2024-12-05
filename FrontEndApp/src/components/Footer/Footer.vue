@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { NLayoutFooter, NProgress, NButton } from 'naive-ui';
+import { NLayoutFooter, NProgress, NButton, NIcon } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import { useMainStore } from '../../store/main';
 import { useNetwork } from '@vueuse/core';
 import VerseSelectorButton from './../VerseSelector.vue';
 import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
+import { PointScan24Filled } from '@vicons/fluent';
 
 const bibleStore = useBibleStore();
 const network = useNetwork();
@@ -40,9 +41,14 @@ onMounted(() => {
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
-        <div class="w-full text-center z-50 font-700">
-            <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="small">
-                {{ $t(bibleStore.getSelectedData.book) }} Chapt.
+        <div class="w-full text-center z-50 font-700 flex items-center justify-center">
+            <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
+                <template #icon>
+                    <NIcon>
+                        <PointScan24Filled />
+                    </NIcon>
+                </template>
+                {{ $t(bibleStore.getSelectedData.book) }}
                 {{ bibleStore.getSelectedData.chapter }}
             </VerseSelectorButton>
         </div>
