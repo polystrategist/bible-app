@@ -6,7 +6,7 @@ export default async () => {
             await StoreDB.schema
                 .createTable('study_spaces', function (table) {
                     table.increments('id').primary();
-                    table.string('title');
+                    table.string('title').unique();
                     table.string('description');
                     table.timestamps(true);
                 })

@@ -53,6 +53,7 @@
     }
   },
   "dependencies": {
+    "dayjs": "^1.11.13",
     "electron-dl": "^3.5.0",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",

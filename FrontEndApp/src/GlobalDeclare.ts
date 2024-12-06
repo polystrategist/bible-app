@@ -28,7 +28,11 @@ declare global {
             /**
              * Downloads Modules
              */
-            downloadModule: (args: { url?: string; urls?: Array<string>; done: () => void }) => void;
+            downloadModule: (args: {
+                url?: string;
+                urls?: Array<string>;
+                done: () => void;
+            }) => void;
 
             /**
              * Save A Bookmark
@@ -105,8 +109,24 @@ declare global {
             savePrayerItem: (args: string) => Promise<any>;
 
             updateDownloadProgress: (progress: { percentage: Function; done: Function }) => void;
-            
-            openDonateWindow: () =>void;
+
+            openDonateWindow: () => void;
+
+            /**
+             * Space Studies Events
+             */
+            getSpaceStudyList: (search: string | null | undefined) => Promise<any>;
+            storeSpaceStudy: (args: string) => Promise<{
+                data: null | {
+                    id: number;
+                    title: string;
+                    description: string;
+                    created_at: string;
+                    updated_at: string;
+                };
+                error: null | { errno: number; code: string; message: string };
+            }>;
+            deleteSpaceStudy: (args: any) => Promise<any>;
         };
     }
 }
