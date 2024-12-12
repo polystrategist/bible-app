@@ -59,5 +59,5 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Space Study Events
     getSpaceStudyList: (args: any) => ipcRenderer.invoke('getSpaceStudyList', args),
     storeSpaceStudy: (args: any) => ipcRenderer.invoke('storeSpaceStudy', JSON.parse(args)),
-    deleteSpaceStudy: (args: any) => ipcRenderer.invoke('deleteSpaceStudy', args),
+    deleteSpaceStudy: (id: number) => ipcRenderer.invoke('deleteSpaceStudy', id),
 });

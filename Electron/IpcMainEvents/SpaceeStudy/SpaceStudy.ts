@@ -45,7 +45,7 @@ export default () => {
         }
     });
 
-    ipcMain.handle('deleteSpaceStudy', async (event, args) => {
-        return await StoreDB('study_spaces').where('id', args).del();
+    ipcMain.handle('deleteSpaceStudy', async (event, id) => {
+        return await StoreDB('study_spaces').where('id', id).del();
     });
 };

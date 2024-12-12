@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { NButton, NCard, NEmpty, NModal } from 'naive-ui';
+import { NButton, NCard, NEmpty, NIcon, NModal } from 'naive-ui';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
 import { ref } from 'vue';
 import StoreStudySpaceModal from './StoreStudySpaceModal.vue';
 import { DAYJS } from '../../util/dayjs';
+import { Delete24Filled, Delete24Regular, Edit24Filled, Edit24Regular } from '@vicons/fluent';
+import { useThemeStore } from '../../store/theme';
 
+const themeStore = useThemeStore();
 const StoreStudySpaceModalRef = ref<{
     toggleModal: Function;
 }>();
@@ -39,10 +42,45 @@ function toggleCreateNewSpaceDialog() {
                         <div
                             class="absolute top-0 w-10px left-0 h-0 group-hover:h-full bg-[var(--primary-color)] transition-all opacity-50"
                         ></div>
-                        <div class="pl-20px py-10px">
-                            <h3 class="m-0">{{ StudySpace.title }}</h3>
-                            <div>{{ StudySpace.description }}</div>
-                            <small class="opacity-50">{{ DAYJS(StudySpace.updated_at).format('MMMM D, YYYY') }}</small>
+                        <div class="pl-20px pr-10px py-10px flex items-center">
+                            <div class="w-full">
+                                <h3 class="m-0">{{ StudySpace.title }}</h3>
+                                <div>{{ StudySpace.description }}</div>
+                                <small class="opacity-50">{{
+                                    DAYJS(StudySpace.updated_at).format('MMMM D, YYYY')
+                                }}</small>
+                            </div>
+                            <div>
+                                <NButton
+                                    type="warning"
+                                    quaternary
+                                    circle
+                                    @click.stop="StoreStudySpaceModalRef?.toggleModal(StudySpace)"
+                                >
+                                    <template #icon>
+                                        <NIcon>
+                                            <Edit24Filled v-if="themeStore.isDark" />
+                                            <Edit24Regular v-else />
+                                        </NIcon>
+                                    </template>
+                                </NButton>
+                                <NButton
+                                    v-show="spaceStudyStore.lists.length > 1 || true"
+                                    type="error"
+                                    quaternary
+                                    circle
+                                    @click.stop="
+                                        spaceStudyStore.deleteStudySpace(StudySpace.id as number)
+                                    "
+                                >
+                                    <template #icon>
+                                        <NIcon>
+                                            <Delete24Filled v-if="themeStore.isDark" />
+                                            <Delete24Regular v-else />
+                                        </NIcon>
+                                    </template>
+                                </NButton>
+                            </div>
                         </div>
                     </div>
                 </div>

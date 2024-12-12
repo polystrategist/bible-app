@@ -2,17 +2,15 @@
 import { NButton, NCard, NForm, NFormItem, NInput, NModal } from 'naive-ui';
 import { ref } from 'vue';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
-// import { SPACE_STUDY_SCHEMA } from '../../store/SpaceStudyStore';
 
 const spaceStudyStore = SpaceStudyStore();
 const storeStudySpaceFormRef = ref();
 const showStoreStudySpaceDialog = ref(false);
-const defaultFormTemp = {
+const storeStudySpaceForm = ref({
     id: 0,
     title: '',
     description: '',
-};
-const storeStudySpaceForm = ref(defaultFormTemp);
+});
 
 async function submit(e: MouseEvent) {
     e.preventDefault();
@@ -26,7 +24,12 @@ async function submit(e: MouseEvent) {
 
 defineExpose({
     toggleModal: (data: any) => {
-        storeStudySpaceForm.value = data ?? defaultFormTemp;
+        if (data) storeStudySpaceForm.value = data;
+        else {
+            storeStudySpaceForm.value.id = 0;
+            storeStudySpaceForm.value.title = '';
+            storeStudySpaceForm.value.description = '';
+        }
         showStoreStudySpaceDialog.value = true;
     },
 });

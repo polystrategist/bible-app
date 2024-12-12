@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import SESSION from '../util/session';
-import { useMessage } from 'naive-ui';
+import { useDialog, useMessage } from 'naive-ui';
 
 export type SPACE_STUDY_SCHEMA = {
     id: number | string | 0;
@@ -14,6 +14,7 @@ export type SPACE_STUDY_SCHEMA = {
 const selectedStudySpaceStorageKey = 'selectedStudySpaceStorageKey';
 
 export default defineStore('useSpaceStudyStore', () => {
+    const dialog = useDialog();
     const message = useMessage();
     const showSpaceStudy = ref(false);
     const lists = ref<Array<SPACE_STUDY_SCHEMA>>([]);
@@ -44,9 +45,28 @@ export default defineStore('useSpaceStudyStore', () => {
         showSpaceStudy.value = false;
     }
 
-    onBeforeMount(() => {
-        getLists();
+    async function deleteStudySpace(id: number) {
+        dialog.error({
+            title: 'Delete Study Space?',
+            content:
+                'Are you sure you want to delete this study space? Any bookmarks, clip notes, and any other data associated with this study space will also be deleted. This action cannot be undone.',
+            positiveText: 'Yes, Remove',
+            negativeText: 'Cancel',
+            onPositiveClick: async () => {
+                await window.browserWindow.deleteSpaceStudy(id);
+                message.success('Deleted Study Space');
+                await getLists();
+            },
+        });
+    }
+
+    onBeforeMount(async () => {
+        await getLists();
         selectedSpaceStudy.value = SESSION.get(selectedStudySpaceStorageKey) as SPACE_STUDY_SCHEMA;
+
+        if (!selectedSpaceStudy.value && lists.value.length === 1) {
+            selectedSpaceStudy.value = lists.value[0];
+        }
     });
 
     return {
@@ -56,5 +76,6 @@ export default defineStore('useSpaceStudyStore', () => {
         store,
         selectedSpaceStudy,
         selectStudySpace,
+        deleteStudySpace,
     };
 });

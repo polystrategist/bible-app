@@ -68,7 +68,12 @@ onBeforeMount(async () => {
                                 <BrainCircuit24Regular v-else />
                             </NIcon>
                             <div>
-                                {{ StudySpaceStore.selectedSpaceStudy?.title ?? $t('Study Space') }}
+                                {{
+                                    StudySpaceStore.lists.length &&
+                                    StudySpaceStore.selectedSpaceStudy?.title
+                                        ? StudySpaceStore.selectedSpaceStudy.title
+                                        : $t('Study Space')
+                                }}
                             </div>
                         </div>
                         <NIcon class="ml-10px">
