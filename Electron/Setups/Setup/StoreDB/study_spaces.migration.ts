@@ -9,27 +9,29 @@ export default async () => {
                     table.increments('id').primary();
                     table.string('title').unique();
                     table.string('description');
+                    table.boolean('is_selected').defaultTo(false);
                     table.timestamps(true);
                 })
                 .then();
-        } else {
-            // check if has data, if not create default data
-            const count = await StoreDB('study_spaces')
-                .count('id as rowCount')
-                .then((data) => {
-                    return data[0].rowCount;
-                });
+        }
 
-            if (count == 0) {
-                await StoreDB('study_spaces').insert([
-                    {
-                        title: 'My Study Space',
-                        description: 'My Study Space',
-                        created_at: DAYJS().utc().format(),
-                        updated_at: DAYJS().utc().format(),
-                    },
-                ]);
-            }
+        // check if has data, if not create default data
+        const count = await StoreDB('study_spaces')
+            .count('id as rowCount')
+            .then((data) => {
+                return data[0].rowCount;
+            });
+
+        if (count == 0) {
+            await StoreDB('study_spaces').insert([
+                {
+                    title: 'My Study Space',
+                    description: 'My Study Space',
+                    is_selected: true,
+                    created_at: DAYJS().utc().format(),
+                    updated_at: DAYJS().utc().format(),
+                },
+            ]);
         }
     });
 };
