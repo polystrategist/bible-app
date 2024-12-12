@@ -126,7 +126,9 @@ declare global {
                 };
                 error: null | { errno: number; code: string; message: string };
             }>;
-            deleteSpaceStudy: (id: number) => Promise<any>;
+            deleteSpaceStudy: (
+                id: number
+            ) => Promise<{ data: any; error: { message: string; [key: string]: any } }>;
         };
     }
 }

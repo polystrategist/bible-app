@@ -33,6 +33,9 @@ export default defineStore('useSpaceStudyStore', () => {
         }
 
         await getLists();
+
+        selectStudySpace(data as any);
+
         return data;
     }
 
@@ -53,11 +56,31 @@ export default defineStore('useSpaceStudyStore', () => {
             positiveText: 'Yes, Remove',
             negativeText: 'Cancel',
             onPositiveClick: async () => {
-                await window.browserWindow.deleteSpaceStudy(id);
+                const data = await window.browserWindow.deleteSpaceStudy(id);
+
+                if (data.error) {
+                    dialog.error({
+                        title: 'Unable To Delete',
+                        content: data.error.message,
+                        positiveText: 'OK',
+                    });
+                    return;
+                }
+
                 message.success('Deleted Study Space');
                 await getLists();
+
+                afterDeleteIfDeletedSelectedSelectTheFirstItemOnTheListAsDefault(id);
             },
         });
+    }
+
+    function afterDeleteIfDeletedSelectedSelectTheFirstItemOnTheListAsDefault(id: any) {
+        const SelectedInSession = SESSION.get(selectedStudySpaceStorageKey) as SPACE_STUDY_SCHEMA;
+
+        if (SelectedInSession && SelectedInSession.id === id) {
+            selectStudySpace(lists.value[0]);
+        }
     }
 
     onBeforeMount(async () => {
