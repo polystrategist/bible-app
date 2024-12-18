@@ -7,7 +7,8 @@ export default async () => {
             await StoreDB.schema
                 .createTable('clip_notes', function (table) {
                     table.increments('id').primary();
-                    table.string('key').unique();
+                    table.integer('study_space_id');
+                    table.string('key');
                     table.integer('book_number');
                     table.integer('chapter');
                     table.integer('verse');

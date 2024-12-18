@@ -6,6 +6,7 @@ export default async () => {
             await StoreDB.schema
                 .createTable('bookmarks', function (table) {
                     table.increments('id').primary();
+                    table.integer('study_space_id');
                     table.string('key').unique();
                     table.integer('book_number');
                     table.integer('chapter');

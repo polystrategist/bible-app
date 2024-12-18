@@ -14,9 +14,9 @@ export default async () => {
     // setup bookmark
     await bookmarksMigration();
 
-    // setup study space
-    await study_spacesMigration();
-
     // setup highlights
     await highlightsMigration();
+
+    // setup study space
+    await study_spacesMigration();
 };

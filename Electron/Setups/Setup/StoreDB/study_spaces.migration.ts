@@ -23,15 +23,42 @@ export default async () => {
             });
 
         if (count == 0) {
-            await StoreDB('study_spaces').insert([
-                {
-                    title: 'My Study Space',
-                    description: 'My Study Space',
-                    is_selected: true,
-                    created_at: DAYJS().utc().format(),
-                    updated_at: DAYJS().utc().format(),
-                },
-            ]);
+            // if their is no set study space, create a study space and add every bookmarks
+            // clip notes, etc, as the study space
+            const data = await StoreDB('study_spaces')
+                .insert([
+                    {
+                        title: 'My Study Space',
+                        description: 'My Study Space',
+                        is_selected: true,
+                        created_at: DAYJS().utc().format(),
+                        updated_at: DAYJS().utc().format(),
+                    },
+                ])
+                .returning('*');
+
+            const studySpaceId = data[0].id;
+
+            // set bookmarks
+            await StoreDB('bookmarks')
+                .update({
+                    study_space_id: studySpaceId,
+                })
+                .where('study_space_id', null);
+
+            // set clip notes
+            await StoreDB('clip_notes')
+                .update({
+                    study_space_id: studySpaceId,
+                })
+                .where('study_space_id', null);
+
+            // set highlights
+            await StoreDB('highlights')
+                .update({
+                    study_space_id: studySpaceId,
+                })
+                .where('study_space_id', null);
         }
     });
 };

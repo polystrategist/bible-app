@@ -17,16 +17,6 @@ export default async () => {
                 })
                 .then();
         } else {
-            // updates if table exists check if column study_space_id exists
-            await StoreDB.schema.hasColumn('prayer_lists', 'study_space_id').then(async (exists) => {
-                if (!exists) {
-                    await StoreDB.schema
-                        .table('prayer_lists', function (table) {
-                            table.integer('study_space_id').after('id');
-                        })
-                        .then();
-                }
-            });
         }
     });
 };

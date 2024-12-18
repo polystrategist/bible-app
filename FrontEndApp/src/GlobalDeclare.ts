@@ -120,15 +120,30 @@ declare global {
                 data: null | {
                     id: number;
                     title: string;
+                    is_selected: boolean | number;
                     description: string;
                     created_at: string;
                     updated_at: string;
                 };
-                error: null | { errno: number; code: string; message: string };
+                error: null | { errno?: number; code?: string; message: string };
             }>;
             deleteSpaceStudy: (
                 id: number
             ) => Promise<{ data: any; error: { message: string; [key: string]: any } }>;
+            selectStudySpace: (
+                id: number | string
+            ) => Promise<{ data: any; error: { message: string; [key: string]: any } }>;
+            getSelectedSpaceStudy: () => Promise<{
+                data: null | {
+                    id: number;
+                    title: string;
+                    is_selected: boolean | number;
+                    description: string;
+                    created_at: string;
+                    updated_at: string;
+                };
+                error: null | { errno?: number; code?: string; message: string };
+            }>;
         };
     }
 }

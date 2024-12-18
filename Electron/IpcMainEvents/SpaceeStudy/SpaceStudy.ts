@@ -2,6 +2,13 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { StoreDB } from '../../DataBase/DataBase';
 import { DAYJS } from '../../util/dayjs';
 
+export async function getSelectedSpaceStudy() {
+    return await StoreDB.select('*')
+        .from('study_spaces')
+        .where('is_selected', true)
+        .first()
+}
+
 export default () => {
     ipcMain.handle('getSpaceStudyList', async (event, args) => {
         return await StoreDB.select('*')
@@ -70,6 +77,37 @@ export default () => {
 
         return {
             data: await StoreDB('study_spaces').where('id', id).del(),
+            error: null,
+        };
+    });
+
+    ipcMain.handle('selectStudySpace', async (event, id) => {
+        try {
+            await StoreDB('study_spaces').whereNot('id', id).update({ is_selected: false });
+            const updatedData = await StoreDB('study_spaces')
+                .where('id', id)
+                .update({ is_selected: true })
+                .returning('*');
+
+            return {
+                data: updatedData[0],
+                error: null,
+            };
+        } catch (e: any) {
+            return {
+                error: {
+                    message: e.message,
+                },
+                data: null,
+            };
+        }
+    });
+
+    ipcMain.handle('getSelectedSpaceStudy', async (event) => {
+        const data = await getSelectedSpaceStudy();
+
+        return {
+            data,
             error: null,
         };
     });

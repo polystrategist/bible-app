@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { onBeforeMount, onMounted, ref } from 'vue';
-import SESSION from '../util/session';
 import { useDialog, useMessage } from 'naive-ui';
+import { useClipNoteStore } from './ClipNotes';
+import { useBibleStore } from './BibleStore';
+import { useBookmarkStore } from './bookmark';
 
 export type SPACE_STUDY_SCHEMA = {
     id: number | string | 0;
@@ -11,9 +13,10 @@ export type SPACE_STUDY_SCHEMA = {
     updated_at?: string;
 };
 
-const selectedStudySpaceStorageKey = 'selectedStudySpaceStorageKey';
-
 export default defineStore('useSpaceStudyStore', () => {
+    const bookmarkStore = useBookmarkStore();
+    const bibleStore = useBibleStore();
+    const clipNoteStore = useClipNoteStore();
     const dialog = useDialog();
     const message = useMessage();
     const showSpaceStudy = ref(false);
@@ -39,10 +42,22 @@ export default defineStore('useSpaceStudyStore', () => {
         return data;
     }
 
-    function selectStudySpace(args: SPACE_STUDY_SCHEMA) {
-        selectedSpaceStudy.value = args;
+    async function selectStudySpace(args: SPACE_STUDY_SCHEMA) {
+        const id = args.id;
 
-        SESSION.set(selectedStudySpaceStorageKey, args);
+        // update the database
+        await window.browserWindow.selectStudySpace(id);
+
+        // refresh the clip notes
+        await clipNoteStore.getClipNotes();
+
+        // refresh the highlights
+        await bibleStore.getHighlights();
+
+        // refresh bookmarks
+        await bookmarkStore.getBookmarks();
+
+        selectedSpaceStudy.value = args;
 
         message.success('Study Space Selected');
         showSpaceStudy.value = false;
@@ -76,20 +91,19 @@ export default defineStore('useSpaceStudyStore', () => {
     }
 
     function afterDeleteIfDeletedSelectedSelectTheFirstItemOnTheListAsDefault(id: any) {
-        const SelectedInSession = SESSION.get(selectedStudySpaceStorageKey) as SPACE_STUDY_SCHEMA;
+        selectStudySpace(lists.value[0]);
+    }
 
-        if (SelectedInSession && SelectedInSession.id === id) {
-            selectStudySpace(lists.value[0]);
-        }
+    async function getSelectedSpaceStudy() {
+        const { data, error } = await window.browserWindow.getSelectedSpaceStudy();
+        return data;
     }
 
     onBeforeMount(async () => {
         await getLists();
-        selectedSpaceStudy.value = SESSION.get(selectedStudySpaceStorageKey) as SPACE_STUDY_SCHEMA;
 
-        if (!selectedSpaceStudy.value && lists.value.length === 1) {
-            selectedSpaceStudy.value = lists.value[0];
-        }
+        const savedSelectedSpace = await getSelectedSpaceStudy();
+        selectedSpaceStudy.value = savedSelectedSpace;
     });
 
     return {
