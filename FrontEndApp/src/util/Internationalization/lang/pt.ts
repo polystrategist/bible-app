@@ -156,5 +156,6 @@ const message: InternationalMessageType = {
     color: 'cor',
     theme: 'tema',
     Donate: 'Doar',
+    'Study Space': 'Estudo',
 };
 export default message;

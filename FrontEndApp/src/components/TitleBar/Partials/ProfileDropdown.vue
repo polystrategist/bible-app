@@ -80,7 +80,7 @@ function handleSelect(key: string | number) {
 
 <template>
     <NDropdown v-if="userStore.user" :options="options" size="small" @select="handleSelect">
-        <NButton round size="tiny" tertiary>
+        <NButton round size="tiny" quaternary>
             <template #icon>
                 <NIcon>
                     <UserIcon />
@@ -89,7 +89,7 @@ function handleSelect(key: string | number) {
             Account
         </NButton>
     </NDropdown>
-    <NButton v-else round size="tiny" tertiary @click="menuStore.setMenu('/profile')">
+    <NButton v-else round size="tiny" quaternary @click="menuStore.setMenu('/profile')">
         <template #icon>
             <NIcon>
                 <Login />

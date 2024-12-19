@@ -61,13 +61,10 @@ function selectVerse(verse: number) {
 }
 </script>
 <template>
-    <NButton
-        @click="showOuter = true"
-        :quaternary="props.quaternary"
-        :size="props.size"
-        :circle="props.circle"
-        :title="title"
-    >
+    <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size" :circle="props.circle" :title="title">
+        <template #icon>
+            <slot name="icon" />
+        </template>
         <slot />
     </NButton>
     <NModal v-model:show="showOuter">
@@ -78,7 +75,7 @@ function selectVerse(verse: number) {
                         v-show="book.deuterocanonical === false || (book.deuterocanonical && settings.showDeuterocanonical)"
                         class="justify-start"
                         @click="selectBook(book)"
-                        size="large"
+                        secondary
                     >
                         {{ $t(book.title) }}
                     </NButton>
@@ -88,23 +85,18 @@ function selectVerse(verse: number) {
         </NCard>
     </NModal>
     <NModal v-model:show="showSelectChapterDrawer">
-        <NCard style="width: 600px" title="Select Chapter" class="my-30px">
+        <NCard style="width: 500px" title="Select Chapter" class="my-30px">
             <div class="flex flex-wrap gap-2">
-                <NButton
-                    v-for="chapter in selectedBook?.chapter_count"
-                    :key="chapter"
-                    @click="selectChapter(chapter)"
-                    size="large"
-                >
+                <NButton v-for="chapter in selectedBook?.chapter_count" secondary :key="chapter" @click="selectChapter(chapter)">
                     {{ chapter }}
                 </NButton>
             </div>
         </NCard>
     </NModal>
     <NModal v-model:show="showSelectVerseDrawer">
-        <NCard style="width: 600px" title="Select Verse" class="my-30px">
+        <NCard style="width: 700px" title="Select Verse" class="my-30px">
             <div class="flex flex-wrap gap-3">
-                <NButton v-for="verse in numberOfVerses" :key="verse" @click="selectVerse(verse)" size="large">
+                <NButton v-for="verse in numberOfVerses" secondary :key="verse" @click="selectVerse(verse)">
                     {{ verse }}
                 </NButton>
             </div>

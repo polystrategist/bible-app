@@ -39,6 +39,7 @@
         "@vueuse/core": "^10.3.0",
         "axios": "^1.5.0",
         "dayjs": "^1.11.13",
+        "intro.js": "^7.2.0",
         "notiflix": "^3.2.6",
         "pinia": "^2.1.6",
         "prosemirror-commands": "^1.5.0",

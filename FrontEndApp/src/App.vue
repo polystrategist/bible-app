@@ -25,6 +25,7 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { isSignedIn } from './util/SupaBase/Auth/Auth';
 import { useUserStore } from './store/userStore';
+import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
 
 const userStore = useUserStore();
 const isMenuCollapse = 'is-menu-collapse';
@@ -45,7 +46,8 @@ onBeforeMount(async () => {
     if (savedLocale) locale.value = savedLocale;
 
     const isCollapseSideMenu = SESSION.get(isMenuCollapse);
-    isSideBarCollapse.value = isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
+    isSideBarCollapse.value =
+        isCollapseSideMenu || typeof isCollapseSideMenu == 'boolean' ? isCollapseSideMenu : true;
 });
 
 onMounted(async () => {
@@ -54,13 +56,16 @@ onMounted(async () => {
 });
 </script>
 <template>
-    <NConfigProvider :theme-overrides="themeStore.themeOverrides" :theme="themeStore.isDark ? darkTheme : null">
+    <NConfigProvider
+        :theme-overrides="themeStore.themeOverrides"
+        :theme="themeStore.isDark ? darkTheme : null"
+    >
         <NDialogProvider>
             <NNotificationProvider>
                 <NMessageProvider>
                     <NLayout class="h-[100vh]">
-                        <TitleBar class="h-40px" />
-                        <NLayout class="h-[calc(100%-80px)]" has-sider>
+                        <TitleBar class="h-30px" />
+                        <NLayout class="h-[calc(100%-60px)]" has-sider>
                             <NLayoutSider
                                 bordered
                                 :collapsed="isSideBarCollapse"
@@ -85,11 +90,15 @@ onMounted(async () => {
                                         :indent="15"
                                         :options="
                                             menuStore.menuUpperTabs
-                                                .filter((item) => menuStore.enableTab.includes(item.key))
+                                                .filter((item) =>
+                                                    menuStore.enableTab.includes(item.key)
+                                                )
                                                 .map((item) => ({
                                                     label: $t(item.label),
                                                     key: item.key,
-                                                    icon: themeStore.isDark ? item.iconDark : item.icon,
+                                                    icon: themeStore.isDark
+                                                        ? item.iconDark
+                                                        : item.icon,
                                                 }))
                                         "
                                     />
@@ -113,18 +122,29 @@ onMounted(async () => {
                                 </div>
                             </NLayoutSider>
                             <NLayout class="h-full">
-                                <ReadBible v-show="menuStore.isRouter == false && menuStore.menuSelected == 'read-bible'" />
-                                <Sermons v-show="menuStore.isRouter == false && menuStore.menuSelected == 'sermons'" />
+                                <ReadBible
+                                    v-show="
+                                        menuStore.isRouter == false &&
+                                        menuStore.menuSelected == 'read-bible'
+                                    "
+                                />
+                                <Sermons
+                                    v-show="
+                                        menuStore.isRouter == false &&
+                                        menuStore.menuSelected == 'sermons'
+                                    "
+                                />
                                 <div class="h-[100%]" v-show="menuStore.isRouter == true">
                                     <RouterView />
                                 </div>
                             </NLayout>
                         </NLayout>
-                        <FooterComponent class="h-40px" />
+                        <FooterComponent class="h-30px" size="tiny" />
                     </NLayout>
                     <DownloadBible />
                     <AboutModal />
                     <SettingsModal />
+                    <SelectStudySpaceModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>

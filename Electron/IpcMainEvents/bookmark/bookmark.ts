@@ -3,8 +3,12 @@ import { bookmarkStore } from '../../ElectronStore/bookmarkStore';
 import { isNightly } from '../../config';
 import UPath from 'upath';
 import knex from 'knex';
+import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 
-const dataPath = UPath.join(app.getPath('appData'), !isNightly ? 'believers-sword' : 'believers-sword-nightly');
+const dataPath = UPath.join(
+    app.getPath('appData'),
+    !isNightly ? 'believers-sword' : 'believers-sword-nightly'
+);
 const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 const StoreDB = knex({
     client: 'sqlite3',
@@ -26,7 +30,11 @@ const saveVersesInBookmark = async ({
     version: Array<any> | null | undefined;
 }) => {
     try {
-        const existingBookmark = await StoreDB('bookmarks').where({ book_number, chapter, verse }).first();
+        const selectedSpaceStudy = await getSelectedSpaceStudy();
+
+        const existingBookmark = await StoreDB('bookmarks')
+            .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
+            .first();
 
         if (!existingBookmark) {
             await StoreDB('bookmarks').insert({
@@ -34,6 +42,7 @@ const saveVersesInBookmark = async ({
                 book_number,
                 chapter,
                 verse,
+                study_space_id: selectedSpaceStudy.id,
                 updated_at: new Date(),
                 created_at: new Date(),
             });
@@ -47,7 +56,11 @@ const saveVersesInBookmark = async ({
 
 const getVersesSavedBookmarks = async () => {
     try {
-        const data = await StoreDB('bookmarks').select();
+        const selectedSpaceStudy = await getSelectedSpaceStudy();
+
+        const data = await StoreDB('bookmarks')
+            .select()
+            .where('study_space_id', selectedSpaceStudy.id);
 
         const result: any = {};
         for (const item of data) {

@@ -7,6 +7,7 @@ import PrayerList from './PrayerList/PrayerList';
 import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
+import SpaceStudy from './SpaceeStudy/SpaceStudy';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -32,4 +33,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // window opener events
     WindowOpenerIpcEvents(BrowserWindow);
+
+    // space study events
+    SpaceStudy();
 };

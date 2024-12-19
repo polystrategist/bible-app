@@ -24,7 +24,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     deleteBookmark: (args: any) => ipcRenderer.invoke('delete-bookmark', JSON.parse(args)),
 
     // Highlights
-    getChapterHighlights: (args: any) => ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
+    getChapterHighlights: (args: any) =>
+        ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
     getHighlights: (args: any) => ipcRenderer.invoke('getHighLights', JSON.parse(args)),
     saveHighlight: (args: any) => ipcRenderer.invoke('saveHighlight', JSON.parse(args)),
 
@@ -32,12 +33,14 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getClipNotes: (args: any) => ipcRenderer.invoke('getClipNotes', JSON.parse(args)),
     storeClipNote: (args: any) => ipcRenderer.invoke('storeClipNote', JSON.parse(args)),
     getChapterClipNotes: (args: any) => ipcRenderer.invoke('getChapterClipNotes', JSON.parse(args)),
-    deleteChapterClipNotes: (args: any) => ipcRenderer.invoke('deleteChapterClipNotes', JSON.parse(args)),
+    deleteChapterClipNotes: (args: any) =>
+        ipcRenderer.invoke('deleteChapterClipNotes', JSON.parse(args)),
 
     // Prayer List
     getPrayerLists: () => ipcRenderer.invoke('getPrayerLists'),
     savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
-    resetPrayerListItems: (args: any) => ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
+    resetPrayerListItems: (args: any) =>
+        ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
     updateDownloadProgress: (progress: { percentage: Function; done: Function }) => {
         // Listen for the event from the main process
@@ -50,8 +53,13 @@ contextBridge.exposeInMainWorld('browserWindow', {
         });
     },
 
-
-
     // WINDOW OPENERS
     openDonateWindow: () => ipcRenderer.invoke('open-donate-window'),
+
+    // Space Study Events
+    getSpaceStudyList: (args: any) => ipcRenderer.invoke('getSpaceStudyList', args),
+    storeSpaceStudy: (args: any) => ipcRenderer.invoke('storeSpaceStudy', JSON.parse(args)),
+    deleteSpaceStudy: (id: number) => ipcRenderer.invoke('deleteSpaceStudy', id),
+    selectStudySpace: (id: number | string) => ipcRenderer.invoke('selectStudySpace', id),
+    getSelectedSpaceStudy: () => ipcRenderer.invoke('getSelectedSpaceStudy'),
 });
