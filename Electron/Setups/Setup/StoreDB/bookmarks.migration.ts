@@ -7,7 +7,7 @@ export default async () => {
                 .createTable('bookmarks', function (table) {
                     table.increments('id').primary();
                     table.integer('study_space_id');
-                    table.string('key').unique();
+                    table.string('key');
                     table.integer('book_number');
                     table.integer('chapter');
                     table.integer('verse');
@@ -25,6 +25,8 @@ export default async () => {
                         .then();
                 }
             });
+
+            // 
         }
     });
 };

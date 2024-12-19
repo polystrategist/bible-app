@@ -3,6 +3,7 @@ import knex from 'knex';
 import { isNightly } from '../../config';
 import UPath from 'upath';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
+import { updateOrCreate } from '../../DataBase/DataBase';
 
 const dataPath = UPath.join(
     app.getPath('appData'),
@@ -67,10 +68,17 @@ export default () => {
             }
         ) => {
             try {
+                const selectedSpaceStudy = await getSelectedSpaceStudy();
+
                 const key = `key_${book_number}_${chapter}_${verse}`;
-                await StoreDB('clip_notes')
-                    .insert({
+
+                const result = await updateOrCreate(
+                    'clip_notes',
+                    {
                         key,
+                        study_space_id: selectedSpaceStudy.id,
+                    },
+                    {
                         book_number,
                         chapter,
                         verse,
@@ -78,11 +86,13 @@ export default () => {
                         color,
                         updated_at: new Date(),
                         created_at: new Date(),
-                    })
-                    .onConflict('key')
-                    .merge();
+                    }
+                );
 
-                return StoreDB('clip_notes').where('key', key).first();
+                return StoreDB('clip_notes')
+                    .where('key', key)
+                    .where('study_space_id', selectedSpaceStudy.id)
+                    .first();
             } catch (e) {
                 console.log(e);
             }

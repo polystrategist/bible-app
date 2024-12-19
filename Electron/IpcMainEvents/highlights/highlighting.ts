@@ -3,6 +3,7 @@ import { isNightly } from './../../config';
 import { app, ipcMain } from 'electron';
 import knex from 'knex';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
+import { updateOrCreate } from '../../DataBase/DataBase';
 
 export type GetVerseArgs = {
     bible_versions: Array<string>;
@@ -97,17 +98,20 @@ export default () => {
             try {
                 if (content.includes('HasHighlightSpan')) {
                     const selectedSpaceStudy = await getSelectedSpaceStudy();
-                    await StoreDB('highlights')
-                        .insert({
+
+                    const result = await updateOrCreate(
+                        'highlights',
+                        {
                             key,
+                            study_space_id: selectedSpaceStudy.id,
+                        },
+                        {
                             book_number,
                             chapter,
                             verse,
                             content,
-                            study_space_id: selectedSpaceStudy.id,
-                        })
-                        .onConflict(['key', 'study_space_id'])
-                        .merge();
+                        }
+                    );
                 } else {
                     await StoreDB('highlights').where('key', key).del();
                 }
