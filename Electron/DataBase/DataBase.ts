@@ -40,3 +40,42 @@ export async function updateOrCreate(
         throw error;
     }
 }
+
+export async function removeUniqueConstraint(tableName: string, columnName: string) {
+    try {
+        // Check for unique constraint using PRAGMA
+        const constraints = await StoreDB.raw(`PRAGMA index_list('${tableName}')`);
+        const uniqueIndexes = constraints.filter((index: any) => index.unique);
+
+        // Find if the column is part of a unique index
+        let uniqueIndexName = null;
+        for (const index of uniqueIndexes) {
+            const indexInfo = await StoreDB.raw(`PRAGMA index_info('${index.name}')`);
+            const columns = indexInfo.map((info: any) => info.name);
+            if (columns.includes(columnName)) {
+                uniqueIndexName = index.name;
+                break;
+            }
+        }
+
+        if (uniqueIndexName) {
+            console.log(
+                `The '${columnName}' column in table '${tableName}' has a unique constraint. Dropping it.`
+            );
+            await StoreDB.schema.alterTable(tableName, (table) => {
+                table.dropUnique([columnName, uniqueIndexName]);
+            });
+            console.log(
+                `Unique constraint removed from the '${columnName}' column in table '${tableName}'.`
+            );
+        } else {
+            console.log(
+                `The '${columnName}' column in table '${tableName}' does not have a unique constraint. Skipping.`
+            );
+        }
+    } catch (error: any) {
+        console.error(`Error checking or removing unique constraint: ${error.message}`);
+    } finally {
+        // await StoreDB.destroy(); // Close the database connection
+    }
+}

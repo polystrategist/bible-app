@@ -1,4 +1,4 @@
-import { StoreDB } from '../../../DataBase/DataBase';
+import { removeUniqueConstraint, StoreDB } from '../../../DataBase/DataBase';
 
 export default async () => {
     await StoreDB.schema.hasTable('clip_notes').then(async (exists) => {
@@ -18,9 +18,10 @@ export default async () => {
                 })
                 .then();
         } else {
+            await removeUniqueConstraint('clip_notes', 'key');
+
             // updates if table exists check if column study_space_id exists
             await StoreDB.schema.hasColumn('clip_notes', 'study_space_id').then(async (exists) => {
-
                 if (!exists) {
                     console.log('ada met kanu ti study_space_id');
                     await StoreDB.schema
