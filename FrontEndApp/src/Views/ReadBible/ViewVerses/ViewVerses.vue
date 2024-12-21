@@ -34,7 +34,9 @@ const { x, y } = useMouse();
 const message = useMessage();
 const createClipNoteRef = ref<null | { toggleClipNoteModal: Function }>(null);
 const clipNoteRender: any = (key: any) => {
-    return (clipNoteStore.chapterClipNotes as any)[key] ? (clipNoteStore.chapterClipNotes as any)[key] : false;
+    return (clipNoteStore.chapterClipNotes as any)[key]
+        ? (clipNoteStore.chapterClipNotes as any)[key]
+        : false;
 };
 
 watch(
@@ -46,9 +48,12 @@ watch(
 
 function navigateChapter(action: 'next' | 'before') {
     if (action == 'before' && bibleStore.selectedChapter == 1) return;
-    if (action == 'next' && bibleStore.selectedChapter == bibleStore.selectedBook.chapter_count) return;
+    if (action == 'next' && bibleStore.selectedChapter == bibleStore.selectedBook.chapter_count)
+        return;
 
-    bibleStore.selectChapter(action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1);
+    bibleStore.selectChapter(
+        action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1
+    );
 }
 
 function clickContextMenu(verse: Object) {
@@ -92,7 +97,9 @@ function checkHere(this: HTMLElement): void {
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
     dialog.warning({
         title: t('Confirm'),
-        content: t('Are You Sure You want to remove? If you delete this clip note, you will not be able to undo it!'),
+        content: t(
+            'Are You Sure You want to remove? If you delete this clip note, you will not be able to undo it!'
+        ),
         positiveText: t('Yes'),
         negativeText: t('No'),
         onPositiveClick: async () => {
@@ -177,11 +184,17 @@ onMounted(() => {
                     {{ fontSize }}
                 </div>
                 <VerseSelector circle>
-                    <NIcon size="25" :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular" />
+                    <NIcon
+                        size="25"
+                        :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular"
+                    />
                 </VerseSelector>
             </div>
             <div>
-                <div class="flex items-center hover:text-[var(--primary-color)] cursor-pointer" @click="navigateChapter('next')">
+                <div
+                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer"
+                    @click="navigateChapter('next')"
+                >
                     <span>{{ $t('Next') }}</span>
                     <NIcon :component="FastForward20Regular" size="20" />
                 </div>
@@ -189,7 +202,7 @@ onMounted(() => {
         </div>
         <div
             id="view-verses-container"
-            class="w-full h-[calc(100%-30px)] scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div"
+            class="w-full h-[calc(100%-70px)] scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div pb-20px"
         >
             <div
                 v-if="
@@ -199,28 +212,45 @@ onMounted(() => {
                 "
                 class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 bg-white z-9 py-2"
             >
-                <div v-for="version in bibleStore.renderVerses[0].version" :key="version.key" class="w-full text-center">
-                    <div class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none font-700">
+                <div
+                    v-for="version in bibleStore.renderVerses[0].version"
+                    :key="version.key"
+                    class="w-full text-center"
+                >
+                    <div
+                        class="opacity-80 dark:opacity-80 text-[var(--primary-color)] select-none font-700"
+                    >
                         {{ version.version.replace('.SQLite3', '') }}
                     </div>
                 </div>
             </div>
-            <div v-for="verse in bibleStore.renderVerses" :key="verse.verse" class="flex flex-col w-full max-w-1200px mx-auto">
+            <div
+                v-for="verse in bibleStore.renderVerses"
+                :key="verse.verse"
+                class="flex flex-col w-full max-w-1200px mx-auto"
+            >
                 <div class="mx-10px">
                     <div
                         :id="verse.verse == bibleStore.selectedVerse ? 'the-selected-verse' : ''"
                         :class="{
-                            'dark:bg-opacity-5 dark:bg-light-100': verse.verse == bibleStore.selectedVerse,
-                            'rounded-t-md': clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`),
+                            'dark:bg-opacity-5 dark:bg-light-100':
+                                verse.verse == bibleStore.selectedVerse,
+                            'rounded-t-md': clipNoteRender(
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                            ),
                         }"
                         :data-book="verse.book_number"
                         :data-chapter="verse.chapter"
                         :data-verse="verse.verse"
                         :style="`border: 1px solid ${
-                            clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                            clipNoteRender(
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                            ).color
                         }`"
                         class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5 relative"
-                        @click="bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)"
+                        @click="
+                            bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)
+                        "
                         @contextmenu="clickContextMenu(verse)"
                     >
                         <div
@@ -236,7 +266,11 @@ onMounted(() => {
                                 {{ verse.verse }}
                             </span>
                             <div
-                                v-show="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
+                                v-show="
+                                    bookmarkStore.isBookmarkExists(
+                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                    )
+                                "
                                 title="This is Bookmarked"
                             >
                                 <NIcon size="20">
@@ -244,7 +278,10 @@ onMounted(() => {
                                 </NIcon>
                             </div>
                         </div>
-                        <div class="flex flex-row gap-3 w-full" :class="{ '!flex-col': verse.version.length > 3 }">
+                        <div
+                            class="flex flex-row gap-3 w-full"
+                            :class="{ '!flex-col': verse.version.length > 3 }"
+                        >
                             <div v-for="version in verse.version" :key="version.key" class="w-full">
                                 <div
                                     v-if="verse.version.length > 3"
@@ -254,7 +291,10 @@ onMounted(() => {
                                     {{ version.version.replace('.SQLite3', '') }}
                                 </div>
                                 <div :style="`font-size:${fontSize}px`">
-                                    <span v-show="verse.version.length <= 3" class="font-bold select-none italic">
+                                    <span
+                                        v-show="verse.version.length <= 3"
+                                        class="font-bold select-none italic"
+                                    >
                                         {{ verse.verse }}.
                                     </span>
                                     <span
@@ -274,24 +314,39 @@ onMounted(() => {
                         </div>
                     </div>
                     <div
-                        v-if="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)"
-                        :style="`background: ${clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`"
+                        v-if="
+                            clipNoteRender(
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                            )
+                        "
+                        :style="`background: ${
+                            clipNoteRender(
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                            ).color
+                        }`"
                         class="prose-mirror-render-html relative text-dark-900 rounded-b-md mb-3"
                     >
-                        <NIcon class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600" size="30">
+                        <NIcon
+                            class="absolute -top-16px left-1 transform rotate-45 dark:text-gray-600"
+                            size="30"
+                        >
                             <Attachment />
                         </NIcon>
                         <div class="absolute flex gap-2 -top-5 right-3">
                             <NButton
                                 class="shadow-md"
                                 :style="`background: ${
-                                    clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                                    clipNoteRender(
+                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                    ).color
                                 }`"
                                 size="small"
                                 @click="
                                     createClipNoteRef &&
                                         createClipNoteRef.toggleClipNoteModal(
-                                            clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`)
+                                            clipNoteRender(
+                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                            )
                                         )
                                 "
                                 title="Edit"
@@ -303,7 +358,9 @@ onMounted(() => {
                             <NButton
                                 class="shadow-md"
                                 :style="`background: ${
-                                    clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).color
+                                    clipNoteRender(
+                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                    ).color
                                 }`"
                                 size="small"
                                 @click="
@@ -323,7 +380,11 @@ onMounted(() => {
                         <div
                             :style="`font-size:${fontSize - 1}px`"
                             class="px-10px pb-1 view-verse-rendered-clip-note"
-                            v-html="clipNoteRender(`key_${verse.book_number}_${verse.chapter}_${verse.verse}`).content"
+                            v-html="
+                                clipNoteRender(
+                                    `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                ).content
+                            "
                         ></div>
                     </div>
                 </div>
@@ -335,9 +396,16 @@ onMounted(() => {
             :x="contextMenuPositionX"
             :y="contextMenuPositionY"
             @close="showContextMenu = false"
-            @create-clip-note="(data) => (createClipNoteRef ? createClipNoteRef.toggleClipNoteModal(data) : false)"
+            @create-clip-note="
+                (data) => (createClipNoteRef ? createClipNoteRef.toggleClipNoteModal(data) : false)
+            "
         />
-        <NPopover :show="showPopOver" :x="contextMenuPositionX" :y="contextMenuPositionY" trigger="click">
+        <NPopover
+            :show="showPopOver"
+            :x="contextMenuPositionX"
+            :y="contextMenuPositionY"
+            trigger="click"
+        >
             <div id="buttons" class="flex items-center gap-10px">
                 <HighlightOptions @setHighlight="showPopOver = false" />
                 <NButton round size="small" strong title="Copy" @click="copyText">

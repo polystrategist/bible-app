@@ -1,5 +1,6 @@
 .splitpanes__splitter {
     position: relative;
+    user-select: none;
 }
 .splitpanes__splitter:before {
     content: '';
@@ -22,5 +23,69 @@
 .splitpanes--horizontal > .splitpanes__splitter:before {
     top: -3px;
     bottom: -3px;
-    width: 10px;
+    height: 10px;
+    width: 100%;
+}
+
+.splitpanes_show_bar {
+    &.splitpanes--horizontal > .splitpanes__splitter {
+        height: 7px;
+        border-top: 1px solid #dfdfdf;
+        background-color: #dfdfdf;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: #a9a9a9;
+            -webkit-transition: background-color 0.3s;
+            -o-transition: background-color 0.3s;
+            transition: background-color 0.3s;
+            margin-top: -2px;
+            -webkit-transform: translateX(-50%);
+            -ms-transform: translateX(-50%);
+            transform: translate(-50%);
+            width: 30px;
+            height: 1px;
+            opacity: 1;
+            margin-top: -1px;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-color: #a9a9a9;
+            -webkit-transition: background-color 0.3s;
+            -o-transition: background-color 0.3s;
+            transition: background-color 0.3s;
+            margin-top: -2px;
+            -webkit-transform: translateX(-50%);
+            -ms-transform: translateX(-50%);
+            transform: translate(-50%);
+            width: 30px;
+            height: 1px;
+            opacity: 1;
+            margin-top: 1px;
+        }
+    }
+}
+
+.dark {
+    .splitpanes_show_bar {
+        &.splitpanes--horizontal > .splitpanes__splitter {
+            border-top: 1px solid #323232;
+            background-color: #323232;
+
+            &::before {
+                background-color: #9c9c9c;
+            }
+
+            &::after {
+                background-color: #9c9c9c;
+            }
+        }
+    }
 }
