@@ -17,8 +17,8 @@ const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
 ]);
 
 const verseViewPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
-    { min: 30, max: 100, size: 50 },
-    { min: 0, max: 70, size: 50 },
+    { min: 30, max: 100, size: 70 },
+    { min: 0, max: 70, size: 30 },
 ]);
 
 function changeSize(sizes: Array<any>) {
