@@ -46,6 +46,10 @@ const props = defineProps({
         type: [String],
         default: '',
     },
+    overflow: {
+        type: Boolean,
+        default: false,
+    },
     buttonActions: {
         type: Array,
         default: [
@@ -114,7 +118,7 @@ function toggleHeading(level: number | any) {
 </script>
 
 <template>
-    <div>
+    <div :class="{'flex flex-col h-full': overflow}">
         <div v-if="editor" class="editor-buttons">
             <NPopselect
                 trigger="click"
@@ -337,6 +341,6 @@ function toggleHeading(level: number | any) {
                 </NIcon>
             </NButton>
         </div>
-        <EditorContent v-if="editor" :editor="editor" />
+        <EditorContent :class="{'overflow-auto overflowing-div': overflow}" v-if="editor" :editor="editor" />
     </div>
 </template>

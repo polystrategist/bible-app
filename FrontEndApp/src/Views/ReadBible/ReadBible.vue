@@ -6,6 +6,7 @@ import LeftSideBar from './LeftSideBar/LeftSideBar.vue';
 import RightSideBar from './RightSideBar/RightSideBar.vue';
 import ViewVerses from './ViewVerses/ViewVerses.vue';
 import Editor from '../../components/Editor/Editor.vue';
+import TakeNote from './TakeNote/TakeNote.vue';
 
 const storageReadBibleSavedSplitPaneSizes = 'storageReadBibleSavedSplitPaneSizes';
 const storageViewVerseSplitPaneSizes = 'storageViewVerseSplitPaneSizes';
@@ -18,7 +19,7 @@ const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
 
 const verseViewPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 30, max: 100, size: 70 },
-    { min: 0, max: 70, size: 30 },
+    { min: 20, max: 70, size: 30 },
 ]);
 
 function changeSize(sizes: Array<any>) {
@@ -58,14 +59,12 @@ onBeforeMount(() => {
                     <ViewVerses />
                 </Pane>
                 <Pane
-                    class="bg-gray-100 dark:bg-dark-600 relative"
+                    class="bg-gray-100 dark:bg-dark-600 relative !overflow-auto"
                     :size="verseViewPaneSizes[1].size"
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"
                 >
-                    <div class="p-2">
-                        <Editor />
-                    </div>
+                    <TakeNote />
                 </Pane>
             </Splitpanes>
         </Pane>
