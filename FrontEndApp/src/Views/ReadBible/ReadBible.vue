@@ -7,9 +7,11 @@ import RightSideBar from './RightSideBar/RightSideBar.vue';
 import ViewVerses from './ViewVerses/ViewVerses.vue';
 import Editor from '../../components/Editor/Editor.vue';
 import TakeNote from './TakeNote/TakeNote.vue';
+import useNoteStore from '../../store/useNoteStore';
 
 const storageReadBibleSavedSplitPaneSizes = 'storageReadBibleSavedSplitPaneSizes';
 const storageViewVerseSplitPaneSizes = 'storageViewVerseSplitPaneSizes';
+const noteStore = useNoteStore();
 
 const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 15, max: 30, size: 20 },
@@ -18,8 +20,8 @@ const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
 ]);
 
 const verseViewPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
-    { min: 30, max: 100, size: 70 },
-    { min: 20, max: 70, size: 30 },
+    { min: 30, max: 100, size: 50 },
+    { min: 20, max: 70, size: 50 },
 ]);
 
 function changeSize(sizes: Array<any>) {
@@ -27,6 +29,12 @@ function changeSize(sizes: Array<any>) {
 }
 
 function changeViewVerseSize(sizes: Array<any>) {
+    if (sizes[1].size === 0 || sizes[0].size === 100) {
+        return;
+    }
+
+    // don't save if note is not open
+    verseViewPaneSizes.value = sizes;
     SESSION.set(storageViewVerseSplitPaneSizes, sizes);
 }
 
@@ -55,12 +63,15 @@ onBeforeMount(() => {
                 class="h-full w-full splitpanes_show_bar"
                 @resized="changeViewVerseSize"
             >
-                <Pane :min-size="30">
+                <Pane
+                    :min-size="noteStore.showNote ? 30 : 100"
+                    :size="noteStore.showNote ? verseViewPaneSizes[0].size : 100"
+                >
                     <ViewVerses />
                 </Pane>
                 <Pane
                     class="bg-gray-100 dark:bg-dark-600 relative !overflow-auto"
-                    :size="verseViewPaneSizes[1].size"
+                    :size="noteStore.showNote ? verseViewPaneSizes[1].size : 0"
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"
                 >

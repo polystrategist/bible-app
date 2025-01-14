@@ -6,8 +6,12 @@ import { useNetwork } from '@vueuse/core';
 import VerseSelectorButton from './../VerseSelector.vue';
 import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
-import { PointScan24Filled } from '@vicons/fluent';
+import { Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
+import useNoteStore from '../../store/useNoteStore';
+import { useThemeStore } from '../../store/theme';
 
+const themeStore = useThemeStore();
+const noteStore = useNoteStore();
 const bibleStore = useBibleStore();
 const network = useNetwork();
 const mainStore = useMainStore();
@@ -34,10 +38,20 @@ onMounted(() => {
     if (network.isSupported) {
     } else {
     }
+
+    document.addEventListener('keydown', function (event) {
+        // Check if Control, Shift, and N are pressed together
+        if (event.ctrlKey && event.shiftKey && event.key === 'N') {
+            noteStore.showNote = !noteStore.showNote;
+        }
+    });
 });
 </script>
 <template>
-    <NLayoutFooter bordered class="flex cursor-default select-none items-center pl-8px light:bg-white">
+    <NLayoutFooter
+        bordered
+        class="flex cursor-default select-none items-center pl-8px light:bg-white"
+    >
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
@@ -51,6 +65,21 @@ onMounted(() => {
                 {{ $t(bibleStore.getSelectedData.book) }}
                 {{ bibleStore.getSelectedData.chapter }}
             </VerseSelectorButton>
+            <NButton
+                secondary
+                size="tiny"
+                @click="noteStore.showNote = !noteStore.showNote"
+                :type="noteStore.showNote ? 'primary' : 'default'"
+                title="Ctr + Shift + N"
+            >
+                <template #icon>
+                    <NIcon>
+                        <Note24Regular v-if="!themeStore.isDark" />
+                        <Note28Filled v-else />
+                    </NIcon>
+                </template>
+                Note
+            </NButton>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">
