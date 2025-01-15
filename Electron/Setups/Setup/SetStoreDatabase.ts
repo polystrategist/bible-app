@@ -4,22 +4,32 @@ import bookmarksMigration from './StoreDB/bookmarks.migration';
 import study_spacesMigration from './StoreDB/study_spaces.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
 import notesMigration from './StoreDB/notes.migration';
+import Log from 'electron-log';
 
 export default async () => {
-    // setup clip_notes
-    await clip_noteMigration();
+    try {
+        // setup clip_notes
+        await clip_noteMigration();
 
-    // setup prayer list
-    await prayerListMigration();
+        // setup prayer list
+        await prayerListMigration();
 
-    // setup bookmark
-    await bookmarksMigration();
+        // setup bookmark
+        await bookmarksMigration();
 
-    // setup highlights
-    await highlightsMigration();
+        // setup highlights
+        await highlightsMigration();
 
-    // setup study space
-    await study_spacesMigration();
+        // setup study space
+        await study_spacesMigration();
 
-    await notesMigration();
+        // set note migration
+        await notesMigration();
+    } catch (e) {
+        try {
+            Log.error(e);
+        } catch (e) {
+            Log.error('SetStoreDatabase.ts');
+        }
+    }
 };
