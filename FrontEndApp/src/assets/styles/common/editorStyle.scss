@@ -1,5 +1,5 @@
 .ProseMirror {
-    min-height: 300px;
+    min-height: 120px;
     outline: none;
     border-radius: 10px;
 }
@@ -112,6 +112,7 @@
 
         code {
             background-color: rgba(#616161, 0.1);
+            font-weight: 600;
         }
     }
 }
@@ -120,6 +121,18 @@
     .ProseMirror {
         hr {
             border-top: 2px solid rgba(#ffffff, 0.3);
+        }
+    }
+
+    .ProseMirror,
+    .prose-mirror-render-html {
+        p {
+            margin: 0;
+            padding: 0 0 15px 0;
+
+            code {
+                background-color: rgba(#ffffff, 0.2);
+            }
         }
     }
 }

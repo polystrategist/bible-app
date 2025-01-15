@@ -3,6 +3,7 @@ import prayerListMigration from './StoreDB/prayerList.migration';
 import bookmarksMigration from './StoreDB/bookmarks.migration';
 import study_spacesMigration from './StoreDB/study_spaces.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
+import notesMigration from './StoreDB/notes.migration';
 
 export default async () => {
     // setup clip_notes
@@ -19,4 +20,6 @@ export default async () => {
 
     // setup study space
     await study_spacesMigration();
+
+    await notesMigration();
 };

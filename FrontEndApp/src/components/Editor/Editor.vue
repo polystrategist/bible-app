@@ -39,12 +39,16 @@ import Youtube from '@tiptap/extension-youtube';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import CodeBlock from '@tiptap/extension-code-block';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
     modelValue: {
         type: [String],
         default: '',
+    },
+    overflow: {
+        type: Boolean,
+        default: false,
     },
     buttonActions: {
         type: Array,
@@ -111,10 +115,14 @@ const editor = useEditor({
 function toggleHeading(level: number | any) {
     editor?.value?.chain().focus().toggleHeading({ level: level }).run();
 }
+
+defineExpose({
+    setContent: (content: string) => editor?.value?.commands.setContent(content),
+});
 </script>
 
 <template>
-    <div>
+    <div :class="{ 'flex flex-col h-full': overflow }">
         <div v-if="editor" class="editor-buttons">
             <NPopselect
                 trigger="click"
@@ -135,7 +143,9 @@ function toggleHeading(level: number | any) {
                     quaternary
                     icon-placement="right"
                     :class="{
-                        'is-active': [1, 2, 3, 4, 5, 6].some((level) => editor?.isActive('heading', { level })),
+                        'is-active': [1, 2, 3, 4, 5, 6].some((level) =>
+                            editor?.isActive('heading', { level })
+                        ),
                     }"
                     size="small"
                 >
@@ -337,6 +347,10 @@ function toggleHeading(level: number | any) {
                 </NIcon>
             </NButton>
         </div>
-        <EditorContent v-if="editor" :editor="editor" />
+        <EditorContent
+            :class="{ 'overflow-auto overflowing-div': overflow }"
+            v-if="editor"
+            :editor="editor"
+        />
     </div>
 </template>

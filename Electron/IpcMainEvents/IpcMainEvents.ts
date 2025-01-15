@@ -8,6 +8,7 @@ import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 import SpaceStudy from './SpaceeStudy/SpaceStudy';
+import notesEvents from './notes/notesEvents';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -36,4 +37,8 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // space study events
     SpaceStudy();
+
+
+    // notes events
+    notesEvents();
 };
