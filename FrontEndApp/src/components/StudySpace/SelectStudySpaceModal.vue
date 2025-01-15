@@ -59,7 +59,7 @@ function toggleCreateNewSpaceDialog() {
                           {
                               if (!searchValue) return true;
 
-                              return searchValue && (sentence.title.split(/\s+/).some((word) => word.toLowerCase() === searchValue.toLowerCase()) || sentence.title.toLowerCase().includes(searchValue.toLowerCase()))
+                              return searchValue && (sentence.title.split(/\s+/).some((word) => word.toLowerCase() === searchValue?.toLowerCase()) || sentence.title.toLowerCase().includes(searchValue.toLowerCase()))
                           }
                         )'
                         @click='spaceStudyStore.selectStudySpace(StudySpace)'
