@@ -7,6 +7,7 @@ declare global {
         searchTheBibleTimeOut: any;
         isElectron: Boolean;
         message: MessageApiInjection;
+        takingNoteTimeOut: any;
         browserWindow: {
             versions: () => Promise<{
                 chrome: string | number;
@@ -144,6 +145,16 @@ declare global {
                 };
                 error: null | { errno?: number; code?: string; message: string };
             }>;
+
+            // Note
+            getNote: (space_study_id: number) => Promise<{
+                content: string;
+                created_at: null | number | string;
+                id: number;
+                study_space_id: number;
+                updated_at: number | string | null;
+            }>;
+            saveNote: (args: { space_study_id: number | string; note: string }) => Promise<any>;
         };
     }
 }

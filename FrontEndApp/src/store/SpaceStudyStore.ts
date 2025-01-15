@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useDialog, useMessage } from 'naive-ui';
 import { useClipNoteStore } from './ClipNotes';
 import { useBibleStore } from './BibleStore';
 import { useBookmarkStore } from './bookmark';
+import useNoteStore from './useNoteStore';
 
 export type SPACE_STUDY_SCHEMA = {
     id: number | string | 0;
@@ -14,6 +15,7 @@ export type SPACE_STUDY_SCHEMA = {
 };
 
 export default defineStore('useSpaceStudyStore', () => {
+    const noteStore = useNoteStore();
     const bookmarkStore = useBookmarkStore();
     const bibleStore = useBibleStore();
     const clipNoteStore = useClipNoteStore();

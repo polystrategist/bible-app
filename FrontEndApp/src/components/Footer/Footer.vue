@@ -55,7 +55,7 @@ onMounted(() => {
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
         </div>
-        <div class="w-full text-center z-50 font-700 flex items-center justify-center">
+        <div class="w-full text-center z-50 font-700 flex items-center justify-center flex items-center gap-2">
             <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
                 <template #icon>
                     <NIcon>

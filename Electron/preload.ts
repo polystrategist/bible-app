@@ -62,4 +62,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
     deleteSpaceStudy: (id: number) => ipcRenderer.invoke('deleteSpaceStudy', id),
     selectStudySpace: (id: number | string) => ipcRenderer.invoke('selectStudySpace', id),
     getSelectedSpaceStudy: () => ipcRenderer.invoke('getSelectedSpaceStudy'),
+
+
+    // Note
+    getNote: (space_study_id: number) => ipcRenderer.invoke('getNote', space_study_id),
+    saveNote: (args: any) => ipcRenderer.invoke('saveNote', args),
 });
