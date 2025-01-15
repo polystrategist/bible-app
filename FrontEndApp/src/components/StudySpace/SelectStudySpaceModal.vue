@@ -89,9 +89,9 @@ function toggleCreateNewSpaceDialog() {
                                     {{ StudySpace.title }}
                                 </h3>
                                 <div>{{ StudySpace.description }}</div>
-                                <small class="opacity-50">{{
-                                    DAYJS(StudySpace.updated_at).format('MMMM D, YYYY')
-                                }}</small>
+                                <small class="opacity-50">
+                                    {{ DAYJS(StudySpace.updated_at).format('MMMM D, YYYY') }}
+                                </small>
                             </div>
                             <div>
                                 <NButton
