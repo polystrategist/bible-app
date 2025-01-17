@@ -123,4 +123,18 @@ export default () => {
             }
         }
     );
+
+    ipcMain.handle(
+        'deleteHighlight',
+        async (event, args: { study_space_id: number | string; key: string }) => {
+            try {
+                return await StoreDB('highlights')
+                    .where('key', args.key)
+                    .where('study_space_id', args.study_space_id)
+                    .del();
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    );
 };

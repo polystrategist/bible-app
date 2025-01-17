@@ -58,6 +58,7 @@ function navigateChapter(action: 'next' | 'before') {
 
 function clickContextMenu(verse: Object) {
     contextMenuData.value = verse;
+
     if (showContextMenu.value) {
         showContextMenu.value = false;
     } else {
@@ -293,7 +294,7 @@ onMounted(() => {
                                 <div :style="`font-size:${fontSize}px`">
                                     <span
                                         v-show="verse.version.length <= 3"
-                                        class="font-bold select-none italic"
+                                        class="font-bold select-none italic the-verse-number"
                                     >
                                         {{ verse.verse }}.
                                     </span>
@@ -307,7 +308,7 @@ onMounted(() => {
                                         class="verse-select-text input-text-search"
                                         contenteditable="true"
                                         spellcheck="false"
-                                        v-html="version.text"
+                                        v-html="'&nbsp;'+version.text+'&nbsp;'"
                                     ></span>
                                 </div>
                             </div>
@@ -408,7 +409,7 @@ onMounted(() => {
         >
             <div id="buttons" class="flex items-center gap-10px">
                 <HighlightOptions @setHighlight="showPopOver = false" />
-                <NButton round size="small" strong title="Copy" @click="copyText">
+                <NButton round size="small" secondary title="Copy" @click="copyText">
                     <template #icon>
                         <NIcon>
                             <Copy />

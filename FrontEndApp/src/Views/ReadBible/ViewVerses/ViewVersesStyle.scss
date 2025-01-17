@@ -1,5 +1,15 @@
 .verse-select-text {
     caret-color: transparent;
+
+    a {
+        display: none !important;
+    }
+}
+
+.the-selected-verse {
+    a, s {
+        display: none !important;
+    }
 }
 
 .show-chapter-verses {

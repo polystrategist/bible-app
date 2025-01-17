@@ -5,8 +5,14 @@ import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
 import { bibleBooks } from '../util/books';
 import { useSettingStore } from './settingStore';
+import { removeHighlight } from '../util/hilitor';
 
-type BookInterface = { title: string; short_name: string; book_number: number; chapter_count: number };
+type BookInterface = {
+    title: string;
+    short_name: string;
+    book_number: number;
+    chapter_count: number;
+};
 const StorageKeyOfChapterVerseSelected = 'selected-chapter-verse-storage';
 const StorageSelectedVersions = 'stored-selected-versions';
 
@@ -33,7 +39,9 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const renderVerses = computed(() => {
         return verses.value.map((v) => {
             const theVersions = v.version.map((ver: any) => {
-                const key = `${ver.version.replace('.SQLite3', '')}_${v.book_number}_${v.chapter}_${v.verse}`;
+                const key = `${ver.version.replace('.SQLite3', '')}_${v.book_number}_${v.chapter}_${
+                    v.verse
+                }`;
                 const highlight = (chapterHighlights.value as any)[key];
                 return {
                     text: highlight ? highlight.content : ver.text,
@@ -73,7 +81,9 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             book_number: selectedBookNumber.value,
             chapter: selectedChapter.value,
         };
-        chapterHighlights.value = await window.browserWindow.getChapterHighlights(JSON.stringify(args));
+        chapterHighlights.value = await window.browserWindow.getChapterHighlights(
+            JSON.stringify(args)
+        );
     }
 
     async function getVerses() {
@@ -153,8 +163,10 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         async selectBook(book: BookInterface) {
             selectedBook.value = book;
             selectedBookNumber.value = book.book_number;
-            if (book.chapter_count < selectedChapter.value) selectedChapter.value = book.chapter_count;
-            if (book.title == 'Daniel' && settingStore.showDeuterocanonical) selectedBook.value.chapter_count = 14;
+            if (book.chapter_count < selectedChapter.value)
+                selectedChapter.value = book.chapter_count;
+            if (book.title == 'Daniel' && settingStore.showDeuterocanonical)
+                selectedBook.value.chapter_count = 14;
             selectedVerse.value = 1;
             saveVersesToStorage();
             await getVerses();
@@ -172,7 +184,10 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             await getVerses();
         },
         getSelectedData: computed(() => {
-            const bookChosen = bibleBooks[bibleBooks.findIndex((book) => book.book_number == selectedBookNumber.value)];
+            const bookChosen =
+                bibleBooks[
+                    bibleBooks.findIndex((book) => book.book_number == selectedBookNumber.value)
+                ];
             return {
                 book: bookChosen.title,
                 chapter: selectedChapter,
@@ -186,6 +201,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         },
         getBookShortName: (book_number: number) => {
             return bibleBooks[bibleBooks.findIndex((book) => book.book_number == book_number)];
+        },
+        removeHighlightInDb: async (study_space_id: number | string, key: string) => {
+            await window.browserWindow.deleteHighlight({ study_space_id, key });
+            await getHighlights();
+            await getChapterHighlights();
         },
     };
 });

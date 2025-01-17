@@ -157,5 +157,6 @@ const message: InternationalMessageType = {
     theme: 'tema',
     Donate: 'Doar',
     'Study Space': 'Estudo',
+    clear: 'limpar' // clear the text
 };
 export default message;
