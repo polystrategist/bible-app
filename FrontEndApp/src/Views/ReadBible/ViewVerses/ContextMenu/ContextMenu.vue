@@ -4,7 +4,11 @@ import { onClickOutside } from '@vueuse/core';
 import { ref } from 'vue';
 import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
+import { useBibleStore } from '../../../../store/BibleStore';
+import SpaceStudyStore from '../../../../store/SpaceStudyStore';
 
+const spaceStudyStore = SpaceStudyStore();
+const bibleStore = useBibleStore();
 const contextMenuRef = ref(null);
 const emits = defineEmits(['close', 'create-clip-note']);
 const bookmarkStore = useBookmarkStore();
@@ -28,11 +32,14 @@ const props = defineProps({
 });
 async function clickContextMenu(key: string) {
     if (key == 'add-to-bookmark') {
-        bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(JSON.stringify(props.data));
+        bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
+            JSON.stringify(props.data)
+        );
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
     } else if (key == 'clear-highlight') {
-        console.log(props.data)
+        if (spaceStudyStore.selectedSpaceStudy?.id)
+            bibleStore.removeHighlightInDb(spaceStudyStore.selectedSpaceStudy?.id, props.data.key);
     }
     emits('close');
 }
@@ -47,7 +54,10 @@ onClickOutside(contextMenuRef, (event) => emits('close'));
         content-style="padding: 0 !important;"
         class="!p-0 !rounded-md"
     >
-        <div ref="contextMenuRef" class="w-200px max-h-200px overflow-y-auto overflowing-div flex flex-col select-none p-5px">
+        <div
+            ref="contextMenuRef"
+            class="w-200px max-h-200px overflow-y-auto overflowing-div flex flex-col select-none p-5px"
+        >
             <div
                 v-for="option in ContextMenuOptions"
                 class="flex items-center pt-4px pb-2px pl-7px pr-1 cursor-pointer hover:bg-[var(--primary-color)] hover:text-dark-500 rounded-sm"

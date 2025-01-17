@@ -252,7 +252,6 @@ onMounted(() => {
                         @click="
                             bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)
                         "
-                        @contextmenu="clickContextMenu(verse)"
                     >
                         <div
                             :class="{ '!h-full': verse.verse == bibleStore.selectedVerse }"
@@ -283,7 +282,12 @@ onMounted(() => {
                             class="flex flex-row gap-3 w-full"
                             :class="{ '!flex-col': verse.version.length > 3 }"
                         >
-                            <div v-for="version in verse.version" :key="version.key" class="w-full">
+                            <div
+                                v-for="version in verse.version"
+                                :key="version.key"
+                                class="w-full"
+                                @contextmenu="clickContextMenu({ ...verse, key: version.key })"
+                            >
                                 <div
                                     v-if="verse.version.length > 3"
                                     class="font-700 opacity-80 dark:opacity-80 mr-10px text-[var(--primary-color)] select-none"
