@@ -57,6 +57,10 @@ declare global {
              * Save a Highlight
              */
             saveHighlight: (args: string) => Promise<any>;
+            deleteHighlight: (args: {
+                study_space_id: number | string;
+                key: string;
+            }) => Promise<any>;
 
             /**
              * Get ClipNotes

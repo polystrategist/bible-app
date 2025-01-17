@@ -2,11 +2,15 @@
 import { ref } from 'vue';
 import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
+import { NButton } from 'naive-ui';
 
 const bibleStore = useBibleStore();
 const selectedHighlight = ref<string | null>(null);
 
-function selectBookVerse(key: string, { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number }) {
+function selectBookVerse(
+    key: string,
+    { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number }
+) {
     selectedHighlight.value = key;
     bibleStore.selectVerse(book_number, chapter, verse);
     bibleStore.AutoScrollSavedPosition(100);
@@ -42,8 +46,24 @@ function nextPage() {
                             <span class="mr-1" v-if="highlight.book_number">
                                 {{ $t(bibleStore.getBook(highlight.book_number).title) }}
                             </span>
-                            <span class="mr-2">{{ highlight.chapter }} : {{ highlight.verse }}</span>
-                            <span class="text-sm opacity-70">{{ highlight.key.split('_')[0] }}</span>
+                            <span class="mr-2">
+                                {{ highlight.chapter }} : {{ highlight.verse }}
+                            </span>
+                            <span class="text-sm opacity-70 mr-1">{{
+                                highlight.key.split('_')[0]
+                            }}</span>
+                            <NButton
+                                size="tiny"
+                                secondary
+                                rounded
+                                type="error"
+                                @click.stop="bibleStore.removeHighlightInDb(
+                                    highlight.study_space_id,
+                                    highlight.key
+                                )"
+                            >
+                                {{ $t('remove') }}
+                            </NButton>
                         </div>
                         <div>
                             <span v-html="highlight.content"></span>

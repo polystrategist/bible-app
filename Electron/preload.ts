@@ -28,6 +28,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.invoke('getChapterHighlights', JSON.parse(args)),
     getHighlights: (args: any) => ipcRenderer.invoke('getHighLights', JSON.parse(args)),
     saveHighlight: (args: any) => ipcRenderer.invoke('saveHighlight', JSON.parse(args)),
+    deleteHighlight: (args: { study_space_id: number | string; key: string }) =>
+        ipcRenderer.invoke('deleteHighlight', args),
 
     // Clip Notes
     getClipNotes: (args: any) => ipcRenderer.invoke('getClipNotes', JSON.parse(args)),
@@ -62,7 +64,6 @@ contextBridge.exposeInMainWorld('browserWindow', {
     deleteSpaceStudy: (id: number) => ipcRenderer.invoke('deleteSpaceStudy', id),
     selectStudySpace: (id: number | string) => ipcRenderer.invoke('selectStudySpace', id),
     getSelectedSpaceStudy: () => ipcRenderer.invoke('getSelectedSpaceStudy'),
-
 
     // Note
     getNote: (space_study_id: number) => ipcRenderer.invoke('getNote', space_study_id),

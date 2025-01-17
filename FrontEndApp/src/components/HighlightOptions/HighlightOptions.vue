@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { highlight, isHighlightable, colors } from './../../util/highlighter';
-import { CircleSolid, Delete } from '@vicons/carbon';
-import { NIcon, NButton } from 'naive-ui';
+import { NButton } from 'naive-ui';
 import { useBibleStore } from '../../store/BibleStore';
 
 const bibleStore = useBibleStore();
@@ -21,15 +20,10 @@ async function highlightSelection(color: string) {
             :key="color.color"
             @click="highlightSelection(color.color)"
             :style="`background: ${color.color}`"
-            class="border-1 border-opacity-0 rounded-full flex items-center justify-center cursor-pointer h-30px w-30px"
+            class="border-1 border-opacity-0 rounded-full flex items-center justify-center cursor-pointer h-28px w-28px"
         ></button>
-        <NButton size="small" @click="highlightSelection('remove')" round strong>
-            <template #icon>
-                <NIcon>
-                    <Delete />
-                </NIcon>
-            </template>
-            <span class="capitalize">{{ $t('remove') }}</span>
+        <NButton secondary size="small" @click="highlightSelection('remove')" round strong>
+            <span class="capitalize">{{ $t('clear') }}</span>
         </NButton>
     </span>
 </template>

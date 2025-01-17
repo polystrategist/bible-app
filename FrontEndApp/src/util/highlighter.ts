@@ -29,7 +29,11 @@ export function isHighlightable(): boolean {
     let parentNode = selection?.startContainer.parentNode as HTMLElement;
 
     for (let x = 0; x <= 10; x++) {
-        if (parentNode && parentNode.classList && parentNode.classList.contains('verse-select-text')) {
+        if (
+            parentNode &&
+            parentNode.classList &&
+            parentNode.classList.contains('verse-select-text')
+        ) {
             return true;
         }
 
@@ -49,7 +53,9 @@ export const highlight = async (color: string) => {
             }
         }
 
-        const allHighlights = (selectedParentElement.parentElement as HTMLElement).querySelectorAll('.HasHighlightSpan');
+        const allHighlights = (selectedParentElement.parentElement as HTMLElement).querySelectorAll(
+            '.HasHighlightSpan'
+        );
 
         for (const elem of allHighlights as any) {
             if (elem.textContent === '') elem.remove();
@@ -59,7 +65,9 @@ export const highlight = async (color: string) => {
         const selection = selected?.getRangeAt(0);
         const selectedContent = selection?.extractContents().textContent;
         const span = document.createElement('span');
+
         span.style.backgroundColor = color;
+
         if (color != 'remove') span.style.color = '#111827';
         if (color != 'remove') span.className = 'imOnlyOne HasHighlightSpan';
         if (selectedContent) span.textContent = selectedContent;
@@ -91,12 +99,29 @@ export const highlight = async (color: string) => {
 
             const rootParent = selectedParentElement.parentElement;
             const rootParentClassList = rootParent.classList.value;
+
             if (rootParentClassList.includes('verse-select-text cursor-text')) {
                 key = rootParent.getAttribute('data-key');
                 bibleVersion = rootParent.getAttribute('data-bible-version');
                 bookNumber = rootParent.getAttribute('data-book');
                 chapterNumber = rootParent.getAttribute('data-chapter');
                 verseNumber = rootParent.getAttribute('data-verse');
+                content = rootParent.innerHTML;
+            }
+
+            if (rootParent) {
+                // remove all span within root parent with empty content
+                const spanElements = rootParent.querySelectorAll('span');
+
+                // Loop through each <span> and remove those with empty content
+                spanElements.forEach((span: HTMLSpanElement, spanIndex: number) => {
+                    const hasContent = span.textContent?.trim().length ?? 0 > 0;
+
+                    if (!hasContent) {
+                        span.remove();
+                    }
+                });
+
                 content = rootParent.innerHTML;
             }
         }
@@ -120,7 +145,13 @@ export async function getChapterHighlights(args: { book_number: number; chapter:
     return await window.browserWindow.getChapterHighlights(JSON.stringify(args));
 }
 
-export async function saveHighlight(args: { key: string; book_number: number; chapter: number; verse: number; content: string }) {
+export async function saveHighlight(args: {
+    key: string;
+    book_number: number;
+    chapter: number;
+    verse: number;
+    content: string;
+}) {
     return await window.browserWindow.saveHighlight(JSON.stringify(args));
 }
 
