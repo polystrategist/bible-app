@@ -308,7 +308,7 @@ onMounted(() => {
                                         class="verse-select-text input-text-search"
                                         contenteditable="true"
                                         spellcheck="false"
-                                        v-html="'&nbsp;'+version.text+'&nbsp;'"
+                                        v-html="version.text"
                                     ></span>
                                 </div>
                             </div>

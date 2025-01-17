@@ -1,4 +1,5 @@
 import { BookmarkAdd, Attachment } from '@vicons/carbon';
+import { EraserSegment24Filled } from '@vicons/fluent';
 
 export const ContextMenuOptions = [
     {
@@ -11,4 +12,9 @@ export const ContextMenuOptions = [
         icon: Attachment,
         key: 'create-clip-note',
     },
+    {
+        label: "Clear Highlight",
+        icon: EraserSegment24Filled,
+        key: 'clear-highlight',
+    }
 ];

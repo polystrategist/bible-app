@@ -109,21 +109,21 @@ export const highlight = async (color: string) => {
                 content = rootParent.innerHTML;
             }
 
-            if (rootParent) {
-                // remove all span within root parent with empty content
-                const spanElements = rootParent.querySelectorAll('span');
+            // if (rootParent) {
+            //     // remove all span within root parent with empty content
+            //     const spanElements = rootParent.querySelectorAll('span');
 
-                // Loop through each <span> and remove those with empty content
-                spanElements.forEach((span: HTMLSpanElement, spanIndex: number) => {
-                    const hasContent = span.textContent?.trim().length ?? 0 > 0;
+            //     // Loop through each <span> and remove those with empty content
+            //     spanElements.forEach((span: HTMLSpanElement, spanIndex: number) => {
+            //         const hasContent = span.textContent?.trim().length ?? 0 > 0;
 
-                    if (!hasContent) {
-                        span.remove();
-                    }
-                });
+            //         if (!hasContent) {
+            //             span.remove();
+            //         }
+            //     });
 
-                content = rootParent.innerHTML;
-            }
+            //     content = rootParent.innerHTML;
+            // }
         }
 
         await saveHighlight({

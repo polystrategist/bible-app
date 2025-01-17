@@ -158,5 +158,6 @@ const message: InternationalMessageType = {
     Donate: 'Donate',
     'Study Space': 'Study Space',
     clear: 'clear',
+    'Clear Highlight': 'Clear Highlight',
 };
 export default message;

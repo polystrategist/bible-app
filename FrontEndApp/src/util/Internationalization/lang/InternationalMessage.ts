@@ -157,6 +157,7 @@ export interface InternationalMessageInterface {
     Donate: string;
     'Study Space': string;
     clear: string;
+    'Clear Highlight': string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

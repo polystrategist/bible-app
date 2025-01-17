@@ -158,6 +158,7 @@ const message: InternationalMessageType = {
     Donate: '寄付',
     'Study Space': '勉強場所',
     clear: 'クリア',
+    "Clear Highlight": 'ハイライトをクリアする',
 }
 
 export default message;

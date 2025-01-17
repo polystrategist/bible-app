@@ -31,6 +31,8 @@ async function clickContextMenu(key: string) {
         bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(JSON.stringify(props.data));
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
+    } else if (key == 'clear-highlight') {
+        console.log(props.data)
     }
     emits('close');
 }
