@@ -60,7 +60,7 @@ onBeforeMount(() => {
         <Pane class="dark:bg-dark-800 h-full">
             <Splitpanes
                 horizontal
-                class="h-full w-full splitpanes_show_bar"
+                class="h-full w-full"
                 @resized="changeViewVerseSize"
             >
                 <Pane

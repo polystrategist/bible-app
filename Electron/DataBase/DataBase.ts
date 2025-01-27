@@ -16,6 +16,16 @@ export const StoreDB = knex({
     },
 });
 
+export const setDB = (pathOfDb: string) => {
+    return knex({
+        client: 'sqlite3',
+        useNullAsDefault: false,
+        connection: {
+            filename: pathOfDb,
+        },
+    })
+}
+
 export async function updateOrCreate(
     tableName: string,
     whereCondition: { [key: string]: any },
