@@ -27,6 +27,7 @@ import { isSignedIn } from './util/SupaBase/Auth/Auth';
 import { useUserStore } from './store/userStore';
 import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
 
+const isMounted = ref(false);
 const userStore = useUserStore();
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
@@ -53,6 +54,8 @@ onBeforeMount(async () => {
 onMounted(async () => {
     const userData = await isSignedIn();
     if (userData) userStore.user = userData;
+
+    isMounted.value = true;
 });
 </script>
 <template>
@@ -63,7 +66,7 @@ onMounted(async () => {
         <NDialogProvider>
             <NNotificationProvider>
                 <NMessageProvider>
-                    <NLayout class="h-[100vh]">
+                    <NLayout class="h-[100vh] opacity-0 transition-all transform scale-50" :class="{'!opacity-100 !scale-100': isMounted}">
                         <TitleBar class="h-30px" />
                         <NLayout class="h-[calc(100%-60px)]" has-sider>
                             <NLayoutSider

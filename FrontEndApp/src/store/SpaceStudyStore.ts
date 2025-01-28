@@ -61,7 +61,9 @@ export default defineStore('useSpaceStudyStore', () => {
 
         selectedSpaceStudy.value = args;
 
-        message.success('Study Space Selected');
+        message.success('Study Space Selected', {
+            duration: 1000,
+        });
         showSpaceStudy.value = false;
     }
 
