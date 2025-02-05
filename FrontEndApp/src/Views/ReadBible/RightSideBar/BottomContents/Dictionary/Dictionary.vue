@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { BookLetter24Filled, BookLetter24Regular } from '@vicons/fluent';
-import { NIcon, NInput, NSelect } from 'naive-ui';
+import { NBadge, NIcon, NInput, NSelect, NTag } from 'naive-ui';
 import { useThemeStore } from '../../../../../store/theme';
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
+const displayFont = ref(false);
+const fontSize = ref(14);
 const themeStore = useThemeStore();
 const selected = ref<string | null>(null);
 const loading = ref(false);
@@ -27,6 +29,41 @@ watch(
         if (val) definitions.value = await window.browserWindow.getDefinitions(val);
     }
 );
+
+function handleDictionaryScroll(deltaY: number) {
+    if (deltaY < 0) {
+        fontSize.value++;
+    } else {
+        fontSize.value--;
+    }
+
+    if (!displayFont.value) displayFont.value = true;
+
+    // @ts-ignore
+    clearTimeout(window.displayFontSizeDictionaryTimeout);
+    // @ts-ignore
+    window.displayFontSizeDictionaryTimeout = setTimeout(() => {
+        displayFont.value = false;
+    }, 2000);
+}
+
+onMounted(() => {
+    document.addEventListener(
+        'wheel',
+        (event) => {
+            if (event.ctrlKey) {
+                // Ensure Ctrl key is pressed
+                const dictionaryElement = document.getElementById('show-dictionary-definitions');
+
+                if (dictionaryElement && dictionaryElement.contains(event.target as Node)) {
+                    event.preventDefault(); // Prevent browser zoom
+                    handleDictionaryScroll(event.deltaY);
+                }
+            }
+        },
+        { passive: false }
+    );
+});
 </script>
 
 <template>
@@ -51,9 +88,25 @@ watch(
                 </NIcon>
             </template>
         </NSelect>
-        <div class="overflowing-div overflow-y-auto h-full flex flex-col gap-3 py-2">
-            <div v-for="definition in definitions">
-                {{ definition.wordtype ?? '' }} {{ definition.definition }}
+        <div
+            id="show-dictionary-definitions"
+            class="py-2 relative h-[calc(100%-50px)]"
+            :style="`font-size:${fontSize}px`"
+        >
+            <NTag
+                :bordered="false"
+                class="absolute bottom-4 right-0 opacity-0"
+                :class="{ '!opacity-100': displayFont }"
+            >
+                {{ fontSize }}px
+            </NTag>
+            <div class="overflowing-div overflow-y-auto h-full flex flex-col gap-3">
+                <div v-for="definition in definitions">
+                    <span class="italic text-[var(--primary-color)]">{{
+                        definition.wordtype ?? ''
+                    }}</span>
+                    {{ definition.definition }}
+                </div>
             </div>
         </div>
     </div>
