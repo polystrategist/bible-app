@@ -21,7 +21,7 @@ Believers Sword is in its early stages but is stable for use from version `0.6.4
 -   🔖 Bookmark verses
 -   📝 Create or edit clip notes
 -   🎨 Highlight verses with colors
-    -🎭 Choose app themes
+- 🎭 Choose app themes
 
 ### 🚧 Upcoming Features & Improvements
 
