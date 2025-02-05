@@ -1,46 +1,69 @@
 ## Believers Sword (Official)
 
-Believers Sword App is an application to help you study and read the bible. Engage in learning the word of God. I am creating this application because this is one way of offering my time to the Lord. I'm so thankful to God for giving me time to create this application and share it with others. I'm not recommending this application, but I am encouraging you to try the one I built, hoping you may like it.
+Believers Sword App is designed to help you study and engage with the Word of God. This app is my way of dedicating time to the Lord, and I’m grateful for the opportunity to create and share it with others. While I’m not here to recommend any specific app, I encourage you to try the one I’ve built—you might find it helpful in your journey of faith.
 
 ### Support
 
--   [BuyMeCoffee.com](https://www.buymeacoffee.com/BroJenuel)
--   [Change Logs](https://buymeacoffee.com/jenuel.dev/posts/202911)
+[☕ Buy Me a Coffee](https://www.buymeacoffee.com/BroJenuel)  
+[📜 View Change Logs](https://buymeacoffee.com/jenuel.dev/posts/202911)
 
 ## Features
-The app is its beginning state but the app is stable to use on version `> 0.6.4`, it is still under development. more features will come later.
 
--   [x] Read Bible
--   [x] Take Notes
--   [x] Study Space - to organize your study notes, bookmarks, etc.
--   [x] Read or watch sermons on sermons page
-    -   [ ] Revamp Sermons Page Making It modern and user friendly.
-    -   [ ] Ability to share own sermons or notes.
--   [x] search bible
--   [x] bookmark verses
--   [x] create or edit clip notes
--   [x] color highlights
--   [x] select your app themes
-    -   [ ] Revamping theme change flow so that it is user friendly.
--   [ ] Bible References - This is a useful feature so that you can easily find passages in the bible that has connections to the verse.
--   [x] Prayer List
-    -   [ ] Revamping Prayer List Making it modern looking and user friendly.
--   [ ] Audio Reader
--   [ ] AI Language model for asking some queries
+Believers Sword is in its early stages but is stable for use from version `0.6.4` onward. Development is ongoing, with more features planned.
+
+### ✅ Current Features
+
+-   📖 Read the Bible
+-   📝 Take Notes
+-   📚 Study Space – Organize study notes, bookmarks, etc.
+-   🎤 Sermons – Read or watch sermons
+-   🔍 Search the Bible
+-   🔖 Bookmark verses
+-   📝 Create or edit clip notes
+-   🎨 Highlight verses with colors
+    -🎭 Choose app themes
+
+### 🚧 Upcoming Features & Improvements
+
+-   🔄 Revamped Sermons Page – A modern and user-friendly experience
+-   📢 User-Generated Content – Share your own sermons and notes
+-   🎨 Improved Theme Selection – More intuitive theme-switching
+-   🔗 Bible References – Easily find related passages
+-   🙏 Prayer List Overhaul – A fresh, modern interface
+-   🔊 Audio Reader – Listen to the Bible
+-   🤖 AI Language Model – Ask questions and get insights
+-   😍 Daily Devotion - Get daily demotions
+-   🏓 Games Page - Play some puzzle games and quizzes to check how much you know the bible.
 
 ## How to contribute
 
-Clone this on your machine. Currently, I am using windows OS for development. So I am not sure if this is going to work for MAC.
+Want to get involved? Want to help improve Believers Sword? Follow these steps to get started. [Check This For More Info](https://github.com/Bible-Projects/believers-sword-next/wiki/Contributing):
 
-1. Clone the repo by running `git clone https://github.com/Bible-Projects/believers-sword-next.git`
-2. run `yarn setup` to setup your electron and front end app.
+1. Clone the repo by running
 
-To run the app, run `yarn start`
+```bash
+git clone https://github.com/Bible-Projects/believers-sword-next.git
+```
 
-Note: if you don't have yarn installed, run `npm install -g yarn`
+2. Set up dependencies:
+
+```bash
+yarn setup
+```
+
+3. Run the App
+
+```bash
+yarn start
+```
+
+Note: If you don’t have Yarn installed, run:
+
+```bash
+npm install -g yarn
+```
 
 ## Sponsors
 
+A special thanks to our sponsor:
 [<img src="https://believers-sword.brojenuel.com/images/sponsors/navicat.png" width="300" />](https://www.navicat.com)
-
-To Contribute you can [Read The Contribution Guide](https://github.com/Bible-Projects/believers-sword-next/wiki/Contributing).
