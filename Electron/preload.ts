@@ -68,4 +68,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Note
     getNote: (space_study_id: number) => ipcRenderer.invoke('getNote', space_study_id),
     saveNote: (args: any) => ipcRenderer.invoke('saveNote', args),
+
+    // Dictionary
+    searchDictionary: (args: any) => ipcRenderer.invoke('searchDictionary', args),
+    getDefinitions: (word: string) => ipcRenderer.invoke('getDefinitions', word),
 });

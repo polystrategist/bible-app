@@ -159,6 +159,10 @@ declare global {
                 updated_at: number | string | null;
             }>;
             saveNote: (args: { space_study_id: number | string; note: string }) => Promise<any>;
+
+            // Dictionary
+            searchDictionary: (search: string) => Promise<any>;
+            getDefinitions: (word: string) => Promise<any>;
         };
     }
 }

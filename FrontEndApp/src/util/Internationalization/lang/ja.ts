@@ -159,6 +159,8 @@ const message: InternationalMessageType = {
     'Study Space': '勉強場所',
     clear: 'クリア',
     "Clear Highlight": 'ハイライトをクリアする',
+    'dictionary': '辞書',
+    'references': '参考文献',
 }
 
 export default message;

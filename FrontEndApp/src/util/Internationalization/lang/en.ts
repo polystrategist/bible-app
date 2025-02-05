@@ -159,5 +159,7 @@ const message: InternationalMessageType = {
     'Study Space': 'Study Space',
     clear: 'clear',
     'Clear Highlight': 'Clear Highlight',
+    'dictionary': 'dictionary',
+    'references': 'references',
 };
 export default message;
