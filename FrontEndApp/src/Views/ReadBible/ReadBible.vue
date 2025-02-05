@@ -61,6 +61,7 @@ onBeforeMount(() => {
             <Splitpanes
                 horizontal
                 class="h-full w-full"
+                :class="{ 'splitter-hidden': !noteStore.showNote}"
                 @resized="changeViewVerseSize"
             >
                 <Pane
@@ -80,7 +81,7 @@ onBeforeMount(() => {
             </Splitpanes>
         </Pane>
         <Pane
-            class="bg-gray-100 dark:bg-dark-600"
+            class="bg-gray-100 dark:bg-dark-600 h-full"
             :size="splitPaneSizes[2].size"
             :min-size="splitPaneSizes[2].min"
             :max-size="splitPaneSizes[2].max"

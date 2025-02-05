@@ -89,3 +89,9 @@
         }
     }
 }
+
+.splitter-hidden {
+    .splitpanes__splitter {
+        display: none;
+    }
+}

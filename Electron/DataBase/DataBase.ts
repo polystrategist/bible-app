@@ -16,6 +16,14 @@ export const StoreDB = knex({
     },
 });
 
+export const DictionaryDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\StoreDB\\Dictionary.db`,
+    },
+});
+
 export const setDB = (pathOfDb: string) => {
     return knex({
         client: 'sqlite3',
@@ -23,8 +31,8 @@ export const setDB = (pathOfDb: string) => {
         connection: {
             filename: pathOfDb,
         },
-    })
-}
+    });
+};
 
 export async function updateOrCreate(
     tableName: string,

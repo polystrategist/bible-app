@@ -56,6 +56,7 @@
         "vicons",
         "videoid",
         "vuedraggable",
-        "vueuse"
+        "vueuse",
+        "wordtype"
     ]
 }

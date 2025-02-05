@@ -9,6 +9,7 @@ import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 import SpaceStudy from './SpaceeStudy/SpaceStudy';
 import notesEvents from './notes/notesEvents';
+import dictionaries from './dictionaries/dictionaries';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -38,7 +39,9 @@ export default (BrowserWindow: BrowserWindow) => {
     // space study events
     SpaceStudy();
 
-
     // notes events
     notesEvents();
+
+    // dictionary events
+    dictionaries();
 };
