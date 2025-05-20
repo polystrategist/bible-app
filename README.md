@@ -13,27 +13,27 @@ Believers Sword is in its early stages but is stable for use from version `0.6.4
 
 ### ✅ Current Features
 
--   📖 Read the Bible
--   📝 Take Notes
--   📚 Study Space – Organize study notes, bookmarks, etc.
--   🎤 Sermons – Read or watch sermons
--   🔍 Search the Bible
--   🔖 Bookmark verses
--   📝 Create or edit clip notes
--   🎨 Highlight verses with colors
-- 🎭 Choose app themes
+- [x] 📖 Read the Bible
+- [x] 📝 Take Notes
+- [x] 📚 Study Space – Organize study notes, bookmarks, etc.
+- [x] 🎤 Sermons – Read or watch sermons
+- [x] 🔍 Search the Bible
+- [x] 🔖 Bookmark verses
+- [x] 📝 Create or edit clip notes
+- [x] 🎨 Highlight verses with colors
+- [x] 🎭 Choose app themes
 
 ### 🚧 Upcoming Features & Improvements
 
--   🔄 Revamped Sermons Page – A modern and user-friendly experience
--   📢 User-Generated Content – Share your own sermons and notes
--   🎨 Improved Theme Selection – More intuitive theme-switching
--   🔗 Bible References – Easily find related passages
--   🙏 Prayer List Overhaul – A fresh, modern interface
--   🔊 Audio Reader – Listen to the Bible
--   🤖 AI Language Model – Ask questions and get insights
--   😍 Daily Devotion - Get daily demotions
--   🏓 Games Page - Play some puzzle games and quizzes to check how much you know the bible.
+- [ ] 🔄 Revamped Sermons Page – A modern and user-friendly experience
+- [ ] 📢 User-Generated Content – Share your own sermons and notes
+- [ ] 🎨 Improved Theme Selection – More intuitive theme-switching
+- [ ] 🔗 Bible References – Easily find related passages
+- [ ] 🙏 Prayer List Overhaul – A fresh, modern interface
+- [ ] 🔊 Audio Reader – Listen to the Bible
+- [ ] 🤖 AI Language Model – Ask questions and get insights
+- [ ] 😍 Daily Devotion - Get daily demotions
+- [ ] 🏓 Games Page - Play some puzzle games and quizzes to check how much you know the bible.
 
 ## How to contribute
 
@@ -62,8 +62,3 @@ Note: If you don’t have Yarn installed, run:
 ```bash
 npm install -g yarn
 ```
-
-## Sponsors
-
-A special thanks to our sponsor:
-[<img src="https://believers-sword.brojenuel.com/images/sponsors/navicat.png" width="300" />](https://www.navicat.com)
