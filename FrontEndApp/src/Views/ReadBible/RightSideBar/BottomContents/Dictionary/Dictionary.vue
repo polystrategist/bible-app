@@ -80,6 +80,7 @@ onMounted(() => {
             remote
             :clear-filter-after-select="false"
             @search="handleSearch"
+            :on-clear="() => (definitions = [])"
         >
             <template #prefix>
                 <NIcon>
@@ -100,13 +101,21 @@ onMounted(() => {
             >
                 {{ fontSize }}px
             </NTag>
-            <div class="overflowing-div overflow-y-auto h-full flex flex-col gap-3">
+            <div
+                v-if="definitions.length"
+                class="overflowing-div overflow-y-auto h-full flex flex-col gap-3"
+            >
                 <div v-for="definition in definitions">
                     <span class="italic text-[var(--primary-color)]">{{
                         definition.wordtype ?? ''
                     }}</span>
                     {{ definition.definition }}
                 </div>
+            </div>
+            <div class="h-full flex flex-col items-center justify-center">
+                <div class="text-3xl">🔎</div>
+                <div>Empty</div>
+                <small>Search for a word</small>
             </div>
         </div>
     </div>
