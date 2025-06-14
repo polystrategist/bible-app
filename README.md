@@ -57,7 +57,7 @@ yarn setup
 yarn start
 ```
 
-Note: If you don’t have Yarn installed, run:
+Note: If you don’t have Yarn installed, install yarn by running:
 
 ```bash
 npm install -g yarn
