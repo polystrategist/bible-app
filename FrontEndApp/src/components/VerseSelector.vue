@@ -61,7 +61,7 @@ function selectVerse(verse: number) {
 }
 </script>
 <template>
-    <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size" :circle="props.circle" :title="title">
+    <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size as any" :circle="props.circle" :title="title">
         <template #icon>
             <slot name="icon" />
         </template>

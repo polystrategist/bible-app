@@ -1,5 +1,6 @@
 import { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider';
 import { SAVED_CLIP_NOTE_TYPE, searchBibleType } from './GlobalTypes';
+import { DialogApiInjection } from 'naive-ui/es/dialog/src/DialogProvider';
 
 declare global {
     interface Window {
@@ -8,6 +9,8 @@ declare global {
         isElectron: Boolean;
         message: MessageApiInjection;
         takingNoteTimeOut: any;
+        $message: MessageApiInjection;
+        $dialog: DialogApiInjection;
         browserWindow: {
             versions: () => Promise<{
                 chrome: string | number;
@@ -134,10 +137,10 @@ declare global {
             }>;
             deleteSpaceStudy: (
                 id: number
-            ) => Promise<{ data: any; error: { message: string; [key: string]: any } }>;
+            ) => Promise<{ data: any; error: { message: string;[key: string]: any } }>;
             selectStudySpace: (
                 id: number | string
-            ) => Promise<{ data: any; error: { message: string; [key: string]: any } }>;
+            ) => Promise<{ data: any; error: { message: string;[key: string]: any } }>;
             getSelectedSpaceStudy: () => Promise<{
                 data: null | {
                     id: number;
@@ -163,7 +166,8 @@ declare global {
             // Dictionary
             searchDictionary: (search: string) => Promise<any>;
             getDefinitions: (word: string) => Promise<any>;
+
         };
     }
 }
-export {};
+export { };

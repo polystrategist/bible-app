@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { NButton, NCard, NEmpty, NIcon, NModal, NInput } from 'naive-ui';
+import { NButton, NCard, NEmpty, NIcon, NModal, NInput, useMessage, useDialog } from 'naive-ui';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import StoreStudySpaceModal from './StoreStudySpaceModal.vue';
 import { DAYJS } from '../../util/dayjs';
 import {
@@ -24,6 +24,11 @@ const spaceStudyStore = SpaceStudyStore();
 function toggleCreateNewSpaceDialog() {
     StoreStudySpaceModalRef.value?.toggleModal();
 }
+
+onMounted(() => {
+    window.$message = useMessage();
+    window.$dialog = useDialog();
+});
 </script>
 
 <template>
@@ -129,9 +134,6 @@ function toggleCreateNewSpaceDialog() {
                 </div>
                 <div v-else>
                     <NEmpty description="Lists Is Empty, Start By Creating A New Space">
-                        <template #description>
-                            Lists Is Empty, Start By Creating A New Space
-                        </template>
                         <template #extra>
                             <NButton secondary type="primary" @click="toggleCreateNewSpaceDialog()">
                                 + New Space
