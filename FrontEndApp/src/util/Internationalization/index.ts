@@ -12,7 +12,6 @@ const messages: any = {
 const internationalizations = createI18n({
     locale: 'English',
     fallbackLocale: 'English',
-    allowComposition: true,
     messages,
 });
 

@@ -82,12 +82,12 @@ onMounted(() => {
             @search="handleSearch"
             :on-clear="() => (definitions = [])"
         >
-            <template #prefix>
+            <!-- <template #prefix>
                 <NIcon>
                     <BookLetter24Filled v-if="themeStore.isDark" />
                     <BookLetter24Regular v-else />
                 </NIcon>
-            </template>
+            </template> -->
         </NSelect>
         <div
             id="show-dictionary-definitions"

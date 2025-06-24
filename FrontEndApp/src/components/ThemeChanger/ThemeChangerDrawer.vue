@@ -22,7 +22,7 @@ defineProps({
 });
 </script>
 <template>
-    <NPopover trigger="click" :placement="placement">
+    <NPopover trigger="click" :placement="placement as any">
         <template #trigger>
             <NButton round size="tiny" quaternary title="Change Theme">
                 <NIcon size="17">

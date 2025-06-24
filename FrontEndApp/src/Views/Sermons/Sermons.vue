@@ -27,7 +27,7 @@ function showContent(from: 'youtube' | 'text', sermon: any) {
 }
 
 useInfiniteScroll(
-    sermonItems,
+    sermonItems as any,
     () => {
         if (sermonStore.sermons.length) sermonStore.page++;
     },
@@ -42,7 +42,10 @@ function publishSermon(sermon: SERMON_TYPE, publish = true) {
         negativeText: 'No, Cancel',
         onPositiveClick: async () => {
             message.loading('Publishing');
-            const { error } = await supabase.from('sermons').update({ is_published: publish }).eq('id', sermon.id);
+            const { error } = await supabase
+                .from('sermons')
+                .update({ is_published: publish })
+                .eq('id', sermon.id);
             message.destroyAll();
             if (error) {
                 message.error(error.message);
@@ -135,7 +138,10 @@ function deleteSermon(sermon: SERMON_TYPE) {
             </div>
         </div>
 
-        <div ref="sermonItems" class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
+        <div
+            ref="sermonItems"
+            class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md"
+        >
             <div class="flex gap-7 flex-wrap px-5 justify-center">
                 <div
                     v-for="sermon in sermonStore.sermons"
@@ -144,7 +150,10 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     @click="showContent(sermon.youtube_video_id ? 'youtube' : 'text', sermon)"
                 >
                     <div class="h-150px overflow-hidden relative">
-                        <div v-if="sermon.thumbnail" class="transition-all top-[0px] left-[0px] !w-full absolute">
+                        <div
+                            v-if="sermon.thumbnail"
+                            class="transition-all top-[0px] left-[0px] !w-full absolute"
+                        >
                             <img
                                 :src="sermon.thumbnail"
                                 alt=""
@@ -159,7 +168,10 @@ function deleteSermon(sermon: SERMON_TYPE) {
                             {{ sermon.title }}
                         </div>
 
-                        <div v-if="userStore.user_id == sermon.added_by" class="absolute top-1 left-1 flex flex-col gap-1">
+                        <div
+                            v-if="userStore.user_id == sermon.added_by"
+                            class="absolute top-1 left-1 flex flex-col gap-1"
+                        >
                             <div
                                 v-if="!sermon.is_published"
                                 class="bg-orange-700 px-2 rounded-md select-none text-white"
@@ -174,7 +186,10 @@ function deleteSermon(sermon: SERMON_TYPE) {
                             >
                                 Published
                             </div>
-                            <div class="bg-red-600 px-2 rounded-md select-none text-white" @click.stop="deleteSermon(sermon)">
+                            <div
+                                class="bg-red-600 px-2 rounded-md select-none text-white"
+                                @click.stop="deleteSermon(sermon)"
+                            >
                                 <NIcon>
                                     <Delete />
                                 </NIcon>
@@ -184,7 +199,9 @@ function deleteSermon(sermon: SERMON_TYPE) {
                     </div>
                     <div class="mt-2">
                         <div class="font-700">{{ sermon.title }}</div>
-                        <div class="overflow-hidden overflow-ellipsis whitespace-nowrap">{{ sermon.description }}</div>
+                        <div class="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                            {{ sermon.description }}
+                        </div>
                         <div>
                             <small>{{ DAYJS(sermon.created_at).fromNow() }}</small> -
                             <small>{{ DAYJS(sermon.created_at).format('MMMM D, YYYY') }}</small>
@@ -196,7 +213,12 @@ function deleteSermon(sermon: SERMON_TYPE) {
                                 </template>
                                 {{ sermon.language }}
                             </NTag>
-                            <NTag v-if="sermon.youtube_video_id" :bordered="false" round type="error">
+                            <NTag
+                                v-if="sermon.youtube_video_id"
+                                :bordered="false"
+                                round
+                                type="error"
+                            >
                                 <template #icon>
                                     <NIcon>
                                         <LogoYoutube />

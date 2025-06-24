@@ -19,8 +19,8 @@ export default defineStore('useSpaceStudyStore', () => {
     const bookmarkStore = useBookmarkStore();
     const bibleStore = useBibleStore();
     const clipNoteStore = useClipNoteStore();
-    const dialog = useDialog();
-    const message = useMessage();
+    // const dialog = useDialog();
+    // const message = useMessage();
     const showSpaceStudy = ref(false);
     const lists = ref<Array<SPACE_STUDY_SCHEMA>>([]);
     const selectedSpaceStudy = ref<SPACE_STUDY_SCHEMA | null>(null);
@@ -61,14 +61,14 @@ export default defineStore('useSpaceStudyStore', () => {
 
         selectedSpaceStudy.value = args;
 
-        message.success('Study Space Selected', {
+        window.$message.success('Study Space Selected', {
             duration: 1000,
         });
         showSpaceStudy.value = false;
     }
 
     async function deleteStudySpace(id: number) {
-        dialog.error({
+        window.$dialog.error({
             title: 'Delete Study Space?',
             content:
                 'Are you sure you want to delete this study space? Any bookmarks, clip notes, and any other data associated with this study space will also be deleted. This action cannot be undone.',
@@ -78,7 +78,7 @@ export default defineStore('useSpaceStudyStore', () => {
                 const data = await window.browserWindow.deleteSpaceStudy(id);
 
                 if (data.error) {
-                    dialog.error({
+                    window.$dialog.error({
                         title: 'Unable To Delete',
                         content: data.error.message,
                         positiveText: 'OK',
@@ -86,7 +86,7 @@ export default defineStore('useSpaceStudyStore', () => {
                     return;
                 }
 
-                message.success('Deleted Study Space');
+                window.$message.success('Deleted Study Space');
                 await getLists();
 
                 afterDeleteIfDeletedSelectedSelectTheFirstItemOnTheListAsDefault(id);
