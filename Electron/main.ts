@@ -8,6 +8,14 @@ import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
 
+// Check if running in portable mode
+const isPortable = !!process.env.PORTABLE_EXECUTABLE_DIR;
+
+if (isPortable) {
+    const exeDir = process.env.PORTABLE_EXECUTABLE_DIR!;
+    app.setPath('userData', path.join(exeDir, 'user-data'));
+}
+
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const appBounds: any = appConfig.get('setting.appBounds');
