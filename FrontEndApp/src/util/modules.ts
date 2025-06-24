@@ -12,6 +12,7 @@ import magandangBalitaBiblia from './Modules/Bible/magandang-balita-biblia';
 import newAmericanStandardBible from './Modules/Bible/new-american-standard-bible';
 import newAmericanStandardVersion2020 from './Modules/Bible/new-american-standard-version-2020';
 import newInternationalVersion from './Modules/Bible/new-international-version';
+import tamilBible2017 from './Modules/Bible/tamil-bible-2017';
 import newAmericanStandardVersion2020Commentaries from './Modules/Commentaries/new-american-standard-version-2020-commentaries';
 import newInternationalVersionCommentaries from './Modules/Commentaries/new-international-version.commentaries';
 
@@ -30,5 +31,6 @@ export const bible = [
     newAmericanStandardBible,
     newInternationalVersion,
     newAmericanStandardVersion2020,
+    tamilBible2017
 ];
 export const commentaries = [newInternationalVersionCommentaries, newAmericanStandardVersion2020Commentaries];
