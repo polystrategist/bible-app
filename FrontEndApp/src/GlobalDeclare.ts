@@ -35,7 +35,9 @@ declare global {
             downloadModule: (args: {
                 url?: string;
                 urls?: Array<string>;
+                percentage: Function;
                 done: () => void;
+                cancel: () => void;
             }) => void;
 
             /**

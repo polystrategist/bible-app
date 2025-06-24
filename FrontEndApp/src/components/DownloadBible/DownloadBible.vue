@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { NModal, NCard, NButton, NIcon } from 'naive-ui';
+import { NModal, NCard, NButton, NIcon, useMessage } from 'naive-ui';
 import { computed, ref } from 'vue';
 import { useBibleDownloadStore } from '../../store/downloadBible';
 import { useModuleStore } from '../../store/moduleStore';
 import { bible } from '../../util/modules';
 import { Download } from '@vicons/carbon';
 
+const message = useMessage();
 const bibleDownloadStore = useBibleDownloadStore();
 const moduleStore = useModuleStore();
+const downloadPercentage = ref<number>(0);
 const BibleVersions = computed(() => {
     return bible.sort((a, b) => (a.title as any) - (b.title as any));
 });
@@ -28,10 +30,19 @@ function clickDownload(downloadLink: string) {
     downloadLoading.value = true;
     window.browserWindow.downloadModule({
         urls: [downloadLink],
+        percentage: (percentage: number) => {
+            console.log(percentage);
+            downloadPercentage.value = percentage;
+        },
         done: async () => {
             downloadLoading.value = false;
             await moduleStore.getBibleLists();
             bibleDownloadStore.isDownloading = false;
+        },
+        cancel: () => {
+            downloadLoading.value = false;
+            bibleDownloadStore.isDownloading = false;
+            message.error('Download Cancelled');
         },
     });
 }
@@ -43,11 +54,8 @@ function clickDownload(downloadLink: string) {
                 <h1 class="font-800 select-none">{{ $t('Available Versions') }}</h1>
             </div>
             <div v-if="BibleVersions.length" class="select-none h-[70vh] overflow-y-auto overflowing-div">
-                <div
-                    v-for="version in BibleVersions"
-                    :disabled="bibleDownloadStore.isDownloading"
-                    class="flex gap-10px items-center my-3"
-                >
+                <div v-for="version in BibleVersions" :disabled="bibleDownloadStore.isDownloading"
+                    class="flex gap-10px items-center my-3">
                     <div :value="version.download_link">
                         <div>
                             "{{ version.title }}" -
@@ -56,23 +64,21 @@ function clickDownload(downloadLink: string) {
                             </span>
                         </div>
                     </div>
-                    <NButton
-                        size="tiny"
-                        :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
+                    <NButton size="tiny" :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
                         :type="!isAlreadyDownloaded(version.file_name) ? 'default' : 'info'"
-                        @click="clickDownload(version.download_link)"
-                        secondary
-                        rounded
-                        :loading="version.download_link === selectedDownloadLink && downloadLoading"
-                    >
+                        @click="clickDownload(version.download_link)" secondary rounded
+                        :loading="version.download_link === selectedDownloadLink && downloadLoading">
                         <NIcon>
                             <Download />
                         </NIcon>
                         <span class="capitalize">{{ $t('download') }}</span>
+                        <span v-if="version.download_link === selectedDownloadLink && downloadLoading" class="px-2"> {{
+                            downloadPercentage }}% </span>
                     </NButton>
                 </div>
             </div>
-            <div v-else class="flex items-center justify-center h-[80vh]">It seems you have downloaded all the modules 😊</div>
+            <div v-else class="flex items-center justify-center h-[80vh]">It seems you have downloaded all the modules
+                😊</div>
         </NCard>
     </NModal>
 </template>

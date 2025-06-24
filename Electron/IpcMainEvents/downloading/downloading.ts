@@ -16,13 +16,18 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
         urls.map(async (url) => {
             await download(mainWindow, url, {
                 directory: filePath,
-                onProgress: (data) => {
-                    console.log(data);
-                    // mainWindow.webContents.send('download-module-inprogress', data);
+                onProgress: (progressObj) => {
+                    // Calculate the download progress percentage
+                    const downloadPercentage = Math.floor(progressObj.percent);
+
+                    // Update UI with progress percentage
+                    mainWindow.webContents.send('download-module-progress', downloadPercentage);
                 },
                 onCompleted: (data) => {
-                    console.log(data);
-                    // mainWindow.webContents.send('download-module-completed', data);
+                    mainWindow.webContents.send('download-module-done');
+                },
+                onCancel: () => {
+                    mainWindow.webContents.send('download-module-cancel');
                 },
                 overwrite: true,
                 saveAs: false,
@@ -37,11 +42,6 @@ export default (mainWindow: BrowserWindow) => {
     });
 
     ipcMain.on('download-module', async (event, urls: Array<string>) => {
-        try {
-            await downloadModuleUrls(mainWindow, urls);
-            mainWindow.webContents.send('download-module-done');
-        } catch (e) {
-            Log.warn('Download was interrupted.');
-        }
+        await downloadModuleUrls(mainWindow, urls);
     });
 };
