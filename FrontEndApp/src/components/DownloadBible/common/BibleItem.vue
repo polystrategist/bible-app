@@ -5,24 +5,9 @@ import { useBibleDownloadStore } from '../../../store/downloadBible';
 import { useModuleStore } from '../../../store/moduleStore';
 
 const props = defineProps(['version']);
-const moduleStore = useModuleStore();
 const percentage = ref(0);
 const downloadBibleStore = useBibleDownloadStore();
 
-function clickDownload() {
-    downloadBibleStore.isDownloading = true;
-    downloadBibleStore.downloadingVersion = props.version.file_name;
-    window.browserWindow.downloadModule({
-        url: props.version.download_link as any,
-        // progress: (data: any) => {
-        //     percentage.value = data.percent * 100;
-        // },
-        done: async () => {
-            await moduleStore.getBibleLists();
-            downloadBibleStore.isDownloading = false;
-        },
-    });
-}
 </script>
 <template>
     <div class="p-2 hover:bg-light-50 hover:bg-opacity-20 flex justify-between">
@@ -33,7 +18,7 @@ function clickDownload() {
             </span>
         </div>
         <div>
-            <NButton size="tiny" @click="clickDownload" :disabled="downloadBibleStore.isDownloading">
+            <NButton size="tiny" :disabled="downloadBibleStore.isDownloading">
                 {{
                     downloadBibleStore.isDownloading && downloadBibleStore.downloadingVersion == props.version.file_name
                         ? `${percentage}%`
