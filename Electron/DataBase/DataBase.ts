@@ -1,6 +1,9 @@
 import { app } from 'electron';
 import knex from 'knex';
+import { setupPortableMode } from '../util/portable';
 
+
+setupPortableMode();
 const dataPath = app.getPath('userData');
 
 export const StoreDB = knex({

@@ -2,11 +2,12 @@ import { app } from 'electron';
 import fs from 'fs';
 import UPath from 'upath';
 import Log from 'electron-log';
-import { isNightly } from '../../config';
+import { setupPortableMode } from '../../util/portable';
 
+setupPortableMode();
+const dataPath = app.getPath('userData');
 const defaultBibleFile = `King James Version - 1769.SQLite3`;
 const isPackaged = app.isPackaged;
-const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\${defaultBibleFile}`;
 
 export const setDefaultBible = new Promise((resolve, reject) => {

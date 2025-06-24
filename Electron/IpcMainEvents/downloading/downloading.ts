@@ -1,13 +1,11 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { app } from 'electron';
-import fs from 'fs';
-import UPath, { resolve } from 'upath';
-import Log from 'electron-log';
-import { isNightly } from '../../config';
 import { download } from 'electron-dl';
+import { setupPortableMode } from '../../util/portable';
 
 const isPackaged = app.isPackaged;
 
+setupPortableMode();
 const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\`;
 

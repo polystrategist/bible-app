@@ -1,10 +1,11 @@
 import { app, ipcMain } from 'electron';
 import knex from 'knex';
-import { isNightly } from '../../config';
 import UPath from 'upath';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
+import { setupPortableMode } from '../../util/portable';
 
+setupPortableMode();
 const dataPath = app.getPath('userData');
 const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 const StoreDB = knex({

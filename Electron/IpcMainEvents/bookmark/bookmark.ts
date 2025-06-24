@@ -1,10 +1,10 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
-import { bookmarkStore } from '../../ElectronStore/bookmarkStore';
-import { isNightly } from '../../config';
 import UPath from 'upath';
 import knex from 'knex';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
+import { setupPortableMode } from '../../util/portable';
 
+setupPortableMode();
 const dataPath = app.getPath('userData');
 const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 const StoreDB = knex({

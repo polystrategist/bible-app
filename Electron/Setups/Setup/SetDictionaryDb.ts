@@ -4,9 +4,10 @@ import UPath from 'upath';
 import Log from 'electron-log';
 import { isNightly } from '../../config';
 import { setDB } from '../../DataBase/DataBase';
+import { setupPortableMode } from '../../util/portable';
 
+setupPortableMode();
 const isPackaged = app.isPackaged;
-
 const dataPath = app.getPath('userData');
 const filePath = UPath.join(dataPath, `StoreDB`, `Dictionary.db`);
 

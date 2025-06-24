@@ -1,6 +1,6 @@
-import { isNightly } from '../../../config';
 import { app, ipcMain } from 'electron';
 import knex from 'knex';
+import { setupPortableMode } from '../../../util/portable';
 
 export type SearchBibleInterface = {
     search: string;
@@ -11,6 +11,7 @@ export type SearchBibleInterface = {
     limit: number;
 };
 
+setupPortableMode();
 const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\`;
 

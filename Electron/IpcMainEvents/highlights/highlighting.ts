@@ -1,9 +1,9 @@
 import Log from 'electron-log';
-import { isNightly } from './../../config';
 import { app, ipcMain } from 'electron';
 import knex from 'knex';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
+import { setupPortableMode } from '../../util/portable';
 
 export type GetVerseArgs = {
     bible_versions: Array<string>;
@@ -11,6 +11,7 @@ export type GetVerseArgs = {
     selected_chapter: number;
 };
 
+setupPortableMode();
 const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\StoreDB\\Store.db`;
 const StoreDB = knex({
