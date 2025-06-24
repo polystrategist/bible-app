@@ -8,7 +8,7 @@ import { download } from 'electron-dl';
 
 const isPackaged = app.isPackaged;
 
-const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
+const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\`;
 
 async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>) {

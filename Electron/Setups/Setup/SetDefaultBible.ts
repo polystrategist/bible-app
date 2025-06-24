@@ -6,7 +6,7 @@ import { isNightly } from '../../config';
 
 const defaultBibleFile = `King James Version - 1769.SQLite3`;
 const isPackaged = app.isPackaged;
-const dataPath = app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
+const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\${defaultBibleFile}`;
 
 export const setDefaultBible = new Promise((resolve, reject) => {
@@ -16,9 +16,9 @@ export const setDefaultBible = new Promise((resolve, reject) => {
 
             const defaultBiblePath = isPackaged
                 ? UPath.toUnix(UPath.join(__dirname, 'defaults', 'Modules', 'Bible', defaultBibleFile)).replace(
-                      'app.asar/dist/Setups/Setup/',
-                      ''
-                  )
+                    'app.asar/dist/Setups/Setup/',
+                    ''
+                )
                 : `./defaults/Modules/Bible/${defaultBibleFile}`;
             Log.info('Default Bible Path:', defaultBiblePath);
 

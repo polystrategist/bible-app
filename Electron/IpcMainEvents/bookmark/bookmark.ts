@@ -5,10 +5,7 @@ import UPath from 'upath';
 import knex from 'knex';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 
-const dataPath = UPath.join(
-    app.getPath('appData'),
-    !isNightly ? 'believers-sword' : 'believers-sword-nightly'
-);
+const dataPath = app.getPath('userData');
 const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
 const StoreDB = knex({
     client: 'sqlite3',

@@ -11,3 +11,4 @@ export const appConfig = new ElectronStore({
         },
     },
 });
+

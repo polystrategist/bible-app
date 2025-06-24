@@ -11,8 +11,7 @@ export type GetVerseArgs = {
     selected_chapter: number;
 };
 
-const dataPath =
-    app.getPath('appData') + (!isNightly ? '\\believers-sword' : '\\believers-sword-nightly');
+const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\StoreDB\\Store.db`;
 const StoreDB = knex({
     client: 'sqlite3',

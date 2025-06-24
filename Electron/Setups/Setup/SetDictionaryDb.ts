@@ -7,18 +7,15 @@ import { setDB } from '../../DataBase/DataBase';
 
 const isPackaged = app.isPackaged;
 
-const dataPath = UPath.join(
-    app.getPath('appData'),
-    !isNightly ? 'believers-sword' : 'believers-sword-nightly'
-);
+const dataPath = app.getPath('userData');
 const filePath = UPath.join(dataPath, `StoreDB`, `Dictionary.db`);
 
 export const setDictionaryDB = new Promise(async (resolve, reject) => {
     const defaultBiblePath = isPackaged
         ? UPath.toUnix(UPath.join(__dirname, 'defaults', 'Main', `Dictionary.db`)).replace(
-              'app.asar/dist/Setups/Setup/',
-              ''
-          )
+            'app.asar/dist/Setups/Setup/',
+            ''
+        )
         : `./defaults/Main/Dictionary.db`;
 
     if (!fs.existsSync(filePath)) {

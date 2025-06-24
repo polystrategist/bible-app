@@ -1,5 +1,5 @@
 import { appConfig } from "./../../ElectronStore/Configuration";
-import { BrowserWindow, ipcMain, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen } from "electron";
 
 const minimizeWindow = (win: any) => {
     win.minimize();
@@ -25,11 +25,7 @@ const maximizeWindow = (win: BrowserWindow): boolean | void => {
 
 const closeWindow = (win: BrowserWindow): void => {
     const appBounds = win.getBounds();
-    appConfig.set({
-        setting: {
-            appBounds,
-        },
-    });
+    appConfig.set('setting.appBounds', appBounds);
     win.destroy();
 };
 

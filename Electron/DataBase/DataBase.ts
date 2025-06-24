@@ -1,12 +1,7 @@
 import { app } from 'electron';
 import knex from 'knex';
-import { isNightly } from '../config';
-import UPath from 'upath';
 
-const dataPath = UPath.join(
-    app.getPath('appData'),
-    !isNightly ? 'believers-sword' : 'believers-sword-nightly'
-);
+const dataPath = app.getPath('userData');
 
 export const StoreDB = knex({
     client: 'sqlite3',

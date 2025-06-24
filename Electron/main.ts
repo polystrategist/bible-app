@@ -7,14 +7,11 @@ import { appConfig } from './ElectronStore/Configuration';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
+import { setupPortableMode } from './util/portable';
+import { attachResizeListener } from './util/window';
 
 // Check if running in portable mode
-const isPortable = !!process.env.PORTABLE_EXECUTABLE_DIR;
-
-if (isPortable) {
-    const exeDir = process.env.PORTABLE_EXECUTABLE_DIR!;
-    app.setPath('userData', path.join(exeDir, 'user-data'));
-}
+setupPortableMode();
 
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -41,6 +38,9 @@ async function createWindow() {
 
     if (appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
     const mainWindow = new BrowserWindow(BrowserWindowOptions);
+
+
+    attachResizeListener(mainWindow);
 
     // Ensure a single instance of the app
     const gotTheLock = app.requestSingleInstanceLock();
@@ -72,11 +72,6 @@ async function createWindow() {
         mainWindow.setAlwaysOnTop(false);
         mainWindow.focus();
     }, 1000);
-
-    // Open the DevTools.
-    if (isDev) {
-        mainWindow.webContents.openDevTools();
-    }
 }
 
 // This method will be called when Electron has finished
@@ -93,16 +88,6 @@ app.whenReady().then(async () => {
     } catch (e) {
         Log.error(e);
         app.quit();
-    }
-
-    // if dev
-    if (isDev) {
-        try {
-            const { installExt } = await import('./installDevTool');
-            await installExt();
-        } catch (e) {
-            console.log('Can not install extension!');
-        }
     }
 
     await createWindow();
