@@ -2,8 +2,11 @@
 import { ref } from 'vue';
 import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
-import { NButton } from 'naive-ui';
+import { NButton, NIcon, NPopconfirm } from 'naive-ui';
+import { Delete16Filled, Delete16Regular } from '@vicons/fluent';
+import { useThemeStore } from '../../../../store/theme';
 
+const themeStore = useThemeStore();
 const bibleStore = useBibleStore();
 const selectedHighlight = ref<string | null>(null);
 
@@ -25,6 +28,10 @@ function nextPage() {
     if (bibleStore.allHighlights.length == bibleStore.highlightLimit) bibleStore.highlightPage++;
     bibleStore.getHighlights();
 }
+
+function handleRemoveHighlight(highlight: any) {
+    bibleStore.removeHighlightInDb(highlight.study_space_id, highlight.key);
+}
 </script>
 
 <template>
@@ -41,7 +48,10 @@ function nextPage() {
                         class="absolute transition-all top-0 left-0 h-0 w-5px bg-[var(--primary-color)] opacity-50"
                         :class="{ '!h-full': selectedHighlight == key as any }"
                     ></div>
-                    <div class="w-full p-10px" @click="selectBookVerse(key as any, highlight)">
+                    <div
+                        class="w-full p-10px relative"
+                        @click="selectBookVerse(key as any, highlight)"
+                    >
                         <div class="font-700">
                             <span class="mr-1" v-if="highlight.book_number">
                                 {{ $t(bibleStore.getBook(highlight.book_number).title) }}
@@ -52,18 +62,24 @@ function nextPage() {
                             <span class="text-sm opacity-70 mr-1">{{
                                 highlight.key.split('_')[0]
                             }}</span>
-                            <NButton
-                                size="tiny"
-                                secondary
-                                rounded
-                                type="error"
-                                @click.stop="bibleStore.removeHighlightInDb(
-                                    highlight.study_space_id,
-                                    highlight.key
-                                )"
-                            >
-                                {{ $t('remove') }}
-                            </NButton>
+                            <NPopconfirm @positive-click="handleRemoveHighlight(highlight)">
+                                <template #trigger>
+                                    <NButton
+                                        secondary
+                                        circle
+                                        type="error"
+                                        class="absolute top-0 right-0"
+                                    >
+                                        <template #icon>
+                                            <NIcon v-if="themeStore.isDark"
+                                                ><Delete16Filled
+                                            /></NIcon>
+                                            <NIcon v-else><Delete16Regular /></NIcon>
+                                        </template>
+                                    </NButton>
+                                </template>
+                                Remove This Highlight?
+                            </NPopconfirm>
                         </div>
                         <div>
                             <span v-html="highlight.content"></span>

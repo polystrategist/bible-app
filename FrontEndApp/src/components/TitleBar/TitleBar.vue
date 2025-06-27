@@ -48,7 +48,7 @@ onBeforeMount(async () => {
 <template>
     <NLayoutHeader
         bordered
-        class="flex cursor-default select-none items-center pl-8px justify-between"
+        class="flex cursor-default select-none items-center pl-13px justify-between"
     >
         <div class="whitespace-nowrap flex items-center gap-1 pl-0px">
             <LogoComponent class="w-20px h-20px" />
@@ -56,10 +56,12 @@ onBeforeMount(async () => {
             <div>
                 <NButton
                     v-if="menuStore.menuSelected === 'read-bible'"
-                    size="tiny"
+                    size="small"
                     icon-placement="right"
                     @click="StudySpaceStore.showSpaceStudy = true"
                     :focusable="false"
+                    type="primary"
+                    secondary
                 >
                     <div class="min-w-150px flex items-center justify-between">
                         <div class="flex items-center">

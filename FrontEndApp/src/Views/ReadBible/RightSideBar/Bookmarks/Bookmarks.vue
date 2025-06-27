@@ -28,11 +28,9 @@ async function deleteBookmark(verse: any) {
             v-for="(bookmark, key) in (bookmarkStore.bookmarks as bookmarksType)"
             :key="key"
             class="relative dark:hover:bg-light-50 dark:hover:bg-opacity-20 hover:bg-gray-800 hover:bg-opacity-20 cursor-pointer flex justify-between items-center"
-            :class="{ 'dark:bg-light-50 dark:bg-opacity-10 bg-gray-800 bg-opacity-10': selectedBookmarkKey == key }"
         >
             <div
                 class="absolute transition-all top-0 left-0 h-0 w-5px bg-[var(--primary-color)] opacity-50"
-                :class="{ '!h-full': selectedBookmarkKey == key }"
             ></div>
             <div class="w-full p-10px" @click="selectBookVerse(key as string, bookmark)">
                 <span class="mr-1">{{ $t(bibleStore.getBook(bookmark.book_number).title) }}</span>

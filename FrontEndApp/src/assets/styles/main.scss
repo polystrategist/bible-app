@@ -1,6 +1,8 @@
 :root {
     --primary-color: #f2ad23;
     --primary-color-light: rgba(238, 167, 24, 0.212);
+    --header-height: 40px;
+    --footer-height: 40px;
 }
 
 @import './common/scrollbar.scss';
