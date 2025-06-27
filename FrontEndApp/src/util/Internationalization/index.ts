@@ -10,6 +10,8 @@ const messages: any = {
 };
 
 const internationalizations = createI18n({
+    legacy: false,
+    globalInjection: true,
     locale: 'English',
     fallbackLocale: 'English',
     messages,
