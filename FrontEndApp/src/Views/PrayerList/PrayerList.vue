@@ -77,7 +77,7 @@ function selectItemFromMenuElement(key: any, element: any) {
     <div
         class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-20px pl-30px dark:bg-dark-800"
     >
-        <div class="w-full max-w-250px h-[100%] flex flex-col">
+        <div class="w-full h-[100%] flex flex-col">
             <div class="py-10px flex justify-between items-end select-none min-h-40px">
                 <span class="font-700 capitalize">{{ $t('prayer list') }}</span>
                 <NewPrayerItem />
@@ -91,7 +91,9 @@ function selectItemFromMenuElement(key: any, element: any) {
                 @change="changeInProgress"
             >
                 <template #item="{ element }">
-                    <div class="relative prayer-list-item group">
+                    <div
+                        class="relative prayer-list-item group dark:bg-white dark:bg-opacity-10 bg-gray-1 rounded-md"
+                    >
                         <div class="pb-0 duration-200">
                             <div
                                 class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1 m-2"
@@ -113,7 +115,11 @@ function selectItemFromMenuElement(key: any, element: any) {
                                 ]"
                                 @select="(key: string) => selectItemFromMenuElement(key, element)"
                             >
-                                <NButton type="primary" size="tiny" class="absolute top-1 right-1 invisible group-hover:visible">
+                                <NButton
+                                    type="primary"
+                                    size="tiny"
+                                    class="absolute top-1 right-1 invisible group-hover:visible"
+                                >
                                     <template #icon>
                                         <NIcon>
                                             <OverflowMenuVertical />
@@ -126,9 +132,9 @@ function selectItemFromMenuElement(key: any, element: any) {
                 </template>
             </Draggable>
         </div>
-        <div class="w-full max-w-250px h-[100%] flex flex-col">
+        <div class="w-full h-[100%] flex flex-col">
             <div class="py-10px flex justify-between items-end min-h-40px">
-                <span class="font-700 select-none capitalize">{{ $t('done') }} </span>
+                <span class="font-700 select-none capitalize">{{ $t('answered') }} </span>
             </div>
             <Draggable
                 class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div dark:bg-dark-900 p-2"
@@ -139,7 +145,9 @@ function selectItemFromMenuElement(key: any, element: any) {
                 @change="changeInDone"
             >
                 <template #item="{ element }">
-                    <div class="group relative prayer-list-item">
+                    <div
+                        class="group relative prayer-list-item dark:bg-white dark:bg-opacity-10 bg-gray-1 rounded-md opacity-50"
+                    >
                         <div
                             class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
                             v-html="element.content"
@@ -160,7 +168,12 @@ function selectItemFromMenuElement(key: any, element: any) {
                             ]"
                             @select="(key: string) => selectItemFromMenuElement(key, element)"
                         >
-                            <NButton type="primary" size="tiny" class="absolute top-1 right-1 invisible group-hover:visible">
+                            <NButton
+                                type="primary"
+                                size="tiny"
+                                class="absolute top-1 right-1 invisible group-hover:visible"
+                                secondary
+                            >
                                 <template #icon>
                                     <NIcon>
                                         <OverflowMenuVertical />

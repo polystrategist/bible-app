@@ -160,6 +160,7 @@ export interface InternationalMessageInterface {
     'Clear Highlight': string;
     'dictionary': string;
     'references': string;
+    'answered': string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

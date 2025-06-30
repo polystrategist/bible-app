@@ -161,6 +161,7 @@ const message: InternationalMessageType = {
     "Clear Highlight": 'ハイライトをクリアする',
     'dictionary': '辞書',
     'references': '参考文献',
+    'answered': '回答済み',
 }
 
 export default message;

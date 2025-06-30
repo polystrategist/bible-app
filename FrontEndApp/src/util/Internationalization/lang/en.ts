@@ -161,5 +161,6 @@ const message: InternationalMessageType = {
     'Clear Highlight': 'Clear Highlight',
     'dictionary': 'dictionary',
     'references': 'references',
+    'answered': 'answered',
 };
 export default message;
