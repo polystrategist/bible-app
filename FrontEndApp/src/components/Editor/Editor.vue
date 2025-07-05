@@ -75,6 +75,10 @@ const props = defineProps({
             'redo',
         ],
     },
+    editorContentStyle: {
+        type: String,
+        default: '',
+    }
 });
 const emits = defineEmits(['update:modelValue']);
 
@@ -351,6 +355,7 @@ defineExpose({
             :class="{ 'overflow-auto overflowing-div': overflow }"
             v-if="editor"
             :editor="editor"
+            :style="editorContentStyle"
         />
     </div>
 </template>
