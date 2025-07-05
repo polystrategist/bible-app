@@ -33,4 +33,5 @@ export const bible = [
     newAmericanStandardVersion2020,
     tamilBible2017
 ];
+
 export const commentaries = [newInternationalVersionCommentaries, newAmericanStandardVersion2020Commentaries];
