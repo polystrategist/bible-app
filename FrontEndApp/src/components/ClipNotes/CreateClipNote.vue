@@ -62,25 +62,23 @@ defineExpose({
             <template #header>
                 <div class="flex justify-between mb-4">
                     <div>
-                        <NIcon><Attachment /></NIcon> {{ $t('Clip Note') }}
+                        <NIcon>
+                            <Attachment />
+                        </NIcon> {{ $t('Clip Note') }}
                     </div>
                     <div class="flex gap-1 items-center">
                         <span> {{ $t('Select Color') }}:</span>
-                        <button
-                            v-for="color in colors"
-                            :key="color.color"
-                            @click="selectedColor = color.color"
+                        <button v-for="color in colors" :key="color.color" @click="selectedColor = color.color"
                             :style="`background-color: ${color.color}`"
-                            class="h-30px w-30px cursor-pointer rounded-full"
-                            :class="{
-                                'border-3 border-gray-50': selectedColor == color.color,
-                            }"
-                        ></button>
+                            class="h-30px w-30px cursor-pointer rounded-full" :class="{
+                                'border-3 border-primary': selectedColor == color.color,
+                            }"></button>
                     </div>
                 </div>
             </template>
             <div>
-                <EditorVue v-model="content" />
+                <EditorVue v-model="content"
+                    :editorContentStyle="`background-color: ${selectedColor}; color: #000; padding: 10px; border-radius: 5px;`" />
             </div>
             <template #footer>
                 <div class="flex gap-2">
