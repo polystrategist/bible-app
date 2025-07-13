@@ -43,7 +43,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             iconDark: renderNIcon(Book24Filled),
         },
         {
-            label: 'Sermons',
+            label: "Believers\' Feed",
             key: 'sermons',
             icon: renderNIcon(DocumentQueueMultiple24Regular),
             iconDark: renderNIcon(DocumentQueueMultiple24Filled),

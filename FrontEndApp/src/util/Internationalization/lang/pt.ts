@@ -162,5 +162,6 @@ const message: InternationalMessageType = {
     'dictionary': 'dicionário',
     'references': 'referências',
     'answered': 'respondido',
+    "Believers\' Feed": "Feed dos Believers",
 };
 export default message;

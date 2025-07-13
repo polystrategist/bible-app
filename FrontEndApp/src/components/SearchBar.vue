@@ -103,27 +103,18 @@ const selectedBooksForSearchString = computed(() => {
 </script>
 
 <template>
-    <div v-if="focused" class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40" @click="focused = false"></div>
+    <div v-if="focused" class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40" @click="focused = false">
+    </div>
     <div class="w-400px flex justify-center top-0 z-999999999 relative">
-        <NInput
-            ref="SearchInputRef"
-            size="small"
-            v-model:value="search"
-            :autofocus="false"
-            :on-focus="() => (focused = true)"
-            class="transition-all"
-            :class="focused ? '!w-400px' : '!w-300px'"
-            clearable
-            :placeholder="$t('Search Bible') + '...'"
-            :round="!focused"
-            @keyup="(key: any) => {
+        <NInput ref="SearchInputRef" size="small" v-model:value="search" :autofocus="false"
+            :on-focus="() => (focused = true)" class="transition-all" :class="focused ? '!w-400px' : '!w-300px'"
+            clearable :placeholder="$t('Search Bible') + '...'" :round="!focused" @keyup="(key: any) => {
                 if (key.key == 'Escape') {
                     focused = false;
-                    if (SearchInputRef) 
+                    if (SearchInputRef)
                         SearchInputRef.blur();
                 }
-            }"
-        >
+            }">
             <template #prefix>
                 <NIcon>
                     <Search24Filled />
@@ -136,12 +127,15 @@ const selectedBooksForSearchString = computed(() => {
                 {{ selectedBooksForSearchString }}
             </div>
             <!-- Select Book Section -->
-            <div v-show="showBookSelection" class="fixed top-0 left-0 bg-dark-800 bg-opacity-60 w-full h-full z-9999999999">
+            <div v-show="showBookSelection"
+                class="fixed top-0 left-0 bg-dark-800 bg-opacity-60 w-full h-full z-9999999999">
                 <div class="dark:bg-dark-300 bg-gray-100 max-w-800px mx-auto mt-5 rounded-lg p-3 relative">
                     <div class="mb-3 flex justify-between">
                         <div>
-                            <NButton class="mr-3" round size="small" @click="selectedBookNumbers = []">Unselect All </NButton>
-                            <NButton round size="small" @click="selectedBookNumbers = bibleBooks.map((book) => book.book_number)">
+                            <NButton class="mr-3" round size="small" @click="selectedBookNumbers = []">Unselect All
+                            </NButton>
+                            <NButton round size="small"
+                                @click="selectedBookNumbers = bibleBooks.map((book) => book.book_number)">
                                 Select All
                             </NButton>
                         </div>
@@ -153,8 +147,10 @@ const selectedBooksForSearchString = computed(() => {
                         <NCheckboxGroup v-model:value="selectedBookNumbers">
                             <div>
                                 <template v-for="book in bibleBooks" :key="book.book_number">
-                                    <div v-if="book.title == 'Matthew'" class="w-full py-3 font-bold">New Testament</div>
-                                    <div v-else-if="book.title == 'Genesis'" class="w-full py-3 font-bold">Old Testament</div>
+                                    <div v-if="book.title == 'Matthew'" class="w-full py-3 font-bold">New Testament
+                                    </div>
+                                    <div v-else-if="book.title == 'Genesis'" class="w-full py-3 font-bold">Old Testament
+                                    </div>
                                     <NCheckbox class="p-1" :label="book.title" :value="book.book_number" />
                                 </template>
                             </div>
@@ -162,21 +158,16 @@ const selectedBooksForSearchString = computed(() => {
                     </div>
                 </div>
             </div>
-            <div
-                id="inputTextSearch"
-                class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses dark:bg-dark-500 bg-gray-50 w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div"
-            >
+            <div id="inputTextSearch"
+                class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses dark:bg-dark-500 bg-gray-50 w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div">
                 <div v-if="!searchedVerses.length || !search" class="flex justify-center items-center mt-10">
                     {{ $t('Search Bible') }}
                 </div>
                 <template v-else>
                     <template v-for="(verse, tabIndex) in searchedVerses">
-                        <div
-                            v-if="bibleStore.isBookExist(verse.book_number)"
-                            :tabindex="tabIndex"
+                        <div v-if="bibleStore.isBookExist(verse.book_number)" :tabindex="tabIndex"
                             class="p-3 dark:hover:bg-dark-100 hover:bg-gray-800 hover:bg-opacity-5 rounded-sm cursor-pointer"
-                            @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)"
-                        >
+                            @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)">
                             <div class="font-700">
                                 {{ bibleStore.getBookShortName(verse.book_number).title }}
                                 {{ verse.chapter }}:{{ verse.verse }}
@@ -193,26 +184,19 @@ const selectedBooksForSearchString = computed(() => {
             </div>
             <div v-show="searchedVerses.length && search != ''" class="flex justify-between px-10px select-none">
                 <div>
-                    <span
-                        v-show="page > 1"
-                        class="cursor-pointer hover:text-[var(--primary-color)]"
-                        @click="
-                            page--;
-                            submitSearch();
-                        "
-                    >
+                    <span v-show="page > 1" class="cursor-pointer hover:text-[var(--primary-color)]" @click="
+                        page--;
+                    submitSearch();
+                    ">
                         {{ $t('Before') }}
                     </span>
                 </div>
                 <div>
-                    <span
-                        v-show="searchedVerses.length > 0 && searchedVerses.length == limit"
-                        class="cursor-pointer hover:text-[var(--primary-color)]"
-                        @click="
+                    <span v-show="searchedVerses.length > 0 && searchedVerses.length == limit"
+                        class="cursor-pointer hover:text-[var(--primary-color)]" @click="
                             page++;
-                            submitSearch();
-                        "
-                    >
+                        submitSearch();
+                        ">
                         {{ $t('Next') }}
                     </span>
                 </div>

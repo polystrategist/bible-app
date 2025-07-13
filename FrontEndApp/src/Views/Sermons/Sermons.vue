@@ -13,6 +13,8 @@ import { supabase } from '../../util/SupaBase/SupaBase';
 import { Icon } from '@iconify/vue';
 import SermonItems from '../../components/Sermon/SermonItems.vue';
 import SelectContentToCreateModal from '../../components/Sermon/SelectContentToCreateModal.vue';
+import { Info24Regular, Info28Filled } from '@vicons/fluent';
+import { useThemeStore } from '../../store/theme';
 
 const SelectContentToCreateModalRef = ref();
 const message = useMessage();
@@ -23,6 +25,7 @@ const sermonItems = ref<HTMLElement | null>(null);
 const sermonStore = userSermonStore();
 const showYoutubeVideo = ref<null | { toggleModal: Function }>(null);
 const textVueContent = ref<null | { toggleModal: Function }>(null);
+const themeStore = useThemeStore();
 
 function showContent(from: 'youtube' | 'text', sermon: any) {
     if (from == 'youtube') showYoutubeVideo.value?.toggleModal(sermon);
@@ -87,13 +90,27 @@ function deleteSermon(sermon: SERMON_TYPE) {
         },
     });
 }
+
+function handleBelieversSwordInfoDialog() {
+    dialog.info({
+        title: "Believers Feed",
+        content: "Believers’ Feed is your spiritual hub within the Believers Sword community—a place where believers come together to share and grow. Here, you’ll find user-submitted sermons, powerful YouTube videos with sermon content, thought-provoking written messages, and engaging discussions centered on faith and the Word of God. Whether you're looking for inspiration, teaching, or fellowship, the Believers’ Feed connects you to a stream of Spirit-led content created and curated by fellow believers"
+    })
+}
+
 </script>
 <template>
     <div id="drawer-target" class="w-full h-full overflowing-div relative">
         <Youtube ref="showYoutubeVideo" />
         <TextVue ref="textVueContent" />
         <div class="!h-50px flex justify-between items-center z-99 w-full">
-            <div class="font-700 text-size-25px pl-5">{{ $t('Sermons') }}</div>
+            <div class="font-700 text-size-25px pl-5 flex items-center gap-2">
+                <span>{{ $t('Believers\' Feed') }}</span>
+                <NIcon class="cursor-pointer" @click="handleBelieversSwordInfoDialog">
+                    <Info24Regular v-if="themeStore.isDark" />
+                    <Info28Filled v-else />
+                </NIcon>
+            </div>
             <div class="flex gap-8px pr-8">
                 <NInput v-model:value="sermonStore.search" :disabled="sermonStore.loading" class="!w-300px"
                     placeholder="Search Using Text" size="small" @keydown.enter="sermonStore.getSermons(true)" />

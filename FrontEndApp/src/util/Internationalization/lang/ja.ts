@@ -162,6 +162,7 @@ const message: InternationalMessageType = {
     'dictionary': '辞書',
     'references': '参考文献',
     'answered': '回答済み',
+    "Believers\' Feed": "信者のフィード",
 }
 
 export default message;
