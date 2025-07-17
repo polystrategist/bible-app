@@ -163,6 +163,7 @@ const message: InternationalMessageType = {
     'references': 'references',
     'answered': 'answered',
     "Believers\' Feed": 'Believers\' Feed',
-    "added": "added"
+    "added": "added",
+    "add": "add"
 };
 export default message;

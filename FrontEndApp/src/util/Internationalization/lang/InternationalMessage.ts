@@ -163,6 +163,7 @@ export interface InternationalMessageInterface {
     'answered': string;
     "Believers\' Feed": string;
     "added": string;
+    "add": string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

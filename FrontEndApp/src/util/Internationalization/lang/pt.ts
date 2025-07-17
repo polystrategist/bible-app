@@ -164,5 +164,6 @@ const message: InternationalMessageType = {
     'answered': 'respondido',
     "Believers\' Feed": "Feed dos Believers",
     "added": "adicionado",
+    "add": "adicionar",
 };
 export default message;

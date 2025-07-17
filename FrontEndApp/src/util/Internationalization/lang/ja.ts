@@ -164,6 +164,7 @@ const message: InternationalMessageType = {
     'answered': '回答済み',
     "Believers\' Feed": "信者のフィード",
     "added": "追加",
+    "add": "追加",    
 }
 
 export default message;
