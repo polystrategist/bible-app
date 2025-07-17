@@ -162,6 +162,10 @@ const message: InternationalMessageType = {
     'dictionary': 'dictionary',
     'references': 'references',
     'answered': 'answered',
-    "Believers\' Feed": 'Believers\' Feed'
+    "Believers\' Feed": 'Believers\' Feed',
+    "added": "added",
+    "add": "add",
+    "bible": "bible",
+    "bible version": "bible version",
 };
 export default message;
