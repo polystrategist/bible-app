@@ -11,8 +11,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getVersesCount: (args: string) => ipcRenderer.invoke('getVersesCount', JSON.parse(args)),
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),
     download: (args: any) => ipcRenderer.send('download', args),
-    downloadModule: ({ urls, done, percentage, cancel }: { urls: Array<string>; percentage: Function; done: Function; cancel: Function }) => {
-        ipcRenderer.send('download-module', urls);
+    downloadModule: ({ urls, done, percentage, cancel }: { urls: Array<string>; percentage: Function; done: Function; cancel: Function }, moduleData?: { title: string; description: string; zipped: boolean }) => {
+        ipcRenderer.send('download-module', urls, moduleData);
         // Listen for the event from the main process
         ipcRenderer.on('download-module-progress', (_, progressValue) => {
             percentage(progressValue);

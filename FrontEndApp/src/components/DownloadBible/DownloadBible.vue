@@ -23,7 +23,7 @@ function isAlreadyDownloaded(file_name: string) {
 
 const downloadLoading = ref(false);
 const selectedDownloadLink = ref<string | null>(null);
-function clickDownload(downloadLink: string) {
+function clickDownload(downloadLink: string, version: any) {
     selectedDownloadLink.value = downloadLink;
 
     bibleDownloadStore.isDownloading = true;
@@ -44,7 +44,7 @@ function clickDownload(downloadLink: string) {
             bibleDownloadStore.isDownloading = false;
             message.error('Download Cancelled');
         },
-    });
+    }, version);
 }
 </script>
 <template>
@@ -66,7 +66,7 @@ function clickDownload(downloadLink: string) {
                     </div>
                     <NButton size="tiny" :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
                         :type="!isAlreadyDownloaded(version.file_name) ? 'default' : 'info'"
-                        @click="clickDownload(version.download_link)" secondary rounded
+                        @click="clickDownload(version.download_link, version)" secondary rounded
                         :loading="version.download_link === selectedDownloadLink && downloadLoading">
                         <NIcon>
                             <Download />

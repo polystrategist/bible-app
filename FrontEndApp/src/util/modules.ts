@@ -16,7 +16,17 @@ import tamilBible2017 from './Modules/Bible/tamil-bible-2017';
 import newAmericanStandardVersion2020Commentaries from './Modules/Commentaries/new-american-standard-version-2020-commentaries';
 import newInternationalVersionCommentaries from './Modules/Commentaries/new-international-version.commentaries';
 
-export const bible = [
+export type MODULE_BIBLE_TYPE = {
+    file_name: string;
+    language: string;
+    language_full: string;
+    title: string;
+    description: string;
+    download_link: string;
+    is_zipped?: boolean | undefined | null;
+};
+
+export const bible: MODULE_BIBLE_TYPE[] = [
     americanStandardVersion1901,
     angBiblia1978,
     angSalitaNgDios2015,
@@ -31,7 +41,23 @@ export const bible = [
     newAmericanStandardBible,
     newInternationalVersion,
     newAmericanStandardVersion2020,
-    tamilBible2017
+    tamilBible2017,
+    {
+        description: "A heavily annotated version by Roman Catholic scholars, notable for its excellent literary quality. A revision called The New Jerusalem Bible appeared in 1985.",
+        download_link: "https://www.ph4.org/_dl.php?back=bbl&a=RSV&b=mybible&c",
+        file_name: "Revised Standard Version.SQLite3",
+        is_zipped: true,
+        language: "en",
+        language_full: "english",
+        title: "Revised Standard Version"
+    }
 ];
+
+const fileNames = bible.map(entry => entry.file_name).filter(Boolean);
+const duplicates = fileNames.filter((name, index, self) => self.indexOf(name) !== index);
+
+if (duplicates.length > 0) {
+    throw new Error("Duplicate file_name(s) found: " + [...new Set(duplicates)].join(", "));
+}
 
 export const commentaries = [newInternationalVersionCommentaries, newAmericanStandardVersion2020Commentaries];

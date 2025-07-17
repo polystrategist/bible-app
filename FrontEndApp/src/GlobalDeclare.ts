@@ -38,7 +38,7 @@ declare global {
                 percentage: Function;
                 done: () => void;
                 cancel: () => void;
-            }) => void;
+            }, moduleData?: { title: string; description: string; zipped: boolean }) => void;
 
             /**
              * Save A Bookmark
