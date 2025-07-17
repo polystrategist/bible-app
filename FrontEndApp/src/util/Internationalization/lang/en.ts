@@ -164,6 +164,8 @@ const message: InternationalMessageType = {
     'answered': 'answered',
     "Believers\' Feed": 'Believers\' Feed',
     "added": "added",
-    "add": "add"
+    "add": "add",
+    "bible": "bible",
+    "bible version": "bible version",
 };
 export default message;

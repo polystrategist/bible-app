@@ -57,9 +57,9 @@ async function extractZip(zipPath: string, destPath: string, file_name: string):
     }
 }
 
-function ensureDirectoryExists(dirPath: string) {
+async function ensureDirectoryExists(dirPath: string) {
     if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
+        await fs.mkdirSync(dirPath, { recursive: true });
         console.log('Created directory:', dirPath);
     }
 }
@@ -130,9 +130,7 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
                     }
 
                     // extract if its a zip file
-                    const extractTo = filePath;
-
-                    const isExtracted = await extractZip(downloadedFilePath, extractTo, moduleData?.title);
+                    const isExtracted = await extractZip(downloadedFilePath, filePath, moduleData?.title);
 
                     if (!isExtracted) {
                         mainWindow.webContents.send('download-module-done');
@@ -143,12 +141,12 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
                     // Optionally remove zip after extraction
                     fs.unlink(downloadedFilePath, (err) => {
                         if (err) console.error('Failed to delete zip:', err);
+
+                        // remove any file with commentaries in the file names
+                        moveFilesWithCommentaries(filePath);
+
+                        mainWindow.webContents.send('download-module-done');
                     });
-
-                    // remove any file with commentaries in the file names
-                    moveFilesWithCommentaries(filePath);
-
-                    mainWindow.webContents.send('download-module-done');
                 },
                 onCancel: () => {
                     mainWindow.webContents.send('download-module-cancel');

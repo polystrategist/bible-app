@@ -52,7 +52,7 @@ function clickDownload(downloadLink: string, version: any) {
     <NModal v-model:show="bibleDownloadStore.showBibleDownloadModal">
         <NCard style="width: 600px" :bordered="false" size="small" role="dialog" aria-modal="true">
             <div class="mb-2">
-                <h1 class="font-800 select-none m-0">{{ $t('Available Versions') }}</h1>
+                <h1 class="font-800 select-none m-0 capitalize">{{ $t('bible version') }}</h1>
                 <NInput v-model:value="searchBible" placeholder="Search..." size="small" />
             </div>
             <div v-if="BibleVersions.length" class="select-none h-[70vh] overflow-y-auto overflowing-div">

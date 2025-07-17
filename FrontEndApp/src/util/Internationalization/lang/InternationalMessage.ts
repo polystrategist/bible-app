@@ -164,6 +164,8 @@ export interface InternationalMessageInterface {
     "Believers\' Feed": string;
     "added": string;
     "add": string;
+    "bible": string;
+    "bible version": string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

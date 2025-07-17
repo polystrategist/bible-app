@@ -165,5 +165,7 @@ const message: InternationalMessageType = {
     "Believers\' Feed": "Feed dos Believers",
     "added": "adicionado",
     "add": "adicionar",
+    "bible": "biblia",
+    "bible version": "versão da biblia",
 };
 export default message;

@@ -165,6 +165,8 @@ const message: InternationalMessageType = {
     "Believers\' Feed": "信者のフィード",
     "added": "追加",
     "add": "追加",    
+    "bible": "聖書",
+    "bible version": "聖書ベーション",    
 }
 
 export default message;
