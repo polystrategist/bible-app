@@ -6,5 +6,11 @@ import { bible } from '../../modules';
  */
 export async function getDownloadedBible(): Promise<Array<any>> {
     const files = await window.browserWindow.getAvailableBibles();
-    return bible.filter((file) => files.includes(file.file_name));
+
+    return files.map((fileName: string) => {
+        return {
+            file_name: fileName,
+            title: fileName.replace('.SQLite3', '').replace('.db', '')
+        }
+    })
 }

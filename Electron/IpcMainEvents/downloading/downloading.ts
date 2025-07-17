@@ -11,11 +11,48 @@ const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\`;
 const commentariesPath = dataPath + `\\modules\\commentaries\\`;
 
-async function extractZip(zipPath: string, destPath: string) {
+async function extractZip(zipPath: string, destPath: string, file_name: string): Promise<boolean> {
     try {
-        await extract(zipPath, { dir: destPath });
+        const extractToPath = path.join(destPath, 'extracted');
+
+        // Ensure extraction path exists
+        if (!fs.existsSync(extractToPath)) {
+            fs.mkdirSync(extractToPath, { recursive: true });
+        }
+
+        // Extract the zip
+        await extract(zipPath, { dir: extractToPath });
+
+        // Read all files in the extracted directory
+        const files = fs.readdirSync(extractToPath);
+
+        for (const file of files) {
+            const fullExtractedPath = path.join(extractToPath, file);
+
+            // Only process files (skip folders)
+            const stat = fs.statSync(fullExtractedPath);
+            if (!stat.isFile()) continue;
+
+            const dotIndex = file.indexOf('.');
+            if (dotIndex === -1) continue;
+
+            // Replace prefix before first dot
+            const newFileName = file.replace(/^.*?\./, file_name + '.');
+            const newFilePath = path.join(destPath, newFileName);
+
+            // Move and rename the file to the main destPath
+            fs.renameSync(fullExtractedPath, newFilePath);
+            console.log(`Renamed & moved: ${file} → ${newFileName}`);
+        }
+
+        // Optional: clean up extracted folder
+        // fs.rmSync(extractToPath, { recursive: true, force: true });
+        fs.rmSync(extractToPath, { recursive: true, force: true });
+        console.log(`Removed temporary folder: ${extractToPath}`);
+
         return true;
     } catch (err) {
+        console.error('extractZip error:', err);
         return false;
     }
 }
@@ -64,10 +101,11 @@ function moveFilesWithCommentaries(dir: string) {
 }
 
 
-async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>, moduleData?: {
+async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>, moduleData: {
     title: string;
     description: string;
     is_zipped: boolean;
+    file_name: string
 }) {
     await Promise.all(
         urls.map(async (url) => {
@@ -82,10 +120,10 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
                 },
                 onCompleted: async (item) => {
                     const downloadedFilePath = item.path;
-                    console.log(downloadedFilePath);
-                    console.log(moduleData);
+
                     const isZipFile = moduleData?.is_zipped && downloadedFilePath.endsWith('.zip');
 
+                    // return if its not a zip file
                     if (!isZipFile) {
                         mainWindow.webContents.send('download-module-done');
                         return
@@ -94,7 +132,7 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
                     // extract if its a zip file
                     const extractTo = filePath;
 
-                    const isExtracted = await extractZip(downloadedFilePath, extractTo);
+                    const isExtracted = await extractZip(downloadedFilePath, extractTo, moduleData?.title);
 
                     if (!isExtracted) {
                         mainWindow.webContents.send('download-module-done');
@@ -127,10 +165,11 @@ export default (mainWindow: BrowserWindow) => {
         // console.log(args);
     });
 
-    ipcMain.on('download-module', async (event, urls: Array<string>, moduleData?: {
+    ipcMain.on('download-module', async (event, urls: Array<string>, moduleData: {
         title: string;
         description: string;
         is_zipped: boolean;
+        file_name: string;
     }) => {
         await downloadModuleUrls(mainWindow, urls, moduleData);
     });
