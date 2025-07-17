@@ -56,6 +56,18 @@ function clickDownload(downloadLink: string, version: any) {
             <div v-if="BibleVersions.length" class="select-none h-[70vh] overflow-y-auto overflowing-div">
                 <div v-for="version in BibleVersions" :disabled="bibleDownloadStore.isDownloading"
                     class="flex gap-10px items-center my-3">
+                    <NButton size="tiny" :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
+                        :type="!isAlreadyDownloaded(version.file_name) ? 'default' : 'info'"
+                        @click="clickDownload(version.download_link, version)" secondary rounded
+                        :loading="version.download_link === selectedDownloadLink && downloadLoading">
+                        <NIcon>
+                            <Download />
+                        </NIcon>
+                        <span class="capitalize">{{ !isAlreadyDownloaded(version.file_name) ? $t('download') : $t('added') }}</span>
+                        <span v-if="version.download_link === selectedDownloadLink && downloadLoading" class="px-2"> {{
+                            downloadPercentage }}% </span>
+                    </NButton>
+
                     <div :value="version.download_link">
                         <div>
                             "{{ version.title }}" -
@@ -64,17 +76,7 @@ function clickDownload(downloadLink: string, version: any) {
                             </span>
                         </div>
                     </div>
-                    <NButton size="tiny" :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
-                        :type="!isAlreadyDownloaded(version.file_name) ? 'default' : 'info'"
-                        @click="clickDownload(version.download_link, version)" secondary rounded
-                        :loading="version.download_link === selectedDownloadLink && downloadLoading">
-                        <NIcon>
-                            <Download />
-                        </NIcon>
-                        <span class="capitalize">{{ $t('download') }}</span>
-                        <span v-if="version.download_link === selectedDownloadLink && downloadLoading" class="px-2"> {{
-                            downloadPercentage }}% </span>
-                    </NButton>
+
                 </div>
             </div>
             <div v-else class="flex items-center justify-center h-[80vh]">It seems you have downloaded all the modules

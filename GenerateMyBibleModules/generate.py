@@ -46,4 +46,8 @@ for tr in soup.find_all("tr"):
 with open("GenerateMyBibleModules/MyBible.module.json", "w", encoding="utf-8") as f:
     json.dump(results, f, indent=4, ensure_ascii=False)
 
+    # Write to JSON
+with open("FrontEndApp/src/assets/json/MyBible.module.json", "w", encoding="utf-8") as f:
+    json.dump(results, f, indent=4, ensure_ascii=False)
+
 print(f"✅ Saved {len(results)} items to MyBible.module.json")

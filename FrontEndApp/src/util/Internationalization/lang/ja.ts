@@ -163,6 +163,7 @@ const message: InternationalMessageType = {
     'references': '参考文献',
     'answered': '回答済み',
     "Believers\' Feed": "信者のフィード",
+    "added": "追加",
 }
 
 export default message;

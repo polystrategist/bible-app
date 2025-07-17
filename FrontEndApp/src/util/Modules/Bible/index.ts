@@ -13,6 +13,8 @@ import newAmericanStandardBible from "./new-american-standard-bible";
 import newAmericanStandardVersion2020 from "./new-american-standard-version-2020";
 import newInternationalVersion from "./new-international-version";
 import tamilBible2017 from "./tamil-bible-2017";
+import MyBibleModule from "./../../../assets/json/MyBible.module.json";
+
 
 export default [
     americanStandardVersion1901,
@@ -38,5 +40,6 @@ export default [
         language: "en",
         language_full: "english",
         title: "Revised Standard Version"
-    }
+    },
+    ...MyBibleModule as any
 ]

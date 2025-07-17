@@ -162,6 +162,7 @@ export interface InternationalMessageInterface {
     'references': string;
     'answered': string;
     "Believers\' Feed": string;
+    "added": string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
