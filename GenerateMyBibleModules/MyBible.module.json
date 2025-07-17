@@ -1,0 +1,1530 @@
+[
+    {
+        "title": "Niobi Study Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Niobe&b=mybible&c",
+        "version_short_name_and_date": "Niobe2009",
+        "description": "Niobi Study Bible",
+        "file_name": "Niobi Study Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "American Standard Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ASV_plus_&b=mybible&c",
+        "version_short_name_and_date": "ASV1901[ASV+]",
+        "description": "American Standard Bible",
+        "file_name": "American Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Revised Standard Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RSV&b=mybible&c",
+        "version_short_name_and_date": "RSV1952",
+        "description": "★Revised Standard Version",
+        "file_name": "★Revised Standard Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New American Standard Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NASB_plus_&b=mybible&c",
+        "version_short_name_and_date": "NASB1971[NASB+]",
+        "description": "★New American Standard Bible",
+        "file_name": "★New American Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Revised Standard Version Anglicised",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NRSVA&b=mybible&c",
+        "version_short_name_and_date": "NRSVA1971",
+        "description": "★New Revised Standard Version Anglicised",
+        "file_name": "★New Revised Standard Version Anglicised.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Logos Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Logos&b=mybible&c",
+        "version_short_name_and_date": "Logos1972",
+        "description": "The Logos Bible",
+        "file_name": "The Logos Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Revised Standard Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NRSV&b=mybible&c",
+        "version_short_name_and_date": "NRSV1989",
+        "description": "★New Revised Standard Version",
+        "file_name": "★New Revised Standard Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Revised Standard Version Catholic Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NRSVCE&b=mybible&c",
+        "version_short_name_and_date": "NRSV-CE1993[NRSVCE]",
+        "description": "★New Revised Standard Version Catholic Edition",
+        "file_name": "★New Revised Standard Version Catholic Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New American Standard Bible (Updated)",
+        "download_link": null,
+        "version_short_name_and_date": "NASU1995",
+        "description": "★New American Standard Bible (Updated)",
+        "file_name": "★New American Standard Bible (Updated).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Revised Standard Version Anglicised Catholic Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NRSVACE&b=mybible&c",
+        "version_short_name_and_date": "NRSVACE1995",
+        "description": "★New Revised Standard Version Anglicised Catholic Edition",
+        "file_name": "★New Revised Standard Version Anglicised Catholic Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World English Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEB_plus_&b=mybible&c",
+        "version_short_name_and_date": "WEB1997, 2020 century[WEB+]",
+        "description": "World English Bible",
+        "file_name": "World English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World English Bible: British Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEBBE&b=mybible&c",
+        "version_short_name_and_date": "WEBBE1997, 2020 century",
+        "description": "World English Bible: British Edition",
+        "file_name": "World English Bible: British Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World English Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEB&b=mybible&c",
+        "version_short_name_and_date": "WEB1997, 2020 century",
+        "description": "World English Bible",
+        "file_name": "World English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Recovery Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RcV'03&b=mybible&c",
+        "version_short_name_and_date": "RcV2003[RcV'03]",
+        "description": "Recovery Version",
+        "file_name": "Recovery Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "English Standard Version Anglicised",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ESVUK&b=mybible&c",
+        "version_short_name_and_date": "ESV-UK2007, 2011 century[ESVUK]",
+        "description": "English Standard Version Anglicised",
+        "file_name": "English Standard Version Anglicised.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★English Standard Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ESV&b=mybible&c",
+        "version_short_name_and_date": "ESV2007, 2011 century",
+        "description": "★English Standard Version",
+        "file_name": "★English Standard Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB&b=mybible&c",
+        "version_short_name_and_date": "NHEB2010",
+        "description": "New Heart English Bible",
+        "file_name": "New Heart English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The ESV Global Study Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ESVGSB&b=mybible&c",
+        "version_short_name_and_date": "ESV-GSB2011[ESVGSB]",
+        "description": "The ESV Global Study Bible",
+        "file_name": "The ESV Global Study Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★American Standard Version",
+        "download_link": null,
+        "version_short_name_and_date": "ASV2014[ASV'14]",
+        "description": "★American Standard Version",
+        "file_name": "★American Standard Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "A Conservative Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ACV&b=mybible&c",
+        "version_short_name_and_date": "ACV2015",
+        "description": "A Conservative Version",
+        "file_name": "A Conservative Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New American Standard Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NASB'20&b=mybible&c",
+        "version_short_name_and_date": "NASB2020[NASB'20]",
+        "description": "New American Standard Bible",
+        "file_name": "New American Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Revised Standard Version Catholic Interconfessional",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RSV-CI&b=mybible&c",
+        "version_short_name_and_date": "RSV-CE1965[RSV-CI]",
+        "description": "Revised Standard Version Catholic Interconfessional",
+        "file_name": "Revised Standard Version Catholic Interconfessional.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Revised Standard Version Catholic Interconfessional",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NRSV-CI&b=mybible&c",
+        "version_short_name_and_date": "NRSV-CI1989",
+        "description": "New Revised Standard Version Catholic Interconfessional",
+        "file_name": "New Revised Standard Version Catholic Interconfessional.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Revised Standard Version, Second Catholic Edition",
+        "download_link": null,
+        "version_short_name_and_date": "RSV-2CE2006[RSV-CE]",
+        "description": "★Revised Standard Version, Second Catholic Edition",
+        "file_name": "★Revised Standard Version, Second Catholic Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Wycliffe Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WYC&b=mybible&c",
+        "version_short_name_and_date": "WYC1382-1395",
+        "description": "Wycliffe Bible",
+        "file_name": "Wycliffe Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV_plus_&b=mybible&c",
+        "version_short_name_and_date": "KJV1611[KJV+]",
+        "description": "★King James Version",
+        "file_name": "★King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Biblia King James",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV1611&b=mybible&c",
+        "version_short_name_and_date": "KJV1611[KJV1611]",
+        "description": "Biblia King James",
+        "file_name": "Biblia King James.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV1769_plus_&b=mybible&c",
+        "version_short_name_and_date": "KJV1611-1769[KJV1769+]",
+        "description": "King James Version",
+        "file_name": "King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version: Pure Cambridge Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=PCE&b=mybible&c",
+        "version_short_name_and_date": "PCE1611",
+        "description": "★King James Version: Pure Cambridge Edition",
+        "file_name": "★King James Version: Pure Cambridge Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJ'1769&b=mybible&c",
+        "version_short_name_and_date": "KJ1769[KJ'1769]",
+        "description": "★King James Version",
+        "file_name": "★King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "King James Version with Apocrypha",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV1769D&b=mybible&c",
+        "version_short_name_and_date": "KJV69D1769[KJV1769D]",
+        "description": "King James Version with Apocrypha",
+        "file_name": "King James Version with Apocrypha.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Bible 1611: Pure Cambridge Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJPCE_plus_&b=mybible&c",
+        "version_short_name_and_date": "KJPCE1900[KJPCE+]",
+        "description": "★King James Bible 1611: Pure Cambridge Edition",
+        "file_name": "★King James Bible 1611: Pure Cambridge Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version with cross references",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=AV&b=mybible&c",
+        "version_short_name_and_date": "AV1914",
+        "description": "★King James Version with cross references",
+        "file_name": "★King James Version with cross references.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Restored Names King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RNKJV&b=mybible&c",
+        "version_short_name_and_date": "RNKJV1934",
+        "description": "★Restored Names King James Version",
+        "file_name": "★Restored Names King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Modern King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=MKJV&b=mybible&c",
+        "version_short_name_and_date": "MKJV1962",
+        "description": "★Modern King James Version",
+        "file_name": "★Modern King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NKJV&b=mybible&c",
+        "version_short_name_and_date": "NKJV1982",
+        "description": "★New King James Version",
+        "file_name": "★New King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★21st Century KJV",
+        "download_link": null,
+        "version_short_name_and_date": "KJ211994",
+        "description": "★21st Century KJV",
+        "file_name": "★21st Century KJV.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★American King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=AKJV_plus_&b=mybible&c",
+        "version_short_name_and_date": "AKJV1999[AKJV+]",
+        "description": "★American King James Version",
+        "file_name": "★American King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James 2000",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJ2&b=mybible&c",
+        "version_short_name_and_date": "KJ22000",
+        "description": "★King James 2000",
+        "file_name": "★King James 2000.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Updated King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=UKJV&b=mybible&c",
+        "version_short_name_and_date": "UKJV2000",
+        "description": "★Updated King James Version",
+        "file_name": "★Updated King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Crossword Project King James Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CKJV&b=mybible&c",
+        "version_short_name_and_date": "cKJV2003[CKJV]",
+        "description": "★Crossword Project King James Version",
+        "file_name": "★Crossword Project King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version",
+        "download_link": null,
+        "version_short_name_and_date": "KJV2006[KJV'06]",
+        "description": "★King James Version",
+        "file_name": "★King James Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Version with Apocrypha, American Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJVA&b=mybible&c",
+        "version_short_name_and_date": "KJVA2010",
+        "description": "★King James Version with Apocrypha, American Edition",
+        "file_name": "★King James Version with Apocrypha, American Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Modern English Version",
+        "download_link": null,
+        "version_short_name_and_date": "MEV2014",
+        "description": "Modern English Version",
+        "file_name": "Modern English Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Wycliffe Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WBMS&b=mybible&c",
+        "version_short_name_and_date": "WBMS2014",
+        "description": "Wycliffe Bible",
+        "file_name": "Wycliffe Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Breakthrough KJV",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BKJV&b=mybible&c",
+        "version_short_name_and_date": "BKJV2019",
+        "description": "Breakthrough KJV",
+        "file_name": "Breakthrough KJV.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Bishop's Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BB&b=mybible&c",
+        "version_short_name_and_date": "BB1568",
+        "description": "The Bishop's Bible",
+        "file_name": "The Bishop's Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Third Millennium Bible",
+        "download_link": null,
+        "version_short_name_and_date": "TMB1998",
+        "description": "Third Millennium Bible",
+        "file_name": "Third Millennium Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Lighthouse Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LHB&b=mybible&c",
+        "version_short_name_and_date": "LHB2006",
+        "description": "Lighthouse Bible",
+        "file_name": "Lighthouse Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Bond Slave Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BSV&b=mybible&c",
+        "version_short_name_and_date": "BSV2009",
+        "description": "Bond Slave Version",
+        "file_name": "Bond Slave Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New European Version of the Bible",
+        "download_link": null,
+        "version_short_name_and_date": "NEV2011",
+        "description": "New European Version of the Bible",
+        "file_name": "New European Version of the Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★King James Bible, Clarified New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJCNT&b=mybible&c",
+        "version_short_name_and_date": "KJC1998[KJCNT]",
+        "description": "★King James Bible, Clarified New Testament",
+        "file_name": "★King James Bible, Clarified New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Revised King James New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RKJNT&b=mybible&c",
+        "version_short_name_and_date": "RKJNT2000",
+        "description": "★Revised King James New Testament",
+        "file_name": "★Revised King James New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Breakthrough Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BV2020&b=mybible&c",
+        "version_short_name_and_date": "BV2020[BV2020]",
+        "description": "Breakthrough Version",
+        "file_name": "Breakthrough Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New International Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NIV'78&b=mybible&c",
+        "version_short_name_and_date": "NIV1978[NIV'78]",
+        "description": "★New International Version",
+        "file_name": "★New International Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New International Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NIV'84&b=mybible&c",
+        "version_short_name_and_date": "NIV1984[NIV'84]",
+        "description": "★New International Version",
+        "file_name": "★New International Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Today's New International Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TNIV&b=mybible&c",
+        "version_short_name_and_date": "TNIV2005",
+        "description": "Today's New International Version",
+        "file_name": "Today's New International Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New International Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NIV'11&b=mybible&c",
+        "version_short_name_and_date": "NIV2011[NIV'11]",
+        "description": "★New International Version",
+        "file_name": "★New International Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New International Version UK",
+        "download_link": null,
+        "version_short_name_and_date": "NIVUK2011",
+        "description": "★New International Version UK",
+        "file_name": "★New International Version UK.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Open English Bible, New Testament and Psalms",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=OEB&b=mybible&c",
+        "version_short_name_and_date": "OEB2010",
+        "description": "Open English Bible, New Testament and Psalms",
+        "file_name": "Open English Bible, New Testament and Psalms.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Open English Bible, New Testament and Psalms",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=OEB-us&b=mybible&c",
+        "version_short_name_and_date": "OEBUS2010[OEB-us]",
+        "description": "Open English Bible, New Testament and Psalms",
+        "file_name": "Open English Bible, New Testament and Psalms.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Open English Bible, New Testament (Commonwealth Spellings)",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=OEB-cw&b=mybible&c",
+        "version_short_name_and_date": "OEBw2010[OEB-cw]",
+        "description": "Open English Bible, New Testament (Commonwealth Spellings)",
+        "file_name": "Open English Bible, New Testament (Commonwealth Spellings).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Unlocked Dynamic Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=UDB&b=mybible&c",
+        "version_short_name_and_date": "UDB2018",
+        "description": "Unlocked Dynamic Bible",
+        "file_name": "Unlocked Dynamic Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Unlocked Literal Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ULB&b=mybible&c",
+        "version_short_name_and_date": "ULB2017",
+        "description": "Unlocked Literal Bible",
+        "file_name": "Unlocked Literal Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "unfoldingWord Literal Text",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ULT&b=mybible&c",
+        "version_short_name_and_date": "ULT2024",
+        "description": "unfoldingWord Literal Text",
+        "file_name": "unfoldingWord Literal Text.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "unfoldingWord Simplified Text",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=UST&b=mybible&c",
+        "version_short_name_and_date": "UST2024",
+        "description": "unfoldingWord Simplified Text",
+        "file_name": "unfoldingWord Simplified Text.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Weymouth New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WMNT&b=mybible&c",
+        "version_short_name_and_date": "WNT1903[WMNT]",
+        "description": "Weymouth New Testament",
+        "file_name": "Weymouth New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Twentieth Century New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TCNT&b=mybible&c",
+        "version_short_name_and_date": "TCNT1904",
+        "description": "Twentieth Century New Testament",
+        "file_name": "Twentieth Century New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The New Testament in Modern English",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Phi&b=mybible&c",
+        "version_short_name_and_date": "JBP1958[Phi]",
+        "description": "The New Testament in Modern English",
+        "file_name": "The New Testament in Modern English.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Complete Jewish Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CJB&b=mybible&c",
+        "version_short_name_and_date": "CJB1989",
+        "description": "Complete Jewish Bible",
+        "file_name": "Complete Jewish Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World Messianic Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEBM&b=mybible&c",
+        "version_short_name_and_date": "WMB1997[WEBM]",
+        "description": "World Messianic Bible",
+        "file_name": "World Messianic Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Messianic Version Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NMV'18&b=mybible&c",
+        "version_short_name_and_date": "NMV2000-2018[NMV'18]",
+        "description": "New Messianic Version Bible",
+        "file_name": "New Messianic Version Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Scriptures",
+        "download_link": null,
+        "version_short_name_and_date": "TS2000[TS'2009]",
+        "description": "The Scriptures",
+        "file_name": "The Scriptures.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World Messianic Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WMB&b=mybible&c",
+        "version_short_name_and_date": "WMB2000",
+        "description": "World Messianic Bible",
+        "file_name": "World Messianic Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "World Messianic Bible British Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WMBB&b=mybible&c",
+        "version_short_name_and_date": "WMBB2000",
+        "description": "World Messianic Bible British Edition",
+        "file_name": "World Messianic Bible British Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Israeli Authorized Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=HKJV_plus_&b=mybible&c",
+        "version_short_name_and_date": "IAV2001[HKJV+]",
+        "description": "★Israeli Authorized Version",
+        "file_name": "★Israeli Authorized Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Orthodox Jewish Bible",
+        "download_link": null,
+        "version_short_name_and_date": "OJB2002",
+        "description": "Orthodox Jewish Bible",
+        "file_name": "Orthodox Jewish Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Word of Yahweh",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WOY&b=mybible&c",
+        "version_short_name_and_date": "WOY2003",
+        "description": "Word of Yahweh",
+        "file_name": "Word of Yahweh.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible Special Edition (Jesus Messiah)",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB-JM&b=mybible&c",
+        "version_short_name_and_date": "NHEB-JM2010",
+        "description": "New Heart English Bible Special Edition (Jesus Messiah)",
+        "file_name": "New Heart English Bible Special Edition (Jesus Messiah).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible Messianic Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB-ME&b=mybible&c",
+        "version_short_name_and_date": "NHEB-ME2010",
+        "description": "New Heart English Bible Messianic Edition",
+        "file_name": "New Heart English Bible Messianic Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible (Yahweh Edition)",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB-Y&b=mybible&c",
+        "version_short_name_and_date": "NHEB-Y2010",
+        "description": "New Heart English Bible (Yahweh Edition)",
+        "file_name": "New Heart English Bible (Yahweh Edition).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible (YHWH Sabaoth Edition)",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB-YS&b=mybible&c",
+        "version_short_name_and_date": "NHEB-YS2010",
+        "description": "New Heart English Bible (YHWH Sabaoth Edition)",
+        "file_name": "New Heart English Bible (YHWH Sabaoth Edition).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Heart English Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB'21&b=mybible&c",
+        "version_short_name_and_date": "NHEB2015, 2021 century[NHEB'21]",
+        "description": "New Heart English Bible",
+        "file_name": "New Heart English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Names of God Bible",
+        "download_link": null,
+        "version_short_name_and_date": "NOG2011",
+        "description": "Names of God Bible",
+        "file_name": "Names of God Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Tree of Life Version",
+        "download_link": null,
+        "version_short_name_and_date": "TLV2012",
+        "description": "Tree of Life Version",
+        "file_name": "Tree of Life Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Weymouth Version NT: Jesus Messiah Edition",
+        "download_link": null,
+        "version_short_name_and_date": "WMTH-JM2013",
+        "description": "New Weymouth Version NT: Jesus Messiah Edition",
+        "file_name": "New Weymouth Version NT: Jesus Messiah Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Old Testament Masoretic Text",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=JPOT&b=mybible&c",
+        "version_short_name_and_date": "JPOT1917",
+        "description": "Old Testament Masoretic Text",
+        "file_name": "Old Testament Masoretic Text.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "JPS TANAKH",
+        "download_link": null,
+        "version_short_name_and_date": "JPS1995",
+        "description": "JPS TANAKH",
+        "file_name": "JPS TANAKH.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Samaritan Pentateuch in English",
+        "download_link": null,
+        "version_short_name_and_date": "SPE2013",
+        "description": "Samaritan Pentateuch in English",
+        "file_name": "Samaritan Pentateuch in English.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Tyndale Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TRC&b=mybible&c",
+        "version_short_name_and_date": "TRC1530",
+        "description": "Tyndale Bible",
+        "file_name": "Tyndale Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Coverdale Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CVB&b=mybible&c",
+        "version_short_name_and_date": "CVB1535",
+        "description": "Coverdale Bible",
+        "file_name": "Coverdale Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Great Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GB1&b=mybible&c",
+        "version_short_name_and_date": "GB1539[GB1]",
+        "description": "Great Bible",
+        "file_name": "Great Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Geneva Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GB&b=mybible&c",
+        "version_short_name_and_date": "GB1557",
+        "description": "Geneva Bible",
+        "file_name": "Geneva Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Webster Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RWV_plus_&b=mybible&c",
+        "version_short_name_and_date": "RWV1833[RWV+]",
+        "description": "Webster Bible",
+        "file_name": "Webster Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Revised Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RV&b=mybible&c",
+        "version_short_name_and_date": "RV1885",
+        "description": "Revised Version",
+        "file_name": "Revised Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Darby Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DBYe&b=mybible&c",
+        "version_short_name_and_date": "DBY1890[DBYe]",
+        "description": "Darby Bible",
+        "file_name": "Darby Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Emphasized Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=EMP&b=mybible&c",
+        "version_short_name_and_date": "ERB1902[EMP]",
+        "description": "Emphasized Bible",
+        "file_name": "Emphasized Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Aramaic of The Peshitta: Lamsa",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LBP&b=mybible&c",
+        "version_short_name_and_date": "LBP1933",
+        "description": "Aramaic of The Peshitta: Lamsa",
+        "file_name": "Aramaic of The Peshitta: Lamsa.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "God's Word to the Nations Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GWN&b=mybible&c",
+        "version_short_name_and_date": "GWN1988",
+        "description": "God's Word to the Nations Version",
+        "file_name": "God's Word to the Nations Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Revised Webster Update",
+        "download_link": null,
+        "version_short_name_and_date": "RWB1995",
+        "description": "Revised Webster Update",
+        "file_name": "Revised Webster Update.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "English Jubilee Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=JUB&b=mybible&c",
+        "version_short_name_and_date": "EJB2000[JUB]",
+        "description": "English Jubilee Bible",
+        "file_name": "English Jubilee Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Apostolic Bible Polyglot",
+        "download_link": null,
+        "version_short_name_and_date": "ABP2003[ABP-en+]",
+        "description": "Apostolic Bible Polyglot",
+        "file_name": "Apostolic Bible Polyglot.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Holman Christian Standard Bible",
+        "download_link": null,
+        "version_short_name_and_date": "HCSB2004",
+        "description": "Holman Christian Standard Bible",
+        "file_name": "Holman Christian Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Restored Holy Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RHB&b=mybible&c",
+        "version_short_name_and_date": "RHB2004",
+        "description": "Restored Holy Bible",
+        "file_name": "Restored Holy Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New English Translation with Full Notes",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NET&b=mybible&c",
+        "version_short_name_and_date": "NET2005",
+        "description": "New English Translation with Full Notes",
+        "file_name": "New English Translation with Full Notes.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Contemporary English Version (with Apocrypha)",
+        "download_link": null,
+        "version_short_name_and_date": "CEV2006[CEVD]",
+        "description": "Contemporary English Version (with Apocrypha)",
+        "file_name": "Contemporary English Version (with Apocrypha).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Expanded Bible",
+        "download_link": null,
+        "version_short_name_and_date": "EXB2009",
+        "description": "Expanded Bible",
+        "file_name": "Expanded Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Context Group Version",
+        "download_link": null,
+        "version_short_name_and_date": "CGV2010",
+        "description": "Context Group Version",
+        "file_name": "Context Group Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Lexham English Bible",
+        "download_link": null,
+        "version_short_name_and_date": "LEB2010",
+        "description": "The Lexham English Bible",
+        "file_name": "The Lexham English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "International Standard Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ISV&b=mybible&c",
+        "version_short_name_and_date": "ISV2011",
+        "description": "International Standard Version",
+        "file_name": "International Standard Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Berean Reader's Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BRB’20&b=mybible&c",
+        "version_short_name_and_date": "BRB2020[BRB’20]",
+        "description": "Berean Reader's Bible",
+        "file_name": "Berean Reader's Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Berean Standard Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BSB’22&b=mybible&c",
+        "version_short_name_and_date": "BSB2016, 2020 century[BSB’22]",
+        "description": "Berean Standard Bible",
+        "file_name": "Berean Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Common English Bible",
+        "download_link": null,
+        "version_short_name_and_date": "CEB2011",
+        "description": "Common English Bible",
+        "file_name": "Common English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Translation for Translators",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=t4t&b=mybible&c",
+        "version_short_name_and_date": "t4t2014",
+        "description": "★Translation for Translators",
+        "file_name": "★Translation for Translators.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Christian Standard Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CSB'17&b=mybible&c",
+        "version_short_name_and_date": "CSB2017[CSB'17]",
+        "description": "Christian Standard Bible",
+        "file_name": "Christian Standard Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Leeser Old Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LOT&b=mybible&c",
+        "version_short_name_and_date": "LOT1853",
+        "description": "Leeser Old Testament",
+        "file_name": "Leeser Old Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "John Wesley New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WSNT&b=mybible&c",
+        "version_short_name_and_date": "JWNT1755[WSNT]",
+        "description": "John Wesley New Testament",
+        "file_name": "John Wesley New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "John Worsley's New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WoNT&b=mybible&c",
+        "version_short_name_and_date": "WNT1770[WoNT]",
+        "description": "John Worsley's New Testament",
+        "file_name": "John Worsley's New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Peschito Syriac New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=PSNT&b=mybible&c",
+        "version_short_name_and_date": "PSNT1846",
+        "description": "The Peschito Syriac New Testament",
+        "file_name": "The Peschito Syriac New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Emphatic Diaglott",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Diaglott&b=mybible&c",
+        "version_short_name_and_date": "EDW1864[Diaglott]",
+        "description": "The Emphatic Diaglott",
+        "file_name": "The Emphatic Diaglott.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "American Bible Union Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ABU&b=mybible&c",
+        "version_short_name_and_date": "ABU1865",
+        "description": "American Bible Union Version",
+        "file_name": "American Bible Union Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Noyes' New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Noy&b=mybible&c",
+        "version_short_name_and_date": "GRN1869[Noy]",
+        "description": "Noyes' New Testament",
+        "file_name": "Noyes' New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Darby Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DBYe_plus_&b=mybible&c",
+        "version_short_name_and_date": "DBY1890[DBYe+]",
+        "description": "Darby Bible",
+        "file_name": "Darby Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Translation of the New Testament from the original Greek",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GDBY&b=mybible&c",
+        "version_short_name_and_date": "TGNT1902[GDBY]",
+        "description": "Translation of the New Testament from the original Greek",
+        "file_name": "Translation of the New Testament from the original Greek.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NTM&b=mybible&c",
+        "version_short_name_and_date": "NTM1913",
+        "description": "New Testament",
+        "file_name": "New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Numeric English New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NumNT&b=mybible&c",
+        "version_short_name_and_date": "NumNT1914",
+        "description": "Numeric English New Testament",
+        "file_name": "Numeric English New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Riverside New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RNT&b=mybible&c",
+        "version_short_name_and_date": "RNT1923",
+        "description": "The Riverside New Testament",
+        "file_name": "The Riverside New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Centenary Translation of the New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=MNT&b=mybible&c",
+        "version_short_name_and_date": "CTNT1924[MNT]",
+        "description": "The Centenary Translation of the New Testament",
+        "file_name": "The Centenary Translation of the New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Common Edition New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=COMM&b=mybible&c",
+        "version_short_name_and_date": "TCE1999[COMM]",
+        "description": "The Common Edition New Testament",
+        "file_name": "The Common Edition New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Far Above All",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=FAA&b=mybible&c",
+        "version_short_name_and_date": "FAA2005",
+        "description": "Far Above All",
+        "file_name": "Far Above All.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Jonathan Mitchell New Testament",
+        "download_link": null,
+        "version_short_name_and_date": "JMNT2010",
+        "description": "Jonathan Mitchell New Testament",
+        "file_name": "Jonathan Mitchell New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "English Majority Text Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=EMTV&b=mybible&c",
+        "version_short_name_and_date": "EMTV2011",
+        "description": "English Majority Text Version",
+        "file_name": "English Majority Text Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Kingdom New Testament: A Contemporary Translation",
+        "download_link": null,
+        "version_short_name_and_date": "NTE2011[KingNT'11]",
+        "description": "The Kingdom New Testament: A Contemporary Translation",
+        "file_name": "The Kingdom New Testament: A Contemporary Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Testament for Everyone",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NTE&b=mybible&c",
+        "version_short_name_and_date": "NTE2011",
+        "description": "New Testament for Everyone",
+        "file_name": "New Testament for Everyone.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Wilbur Pickering’s New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WPNT&b=mybible&c",
+        "version_short_name_and_date": "WPNT2015",
+        "description": "Wilbur Pickering’s New Testament",
+        "file_name": "Wilbur Pickering’s New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Sovereign Creator Has Spoken",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WPNT2&b=mybible&c",
+        "version_short_name_and_date": "BV2016[WPNT2]",
+        "description": "The Sovereign Creator Has Spoken",
+        "file_name": "The Sovereign Creator Has Spoken.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Matthew Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NMB&b=mybible&c",
+        "version_short_name_and_date": "NMB2016",
+        "description": "New Matthew Bible",
+        "file_name": "New Matthew Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Evangelical Heritage Version, New Testament & Psalms",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=EHV&b=mybible&c",
+        "version_short_name_and_date": "EHV2017",
+        "description": "Evangelical Heritage Version, New Testament & Psalms",
+        "file_name": "Evangelical Heritage Version, New Testament & Psalms.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Passion Translation",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TPT&b=mybible&c",
+        "version_short_name_and_date": "TPT2017",
+        "description": "The Passion Translation",
+        "file_name": "The Passion Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Interliniar English-Greek New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=iESVTH_plus_&b=mybible&c",
+        "version_short_name_and_date": "iESVTH2017[iESVTH+]",
+        "description": "The Interliniar English-Greek New Testament",
+        "file_name": "The Interliniar English-Greek New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Interlinear Hebrew Old Testament with Strong's Number",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=IHOT_plus_&b=mybible&c",
+        "version_short_name_and_date": "IHOT2017[IHOT+]",
+        "description": "Interlinear Hebrew Old Testament with Strong's Number",
+        "file_name": "Interlinear Hebrew Old Testament with Strong's Number.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Young's Literal Translation of the Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=YLT&b=mybible&c",
+        "version_short_name_and_date": "YLT1862",
+        "description": "Young's Literal Translation of the Bible",
+        "file_name": "Young's Literal Translation of the Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Julia E. Smith Parker Translation",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=SLT&b=mybible&c",
+        "version_short_name_and_date": "SLT1876",
+        "description": "Julia E. Smith Parker Translation",
+        "file_name": "Julia E. Smith Parker Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Young's Literal Translation of the Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=YLT1898&b=mybible&c",
+        "version_short_name_and_date": "YLT1898[YLT1898]",
+        "description": "Young's Literal Translation of the Bible",
+        "file_name": "Young's Literal Translation of the Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Amplified Bible Classic Edition",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=AMPC&b=mybible&c",
+        "version_short_name_and_date": "AMPC1987",
+        "description": "★Amplified Bible Classic Edition",
+        "file_name": "★Amplified Bible Classic Edition.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Green's Literal Translation",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LITV&b=mybible&c",
+        "version_short_name_and_date": "LITV1993",
+        "description": "Green's Literal Translation",
+        "file_name": "Green's Literal Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Modern Literal Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=MLV'19&b=mybible&c",
+        "version_short_name_and_date": "MLV1999-2019[MLV'19]",
+        "description": "Modern Literal Version",
+        "file_name": "Modern Literal Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "King James 3 — The Literal Translation",
+        "download_link": null,
+        "version_short_name_and_date": "KJ32006",
+        "description": "King James 3 — The Literal Translation",
+        "file_name": "King James 3 — The Literal Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "A Voice in the Wilderness",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=VW&b=mybible&c",
+        "version_short_name_and_date": "VW2006",
+        "description": "A Voice in the Wilderness",
+        "file_name": "A Voice in the Wilderness.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★Amplified Bible",
+        "download_link": null,
+        "version_short_name_and_date": "AMP2015",
+        "description": "★Amplified Bible",
+        "file_name": "★Amplified Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "James Murdock Translation of the Peshitta",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Murd&b=mybible&c",
+        "version_short_name_and_date": "Murd1851",
+        "description": "James Murdock Translation of the Peshitta",
+        "file_name": "James Murdock Translation of the Peshitta.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Concordant Literal New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CLNT&b=mybible&c",
+        "version_short_name_and_date": "CLNT1966",
+        "description": "The Concordant Literal New Testament",
+        "file_name": "The Concordant Literal New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "An Understandable Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=AUV&b=mybible&c",
+        "version_short_name_and_date": "AUV1995",
+        "description": "An Understandable Version",
+        "file_name": "An Understandable Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Analytical Literal Translation",
+        "download_link": null,
+        "version_short_name_and_date": "ALT1999",
+        "description": "Analytical Literal Translation",
+        "file_name": "Analytical Literal Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Disciples’ Literal New Testament",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DLNT&b=mybible&c",
+        "version_short_name_and_date": "DLNT2011",
+        "description": "Disciples’ Literal New Testament",
+        "file_name": "Disciples’ Literal New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Message",
+        "download_link": null,
+        "version_short_name_and_date": "MSG1993, 2002 century",
+        "description": "The Message",
+        "file_name": "The Message.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Century Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NCV&b=mybible&c",
+        "version_short_name_and_date": "NCV1987",
+        "description": "New Century Version",
+        "file_name": "New Century Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "International Children’s Bible",
+        "download_link": null,
+        "version_short_name_and_date": "ICB2015",
+        "description": "International Children’s Bible",
+        "file_name": "International Children’s Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Living Oracles",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LONT&b=mybible&c",
+        "version_short_name_and_date": "LONT1826",
+        "description": "The Living Oracles",
+        "file_name": "The Living Oracles.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Life Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NLV&b=mybible&c",
+        "version_short_name_and_date": "NLV1969",
+        "description": "New Life Version",
+        "file_name": "New Life Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Living Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TLB&b=mybible&c",
+        "version_short_name_and_date": "TLB1971",
+        "description": "The Living Bible",
+        "file_name": "The Living Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New International Reader's Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NIRV&b=mybible&c",
+        "version_short_name_and_date": "NIrV1996",
+        "description": "New International Reader's Version",
+        "file_name": "New International Reader's Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "God's Living Word",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GLW&b=mybible&c",
+        "version_short_name_and_date": "GLW1996",
+        "description": "God's Living Word",
+        "file_name": "God's Living Word.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Holy Bible: Easy-to-Read Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ERV&b=mybible&c",
+        "version_short_name_and_date": "ERV2005",
+        "description": "Holy Bible: Easy-to-Read Version",
+        "file_name": "Holy Bible: Easy-to-Read Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Living Translation",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NLT'07&b=mybible&c",
+        "version_short_name_and_date": "NLT2007",
+        "description": "★New Living Translation",
+        "file_name": "★New Living Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New Living Translation",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NLT'15&b=mybible&c",
+        "version_short_name_and_date": "NLT2015",
+        "description": "★New Living Translation",
+        "file_name": "★New Living Translation.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Bible In Worldwide English",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NTWE&b=mybible&c",
+        "version_short_name_and_date": "BWE1959",
+        "description": "Bible In Worldwide English",
+        "file_name": "Bible In Worldwide English.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Bible in Basic English",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BBE&b=mybible&c",
+        "version_short_name_and_date": "BBE1965",
+        "description": "Bible in Basic English",
+        "file_name": "Bible in Basic English.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Good News Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GNT&b=mybible&c",
+        "version_short_name_and_date": "GNB1976",
+        "description": "Good News Bible",
+        "file_name": "Good News Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "God's Word",
+        "download_link": null,
+        "version_short_name_and_date": "GW1995",
+        "description": "God's Word",
+        "file_name": "God's Word.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Good News Translation (US Version)",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GNTD&b=mybible&c",
+        "version_short_name_and_date": "GNT2001",
+        "description": "Good News Translation (US Version)",
+        "file_name": "Good News Translation (US Version).SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Holy New Covenant",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=HNC&b=mybible&c",
+        "version_short_name_and_date": "HNC2002",
+        "description": "Holy New Covenant",
+        "file_name": "Holy New Covenant.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Free Bible Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=FBV&b=mybible&c",
+        "version_short_name_and_date": "FBV2003",
+        "description": "The Free Bible Version",
+        "file_name": "The Free Bible Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Simplified Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NSB&b=mybible&c",
+        "version_short_name_and_date": "NSB2004",
+        "description": "New Simplified Bible",
+        "file_name": "New Simplified Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "EasyEnglish Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=EE&b=mybible&c",
+        "version_short_name_and_date": "EE2005",
+        "description": "EasyEnglish Bible",
+        "file_name": "EasyEnglish Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Spoken English New Testament",
+        "download_link": null,
+        "version_short_name_and_date": "SENT2008",
+        "description": "Spoken English New Testament",
+        "file_name": "Spoken English New Testament.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Free Bible Version New Testament with Psalms",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=FBVNT'18&b=mybible&c",
+        "version_short_name_and_date": "FBVNT2018",
+        "description": "Free Bible Version New Testament with Psalms",
+        "file_name": "Free Bible Version New Testament with Psalms.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Contemporary English Version",
+        "download_link": null,
+        "version_short_name_and_date": "CEV1995",
+        "description": "Contemporary English Version",
+        "file_name": "Contemporary English Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Welcome Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WB&b=mybible&c",
+        "version_short_name_and_date": "WB1895",
+        "description": "Welcome Bible",
+        "file_name": "Welcome Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The Remedy",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Remedy&b=mybible&c",
+        "version_short_name_and_date": "Rem2005",
+        "description": "The Remedy",
+        "file_name": "The Remedy.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Thomson LXX & NT",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=Thomson&b=mybible&c",
+        "version_short_name_and_date": "LXXCT1808",
+        "description": "Thomson LXX & NT",
+        "file_name": "Thomson LXX & NT.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Apostles' Bible Complete",
+        "download_link": null,
+        "version_short_name_and_date": "ABC2002-2004",
+        "description": "Apostles' Bible Complete",
+        "file_name": "Apostles' Bible Complete.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Septuagint in American English",
+        "download_link": null,
+        "version_short_name_and_date": "LXX-US2012",
+        "description": "Septuagint in American English",
+        "file_name": "Septuagint in American English.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "English version of the Septuagint Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=LXXe&b=mybible&c",
+        "version_short_name_and_date": "LXXE2012",
+        "description": "English version of the Septuagint Bible",
+        "file_name": "English version of the Septuagint Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Douay-Rheims Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DRC&b=mybible&c",
+        "version_short_name_and_date": "DRB1609-1610",
+        "description": "Douay-Rheims Bible",
+        "file_name": "Douay-Rheims Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Douay-Rheims Bible, Challoner Revision",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DRB&b=mybible&c",
+        "version_short_name_and_date": "DRB1752",
+        "description": "Douay-Rheims Bible, Challoner Revision",
+        "file_name": "Douay-Rheims Bible, Challoner Revision.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Revised Version with Apocrypha",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=RV'1895&b=mybible&c",
+        "version_short_name_and_date": "RV1895",
+        "description": "Revised Version with Apocrypha",
+        "file_name": "Revised Version with Apocrypha.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "The New English Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NEB'70&b=mybible&c",
+        "version_short_name_and_date": "NEB1970",
+        "description": "The New English Bible",
+        "file_name": "The New English Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "New Jerusalem Bible",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NJB&b=mybible&c",
+        "version_short_name_and_date": "NJB1985",
+        "description": "New Jerusalem Bible",
+        "file_name": "New Jerusalem Bible.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "Catholic Public Domain Version",
+        "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CPDV&b=mybible&c",
+        "version_short_name_and_date": "CPDV2009",
+        "description": "Catholic Public Domain Version",
+        "file_name": "Catholic Public Domain Version.SQLite3",
+        "is_zipped": true
+    },
+    {
+        "title": "★New American Bible (Revised Edition)",
+        "download_link": null,
+        "version_short_name_and_date": "NABRE2011",
+        "description": "★New American Bible (Revised Edition)",
+        "file_name": "★New American Bible (Revised Edition).SQLite3",
+        "is_zipped": true
+    }
+]

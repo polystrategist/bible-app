@@ -6,3 +6,4 @@ dist_electron
 up_using_window.cmd
 .idea
 web/public/app
+GenerateMyBibleModules/venv
