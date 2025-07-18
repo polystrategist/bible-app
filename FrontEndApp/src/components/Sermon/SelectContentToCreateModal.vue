@@ -5,10 +5,14 @@ import { ref } from 'vue';
 import { useThemeStore } from '../../store/theme';
 import { TextEditStyle24Filled, TextEditStyle24Regular } from "@vicons/fluent"
 import { hasInternetConnection } from '../../util/internet';
+import { useRouter } from 'vue-router';
+import { useMenuStore } from '../../store/menu';
 
 const themeStore = useThemeStore();
 const showModal = ref(false);
 const dialog = useDialog();
+const router = useRouter();
+const menuStore = useMenuStore();
 
 function toggleModal() {
     hasInternetConnection().then((isOnline) => {
@@ -36,8 +40,8 @@ defineExpose({
         <NCard style="max-width: 600px;">
             <div class="flex flex-col gap-5 w-full">
                 <div class="flex gap-5 w-full">
-                    <div
-                        class="flex justify-center items-center flex-col text-center gap-1 group dark:hover:bg-gray-6 cursor-pointer rounded-md p-2 w-full">
+                    <div class="flex justify-center items-center flex-col text-center gap-1 group dark:hover:bg-gray-6 cursor-pointer rounded-md p-2 w-full"
+                        @click="menuStore.setMenu('/create-text-base-sermon'); showModal = false">
                         <NIcon size="40">
                             <TextEditStyle24Filled v-if="themeStore.isDark"
                                 class="text-size-40px group-hover:text-blue-5" />
