@@ -1,5 +1,4 @@
 import { useMainStore } from './main';
-import { routes } from '../router/router';
 import { defineStore } from 'pinia';
 import { useRouter } from 'vue-router';
 import { onBeforeMount, ref, watch } from 'vue';
@@ -19,16 +18,9 @@ import {
     HeartCircle24Regular,
     Settings24Regular,
 } from '@vicons/fluent';
-import { useThemeStore } from './theme';
-
-type menuHasRoute = '/prayer-list' | '/profile' | '/create-sermon' | '/donate-page';
-type menuHasNoRoute = 'read-bible' | 'sermons' | 'donate-modal';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
-    const themeStore = useThemeStore();
-    const menuWithRoute: Array<menuHasRoute | string> = routes.map((route) => route.path);
-    const menuWithNoRoute: Array<menuHasNoRoute> = ['read-bible', 'sermons'];
-    const menuSelected = ref<menuHasRoute | menuHasNoRoute>('read-bible');
+    const menuSelected = ref<string>('read-bible');
     const router = useRouter();
     const isRouter = ref<boolean>(false);
     const menuSessionKey = 'menu-session';
@@ -96,7 +88,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         { deep: true }
     );
 
-    function setMenuWithNoRoute(menu: menuHasNoRoute) {
+    function setMenuWithNoRoute(menu: string) {
         menuSelected.value = menu;
         isRouter.value = false;
         session.set(menuSessionKey, {
@@ -105,7 +97,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         });
     }
 
-    async function setMenuWithRoute(menu: menuHasRoute) {
+    async function setMenuWithRoute(menu: string) {
         menuSelected.value = menu;
         isRouter.value = true;
         session.set(menuSessionKey, {
@@ -122,20 +114,13 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         }
 
         if (menu == 'donate-modal') {
-            // const screenHeight = window.screen.height;
-            // const height = Math.round(screenHeight * 0.7); // 70% of the screen height
-            // window.open(
-            //     'https://buymeacoffee.com/jenuel.dev',
-            //     '_blank',
-            //     `width=700,height=${height},resizable=no,scrollbars=yes,menubar=no`
-            // );
             window.browserWindow.openDonateWindow();
             return;
         }
 
         if (menu == menuSelected.value) return;
-        else if (menuWithRoute.includes(menu)) await setMenuWithRoute(menu as any);
-        else if (menuWithNoRoute.includes(menu as any)) setMenuWithNoRoute(menu as any);
+        else if (menu.includes('/')) await setMenuWithRoute(menu as any);
+        else if (!menu.includes('/')) setMenuWithNoRoute(menu as any);
     }
 
     onBeforeMount(async () => {
@@ -161,8 +146,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     return {
         menuSelected,
         isRouter,
-        menuWithRoute,
-        menuWithNoRoute,
         setMenu,
         menuUpperTabs,
         bottomMenuTabs,
