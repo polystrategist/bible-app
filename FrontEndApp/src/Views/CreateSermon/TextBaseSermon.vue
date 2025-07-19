@@ -4,10 +4,11 @@ import axios from 'axios';
 import { supabase } from '../../util/SupaBase/SupaBase';
 import { useMenuStore } from '../../store/menu';
 import Editor from '../../components/Editor/Editor.vue';
-import { NButton, NInput, NSelect } from 'naive-ui';
+import { NButton, NIcon, NInput, NSelect } from 'naive-ui';
 import { DAYJS } from '../../util/dayjs';
 import { useUserStore } from '../../store/userStore';
 import { useRouter } from 'vue-router';
+import { Close } from '@vicons/carbon';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -196,20 +197,22 @@ function resetForm() {
 </script>
 <template>
     <div class="h-[100%] w-[100%] relative">
-        <div class="absolute top-5 left-5">
-            <NButton type="error" size="large">Close</NButton>
+        <div class="absolute top-5 right-5">
+            <NButton size="large" @click="menuStore.setMenu('sermons')" circle secondary>
+                <template #icon>
+                    <NIcon>
+                        <Close />
+                    </NIcon>
+                </template>
+            </NButton>
         </div>
-        <div class="w-full mx-auto h-[100%] overflow-auto">
+        <div class="w-full mx-auto h-[100%] overflow-auto overflowing-div">
             <div class="w-full max-w-700px mx-auto">
                 <div>
                     <h2 class="font-thin text-size-23px mb-0 font-800">Submit Sermon</h2>
                     <div>Submit your sermon here so that other people can also watch or listen to your sermon.</div>
                 </div>
                 <div class="mt-10 flex flex-col gap-5">
-                    <div v-if="selectedType == 'youtube'">
-                        <label for="">Youtube ID:</label><br />
-                        <NInput v-model:value="youtubeId" placeholder="Enter Youtube Id..." required type="text" />
-                    </div>
                     <div v-if="selectedType == 'text'">
                         <label for="">Title:</label><br />
                         <NInput v-model:value="title" placeholder="enter title" required type="text" />

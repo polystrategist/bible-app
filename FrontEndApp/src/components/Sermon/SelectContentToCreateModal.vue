@@ -50,8 +50,8 @@ defineExpose({
                         <h3 class="m-0 leading-tight group-hover:underline">Text Based Sermon</h3>
                         <p class="m-0 leading-tight">Submit a sermon in text format. Others cant comment on this.</p>
                     </div>
-                    <div
-                        class="flex justify-center items-center flex-col text-center gap-1 group dark:hover:bg-gray-6 cursor-pointer rounded-md p-2 w-full">
+                    <div class="flex justify-center items-center flex-col text-center gap-1 group dark:hover:bg-gray-6 cursor-pointer rounded-md p-2 w-full"
+                        @click="menuStore.setMenu('/create-sermon-youtube-share'); showModal = false">
                         <Icon icon="mdi:youtube" class="text-size-40px group-hover:text-red-5" />
                         <h3 class="m-0 leading-tight group-hover:underline">Share a Youtube Content</h3>
                         <p class="m-0 leading-tight">Share a youtube video link. Other people cant comment on this video
@@ -63,7 +63,7 @@ defineExpose({
                     <Icon icon="healthicons:group-discussion-meetingx3"
                         class="text-size-40px group-hover:text-amber-5" />
                     <h3 class="m-0 leading-tight group-hover:underline">Discussion</h3>
-                    <p class="m-0 leading-tight">Submit a discussion, so that you and others can have a reply based
+                    <p class="m-0 leading-tight"> Submit a discussion, so that you and others can have a reply based
                         discussion.</p>
                 </div>
             </div>
