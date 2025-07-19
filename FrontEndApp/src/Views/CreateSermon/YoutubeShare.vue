@@ -4,10 +4,11 @@ import axios from 'axios';
 import { supabase } from '../../util/SupaBase/SupaBase';
 import { useMenuStore } from '../../store/menu';
 import Editor from '../../components/Editor/Editor.vue';
-import { NButton, NInput, NSelect } from 'naive-ui';
+import { NAlert, NButton, NIcon, NInput, NSelect } from 'naive-ui';
 import { DAYJS } from '../../util/dayjs';
 import { useUserStore } from '../../store/userStore';
 import { useRouter } from 'vue-router';
+import { Close } from '@vicons/carbon';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -195,84 +196,70 @@ function resetForm() {
 }
 </script>
 <template>
-    <div class="h-[100%] w-[100%] p-5 pl-10 py-5">
-        <div class="w-full max-w-700px mx-auto">
-            <div>
-                <h2 class="font-thin text-size-23px mb-0 font-800">Submit Sermon</h2>
-                <div>Submit your sermon here so that other people can also watch or listen to your sermon.</div>
-            </div>
-            <div class="mt-10 flex flex-col gap-5">
+    <div class="h-[100%] w-[100%]">
+        <div class="absolute top-5 right-5">
+            <NButton size="large" @click="menuStore.setMenu('sermons')" circle secondary>
+                <template #icon>
+                    <NIcon>
+                        <Close />
+                    </NIcon>
+                </template>
+            </NButton>
+        </div>
+        <div class="w-full mx-auto h-[100%] overflow-auto">
+            <div class="w-full max-w-700px mx-auto">
                 <div>
-                    <label for="">Select Type:</label><br />
-                    <NSelect v-model:value="selectedType" :options="selectTypeOptions" />
-                </div>
-                <div v-if="selectedType == 'youtube'">
-                    <label for="">Youtube ID:</label><br />
-                    <NInput v-model:value="youtubeId" placeholder="Enter Youtube Id..." required type="text" />
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">Title:</label><br />
-                    <NInput v-model:value="title" placeholder="enter title" required type="text" />
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">Scripture:</label><br />
-                    <NInput v-model:value="scripture" placeholder="enter scripture" required type="text" />
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">Content Author:</label><br />
-                    <NInput v-model:value="author" placeholder="enter scripture" required type="text" />
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">Select Denomination:</label><br />
-                    <select v-model="denomination"
-                        class="p-2 rounded-md !dark:bg-dark-300 dark:text-gray-200 outline-none w-full" required>
-                        <option :value="null">-- Select Denomination --</option>
-                        <option v-for="den in denominationOptions" :key="den.label" :value="den.label">
-                            {{ den.label }}
-                        </option>
-                    </select>
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">A Short Summary/Description:</label><br />
-                    <NInput type="textarea" v-model="description" class="p-2" placeholder="Enter Description Here"
-                        required />
-                </div>
-                <div>
-                    <label for="">Select Language:</label><br />
-                    <select v-model="language"
-                        class="p-2 rounded-md min-w-200px w-full !dark:bg-dark-300 dark:text-gray-200 outline-none"
-                        required>
-                        <option value="english">English</option>
-                        <option value="tagalog">Tagalog</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="">Enter Source (Optional):</label><br />
-                    <NInput v-model="source"
-                        class="p-2 rounded-md min-w-250px w-full !dark:bg-dark-300 dark:text-gray-200 outline-none"
-                        placeholder="enter URL" type="text" />
-                </div>
-                <div>
-                    <label class="select-none">
-                        <input v-model="isPublished" placeholder="enter URL" type="checkbox" />
-                        Is Published?
-                    </label>
-                </div>
-                <div v-if="selectedType == 'text'">
-                    <label for="">Set Content:</label><br />
-                    <div class="bg-white bg-opacity-10 p-2 rounded-md">
-                        <Editor v-model="content" overflow editorContentStyle="max-height: 300px;" />
+                    <h2 class="font-thin text-size-23px mb-0 font-800">Share A Youtube Sermon</h2>
+                    <div>
+                        Submit your sermon here so that other people can also watch or listen to your sermon.
                     </div>
                 </div>
-                <div class="mb-10">
-                    <NButton v-if="userStore.user" :disabled="loading" :loading="loading" type="primary"
-                        @click="submitSermon()">
-                        Create
-                    </NButton>
-                    <NButton v-else :disabled="loading" :loading="loading" type="primary"
-                        @click="router.push('/profile')">
-                        Login First
-                    </NButton>
+                <div class="mt-10 flex flex-col gap-5">
+                    <div>
+                        <label for="">Youtube Video ID:</label><br />
+                        <NInput v-model:value="youtubeId" placeholder="Enter Youtube Video ID ..." required type="text"
+                            class="mb-2" size="large" />
+                        <NAlert type="info">
+                            The video ID will be located in the URL of the video page, right after the v= URL parameter.
+                            In
+                            this case, the URL of the video is: https://www.youtube.com/watch?v=aqz-KE-bpKQ. Therefore,
+                            the
+                            ID of the video is aqz-KE-bpKQ .
+                        </NAlert>
+                    </div>
+                    <div>
+                        <label for=""> Select Language: </label><br />
+                        <NSelect v-model:value="language" :options="[
+                            {
+                                label: 'English',
+                                value: 'english',
+                            },
+                            {
+                                label: 'Tagalog',
+                                value: 'tagalog',
+                            },
+                        ]" size="large" />
+                    </div>
+                    <div>
+                        <label for="">Enter Source (Optional):</label><br />
+                        <NInput v-model="source" placeholder="enter URL" type="text" size="large" />
+                    </div>
+                    <div>
+                        <label class="select-none">
+                            <input v-model="isPublished" placeholder="enter URL" type="checkbox" />
+                            Is Published?
+                        </label>
+                    </div>
+                    <div class="mb-10">
+                        <NButton v-if="userStore.user" :disabled="loading" :loading="loading" type="primary"
+                            @click="submitSermon()">
+                            Create
+                        </NButton>
+                        <NButton v-else :disabled="loading" :loading="loading" type="primary"
+                            @click="router.push('/profile')">
+                            Login First
+                        </NButton>
+                    </div>
                 </div>
             </div>
         </div>

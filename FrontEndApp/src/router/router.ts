@@ -5,6 +5,8 @@ import AboutPage from './../Views/About/About.vue';
 import CreateSermon from './../Views/CreateSermon/CreateSermon.vue';
 import LoginPage from './../Views/UserProfile/Pages/Login.vue';
 import ProfileAccountPage from './../Views/UserProfile/Pages/Profile/Profile.vue';
+import TextBaseSermon from '../Views/CreateSermon/TextBaseSermon.vue';
+import YoutubeShare from '../Views/CreateSermon/YoutubeShare.vue';
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -41,6 +43,16 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/create-sermon',
         component: CreateSermon,
     },
+    {
+        name: "CreateTextBaseSermon",
+        path: "/create-text-base-sermon",
+        component: TextBaseSermon
+    },
+    {
+        name: "CreateSermonYoutubeShare",
+        path: "/create-sermon-youtube-share",
+        component: YoutubeShare
+    }
 ];
 const mode = import.meta.env.MODE == 'web' ? '/app/' : undefined;
 const router = createRouter({

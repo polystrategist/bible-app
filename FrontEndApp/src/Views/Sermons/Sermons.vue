@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NButton, NIcon, NInput, NTag, useDialog, useMessage } from 'naive-ui';
+import { NButton, NIcon, NInput, NTag, NTooltip, useDialog, useMessage } from 'naive-ui';
 import { SERMON_TYPE, userSermonStore } from '../../store/Sermons';
 import { Delete, LogoYoutube, Reset, Search, TextAlignJustify } from '@vicons/carbon';
 import Youtube from './Youtube/Youtube.vue';
@@ -134,12 +134,18 @@ function handleBelieversSwordInfoDialog() {
                     </template>
                     {{ $t('Reset') }}
                 </NButton>
-                <NButton size="small" type="primary" @click="SelectContentToCreateModalRef?.toggleModal()">
-                    <template #icon>
-                        <Icon icon="iconoir:submit-document" />
+                <NTooltip trigger="hover" placement="bottom">
+                    <template #trigger>
+                        <NButton size="small" disabled type="primary"
+                            @click="SelectContentToCreateModalRef?.toggleModal()">
+                            <template #icon>
+                                <Icon icon="iconoir:submit-document" />
+                            </template>
+                            {{ $t('Submit Sermon') }}
+                        </NButton>
                     </template>
-                    {{ $t('Submit Sermon') }}
-                </NButton>
+                    Submitting sermon is being renovated and will be available soon.
+                </NTooltip>
             </div>
         </div>
         <div ref="sermonItems"
