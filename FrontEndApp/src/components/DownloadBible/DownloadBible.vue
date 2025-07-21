@@ -57,7 +57,7 @@ function clickDownload(downloadLink: string, version: any) {
             </div>
             <div v-if="BibleVersions.length" class="select-none h-[70vh] overflow-y-auto overflowing-div">
                 <template v-for="version in BibleVersions">
-                    <div v-show="!searchBible || version.title.toLowerCase().includes(searchBible.toLowerCase())"
+                    <div v-if="!version.title.includes('commentaries')" v-show="!searchBible || version.title.toLowerCase().includes(searchBible.toLowerCase())"
                         :disabled="bibleDownloadStore.isDownloading" class="flex gap-10px items-center my-3">
                         <NButton size="tiny" :disabled="!isAlreadyDownloaded(version.file_name) || downloadLoading"
                             :type="!isAlreadyDownloaded(version.file_name) ? 'default' : 'info'"
