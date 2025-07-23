@@ -12,6 +12,7 @@ type BookInterface = {
     short_name: string;
     book_number: number;
     chapter_count: number;
+    deuterocanonical_chapter_count?: number;
 };
 const StorageKeyOfChapterVerseSelected = 'selected-chapter-verse-storage';
 const StorageSelectedVersions = 'stored-selected-versions';

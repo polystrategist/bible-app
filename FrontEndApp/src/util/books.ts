@@ -4,6 +4,7 @@ export type BookInfo = {
     book_number: number;
     chapter_count: number;
     deuterocanonical: boolean;
+    deuterocanonical_chapter_count?: number;
 };
 
 export const bibleBooks: Array<BookInfo> = [
@@ -229,6 +230,7 @@ export const bibleBooks: Array<BookInfo> = [
         short_name: 'Dan',
         book_number: 340,
         chapter_count: 12,
+        deuterocanonical_chapter_count: 14,
         deuterocanonical: false,
     },
     {
