@@ -33,7 +33,8 @@ function handleCheckBox(bibleVersions: Array<any>) {
         </template>
         <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox">
             <template v-for="bible in moduleStore.bibleLists">
-                <NCheckbox :value="bible.file_name" :label="`${bible.title}`" /><br />
+                <NCheckbox v-if="!bible.title.includes('commentaries')" :value="bible.file_name"
+                    :label="`${bible.title}`" /><br />
             </template>
         </NCheckboxGroup>
     </RightSideBarContainer>
