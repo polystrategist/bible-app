@@ -31,10 +31,10 @@ function handleCheckBox(bibleVersions: Array<any>) {
                 <span class="capitalize">{{ $t('download') }}</span>
             </NButton>
         </template>
-        <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox">
+        <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox" class="flex flex-col">
             <template v-for="bible in moduleStore.bibleLists">
                 <NCheckbox v-if="!bible.title.includes('commentaries')" :value="bible.file_name"
-                    :label="`${bible.title}`" /><br />
+                    :label="`${bible.title}`" />
             </template>
         </NCheckboxGroup>
     </RightSideBarContainer>
