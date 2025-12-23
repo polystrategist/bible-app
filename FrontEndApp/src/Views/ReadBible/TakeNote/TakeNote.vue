@@ -31,7 +31,7 @@ watch(
 );
 </script>
 <template>
-    <div class="p-10px h-[calc(100%-20px)] relative dark:bg-dark-400 bg-white">
+    <div class="p-10px h-[calc(100%-20px)] relative dark:bg-dark-400 bg-gray-100 rounded-md">
         <Editor ref="EditorRef" v-model="noteStore.note" overflow />
     </div>
 </template>

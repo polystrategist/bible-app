@@ -221,7 +221,7 @@ onMounted(() => {
                         `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
                     ).color
                         }`"
-                        class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-5 relative"
+                        class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-2 relative"
                         @click="
                             bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)
                             ">

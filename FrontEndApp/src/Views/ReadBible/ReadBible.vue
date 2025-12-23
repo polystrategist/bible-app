@@ -71,12 +71,14 @@ onBeforeMount(() => {
                     <ViewVerses />
                 </Pane>
                 <Pane
-                    class="bg-gray-100 dark:bg-dark-600 relative !overflow-auto"
+                    class="relative !overflow-auto"
                     :size="noteStore.showNote ? verseViewPaneSizes[1].size : 0"
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"
                 >
-                    <TakeNote />
+                    <div class="p-5px h-[calc(100%-10px)]">
+                        <TakeNote />
+                    </div>
                 </Pane>
             </Splitpanes>
         </Pane>
