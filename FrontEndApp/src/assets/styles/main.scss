@@ -5,6 +5,10 @@
     --footer-height: 40px;
 }
 
+html {
+    --bible-font-family: 'Poppins';
+}
+
 @import './common/scrollbar.scss';
 @import './common/splitjs.scss';
 @import './common/editorStyle.scss';
@@ -12,6 +16,16 @@
 @font-face {
     font-family: 'Poppins';
     src: url('./fonts/poppins/Poppins-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./fonts/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Zodiac';
+    src: url('./fonts/Zodiac/Zodiac-Regular.ttf') format('truetype');
 }
 
 * {

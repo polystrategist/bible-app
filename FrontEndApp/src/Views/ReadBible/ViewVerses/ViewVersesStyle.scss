@@ -1,13 +1,18 @@
 .verse-select-text {
     caret-color: transparent;
 
+    &, * {
+        font-family: var(--bible-font-family) !important;
+    }
+
     a {
         display: none !important;
     }
 }
 
 .the-selected-verse {
-    a, s {
+    a,
+    s {
         display: none !important;
     }
 }
