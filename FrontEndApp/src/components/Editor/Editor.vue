@@ -116,6 +116,20 @@ const editor = useEditor({
     },
 });
 
+watch(
+    () => props.modelValue,
+    (newContent) => {
+        if (!editor?.value) {
+            return;
+        }
+
+        const current = editor.value.getHTML();
+        if ((newContent || '') !== current) {
+            editor.value.commands.setContent((newContent as string) || '');
+        }
+    }
+);
+
 function toggleHeading(level: number | any) {
     editor?.value?.chain().focus().toggleHeading({ level: level }).run();
 }
