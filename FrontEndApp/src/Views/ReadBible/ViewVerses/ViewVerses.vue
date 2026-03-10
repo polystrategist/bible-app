@@ -16,11 +16,14 @@ import { useI18n } from 'vue-i18n';
 import { FastForward20Regular, SlideSearch28Regular } from '@vicons/fluent';
 import { SlideSearch28Filled } from '@vicons/fluent';
 import { Mic24Regular, Mic24Filled } from '@vicons/fluent';
+import { Note24Regular, Note28Filled } from '@vicons/fluent';
 import { useThemeStore } from '../../../store/theme';
+import useNoteStore from '../../../store/useNoteStore';
 import AudioBiblePlayer from './AudioBiblePlayer.vue';
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
+const noteStore = useNoteStore();
 const dialog = useDialog();
 const clipNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
@@ -228,6 +231,17 @@ onMounted(() => {
                         :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular"
                     />
                 </VerseSelector>
+                <NButton
+                    size="small"
+                    quaternary
+                    circle
+                    :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
+                    @click="noteStore.showNote = !noteStore.showNote"
+                >
+                    <template #icon>
+                        <NIcon :component="noteStore.showNote ? Note28Filled : Note24Regular" size="20" />
+                    </template>
+                </NButton>
                 <NButton
                     size="small"
                     quaternary

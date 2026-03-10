@@ -8,9 +8,7 @@ import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
 import { Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
 import useNoteStore from '../../store/useNoteStore';
-import { useThemeStore } from '../../store/theme';
 
-const themeStore = useThemeStore();
 const noteStore = useNoteStore();
 const bibleStore = useBibleStore();
 const network = useNetwork();
@@ -71,17 +69,17 @@ onMounted(() => {
                 v-if="menuStore.menuSelected === 'read-bible'"
                 secondary
                 size="tiny"
-                @click="noteStore.showNote = !noteStore.showNote"
+                circle
                 :type="noteStore.showNote ? 'primary' : 'default'"
-                title="Ctr + Shift + N"
+                :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
+                @click="noteStore.showNote = !noteStore.showNote"
             >
                 <template #icon>
                     <NIcon>
-                        <Note24Regular v-if="!themeStore.isDark" />
-                        <Note28Filled v-else />
+                        <Note28Filled v-if="noteStore.showNote" />
+                        <Note24Regular v-else />
                     </NIcon>
                 </template>
-                Note
             </NButton>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
