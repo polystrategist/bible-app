@@ -16,6 +16,7 @@ setupPortableMode();
 async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const appBounds: any = appConfig.get('setting.appBounds');
+    const wasFullScreen = Boolean(appConfig.get('setting.isFullScreen'));
 
     let iconPath = path.join(__dirname, 'assets', 'icon.ico');
 
@@ -63,7 +64,10 @@ async function createWindow() {
     // win.loadFile("index.html");
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
 
-    if (appBounds !== undefined && appBounds !== null && appBounds.width > width && appBounds.height > height)
+    if (wasFullScreen) {
+        mainWindow.setFullScreen(true);
+        mainWindow.show();
+    } else if (appBounds !== undefined && appBounds !== null && appBounds.width > width && appBounds.height > height)
         mainWindow.maximize();
     else mainWindow.show();
 

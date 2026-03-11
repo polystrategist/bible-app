@@ -15,5 +15,7 @@ function onAfterResizeOrMove(win: BrowserWindow) {
 export function attachResizeListener(win: BrowserWindow) {
     win.on('resize', () => onAfterResizeOrMove(win));
     win.on('move', () => onAfterResizeOrMove(win));
+    win.on('enter-full-screen', () => appConfig.set('setting.isFullScreen', true));
+    win.on('leave-full-screen', () => appConfig.set('setting.isFullScreen', false));
 }
 
