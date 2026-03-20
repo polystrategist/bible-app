@@ -78,7 +78,7 @@ onBeforeMount(() => {
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"
                 >
-                    <div class="p-5px h-[calc(100%-10px)]">
+                    <div class="p-5px h-[calc(100%-10px)] take-note-fade" :class="{ 'take-note-show': noteStore.showNote }">
                         <TakeNote />
                     </div>
                 </Pane>
@@ -94,3 +94,15 @@ onBeforeMount(() => {
         </Pane>
     </Splitpanes>
 </template>
+
+<style scoped lang="scss">
+.take-note-fade {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.take-note-fade.take-note-show {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out 0.1s;
+}
+</style>
