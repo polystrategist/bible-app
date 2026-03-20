@@ -75,7 +75,7 @@ function selectItemFromMenuElement(key: any, element: any) {
 </script>
 <template>
     <div
-        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-20px pl-30px dark:bg-dark-800"
+        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-20px pl-30px"
     >
         <div class="w-full h-[100%] flex flex-col">
             <div class="py-10px flex justify-between items-end select-none min-h-40px">
@@ -83,7 +83,7 @@ function selectItemFromMenuElement(key: any, element: any) {
                 <NewPrayerItem />
             </div>
             <Draggable
-                class="list-group h-[100%] overflow-y-auto overflowing-div dark:bg-dark-900 p-2"
+                class="list-group prayer-list-column h-[100%] overflow-y-auto overflowing-div p-2"
                 :list="prayerListStore.prayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -91,9 +91,7 @@ function selectItemFromMenuElement(key: any, element: any) {
                 @change="changeInProgress"
             >
                 <template #item="{ element }">
-                    <div
-                        class="relative prayer-list-item group dark:bg-white dark:bg-opacity-10 bg-gray-1 rounded-md"
-                    >
+                    <div class="relative prayer-list-item group rounded-md">
                         <div class="pb-0 duration-200">
                             <div
                                 class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1 m-2"
@@ -137,7 +135,7 @@ function selectItemFromMenuElement(key: any, element: any) {
                 <span class="font-700 select-none capitalize">{{ $t('answered') }} </span>
             </div>
             <Draggable
-                class="list-group list-group-done h-[100%] overflow-y-auto overflowing-div dark:bg-dark-900 p-2"
+                class="list-group list-group-done prayer-list-column h-[100%] overflow-y-auto overflowing-div p-2"
                 :list="prayerListStore.donePrayerList"
                 v-bind="dragOptions"
                 group="prayer-list-items"
@@ -145,9 +143,7 @@ function selectItemFromMenuElement(key: any, element: any) {
                 @change="changeInDone"
             >
                 <template #item="{ element }">
-                    <div
-                        class="group relative prayer-list-item dark:bg-white dark:bg-opacity-10 bg-gray-1 rounded-md opacity-50"
-                    >
+                    <div class="group relative prayer-list-item rounded-md opacity-50">
                         <div
                             class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
                             v-html="element.content"
@@ -190,8 +186,26 @@ function selectItemFromMenuElement(key: any, element: any) {
 </template>
 
 <style lang="scss">
+.prayer-list-page {
+    background-color: var(--theme-bg-main, #1f2230);
+    color: var(--theme-text, #ececff);
+}
+
+.prayer-list-column {
+    background-color: var(--theme-bg-main, #1f2230);
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+    border-radius: 8px;
+}
+
 .prayer-list-item {
-    @apply dark:bg-opacity-50 dark:bg-gray-800 dark:hover:bg-gray-800 bg-gray-300 hover:bg-gray-400 rounded-md relative overflow-hidden cursor-move mb-2 p-1;
+    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.06));
+    color: var(--theme-text, #ececff);
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+    @apply rounded-md relative overflow-hidden cursor-move mb-2 p-1;
+
+    &:hover {
+        background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.12));
+    }
 
     .flip-list-move {
         transition: transform 0.5s;
