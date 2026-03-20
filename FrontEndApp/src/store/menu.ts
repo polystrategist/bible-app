@@ -55,12 +55,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         //     icon: renderNIcon(Person24Regular),
         //     iconDark: renderNIcon(Person24Filled),
         // },
-        {
-            label: 'Donate',
-            key: 'donate-modal',
-            icon: renderNIcon(HeartCircle24Regular),
-            iconDark: renderNIcon(HeartCircle24Filled),
-        },
+        // {
+        //     label: 'Donate',
+        //     key: 'donate-modal',
+        //     icon: renderNIcon(HeartCircle24Regular),
+        //     iconDark: renderNIcon(HeartCircle24Filled),
+        // },
         {
             label: 'Settings',
             key: '/settings-page',
