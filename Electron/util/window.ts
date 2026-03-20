@@ -16,6 +16,9 @@ export function attachResizeListener(win: BrowserWindow) {
     win.on('resize', () => onAfterResizeOrMove(win));
     win.on('move', () => onAfterResizeOrMove(win));
     win.on('enter-full-screen', () => appConfig.set('setting.isFullScreen', true));
-    win.on('leave-full-screen', () => appConfig.set('setting.isFullScreen', false));
+    // leave-full-screen is intentionally NOT saved here.
+    // closeWindow() in BrowserWindowEvents reads win.isFullScreen() at the correct moment.
+    // On Windows, win.destroy() fires a synthetic leave-full-screen event which would
+    // overwrite the correctly-saved true value back to false.
 }
 

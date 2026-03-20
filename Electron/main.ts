@@ -39,7 +39,9 @@ async function createWindow() {
         frame: false,
     };
 
-    if (appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
+    // Don't apply saved fullscreen-sized bounds when restoring fullscreen — the window would be
+    // created at screen dimensions already, causing setFullScreen(true) to have no effect on Windows.
+    if (!wasFullScreen && appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
     const mainWindow = new BrowserWindow(BrowserWindowOptions);
 
     mainWindow.webContents.setZoomFactor(appScale);
