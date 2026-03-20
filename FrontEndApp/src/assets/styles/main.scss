@@ -370,6 +370,39 @@ body[class*='theme-bg-']:not(.theme-bg-default) .take-note-root {
     color: var(--theme-text);
 }
 
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .splitpanes__pane,
+body[class*='theme-bg-']:not(.theme-bg-default) .take-note-split .splitpanes__pane {
+    background-color: var(--theme-bg-main) !important;
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .splitpanes__splitter,
+body[class*='theme-bg-']:not(.theme-bg-default) .take-note-split .splitpanes__splitter {
+    background-color: var(--theme-bg-main) !important;
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default)
+    .read-bible-layout
+    .splitpanes_show_bar.splitpanes--horizontal
+    > .splitpanes__splitter {
+    border-top-color: var(--theme-border) !important;
+    background-color: var(--theme-bg-soft) !important;
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default)
+    .read-bible-layout
+    .splitpanes_show_bar.splitpanes--horizontal
+    > .splitpanes__splitter::before,
+body[class*='theme-bg-']:not(.theme-bg-default)
+    .read-bible-layout
+    .splitpanes_show_bar.splitpanes--horizontal
+    > .splitpanes__splitter::after,
+body[class*='theme-bg-']:not(.theme-bg-default)
+    .read-bible-layout
+    .take-note-split
+    .splitpanes__splitter::before {
+    background-color: var(--theme-text-soft) !important;
+}
+
 body[class*='theme-bg-']:not(.theme-bg-default) {
     --scrollbar-track: var(--theme-bg-soft);
     --scrollbar-thumb: var(--theme-text-soft);
@@ -396,5 +429,16 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dar
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-600,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-800 {
     background-color: var(--theme-bg-elevated) !important;
+    border-color: var(--theme-border) !important;
+}
+
+/* Keep clear layer contrast in notes area so panel gaps remain visible */
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root.bg-gray-100 {
+    background-color: var(--theme-bg-main) !important;
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-list-panel,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-editor-panel {
+    background-color: var(--theme-bg-soft) !important;
     border-color: var(--theme-border) !important;
 }
