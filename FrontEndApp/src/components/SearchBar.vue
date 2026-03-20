@@ -125,7 +125,7 @@ const selectedBooksForSearchString = computed(() => {
         </NInput>
         <div
             v-show="focused"
-            class="absolute w-full top-10 rounded-lg shadow-lg border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
+            class="absolute w-560px left-1/2 -translate-x-1/2 top-10 rounded-lg shadow-lg border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
             style="background-color: var(--theme-bg-elevated, var(--n-color)); color: var(--theme-text, var(--n-text-color)); border-color: var(--theme-border, var(--n-border-color));"
         >
             <div

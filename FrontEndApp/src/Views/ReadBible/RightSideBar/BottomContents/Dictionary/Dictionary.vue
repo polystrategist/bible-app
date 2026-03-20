@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { BookLetter24Filled, BookLetter24Regular } from '@vicons/fluent';
-import { NBadge, NIcon, NInput, NSelect, NTag } from 'naive-ui';
-import { useThemeStore } from '../../../../../store/theme';
+import { NSelect, NTag } from 'naive-ui';
 import { onMounted, ref, watch } from 'vue';
 
 const displayFont = ref(false);
 const fontSize = ref(14);
-const themeStore = useThemeStore();
 const selected = ref<string | null>(null);
 const loading = ref(false);
 const options = ref([]);
+const dictionarySelectThemeOverrides = {
+    peers: {
+        InternalSelectMenu: {
+            color: 'var(--theme-bg-elevated, #3a3a5d)',
+            optionTextColor: 'var(--theme-text, #ececff)',
+            optionTextColorActive: 'var(--theme-text, #ececff)',
+            optionColorPending: 'var(--theme-bg-soft, #333353)',
+            optionColorActivePending: 'var(--theme-bg-main, #2b2b42)',
+        },
+    },
+};
 const definitions = ref<
     Array<{
         word: string;
@@ -78,6 +86,7 @@ onMounted(() => {
             label-field="word"
             value-field="word"
             remote
+            :theme-overrides="dictionarySelectThemeOverrides"
             :clear-filter-after-select="false"
             @search="handleSearch"
             :on-clear="() => (definitions = [])"
