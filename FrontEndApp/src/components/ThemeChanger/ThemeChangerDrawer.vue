@@ -61,11 +61,11 @@ defineProps({
                 <div class="capitalize">{{ $t('theme') }}</div>
                 <NButton
                     class="mr-1"
-                    @click="themeStore.isDark = false"
+                    @click="themeStore.isDark = false; themeStore.setBackgroundTheme('default')"
                     secondary
                     round
                     size="small"
-                    :type="!themeStore.isDark ? 'primary' : 'default'"
+                    :type="!themeStore.isDark && themeStore.backgroundTheme === 'default' ? 'primary' : 'default'"
                 >
                     <template #icon>
                         <NIcon>
@@ -76,11 +76,12 @@ defineProps({
                     {{ $t('light') }}
                 </NButton>
                 <NButton
-                    @click="themeStore.isDark = true"
+                    class="mr-1"
+                    @click="themeStore.isDark = true; themeStore.setBackgroundTheme('default')"
                     secondary
                     round
                     size="small"
-                    :type="themeStore.isDark ? 'primary' : 'default'"
+                    :type="themeStore.isDark && themeStore.backgroundTheme === 'default' ? 'primary' : 'default'"
                 >
                     <template #icon>
                         <NIcon>
@@ -89,6 +90,18 @@ defineProps({
                         </NIcon>
                     </template>
                     <span class="capitalize">{{ $t('night') }}</span>
+                </NButton>
+                <NButton
+                    @click="themeStore.isDark = false; themeStore.setBackgroundTheme('sepia')"
+                    secondary
+                    round
+                    size="small"
+                    :type="themeStore.backgroundTheme === 'sepia' ? 'primary' : 'default'"
+                >
+                    <template #icon>
+                        <Circle24Filled color="#8b6b3f"></Circle24Filled>
+                    </template>
+                    <span class="capitalize">{{ $t('sepia') }}</span>
                 </NButton>
             </div>
         </div>

@@ -131,6 +131,17 @@ export interface InternationalMessageInterface {
     ocean: string;
     reds: string;
     olive: string;
+    sepia: string;
+    ember: string;
+    lavender: string;
+    mint: string;
+    rose: string;
+    slate: string;
+    amber: string;
+    indigo: string;
+    teal: string;
+    cobalt: string;
+    orchid: string;
     themes: string;
     Themes: string;
 

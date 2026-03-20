@@ -31,3 +31,54 @@ html {
 * {
     font-family: Poppins;
 }
+
+body.theme-bg-sepia {
+    --sepia-bg-main: #f4eddd;
+    --sepia-bg-soft: #efe5d0;
+    --sepia-bg-elevated: #e7dcc3;
+    --sepia-border: #d7c7a5;
+    --sepia-text: #3f2f1e;
+    --sepia-text-soft: #6f5a3f;
+    color: var(--sepia-text);
+}
+
+body.theme-bg-sepia .n-layout,
+body.theme-bg-sepia .n-layout-scroll-container {
+    background-color: var(--sepia-bg-main) !important;
+    color: var(--sepia-text);
+}
+
+body.theme-bg-sepia .n-layout-header,
+body.theme-bg-sepia .n-layout-footer,
+body.theme-bg-sepia .n-layout-sider {
+    background-color: var(--sepia-bg-soft) !important;
+    color: var(--sepia-text) !important;
+}
+
+body.theme-bg-sepia .n-card,
+body.theme-bg-sepia .n-popover,
+body.theme-bg-sepia .n-base-selection,
+body.theme-bg-sepia .n-input,
+body.theme-bg-sepia .n-drawer,
+body.theme-bg-sepia .n-modal {
+    background-color: var(--sepia-bg-elevated) !important;
+    color: var(--sepia-text) !important;
+    border-color: var(--sepia-border) !important;
+}
+
+body.theme-bg-sepia .n-menu-item-content,
+body.theme-bg-sepia .n-menu-item-content-header,
+body.theme-bg-sepia .n-menu-item-content__icon {
+    color: var(--sepia-text) !important;
+}
+
+body.theme-bg-sepia .n-base-selection-label,
+body.theme-bg-sepia .n-input__input-el,
+body.theme-bg-sepia .n-button {
+    color: var(--sepia-text) !important;
+}
+
+body.theme-bg-sepia .opacity-70,
+body.theme-bg-sepia .opacity-80 {
+    color: var(--sepia-text-soft);
+}
