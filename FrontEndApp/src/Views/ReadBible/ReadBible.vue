@@ -48,16 +48,16 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <Splitpanes vertical class="h-full w-full" @resized="changeSize">
+    <Splitpanes vertical class="h-full w-full read-bible-layout" @resized="changeSize">
         <Pane
-            class="bg-gray-100 dark:bg-dark-600"
+            class="bg-gray-100 dark:bg-dark-600 read-bible-left-panel"
             :size="splitPaneSizes[0].size"
             :min-size="splitPaneSizes[0].min"
             :max-size="splitPaneSizes[0].max"
         >
             <LeftSideBar />
         </Pane>
-        <Pane class="dark:bg-dark-800 h-full">
+        <Pane class="dark:bg-dark-800 h-full read-bible-center-panel">
             <Splitpanes
                 horizontal
                 class="h-full w-full"
@@ -97,7 +97,7 @@ onBeforeMount(() => {
             </Splitpanes>
         </Pane>
         <Pane
-            class="bg-gray-100 dark:bg-dark-600 h-full"
+            class="bg-gray-100 dark:bg-dark-600 h-full read-bible-right-panel"
             :size="splitPaneSizes[2].size"
             :min-size="splitPaneSizes[2].min"
             :max-size="splitPaneSizes[2].max"

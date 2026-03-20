@@ -57,7 +57,7 @@ onBeforeMount(() => {
                         : 100
                 "
             >
-                <div class="h-full p-2">
+                <div class="h-full p-2 read-bible-right-content">
                     <BibleList v-show="selectedButton == 'bible-lists'" />
                     <Bookmarks v-show="selectedButton == 'bible-bookmarks'" />
                     <Highlights v-show="selectedButton == 'bible-highlights'" />
@@ -79,7 +79,7 @@ onBeforeMount(() => {
             </Pane>
         </Splitpanes>
         <div
-            class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 pt-3 text-size-20px flex flex-col justify-between items-center pb-3"
+            class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 pt-3 text-size-20px flex flex-col justify-between items-center pb-3 read-bible-right-toolbar"
         >
             <div class="flex flex-col items-center gap-1">
                 <NTooltip v-for="menu in rightSideBarMenus" :placement="'left'">

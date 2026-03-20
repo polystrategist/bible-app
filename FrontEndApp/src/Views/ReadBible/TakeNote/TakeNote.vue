@@ -172,7 +172,7 @@ function changePaneSizes(sizes: Array<any>) {
 }
 </script>
 <template>
-    <div class="h-[calc(100%-1px)] relative bg-opacity-0 bg-gray-100">
+    <div class="h-[calc(100%-1px)] relative bg-opacity-0 bg-gray-100 take-note-root">
         <Splitpanes vertical class="h-full w-full take-note-split" @resized="changePaneSizes">
             <Pane
                 :size="paneSizes[0].size"
@@ -181,7 +181,7 @@ function changePaneSizes(sizes: Array<any>) {
                 class="rounded-md"
             >
                 <div
-                    class="h-[calc(100%-20px)] border border-gray-200 dark:bg-dark-400 bg-gray-200/55 dark:bg-dark-400 p-10px flex flex-col gap-2"
+                    class="h-[calc(100%-20px)] border border-gray-200 dark:bg-dark-400 bg-gray-200/55 dark:bg-dark-400 p-10px flex flex-col gap-2 take-note-list-panel"
                 >
                     <NButton size="small" type="primary" secondary @click="openCreateNoteDialog()">
                         <template #icon>
@@ -230,7 +230,7 @@ function changePaneSizes(sizes: Array<any>) {
 
             <Pane :size="paneSizes[1].size" :min-size="paneSizes[1].min" :max-size="paneSizes[1].max" class="rounded-md">
                 <div
-                    class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 p-2"
+                    class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 p-2 take-note-editor-panel"
                 >
                     <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow />
                 </div>

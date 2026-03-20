@@ -206,8 +206,8 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="w-full h-full show-chapter-verses flex flex-col">
-        <div class="h-30px dark:bg-dark-400 flex items-center pb-10px pt-10px select-none px-10px">
+    <div class="w-full h-full show-chapter-verses flex flex-col read-bible-verses-panel">
+        <div class="h-30px dark:bg-dark-400 flex items-center pb-10px pt-10px select-none px-10px read-bible-verses-toolbar">
             <div>
                 <div
                     class="flex items-center hover:text-[var(--primary-color)] cursor-pointer"
@@ -275,7 +275,7 @@ onMounted(() => {
                     bibleStore.renderVerses[0].version &&
                     bibleStore.renderVerses[0].version.length <= 3
                 "
-                class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 bg-white z-9 py-2"
+                class="sticky top-0 flex w-full mx-auto gap-20 dark:bg-dark-400 bg-white z-9 py-2 read-bible-version-sticky"
             >
                 <div
                     v-for="version in bibleStore.renderVerses[0].version"

@@ -346,3 +346,34 @@ body.theme-bg-sandstone {
     --theme-text: #3f2f20;
     --theme-text-soft: #6f5640;
 }
+
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-verses-panel,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-content,
+body[class*='theme-bg-']:not(.theme-bg-default) .take-note-root {
+    background-color: var(--theme-bg-main) !important;
+    color: var(--theme-text);
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-left-panel,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-panel,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-toolbar,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-verses-toolbar,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-version-sticky,
+body[class*='theme-bg-']:not(.theme-bg-default) .take-note-list-panel,
+body[class*='theme-bg-']:not(.theme-bg-default) .take-note-editor-panel {
+    background-color: var(--theme-bg-elevated) !important;
+    color: var(--theme-text) !important;
+    border-color: var(--theme-border) !important;
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .bg-gray-100,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .bg-gray-200\/55,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .bg-white,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-200,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-400,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-600,
+body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .dark\:bg-dark-800 {
+    background-color: var(--theme-bg-elevated) !important;
+    border-color: var(--theme-border) !important;
+}
