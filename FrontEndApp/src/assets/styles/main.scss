@@ -3,6 +3,21 @@
     --primary-color-light: rgba(238, 167, 24, 0.212);
     --header-height: 40px;
     --footer-height: 40px;
+    --scrollbar-track: rgba(20, 20, 20, 0.08);
+    --scrollbar-thumb: rgba(40, 40, 40, 0.28);
+    --scrollbar-thumb-hover: var(--primary-color);
+}
+
+body.light {
+    --scrollbar-track: rgba(30, 30, 30, 0.08);
+    --scrollbar-thumb: rgba(30, 30, 30, 0.28);
+    --scrollbar-thumb-hover: var(--primary-color);
+}
+
+body.dark {
+    --scrollbar-track: rgba(255, 255, 255, 0.1);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.26);
+    --scrollbar-thumb-hover: var(--primary-color);
 }
 
 html {
@@ -353,6 +368,12 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-content,
 body[class*='theme-bg-']:not(.theme-bg-default) .take-note-root {
     background-color: var(--theme-bg-main) !important;
     color: var(--theme-text);
+}
+
+body[class*='theme-bg-']:not(.theme-bg-default) {
+    --scrollbar-track: var(--theme-bg-soft);
+    --scrollbar-thumb: var(--theme-text-soft);
+    --scrollbar-thumb-hover: var(--primary-color);
 }
 
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-left-panel,

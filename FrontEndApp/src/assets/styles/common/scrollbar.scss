@@ -1,36 +1,28 @@
-// for chromes scrollbar
-*::-webkit-scrollbar-track {
-    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    // border-radius: 10px;
-    // background-color: var(--lightestPrimary);
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scroll-behavior: smooth;
 }
+
 *::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0);
-    border-radius: 10px;
-    margin: 10px;
-    opacity: 0.5;
-
-    &:hover {
-        background-color: var(--primary-color);
-    }
+    background: var(--scrollbar-thumb);
+    border-radius: 999px;
+    border: 2px solid var(--scrollbar-track);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.dark *::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0);
-    border-radius: 10px;
-    margin: 10px;
-}
-
-* {
-    scrollbar-width: thin;
-    scroll-behavior: smooth;
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
 .s-loading {
@@ -38,49 +30,23 @@
 }
 
 .overflowing-div {
-    transition: all 0.3s;
-    &:hover {
-        scrollbar-color: var(--primary-color) #22222200;
-
-        &::-webkit-scrollbar-thumb {
-            background-color: var(--primary-color);
-            opacity: 1;
-
-            &:hover {
-                background-color: var(--primary-color);
-            }
-        }
-    }
+    transition: scrollbar-color 0.25s ease;
 }
 
-.dark .overflowing-div {
-    scrollbar-color: #333 #222;
-
-    &:hover {
-        scrollbar-color: var(--primary-color) #222;
-    }
+.overflowing-div:hover {
+    scrollbar-color: var(--scrollbar-thumb-hover) var(--scrollbar-track);
 }
 
-.scroll-bar-md,
-.scroll-bar-sm {
-    &::-webkit-scrollbar-thumb {
-        border-radius: 5px;
-        margin: 10px;
-    }
+.overflowing-div:hover::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-hover);
 }
 
-.scroll-bar-sm {
-    scrollbar-width: thin;
-
-    &::-webkit-scrollbar {
-        width: 3px !important;
-        height: 3px !important;
-    }
+.scroll-bar-sm::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
 }
 
-.scroll-bar-md {
-    &::-webkit-scrollbar {
-        width: 10px !important;
-        height: 10px !important;
-    }
+.scroll-bar-md::-webkit-scrollbar {
+    width: 10px !important;
+    height: 10px !important;
 }
