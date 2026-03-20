@@ -10,19 +10,24 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     const isDark = ref(true);
     const backgroundTheme = ref<backgroundThemeType>('default');
     const selectedTheme = ref<typeNameInterface>('default');
-    const themeOverrides = ref<{
-        common: {
-            primaryColor: string;
-            primaryColorHover: string;
-            primaryColorSuppl: string;
-            primaryColorPressed: string;
-        };
-    }>({
+    const themeOverrides = ref<any>({
         common: {
             primaryColor: '#f2c423',
             primaryColorHover: 'rgba(238, 167, 24, 0.212)',
             primaryColorSuppl: '#E4BB2F',
             primaryColorPressed: '#E5BD1D',
+        },
+        Input: {
+            color: 'var(--theme-bg-elevated)',
+            textColor: 'var(--theme-text)',
+            placeholderColor: 'var(--theme-text-soft)',
+            colorFocus: 'var(--theme-bg-soft)',
+            colorDisabled: 'var(--theme-bg-soft)',
+            textColorDisabled: 'var(--theme-text-soft)',
+            border: '1px solid var(--theme-border)',
+            borderFocus: '1px solid var(--primary-color)',
+            borderHover: '1px solid var(--theme-border)',
+            boxShadowFocus: '0 0 8px 0 rgba(124, 131, 253, 0.3)',
         },
     });
 
