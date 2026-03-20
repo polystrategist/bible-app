@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NSwitch, NIcon, NButton } from 'naive-ui';
+import { NIcon, NButton } from 'naive-ui';
 import { Moon, Sun } from '@vicons/carbon';
 import { useThemeStore } from '../../../store/theme';
 
@@ -15,18 +15,22 @@ const themeStore = useThemeStore();
             </NIcon>
             {{ $t('themes') }}
         </div>
-        <NSwitch v-model:value="themeStore.isDark">
-            <template #checked> {{ $t('dark') }} </template>
-            <template #unchecked> {{ $t('light') }} </template>
-        </NSwitch>
-        <NButton
-            class="ml-2"
-            size="small"
-            secondary
-            :type="themeStore.backgroundTheme === 'sepia' ? 'primary' : 'default'"
-            @click="themeStore.isDark = false; themeStore.setBackgroundTheme(themeStore.backgroundTheme === 'sepia' ? 'default' : 'sepia')"
-        >
-            {{ $t('sepia') }}
-        </NButton>
+        <div class="mt-2 flex flex-wrap gap-1">
+            <NButton
+                v-for="appearance in themeStore.appearanceThemeOptions"
+                :key="appearance.key"
+                size="small"
+                secondary
+                :type="
+                    themeStore.isDark === appearance.isDark &&
+                    themeStore.backgroundTheme === appearance.backgroundTheme
+                        ? 'primary'
+                        : 'default'
+                "
+                @click="themeStore.applyAppearanceTheme(appearance)"
+            >
+                {{ $t(appearance.label) }}
+            </NButton>
+        </div>
     </div>
 </template>

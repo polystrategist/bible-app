@@ -32,53 +32,317 @@ html {
     font-family: Poppins;
 }
 
-body.theme-bg-sepia {
-    --sepia-bg-main: #f4eddd;
-    --sepia-bg-soft: #efe5d0;
-    --sepia-bg-elevated: #e7dcc3;
-    --sepia-border: #d7c7a5;
-    --sepia-text: #3f2f1e;
-    --sepia-text-soft: #6f5a3f;
-    color: var(--sepia-text);
+body.theme-bg-sepia,
+body.theme-bg-forest,
+body.theme-bg-dawn,
+body.theme-bg-dusk,
+body.theme-bg-nord,
+body.theme-bg-midnight,
+body.theme-bg-rosepaper,
+body.theme-bg-oceanic,
+body.theme-bg-graphite,
+body.theme-bg-sandstone {
+    color: var(--theme-text);
 }
 
 body.theme-bg-sepia .n-layout,
-body.theme-bg-sepia .n-layout-scroll-container {
-    background-color: var(--sepia-bg-main) !important;
-    color: var(--sepia-text);
+body.theme-bg-forest .n-layout,
+body.theme-bg-dawn .n-layout,
+body.theme-bg-dusk .n-layout,
+body.theme-bg-nord .n-layout,
+body.theme-bg-midnight .n-layout,
+body.theme-bg-rosepaper .n-layout,
+body.theme-bg-oceanic .n-layout,
+body.theme-bg-graphite .n-layout,
+body.theme-bg-sandstone .n-layout,
+body.theme-bg-sepia .n-layout-scroll-container,
+body.theme-bg-forest .n-layout-scroll-container,
+body.theme-bg-dawn .n-layout-scroll-container,
+body.theme-bg-dusk .n-layout-scroll-container,
+body.theme-bg-nord .n-layout-scroll-container,
+body.theme-bg-midnight .n-layout-scroll-container,
+body.theme-bg-rosepaper .n-layout-scroll-container,
+body.theme-bg-oceanic .n-layout-scroll-container,
+body.theme-bg-graphite .n-layout-scroll-container,
+body.theme-bg-sandstone .n-layout-scroll-container {
+    background-color: var(--theme-bg-main) !important;
+    color: var(--theme-text);
 }
 
 body.theme-bg-sepia .n-layout-header,
+body.theme-bg-forest .n-layout-header,
+body.theme-bg-dawn .n-layout-header,
+body.theme-bg-dusk .n-layout-header,
+body.theme-bg-nord .n-layout-header,
+body.theme-bg-midnight .n-layout-header,
+body.theme-bg-rosepaper .n-layout-header,
+body.theme-bg-oceanic .n-layout-header,
+body.theme-bg-graphite .n-layout-header,
+body.theme-bg-sandstone .n-layout-header,
 body.theme-bg-sepia .n-layout-footer,
-body.theme-bg-sepia .n-layout-sider {
-    background-color: var(--sepia-bg-soft) !important;
-    color: var(--sepia-text) !important;
+body.theme-bg-forest .n-layout-footer,
+body.theme-bg-dawn .n-layout-footer,
+body.theme-bg-dusk .n-layout-footer,
+body.theme-bg-nord .n-layout-footer,
+body.theme-bg-midnight .n-layout-footer,
+body.theme-bg-rosepaper .n-layout-footer,
+body.theme-bg-oceanic .n-layout-footer,
+body.theme-bg-graphite .n-layout-footer,
+body.theme-bg-sandstone .n-layout-footer,
+body.theme-bg-sepia .n-layout-sider,
+body.theme-bg-forest .n-layout-sider,
+body.theme-bg-dawn .n-layout-sider,
+body.theme-bg-dusk .n-layout-sider,
+body.theme-bg-nord .n-layout-sider,
+body.theme-bg-midnight .n-layout-sider,
+body.theme-bg-rosepaper .n-layout-sider,
+body.theme-bg-oceanic .n-layout-sider,
+body.theme-bg-graphite .n-layout-sider,
+body.theme-bg-sandstone .n-layout-sider {
+    background-color: var(--theme-bg-soft) !important;
+    color: var(--theme-text) !important;
 }
 
 body.theme-bg-sepia .n-card,
+body.theme-bg-forest .n-card,
+body.theme-bg-dawn .n-card,
+body.theme-bg-dusk .n-card,
+body.theme-bg-nord .n-card,
+body.theme-bg-midnight .n-card,
+body.theme-bg-rosepaper .n-card,
+body.theme-bg-oceanic .n-card,
+body.theme-bg-graphite .n-card,
+body.theme-bg-sandstone .n-card,
 body.theme-bg-sepia .n-popover,
+body.theme-bg-forest .n-popover,
+body.theme-bg-dawn .n-popover,
+body.theme-bg-dusk .n-popover,
+body.theme-bg-nord .n-popover,
+body.theme-bg-midnight .n-popover,
+body.theme-bg-rosepaper .n-popover,
+body.theme-bg-oceanic .n-popover,
+body.theme-bg-graphite .n-popover,
+body.theme-bg-sandstone .n-popover,
 body.theme-bg-sepia .n-base-selection,
+body.theme-bg-forest .n-base-selection,
+body.theme-bg-dawn .n-base-selection,
+body.theme-bg-dusk .n-base-selection,
+body.theme-bg-nord .n-base-selection,
+body.theme-bg-midnight .n-base-selection,
+body.theme-bg-rosepaper .n-base-selection,
+body.theme-bg-oceanic .n-base-selection,
+body.theme-bg-graphite .n-base-selection,
+body.theme-bg-sandstone .n-base-selection,
 body.theme-bg-sepia .n-input,
+body.theme-bg-forest .n-input,
+body.theme-bg-dawn .n-input,
+body.theme-bg-dusk .n-input,
+body.theme-bg-nord .n-input,
+body.theme-bg-midnight .n-input,
+body.theme-bg-rosepaper .n-input,
+body.theme-bg-oceanic .n-input,
+body.theme-bg-graphite .n-input,
+body.theme-bg-sandstone .n-input,
 body.theme-bg-sepia .n-drawer,
-body.theme-bg-sepia .n-modal {
-    background-color: var(--sepia-bg-elevated) !important;
-    color: var(--sepia-text) !important;
-    border-color: var(--sepia-border) !important;
+body.theme-bg-forest .n-drawer,
+body.theme-bg-dawn .n-drawer,
+body.theme-bg-dusk .n-drawer,
+body.theme-bg-nord .n-drawer,
+body.theme-bg-midnight .n-drawer,
+body.theme-bg-rosepaper .n-drawer,
+body.theme-bg-oceanic .n-drawer,
+body.theme-bg-graphite .n-drawer,
+body.theme-bg-sandstone .n-drawer,
+body.theme-bg-sepia .n-modal,
+body.theme-bg-forest .n-modal,
+body.theme-bg-dawn .n-modal,
+body.theme-bg-dusk .n-modal,
+body.theme-bg-nord .n-modal,
+body.theme-bg-midnight .n-modal,
+body.theme-bg-rosepaper .n-modal,
+body.theme-bg-oceanic .n-modal,
+body.theme-bg-graphite .n-modal,
+body.theme-bg-sandstone .n-modal {
+    background-color: var(--theme-bg-elevated) !important;
+    color: var(--theme-text) !important;
+    border-color: var(--theme-border) !important;
 }
 
 body.theme-bg-sepia .n-menu-item-content,
+body.theme-bg-forest .n-menu-item-content,
+body.theme-bg-dawn .n-menu-item-content,
+body.theme-bg-dusk .n-menu-item-content,
+body.theme-bg-nord .n-menu-item-content,
+body.theme-bg-midnight .n-menu-item-content,
+body.theme-bg-rosepaper .n-menu-item-content,
+body.theme-bg-oceanic .n-menu-item-content,
+body.theme-bg-graphite .n-menu-item-content,
+body.theme-bg-sandstone .n-menu-item-content,
 body.theme-bg-sepia .n-menu-item-content-header,
-body.theme-bg-sepia .n-menu-item-content__icon {
-    color: var(--sepia-text) !important;
+body.theme-bg-forest .n-menu-item-content-header,
+body.theme-bg-dawn .n-menu-item-content-header,
+body.theme-bg-dusk .n-menu-item-content-header,
+body.theme-bg-nord .n-menu-item-content-header,
+body.theme-bg-midnight .n-menu-item-content-header,
+body.theme-bg-rosepaper .n-menu-item-content-header,
+body.theme-bg-oceanic .n-menu-item-content-header,
+body.theme-bg-graphite .n-menu-item-content-header,
+body.theme-bg-sandstone .n-menu-item-content-header,
+body.theme-bg-sepia .n-menu-item-content__icon,
+body.theme-bg-forest .n-menu-item-content__icon,
+body.theme-bg-dawn .n-menu-item-content__icon,
+body.theme-bg-dusk .n-menu-item-content__icon,
+body.theme-bg-nord .n-menu-item-content__icon,
+body.theme-bg-midnight .n-menu-item-content__icon,
+body.theme-bg-rosepaper .n-menu-item-content__icon,
+body.theme-bg-oceanic .n-menu-item-content__icon,
+body.theme-bg-graphite .n-menu-item-content__icon,
+body.theme-bg-sandstone .n-menu-item-content__icon {
+    color: var(--theme-text) !important;
 }
 
 body.theme-bg-sepia .n-base-selection-label,
+body.theme-bg-forest .n-base-selection-label,
+body.theme-bg-dawn .n-base-selection-label,
+body.theme-bg-dusk .n-base-selection-label,
+body.theme-bg-nord .n-base-selection-label,
+body.theme-bg-midnight .n-base-selection-label,
+body.theme-bg-rosepaper .n-base-selection-label,
+body.theme-bg-oceanic .n-base-selection-label,
+body.theme-bg-graphite .n-base-selection-label,
+body.theme-bg-sandstone .n-base-selection-label,
 body.theme-bg-sepia .n-input__input-el,
-body.theme-bg-sepia .n-button {
-    color: var(--sepia-text) !important;
+body.theme-bg-forest .n-input__input-el,
+body.theme-bg-dawn .n-input__input-el,
+body.theme-bg-dusk .n-input__input-el,
+body.theme-bg-nord .n-input__input-el,
+body.theme-bg-midnight .n-input__input-el,
+body.theme-bg-rosepaper .n-input__input-el,
+body.theme-bg-oceanic .n-input__input-el,
+body.theme-bg-graphite .n-input__input-el,
+body.theme-bg-sandstone .n-input__input-el,
+body.theme-bg-sepia .n-button,
+body.theme-bg-forest .n-button,
+body.theme-bg-dawn .n-button,
+body.theme-bg-dusk .n-button,
+body.theme-bg-nord .n-button,
+body.theme-bg-midnight .n-button,
+body.theme-bg-rosepaper .n-button,
+body.theme-bg-oceanic .n-button,
+body.theme-bg-graphite .n-button,
+body.theme-bg-sandstone .n-button {
+    color: var(--theme-text) !important;
 }
 
 body.theme-bg-sepia .opacity-70,
-body.theme-bg-sepia .opacity-80 {
-    color: var(--sepia-text-soft);
+body.theme-bg-forest .opacity-70,
+body.theme-bg-dawn .opacity-70,
+body.theme-bg-dusk .opacity-70,
+body.theme-bg-nord .opacity-70,
+body.theme-bg-midnight .opacity-70,
+body.theme-bg-rosepaper .opacity-70,
+body.theme-bg-oceanic .opacity-70,
+body.theme-bg-graphite .opacity-70,
+body.theme-bg-sandstone .opacity-70,
+body.theme-bg-sepia .opacity-80,
+body.theme-bg-forest .opacity-80,
+body.theme-bg-dawn .opacity-80,
+body.theme-bg-dusk .opacity-80,
+body.theme-bg-nord .opacity-80,
+body.theme-bg-midnight .opacity-80,
+body.theme-bg-rosepaper .opacity-80,
+body.theme-bg-oceanic .opacity-80,
+body.theme-bg-graphite .opacity-80,
+body.theme-bg-sandstone .opacity-80 {
+    color: var(--theme-text-soft);
+}
+
+body.theme-bg-sepia {
+    --theme-bg-main: #f4eddd;
+    --theme-bg-soft: #efe5d0;
+    --theme-bg-elevated: #e7dcc3;
+    --theme-border: #d7c7a5;
+    --theme-text: #3f2f1e;
+    --theme-text-soft: #6f5a3f;
+}
+
+body.theme-bg-forest {
+    --theme-bg-main: #e7f1e5;
+    --theme-bg-soft: #d7e7d2;
+    --theme-bg-elevated: #c6dbc0;
+    --theme-border: #afcaa6;
+    --theme-text: #24351f;
+    --theme-text-soft: #46613d;
+}
+
+body.theme-bg-dawn {
+    --theme-bg-main: #fff2e6;
+    --theme-bg-soft: #ffe5d1;
+    --theme-bg-elevated: #ffd8bc;
+    --theme-border: #f2c5a4;
+    --theme-text: #4a2d18;
+    --theme-text-soft: #815338;
+}
+
+body.theme-bg-dusk {
+    --theme-bg-main: #2b2b42;
+    --theme-bg-soft: #333353;
+    --theme-bg-elevated: #3a3a5d;
+    --theme-border: #4a4a72;
+    --theme-text: #ececff;
+    --theme-text-soft: #c8c8e8;
+}
+
+body.theme-bg-nord {
+    --theme-bg-main: #2d3748;
+    --theme-bg-soft: #364458;
+    --theme-bg-elevated: #41526a;
+    --theme-border: #536882;
+    --theme-text: #e6eef7;
+    --theme-text-soft: #c2cfde;
+}
+
+body.theme-bg-midnight {
+    --theme-bg-main: #141b2d;
+    --theme-bg-soft: #1c2742;
+    --theme-bg-elevated: #243254;
+    --theme-border: #32446c;
+    --theme-text: #e8efff;
+    --theme-text-soft: #b9c6eb;
+}
+
+body.theme-bg-rosepaper {
+    --theme-bg-main: #fdf0f2;
+    --theme-bg-soft: #f8e1e5;
+    --theme-bg-elevated: #f1d1d7;
+    --theme-border: #e3bbc3;
+    --theme-text: #4b2530;
+    --theme-text-soft: #7b4a57;
+}
+
+body.theme-bg-oceanic {
+    --theme-bg-main: #132b33;
+    --theme-bg-soft: #1a3741;
+    --theme-bg-elevated: #224551;
+    --theme-border: #2f5a68;
+    --theme-text: #e0f4f8;
+    --theme-text-soft: #aad0d9;
+}
+
+body.theme-bg-graphite {
+    --theme-bg-main: #2a2d34;
+    --theme-bg-soft: #353941;
+    --theme-bg-elevated: #40454f;
+    --theme-border: #535a66;
+    --theme-text: #f1f3f7;
+    --theme-text-soft: #c3c9d2;
+}
+
+body.theme-bg-sandstone {
+    --theme-bg-main: #f5eadf;
+    --theme-bg-soft: #eeddcc;
+    --theme-bg-elevated: #e5d2be;
+    --theme-border: #d8bea3;
+    --theme-text: #3f2f20;
+    --theme-text-soft: #6f5640;
 }

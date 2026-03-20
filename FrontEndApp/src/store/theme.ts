@@ -2,8 +2,7 @@ import { defineStore } from 'pinia';
 import { onBeforeMount, ref, watch } from 'vue';
 import SESSION from '../util/session';
 import { getTheme, themesOptions, typeNameInterface } from '../util/themes';
-
-type backgroundThemeType = 'default' | 'sepia';
+import { appearanceThemeOptions, backgroundThemeType } from '../util/appearanceThemes';
 
 export const useThemeStore = defineStore('useThemeStore', () => {
     const showThemeChangerDrawer = ref(false);
@@ -31,7 +30,9 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         document.body.classList.remove('dark', 'light');
         document.body.classList.add(isDark.value ? 'dark' : 'light');
 
-        document.body.classList.remove('theme-bg-default', 'theme-bg-sepia');
+        appearanceThemeOptions.forEach((theme) => {
+            document.body.classList.remove(`theme-bg-${theme.backgroundTheme}`);
+        });
         document.body.classList.add(`theme-bg-${backgroundTheme.value}`);
     }
 
@@ -92,12 +93,21 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         backgroundTheme.value = theme;
     }
 
+    function applyAppearanceTheme(theme: { isDark: boolean; backgroundTheme: backgroundThemeType }) {
+        isDark.value = theme.isDark;
+        backgroundTheme.value = theme.backgroundTheme;
+        saveThemeSelected(theme.isDark);
+        changeTheRootProperty();
+    }
+
     return {
         selectedTheme,
         themeOverrides,
         isDark,
         backgroundTheme,
         setBackgroundTheme,
+        applyAppearanceTheme,
+        appearanceThemeOptions,
         changePrimaryColor,
         showThemeChangerDrawer
     };

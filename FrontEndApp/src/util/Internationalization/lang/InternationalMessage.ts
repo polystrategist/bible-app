@@ -142,6 +142,15 @@ export interface InternationalMessageInterface {
     teal: string;
     cobalt: string;
     orchid: string;
+    forest: string;
+    dawn: string;
+    dusk: string;
+    nord: string;
+    midnight: string;
+    rosepaper: string;
+    oceanic: string;
+    graphite: string;
+    sandstone: string;
     themes: string;
     Themes: string;
 
