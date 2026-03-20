@@ -121,15 +121,25 @@ const selectedBooksForSearchString = computed(() => {
                 </NIcon>
             </template>
         </NInput>
-        <div v-show="focused" class="absolute w-full top-10 dark:bg-dark-500 bg-gray-100 rounded-lg shadow-lg">
-            <div class="w-full whitespace-nowrap overflow-hidden truncate p-1 dark:bg-dark-500">
+        <div
+            v-show="focused"
+            class="absolute w-full top-10 rounded-lg shadow-lg border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
+            style="background-color: var(--theme-bg-elevated, var(--n-color)); color: var(--theme-text, var(--n-text-color)); border-color: var(--theme-border, var(--n-border-color));"
+        >
+            <div
+                class="w-full whitespace-nowrap overflow-hidden truncate p-1 border-b border-[var(--n-border-color)] bg-[var(--n-color)]"
+                style="background-color: var(--theme-bg-soft, var(--n-color)); border-color: var(--theme-border, var(--n-border-color));"
+            >
                 <NButton @click="showBookSelection = true" size="small" tertiary round>Select Book</NButton>
                 {{ selectedBooksForSearchString }}
             </div>
             <!-- Select Book Section -->
             <div v-show="showBookSelection"
-                class="fixed top-0 left-0 bg-dark-800 bg-opacity-60 w-full h-full z-9999999999">
-                <div class="dark:bg-dark-300 bg-gray-100 max-w-800px mx-auto mt-5 rounded-lg p-3 relative">
+                class="fixed top-0 left-0 bg-black/55 w-full h-full z-9999999999">
+                <div
+                    class="max-w-800px mx-auto mt-5 rounded-lg p-3 relative border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
+                    style="background-color: var(--theme-bg-elevated, var(--n-color)); color: var(--theme-text, var(--n-text-color)); border-color: var(--theme-border, var(--n-border-color));"
+                >
                     <div class="mb-3 flex justify-between">
                         <div>
                             <NButton class="mr-3" round size="small" @click="selectedBookNumbers = []">Unselect All
@@ -159,14 +169,16 @@ const selectedBooksForSearchString = computed(() => {
                 </div>
             </div>
             <div id="inputTextSearch"
-                class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses dark:bg-dark-500 bg-gray-50 w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div">
+                class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses bg-[var(--n-color)] w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div"
+                style="background-color: var(--theme-bg-main, var(--n-color));"
+            >
                 <div v-if="!searchedVerses.length || !search" class="flex justify-center items-center mt-10">
                     {{ $t('Search Bible') }}
                 </div>
                 <template v-else>
                     <template v-for="(verse, tabIndex) in searchedVerses">
                         <div v-if="bibleStore.isBookExist(verse.book_number)" :tabindex="tabIndex"
-                            class="p-3 dark:hover:bg-dark-100 hover:bg-gray-800 hover:bg-opacity-5 rounded-sm cursor-pointer"
+                            class="p-3 hover:bg-[var(--n-color-hover)] rounded-sm cursor-pointer"
                             @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)">
                             <div class="font-700">
                                 {{ bibleStore.getBookShortName(verse.book_number).title }}
