@@ -272,10 +272,10 @@ function resetForm() {
                             @click="submitSermon()">
                             Create
                         </NButton>
-                        <NButton v-else :disabled="loading" :loading="loading" type="primary"
+                        <!-- <NButton v-else :disabled="loading" :loading="loading" type="primary"
                             @click="router.push('/profile')">
                             Login First
-                        </NButton>
+                        </NButton> -->
                     </div>
                 </div>
             </div>

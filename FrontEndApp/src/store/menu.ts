@@ -49,12 +49,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
     ]);
 
     const bottomMenuTabs = ref([
-        {
-            label: 'Profile',
-            key: '/profile',
-            icon: renderNIcon(Person24Regular),
-            iconDark: renderNIcon(Person24Filled),
-        },
+        // {
+        //     label: 'Profile',
+        //     key: '/profile',
+        //     icon: renderNIcon(Person24Regular),
+        //     iconDark: renderNIcon(Person24Filled),
+        // },
         {
             label: 'Donate',
             key: 'donate-modal',
@@ -74,7 +74,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         'read-bible',
         'sermons',
         '/prayer-list',
-        '/profile',
+        // '/profile',
         '/settings-page',
         '/create-sermon',
         '/donate-page',

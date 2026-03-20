@@ -15,7 +15,7 @@ import { useThemeStore } from '../../store/theme';
 import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
 import LogoComponent from './../LogoComponent.vue';
-import ProfileDropdown from './Partials/ProfileDropdown.vue';
+// import ProfileDropdown from './Partials/ProfileDropdown.vue';
 import ThemeChangerDrawer from '../ThemeChanger/ThemeChangerDrawer.vue';
 import { useMenuStore } from '../../store/menu';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
@@ -98,7 +98,7 @@ onBeforeMount(async () => {
                 </NIcon>
             </NButton>
             <ThemeChangerDrawer />
-            <ProfileDropdown />
+            <!-- <ProfileDropdown /> -->
             <NButton
                 v-show="isElectron"
                 size="tiny"
