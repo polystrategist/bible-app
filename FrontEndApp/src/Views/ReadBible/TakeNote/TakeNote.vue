@@ -49,14 +49,14 @@ watch(
     () => spaceStudyStore.selectedSpaceStudy,
     async () => {
         await setNoteWhenSelectingADifferentSpace();
-    }
+    },
 );
 
 watch(
     () => noteStore.selectedNoteId,
     () => {
         EditorRef.value?.setContent(noteStore.currentNoteContent);
-    }
+    },
 );
 
 onMounted(async () => {
@@ -148,7 +148,9 @@ function handleDropdownSelect(key: string | number) {
     }
 }
 
-const noteModalTitle = computed(() => (noteModalMode.value === 'create' ? 'Create Note' : 'Rename Note'));
+const noteModalTitle = computed(() =>
+    noteModalMode.value === 'create' ? 'Create Note' : 'Rename Note',
+);
 
 function submitRename() {
     if (noteModalMode.value === 'create') {
@@ -173,7 +175,12 @@ function changePaneSizes(sizes: Array<any>) {
 </script>
 <template>
     <div class="h-[calc(100%-1px)] relative bg-opacity-0 take-note-root">
-        <Splitpanes vertical :dbl-click-splitter="false" class="h-full w-full take-note-split" @resized="changePaneSizes">
+        <Splitpanes
+            vertical
+            :dbl-click-splitter="false"
+            class="h-full w-full take-note-split"
+            @resized="changePaneSizes"
+        >
             <Pane
                 :size="paneSizes[0].size"
                 :min-size="paneSizes[0].min"
@@ -190,8 +197,14 @@ function changePaneSizes(sizes: Array<any>) {
                         New Note
                     </NButton>
 
-                    <div class="overflow-y-auto overflowing-div hide-note-list-scrollbar h-full flex flex-col gap-1 pr-1">
-                        <NEmpty v-if="!noteStore.notes.length" description="No notes yet" size="small" />
+                    <div
+                        class="overflow-y-auto overflowing-div hide-note-list-scrollbar h-full flex flex-col gap-1 pr-1"
+                    >
+                        <NEmpty
+                            v-if="!noteStore.notes.length"
+                            description="No notes yet"
+                            size="small"
+                        />
 
                         <div
                             v-for="(noteItem, index) in noteStore.notes"
@@ -205,18 +218,27 @@ function changePaneSizes(sizes: Array<any>) {
                             }"
                             @click="noteStore.selectNote(noteItem.id)"
                             @contextmenu="
-                                openNoteContextMenu($event, noteItem.id, noteItem.title || `Note ${index + 1}`)
+                                openNoteContextMenu(
+                                    $event,
+                                    noteItem.id,
+                                    noteItem.title || `Note ${index + 1}`,
+                                )
                             "
                         >
                             <div class="flex items-start justify-between gap-1">
-                                <div class="text-xs font-700 truncate">
+                                <div class="text-xs font-700 truncate select-none">
                                     {{ noteItem.title || `Note ${index + 1}` }}
                                 </div>
                                 <NButton
                                     quaternary
                                     size="tiny"
                                     title="Delete note"
-                                    @click.stop="confirmDeleteNote(noteItem.id, noteItem.title || `Note ${index + 1}`)"
+                                    @click.stop="
+                                        confirmDeleteNote(
+                                            noteItem.id,
+                                            noteItem.title || `Note ${index + 1}`,
+                                        )
+                                    "
                                 >
                                     <template #icon>
                                         <NIcon><TrashCan /></NIcon>
@@ -228,11 +250,16 @@ function changePaneSizes(sizes: Array<any>) {
                 </div>
             </Pane>
 
-            <Pane :size="paneSizes[1].size" :min-size="paneSizes[1].min" :max-size="paneSizes[1].max" class="rounded-md">
+            <Pane
+                :size="paneSizes[1].size"
+                :min-size="paneSizes[1].min"
+                :max-size="paneSizes[1].max"
+                class="rounded-md"
+            >
                 <div
                     class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 take-note-editor-panel"
                 >
-                    <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow  />
+                    <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow />
                 </div>
             </Pane>
         </Splitpanes>

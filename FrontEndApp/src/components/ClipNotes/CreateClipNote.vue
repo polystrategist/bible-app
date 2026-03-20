@@ -69,7 +69,7 @@ defineExpose({
                             {{ $t('Clip Note') }}
                         </span>
                     </div>
-                    <div class="flex gap-1 items-center h-50px">
+                    <div class="flex gap-1 items-center flex-wrap min-h-50px">
                         <span> {{ $t('Select Color') }}:</span>
                         <button v-for="color in colors" :key="color.color" @click="selectedColor = color.color"
                             :style="`background-color: ${color.color}`"

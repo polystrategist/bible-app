@@ -176,4 +176,32 @@ export const colors = [
         color: '#C2B8A3',
         name: 'brown',
     },
+    {
+        color: '#F9A8D4',
+        name: 'rose',
+    },
+    {
+        color: '#C4B5FD',
+        name: 'violet',
+    },
+    {
+        color: '#7DD3FC',
+        name: 'sky',
+    },
+    {
+        color: '#A7F3D0',
+        name: 'mint',
+    },
+    {
+        color: '#FDE68A',
+        name: 'amber',
+    },
+    {
+        color: '#E9D5FF',
+        name: 'lavender',
+    },
+    {
+        color: '#FBCFE8',
+        name: 'pink',
+    },
 ];
