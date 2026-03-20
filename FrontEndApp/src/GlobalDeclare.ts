@@ -23,6 +23,8 @@ declare global {
             closeWindow: () => Promise<void>;
             maximizeWindow: () => Promise<void>;
             minimizeWindow: () => Promise<void>;
+            getAppScale: () => Promise<number>;
+            setAppScale: (scale: number) => Promise<number>;
             getAvailableBibles: () => Promise<Array<any>>;
             getVerses: (args: string) => Promise<Array<any>>;
             getVersesCount: (args: string) => Promise<number>;

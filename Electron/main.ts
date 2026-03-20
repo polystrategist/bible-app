@@ -17,6 +17,8 @@ async function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     const appBounds: any = appConfig.get('setting.appBounds');
     const wasFullScreen = Boolean(appConfig.get('setting.isFullScreen'));
+    const savedScale = Number(appConfig.get('setting.appScale', 1));
+    const appScale = Number.isFinite(savedScale) ? Math.min(1.5, Math.max(0.75, savedScale)) : 1;
 
     let iconPath = path.join(__dirname, 'assets', 'icon.ico');
 
@@ -39,6 +41,8 @@ async function createWindow() {
 
     if (appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
     const mainWindow = new BrowserWindow(BrowserWindowOptions);
+
+    mainWindow.webContents.setZoomFactor(appScale);
 
 
     attachResizeListener(mainWindow);

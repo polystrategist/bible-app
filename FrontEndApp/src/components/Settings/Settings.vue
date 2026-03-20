@@ -8,6 +8,7 @@ import TabSetting from './Tabs/TabSetting.vue';
 import { ref } from 'vue';
 import SyncData from './Sync/SyncData.vue';
 import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
+import Scale from './Scale/Scale.vue';
 
 const name = ref('General');
 </script>
@@ -29,6 +30,7 @@ const name = ref('General');
                     </template>
                     <div class="flex flex-col gap-5 py-3">
                         <LanguageSetting />
+                        <Scale />
                         <SyncData />
                         <Deuterocanonical />
                     </div>

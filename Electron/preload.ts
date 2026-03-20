@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     maximizeWindow: () => ipcRenderer.invoke('maximizeWindow'),
     closeWindow: () => ipcRenderer.invoke('closeWindow'),
     isWindowBrowserMaximized: () => ipcRenderer.invoke('isWindowBrowserMaximized'),
+    getAppScale: () => ipcRenderer.invoke('getAppScale'),
+    setAppScale: (scale: number) => ipcRenderer.invoke('setAppScale', scale),
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
