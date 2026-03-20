@@ -141,7 +141,7 @@ defineExpose({
 
 <template>
     <div :class="{ 'flex flex-col h-full': overflow }">
-        <div v-if="editor" class="editor-buttons">
+        <div v-if="editor" class="editor-buttons bg-white bg-opacity-5 !light:bg-dark !light:bg-opacity-5">
             <NPopselect
                 trigger="click"
                 @update:value="toggleHeading"
@@ -366,7 +366,7 @@ defineExpose({
             </NButton>
         </div>
         <EditorContent
-            :class="{ 'overflow-auto overflowing-div': overflow }"
+            :class="{ 'overflow-auto overflowing-div p-2 h-100%': overflow }"
             v-if="editor"
             :editor="editor"
             :style="editorContentStyle"

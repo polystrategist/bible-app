@@ -230,9 +230,9 @@ function changePaneSizes(sizes: Array<any>) {
 
             <Pane :size="paneSizes[1].size" :min-size="paneSizes[1].min" :max-size="paneSizes[1].max" class="rounded-md">
                 <div
-                    class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 p-2 take-note-editor-panel"
+                    class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 take-note-editor-panel"
                 >
-                    <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow />
+                    <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow  />
                 </div>
             </Pane>
         </Splitpanes>

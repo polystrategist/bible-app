@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NIcon, NTooltip, useMessage } from 'naive-ui';
+import { NButton, NIcon, NTooltip, useMessage } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 import { rightSideBarBottomMenu, rightSideBarMenus } from './RightSideBar';
 import BibleList from './Bibles/Bibles.vue';
@@ -102,25 +102,26 @@ onBeforeMount(() => {
             </div>
             <div>
                 <template v-for="menu in rightSideBarBottomMenu">
-                    <NTooltip
+                    <NButton
                         v-if="typeof menu.show === 'undefined' && !menu.show"
-                        :placement="'left'"
+                        :key="menu.key"
+                        quaternary
+                        :class="{
+                            '!bg-[var(--primary-color)] hover:!bg-[var(--primary-color)]':
+                                rightSideStore.lastSelectedBottomMenu == menu.key,
+                            'h-75px': menu.key === 'dictionary',
+                            'h-27px': menu.key !== 'dictionary',
+                        }"
+                        class="relative !p-0 !min-w-27px w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 !rounded-md !cursor-pointer flex items-center justify-center"
+                        @click="selectRightSideBarBottomMenu(menu.key)"
                     >
-                        <template #trigger>
-                            <div
-                                :key="menu.key"
-                                :class="{
-                                    'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
-                                        rightSideStore.lastSelectedBottomMenu == menu.key,
-                                }"
-                                class="w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
-                                @click="selectRightSideBarBottomMenu(menu.key)"
-                            >
-                                <NIcon :component="themeStore.isDark ? menu.iconDark : menu.icon" />
-                            </div>
-                        </template>
-                        <span class="capitalize select-none">{{ $t(menu.title) }}</span>
-                    </NTooltip>
+                        <span
+                            class="absolute left-1/2 top-1/2 text-[10px] font-700 leading-none whitespace-nowrap capitalize tracking-[0.08em] select-none"
+                            style="transform: translate(-50%, -50%) rotate(-90deg);"
+                        >
+                            {{ $t('dictionary') }}
+                        </span>
+                    </NButton>
                 </template>
             </div>
         </div>
