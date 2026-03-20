@@ -27,6 +27,10 @@ type themeOptionsType = {
         dark: colorTypes;
         light: colorTypes;
     };
+    olive: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
 };
 
 export const themesOptions: themeOptionsType = {
@@ -104,9 +108,24 @@ export const themesOptions: themeOptionsType = {
             primaryColorPressed: '#FFBB5C',
         },
     },
+
+    olive: {
+        dark: {
+            primaryColor: '#98C379',
+            primaryColorHover: '#6FA956',
+            primaryColorSuppl: '#7CB369',
+            primaryColorPressed: '#B7D89A',
+        },
+        light: {
+            primaryColor: '#5E8C3B',
+            primaryColorHover: '#7CB369',
+            primaryColorSuppl: '#98C379',
+            primaryColorPressed: '#B7D89A',
+        },
+    },
 };
 
-export type typeNameInterface = 'default' | 'Nature' | 'Sky' | 'ocean' | 'reds';
+export type typeNameInterface = 'default' | 'Nature' | 'Sky' | 'ocean' | 'reds' | 'olive';
 
 export function getTheme(name: typeNameInterface) {
     return themesOptions[name];

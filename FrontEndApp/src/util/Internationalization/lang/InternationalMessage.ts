@@ -130,6 +130,7 @@ export interface InternationalMessageInterface {
     Sky: string;
     ocean: string;
     reds: string;
+    olive: string;
     themes: string;
     Themes: string;
 

@@ -130,6 +130,7 @@ const message: InternationalMessageType = {
     Nature: '自然',
     ocean: '海',
     reds: '赤',
+    olive: 'オリーブ',
     sky: '空',
     Sky: '空',
     Themes: 'テーマ',
