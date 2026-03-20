@@ -173,7 +173,7 @@ function changePaneSizes(sizes: Array<any>) {
 </script>
 <template>
     <div class="h-[calc(100%-1px)] relative bg-opacity-0 take-note-root">
-        <Splitpanes vertical class="h-full w-full take-note-split" @resized="changePaneSizes">
+        <Splitpanes vertical :dbl-click-splitter="false" class="h-full w-full take-note-split" @resized="changePaneSizes">
             <Pane
                 :size="paneSizes[0].size"
                 :min-size="paneSizes[0].min"

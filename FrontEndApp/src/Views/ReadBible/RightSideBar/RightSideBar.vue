@@ -46,6 +46,7 @@ onBeforeMount(() => {
         <Splitpanes
             @resized="rightSideStore.resizingPaneRightSide"
             horizontal
+            :dbl-click-splitter="false"
             class="splitpanes_show_bar w-[calc(100%-40px)] h-full"
             :class="{ 'splitter-hidden': !rightSideStore.showBottomPane }"
         >

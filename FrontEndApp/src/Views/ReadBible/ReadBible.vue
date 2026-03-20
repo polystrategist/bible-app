@@ -48,7 +48,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <Splitpanes vertical class="h-full w-full read-bible-layout" @resized="changeSize">
+    <Splitpanes vertical :dbl-click-splitter="false" class="h-full w-full read-bible-layout" @resized="changeSize">
         <Pane
             class="bg-gray-100 dark:bg-dark-600 read-bible-left-panel"
             :size="splitPaneSizes[0].size"
@@ -60,6 +60,7 @@ onBeforeMount(() => {
         <Pane class="dark:bg-dark-800 h-full read-bible-center-panel">
             <Splitpanes
                 horizontal
+                :dbl-click-splitter="false"
                 class="h-full w-full"
                 :class="{ 'splitter-hidden': !noteStore.showNote}"
                 @resized="changeViewVerseSize"
