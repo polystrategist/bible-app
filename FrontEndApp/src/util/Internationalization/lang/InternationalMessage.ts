@@ -178,6 +178,8 @@ export interface InternationalMessageInterface {
     Donate: string;
     'Study Space': string;
     clear: string;
+    'hide-notes': string;
+    'show-notes': string;
     'Clear Highlight': string;
     'dictionary': string;
     'references': string;

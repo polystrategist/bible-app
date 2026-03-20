@@ -179,6 +179,8 @@ const message: InternationalMessageType = {
     Donate: 'Doar',
     'Study Space': 'Estudo',
     clear: 'limpar',
+    'hide-notes': 'Ocultar Notas',
+    'show-notes': 'Mostrar Notas',
     "Clear Highlight": 'Limpar destaque',
     'dictionary': 'dicionário',
     'references': 'referências',

@@ -179,6 +179,8 @@ const message: InternationalMessageType = {
     Donate: 'Donate',
     'Study Space': 'Study Space',
     clear: 'clear',
+    'hide-notes': 'Hide Notes',
+    'show-notes': 'Show Notes',
     'Clear Highlight': 'Clear Highlight',
     'dictionary': 'dictionary',
     'references': 'references',
