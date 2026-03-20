@@ -35,6 +35,8 @@ watch(
             return;
         }
 
+        page.value = 1;
+
         clearTimeout(window.searchTheBibleTimeOut);
 
         window.searchTheBibleTimeOut = setTimeout(() => {
@@ -194,7 +196,7 @@ const selectedBooksForSearchString = computed(() => {
                     </template>
                 </template>
             </div>
-            <div v-show="searchedVerses.length && search != ''" class="flex justify-between px-10px select-none">
+            <div v-show="searchedVerses.length && search && search.trim() !== ''" class="flex justify-between px-10px select-none">
                 <div>
                     <span v-show="page > 1" class="cursor-pointer hover:text-[var(--primary-color)]" @click="
                         page--;
