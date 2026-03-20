@@ -209,11 +209,11 @@ function changePaneSizes(sizes: Array<any>) {
                         <div
                             v-for="(noteItem, index) in noteStore.notes"
                             :key="noteItem.id"
-                            class="rounded-md border border-gray-200 dark:border-dark-300 p-2 cursor-pointer transition-colors"
+                            class="group note-item rounded-md border p-2 cursor-pointer transition-all duration-200 ease-out"
                             :class="{
-                                'bg-[var(--primary-color)]/20 border-[var(--primary-color)]':
+                                'note-item-selected bg-[var(--primary-color)]/20 border-[var(--primary-color)] shadow-md':
                                     noteStore.selectedNoteId === noteItem.id,
-                                'hover:bg-gray-200/40 dark:hover:bg-dark-200':
+                                'note-item-unselected':
                                     noteStore.selectedNoteId !== noteItem.id,
                             }"
                             @click="noteStore.selectNote(noteItem.id)"
@@ -233,6 +233,7 @@ function changePaneSizes(sizes: Array<any>) {
                                     quaternary
                                     size="tiny"
                                     title="Delete note"
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-600 hover:bg-red-500/10"
                                     @click.stop="
                                         confirmDeleteNote(
                                             noteItem.id,
@@ -334,5 +335,25 @@ function changePaneSizes(sizes: Array<any>) {
     width: 0;
     height: 0;
     display: none;
+}
+
+.note-item {
+    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.05));
+    border-color: var(--theme-border, rgba(255, 255, 255, 0.1));
+    color: var(--theme-text, #ffffff);
+    transform: translateY(0);
+}
+
+.note-item-unselected:hover {
+    background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.1));
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+.note-item-selected {
+    background-color: var(--primary-color) !important;
+    color: #ffffff;
+    transform: translateY(0);
 }
 </style>

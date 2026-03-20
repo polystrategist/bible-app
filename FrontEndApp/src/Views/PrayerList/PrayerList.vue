@@ -187,24 +187,24 @@ function selectItemFromMenuElement(key: any, element: any) {
 
 <style lang="scss">
 .prayer-list-page {
-    background-color: var(--theme-bg-main, #1f2230);
-    color: var(--theme-text, #ececff);
+    background-color: var(--theme-bg-main, #f9fafb);
+    color: var(--theme-text, #1f2937);
 }
 
 .prayer-list-column {
-    background-color: var(--theme-bg-main, #1f2230);
-    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+    background-color: var(--theme-bg-main, #f9fafb);
+    border: 1px solid var(--theme-border, #e5e7eb);
     border-radius: 8px;
 }
 
 .prayer-list-item {
-    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.06));
-    color: var(--theme-text, #ececff);
-    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+    background-color: var(--theme-bg-soft, #ffffff);
+    color: var(--theme-text, #1f2937);
+    border: 1px solid var(--theme-border, #e5e7eb);
     @apply rounded-md relative overflow-hidden cursor-move mb-2 p-1;
 
     &:hover {
-        background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.12));
+        background-color: var(--theme-bg-elevated, #f3f4f6);
     }
 
     .flip-list-move {
@@ -218,6 +218,27 @@ function selectItemFromMenuElement(key: any, element: any) {
     }
     .list-group {
         min-height: 20px;
+    }
+}
+
+// Dark mode specific styles
+body.dark .prayer-list-page {
+    background-color: var(--theme-bg-main, #1f2230);
+    color: var(--theme-text, #ececff);
+}
+
+body.dark .prayer-list-column {
+    background-color: var(--theme-bg-main, #1f2230);
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+}
+
+body.dark .prayer-list-item {
+    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.06));
+    color: var(--theme-text, #ececff);
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+
+    &:hover {
+        background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.12));
     }
 }
 </style>
