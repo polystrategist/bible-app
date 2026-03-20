@@ -8,12 +8,14 @@ import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
 import { Book24Regular, Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
 import useNoteStore from '../../store/useNoteStore';
+import { useSettingStore } from '../../store/settingStore';
 
 const noteStore = useNoteStore();
 const bibleStore = useBibleStore();
 const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
+const settingStore = useSettingStore();
 const downloadPercentage = ref<number>(0);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];
@@ -41,6 +43,17 @@ onMounted(() => {
         // Check if Control, Shift, and N are pressed together
         if (event.ctrlKey && event.shiftKey && event.key === 'N') {
             noteStore.showNote = !noteStore.showNote;
+        }
+
+        // Ctrl+Shift+- → decrease scale  (event.code used so it works regardless of keyboard layout)
+        // Ctrl+Shift++ → increase scale
+        if (event.ctrlKey && event.shiftKey && event.code === 'Minus') {
+            event.preventDefault();
+            settingStore.appScale = Math.max(0.75, Math.round((settingStore.appScale - 0.05) * 100) / 100);
+        }
+        if (event.ctrlKey && event.shiftKey && event.code === 'Equal') {
+            event.preventDefault();
+            settingStore.appScale = Math.min(1.5, Math.round((settingStore.appScale + 0.05) * 100) / 100);
         }
     });
 });
