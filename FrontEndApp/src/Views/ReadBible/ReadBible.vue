@@ -70,18 +70,6 @@ onBeforeMount(() => {
                 >
                     <div class="relative h-full">
                         <ViewVerses />
-                        <button
-                            class="absolute bottom-20px right-15px translate-y-1/2 z-30 px-3 py-1 text-11px font-700 border rounded-md shadow-sm transition-colors"
-                            :class="
-                                noteStore.showNote
-                                    ? 'border-[var(--primary-color)] bg-[var(--primary-color)] text-white'
-                                    : 'dark:bg-dark-200 text-gray-700 dark:text-gray-200 hover:text-[var(--primary-color)]'
-                            "
-                            :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
-                            @click="noteStore.showNote = !noteStore.showNote"
-                        >
-                            {{ noteStore.showNote ? 'Hide Notes' : 'Open Notes' }}
-                        </button>
                     </div>
                 </Pane>
                 <Pane

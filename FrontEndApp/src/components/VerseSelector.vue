@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { NButton, NModal, NCard } from 'naive-ui';
+import { NButton, NModal, NCard, NInput } from 'naive-ui';
 import { useBibleStore } from './../store/BibleStore';
 import { bibleBooks, BookInfo } from '../util/books';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useSettingStore } from '../store/settingStore';
 
 const settings = useSettingStore();
@@ -11,6 +11,7 @@ const showOuter = ref(false);
 const showSelectChapterDrawer = ref(false);
 const showSelectVerseDrawer = ref(false);
 const numberOfVerses = ref<number>(0);
+const searchQuery = ref('');
 const props = defineProps({
     size: {
         type: String,
@@ -32,6 +33,17 @@ const props = defineProps({
 
 const selectedBook = ref<BookInfo | null>(null);
 const selectedChapter = ref<number | null>(null);
+
+const filteredBooks = computed(() => {
+    if (!searchQuery.value.trim()) {
+        return bibleBooks;
+    }
+    const query = searchQuery.value.toLowerCase();
+    return bibleBooks.filter(book => 
+        book.title.toLowerCase().includes(query) || 
+        book.short_name.toLowerCase().includes(query)
+    );
+});
 
 function selectBook(book: BookInfo) {
     selectedBook.value = book;
@@ -59,6 +71,10 @@ function selectVerse(verse: number) {
     showSelectChapterDrawer.value = false;
     showOuter.value = false;
 }
+
+function resetSearch() {
+    searchQuery.value = '';
+}
 </script>
 <template>
     <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size as any" :circle="props.circle" :title="title">
@@ -67,20 +83,50 @@ function selectVerse(verse: number) {
         </template>
         <slot />
     </NButton>
-    <NModal v-model:show="showOuter">
-        <NCard style="width: 600px" title="Select Bible" class="my-30px">
-            <div class="flex flex-wrap gap-2">
-                <template v-for="(book, i) in bibleBooks" :key="book.book_number">
-                    <NButton
-                        v-show="book.deuterocanonical === false || (book.deuterocanonical && settings.showDeuterocanonical)"
-                        class="justify-start"
-                        @click="selectBook(book)"
-                        secondary
-                    >
-                        {{ $t(book.title) }}
-                    </NButton>
-                    <div v-if="book.title == 'Malachi'" class="w-full py-3"></div>
-                </template>
+    <NModal v-model:show="showOuter" @update:show="(val) => !val && resetSearch()">
+        <NCard style="width: 600px; max-height: 80vh;" title="Select Bible" class="my-30px" content-style="max-height: calc(80vh - 110px); overflow-y: auto; padding: 16px;">
+            <template #header-extra>
+                <NInput 
+                    v-model:value="searchQuery" 
+                    type="text" 
+                    placeholder="Search books..." 
+                    style="width: 200px"
+                    clearable
+                />
+            </template>
+            <div>
+                <div class="mb-4">
+                    <div class="text-sm font-600 text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wide">Old Testament</div>
+                    <div class="flex flex-wrap gap-2">
+                        <template v-for="(book, i) in filteredBooks" :key="book.book_number">
+                            <NButton
+                                v-show="(book.deuterocanonical === false || (book.deuterocanonical && settings.showDeuterocanonical)) && book.book_number < 470"
+                                class="justify-start"
+                                @click="selectBook(book)"
+                                secondary
+                                round
+                            >
+                                {{ $t(book.title) }}
+                            </NButton>
+                        </template>
+                    </div>
+                </div>
+                <div>
+                    <div class="text-sm font-600 text-gray-600 dark:text-gray-400 mb-3 uppercase tracking-wide">New Testament</div>
+                    <div class="flex flex-wrap gap-2">
+                        <template v-for="(book, i) in filteredBooks" :key="book.book_number">
+                            <NButton
+                                v-show="book.book_number >= 470"
+                                class="justify-start"
+                                @click="selectBook(book)"
+                                secondary
+                                round
+                            >
+                                {{ $t(book.title) }}
+                            </NButton>
+                        </template>
+                    </div>
+                </div>
             </div>
         </NCard>
     </NModal>

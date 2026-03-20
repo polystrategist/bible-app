@@ -6,7 +6,7 @@ import { useNetwork } from '@vueuse/core';
 import VerseSelectorButton from './../VerseSelector.vue';
 import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
-import { Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
+import { Book24Regular, Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
 import useNoteStore from '../../store/useNoteStore';
 
 const noteStore = useNoteStore();
@@ -59,7 +59,7 @@ onMounted(() => {
             <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
                 <template #icon>
                     <NIcon>
-                        <PointScan24Filled />
+                        <Book24Regular />
                     </NIcon>
                 </template>
                 {{ $t(bibleStore.getSelectedData.book) }}
@@ -69,7 +69,6 @@ onMounted(() => {
                 v-if="menuStore.menuSelected === 'read-bible'"
                 secondary
                 size="tiny"
-                circle
                 :type="noteStore.showNote ? 'primary' : 'default'"
                 :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
                 @click="noteStore.showNote = !noteStore.showNote"
@@ -80,6 +79,7 @@ onMounted(() => {
                         <Note24Regular v-else />
                     </NIcon>
                 </template>
+                 {{ noteStore.showNote ? $t('hide-notes') : $t('show-notes') }}
             </NButton>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
