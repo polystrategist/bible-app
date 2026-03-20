@@ -167,5 +167,18 @@ onMounted(async () => {
             height: 30px;
         }
     }
+    .n-layout-toggle-bar {
+        // background-color: var(--theme-bg-main, transparent) !important;
+        // border-color: var(--theme-border, transparent) !important;
+        
+        // &:hover {
+        //     background-color: var(--theme-bg-soft, transparent) !important;
+        // }
+        
+        .n-layout-toggle-bar__top,
+        .n-layout-toggle-bar__bottom {
+            background-color: var(--theme-text, currentColor) !important;
+        }
+    }
 }
 </style>
