@@ -1,4 +1,5 @@
 import { app, ipcMain } from 'electron';
+import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
 import { StoreDB } from '../../DataBase/DataBase';
@@ -83,21 +84,20 @@ export default () => {
         'getChapterClipNotes',
         async (event, { book_number, chapter }: { book_number: number; chapter: number }) => {
             try {
-                let data: any = {};
-
-                await StoreDB('clip_notes')
+                const data = await StoreDB('clip_notes')
                     .select()
                     .where('book_number', book_number)
-                    .where('chapter', chapter)
-                    .then((row) => {
-                        row.forEach((row: any, index: any) => {
-                            data[row.key] = row;
-                        });
-                    });
+                    .where('chapter', chapter);
 
-                return data;
+                const result: any = {};
+                data.forEach((row: any) => {
+                    result[row.key] = row;
+                });
+
+                return result;
             } catch (e) {
-                console.log(e);
+                Log.error(e);
+                return {};
             }
         }
     );

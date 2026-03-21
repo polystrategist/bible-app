@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import Log from 'electron-log';
 import { StoreDB } from '../../DataBase/DataBase';
 const tableName = 'prayer_lists';
 export default () => {
@@ -12,7 +13,7 @@ export default () => {
                 await StoreDB(tableName).insert(args.data);
             }
         } catch (e) {
-            console.log(e);
+            Log.error(e);
         }
     });
 
@@ -20,7 +21,7 @@ export default () => {
         try {
             return await StoreDB(tableName).where('key', key).del();
         } catch (e) {
-            console.log(e);
+            Log.error(e);
         }
     });
 
@@ -28,17 +29,15 @@ export default () => {
         'getPrayerLists',
         async (event, args: { status: string | null; search: null | string } = { search: null, status: null }) => {
             try {
-                return await StoreDB(tableName)
-                    .select()
-                    .where(function (query) {
-                        if (args.status) query.where('status', args.status);
-                        if (args.search) query.whereLike('content', `%${args.search}%`);
-                    })
-                    .then((row) => {
-                        return row;
-                    });
+                const query = StoreDB(tableName).select();
+                
+                if (args.status) query.where('status', args.status);
+                if (args.search) query.whereLike('content', `%${args.search}%`);
+                
+                return await query;
             } catch (e) {
-                console.log(e);
+                Log.error(e);
+                return [];
             }
         }
     );
@@ -52,7 +51,7 @@ export default () => {
             try {
                 return await StoreDB(tableName).insert(args).onConflict('key').merge();
             } catch (e) {
-                console.log(e);
+                Log.error(e);
             }
         }
     );

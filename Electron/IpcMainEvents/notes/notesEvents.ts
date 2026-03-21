@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import Log from 'electron-log';
 import { StoreDB, updateOrCreate } from '../../DataBase/DataBase';
 
 export default () => {
@@ -21,7 +22,7 @@ export default () => {
                     }
                 );
             } catch (e) {
-                console.log(e);
+                Log.error(e);
             }
         }
     );

@@ -1,4 +1,5 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
+import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { StoreDB } from '../../DataBase/DataBase';
 
@@ -34,7 +35,8 @@ const saveVersesInBookmark = async ({
 
         return await getVersesSavedBookmarks();
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        Log.error(e);
+        return {};
     }
 };
 
@@ -47,13 +49,14 @@ const getVersesSavedBookmarks = async () => {
             .where('study_space_id', selectedSpaceStudy.id);
 
         const result: any = {};
-        for (const item of data) {
+        data.forEach((item: any) => {
             result[item.key] = item;
-        }
+        });
 
         return result;
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        Log.error(e);
+        return {};
     }
 };
 

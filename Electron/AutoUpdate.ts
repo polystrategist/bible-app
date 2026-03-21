@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
+import Log from 'electron-log';
 
 let errorAlreadyShown = false;
 export default (mainWindow: BrowserWindow) => {
@@ -55,7 +56,7 @@ export default (mainWindow: BrowserWindow) => {
         // Handle update error
         if (!errorAlreadyShown) {
             errorAlreadyShown = true;
-            console.log('Their is an Error Updating, the developer is working on a fix right now.');
+            Log.error('Update error:', error);
         }
     });
 };
