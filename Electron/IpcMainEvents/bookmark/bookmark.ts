@@ -1,19 +1,6 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
-import UPath from 'upath';
-import knex from 'knex';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
-import { setupPortableMode } from '../../util/portable';
-
-setupPortableMode();
-const dataPath = app.getPath('userData');
-const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
-const StoreDB = knex({
-    client: 'sqlite3',
-    useNullAsDefault: false,
-    connection: {
-        filename: filePath,
-    },
-});
+import { StoreDB } from '../../DataBase/DataBase';
 
 const saveVersesInBookmark = async ({
     book_number,

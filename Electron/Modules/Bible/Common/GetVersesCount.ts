@@ -1,7 +1,5 @@
-import { isNightly } from '../../../config';
 import { app, ipcMain } from 'electron';
-import knex from 'knex';
-import { setupPortableMode } from '../../../util/portable';
+import { getBibleVersionDb } from './BibleVersionCache';
 
 export type GetVerseArgs = {
     bible_versions: Array<string>;
@@ -9,31 +7,20 @@ export type GetVerseArgs = {
     selected_chapter: number;
 };
 
-setupPortableMode();
-const dataPath = app.getPath('userData');
-const filePath = dataPath + `\\modules\\bible\\`;
-
 export default () => {
     ipcMain.handle('getVersesCount', async (event: any, args: GetVerseArgs) => {
         let versesCount = 0;
 
         for (const version of args.bible_versions) {
-            const bibleVersion = knex({
-                client: 'sqlite3',
-                useNullAsDefault: false,
-                connection: {
-                    filename: filePath + version,
-                },
-            });
+            const bibleVersion = getBibleVersionDb(version);
 
-            await bibleVersion
+            const rows = await bibleVersion
                 .select()
                 .from('verses')
                 .where('book_number', args.book_number)
-                .where('chapter', args.selected_chapter)
-                .then((rows) => {
-                    versesCount = rows.length;
-                });
+                .where('chapter', args.selected_chapter);
+
+            versesCount = rows.length;
         }
         return versesCount;
     });

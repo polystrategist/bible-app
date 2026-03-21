@@ -9,6 +9,7 @@ import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
 import { setupPortableMode } from './util/portable';
 import { attachResizeListener } from './util/window';
+import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 
 // Check if running in portable mode
 setupPortableMode();
@@ -90,14 +91,12 @@ async function createWindow() {
 app.whenReady().then(async () => {
     // check and set up the database
     try {
-        await setupDefault
-            .then((response) => console.log(response))
-            .catch((e) => {
-                console.log(e);
-            });
+        await setupDefault;
+        Log.info('Database setup completed successfully');
     } catch (e) {
-        Log.error(e);
+        Log.error('Database setup failed:', e);
         app.quit();
+        return;
     }
 
     await createWindow();
@@ -113,6 +112,14 @@ app.whenReady().then(async () => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+        // Clean up Bible version cache to prevent memory leaks
+        clearBibleVersionCache();
         app.quit();
     }
+});
+
+// Clean up resources before quitting
+app.on('before-quit', () => {
+    clearBibleVersionCache();
+    Log.info('Application cleanup completed');
 });
