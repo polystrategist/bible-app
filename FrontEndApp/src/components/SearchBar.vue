@@ -267,7 +267,7 @@ const selectedBooksForSearchString = computed(() => {
             >
                 <div>
                     <span
-                        v-show="page > 1"
+                        v-if="page > 1 && searchedVerses.length > 0"
                         class="cursor-pointer hover:text-[var(--primary-color)]"
                         @click="
                             page--;
@@ -279,7 +279,7 @@ const selectedBooksForSearchString = computed(() => {
                 </div>
                 <div>
                     <span
-                        v-show="searchedVerses.length > 0 && searchedVerses.length == limit"
+                        v-if="searchedVerses.length > 0 && searchedVerses.length >= limit"
                         class="cursor-pointer hover:text-[var(--primary-color)]"
                         @click="
                             page++;
