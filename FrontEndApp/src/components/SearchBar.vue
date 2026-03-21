@@ -43,7 +43,7 @@ watch(
             if (val && val != '') submitSearch(val);
             else removeHighlight();
         }, 500);
-    }
+    },
 );
 
 function handleSelectedBook() {
@@ -71,7 +71,7 @@ function selectAVerse(book_number: number, chapter: number, verse: number) {
     removeHighlight();
 
     setTimeout(() => {
-        highlighter('input-text-search', search.value as string), 100;
+        (highlighter('input-text-search', search.value as string), 100);
     }, 500);
 }
 
@@ -105,90 +105,155 @@ const selectedBooksForSearchString = computed(() => {
 </script>
 
 <template>
-    <div v-if="focused" class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40" @click="focused = false">
-    </div>
+    <div
+        v-if="focused"
+        class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40"
+        @click="focused = false"
+    ></div>
     <div class="w-400px flex justify-center top-0 z-999999999 relative">
-        <NInput ref="SearchInputRef" size="small" v-model:value="search" :autofocus="false"
-            :on-focus="() => (focused = true)" class="transition-all" :class="focused ? '!w-400px' : '!w-300px'"
-            clearable :placeholder="$t('Search Bible') + '...'" :round="!focused" @keyup="(key: any) => {
-                if (key.key == 'Escape') {
-                    focused = false;
-                    if (SearchInputRef)
-                        SearchInputRef.blur();
+        <NInput
+            ref="SearchInputRef"
+            size="small"
+            v-model:value="search"
+            :autofocus="false"
+            :on-focus="() => (focused = true)"
+            class="transition-all"
+            :class="focused ? '!w-400px' : '!w-300px'"
+            clearable
+            :placeholder="$t('Search Bible') + '...'"
+            :round="!focused"
+            @keyup="
+                (key: any) => {
+                    if (key.key == 'Escape') {
+                        focused = false;
+                        if (SearchInputRef) SearchInputRef.blur();
+                    }
                 }
-            }">
+            "
+        >
             <template #prefix>
                 <NIcon>
                     <Search24Filled />
                 </NIcon>
             </template>
+            <template v-if="focused" #suffix>
+                <span class="text-xs">Esc</span>
+            </template>
         </NInput>
         <div
             v-show="focused"
             class="absolute w-560px left-1/2 -translate-x-1/2 top-10 rounded-lg shadow-lg border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
-            style="background-color: var(--theme-bg-elevated, var(--n-color)); color: var(--theme-text, var(--n-text-color)); border-color: var(--theme-border, var(--n-border-color));"
+            style="
+                background-color: var(--theme-bg-elevated, var(--n-color));
+                color: var(--theme-text, var(--n-text-color));
+                border-color: var(--theme-border, var(--n-border-color));
+            "
         >
             <div
                 class="w-full whitespace-nowrap overflow-hidden truncate p-1 border-b border-[var(--n-border-color)] bg-[var(--n-color)]"
-                style="background-color: var(--theme-bg-soft, var(--n-color)); border-color: var(--theme-border, var(--n-border-color));"
+                style="
+                    background-color: var(--theme-bg-soft, var(--n-color));
+                    border-color: var(--theme-border, var(--n-border-color));
+                "
             >
-                <NButton @click="showBookSelection = true" size="small" tertiary round>Select Book</NButton>
+                <NButton @click="showBookSelection = true" size="small" tertiary round
+                    >Select Book</NButton
+                >
                 {{ selectedBooksForSearchString }}
             </div>
             <!-- Select Book Section -->
-            <div v-show="showBookSelection"
-                class="fixed top-0 left-0 bg-black/55 w-full h-full z-9999999999">
+            <div
+                v-show="showBookSelection"
+                class="fixed top-0 left-0 bg-black/55 w-full h-full z-9999999999"
+            >
                 <div
                     class="max-w-800px mx-auto mt-5 rounded-lg p-3 relative border border-[var(--n-border-color)] bg-[var(--n-color)] text-[var(--n-text-color)]"
-                    style="background-color: var(--theme-bg-elevated, var(--n-color)); color: var(--theme-text, var(--n-text-color)); border-color: var(--theme-border, var(--n-border-color));"
+                    style="
+                        background-color: var(--theme-bg-elevated, var(--n-color));
+                        color: var(--theme-text, var(--n-text-color));
+                        border-color: var(--theme-border, var(--n-border-color));
+                    "
                 >
                     <div class="mb-3 flex justify-between">
                         <div>
-                            <NButton class="mr-3" round size="small" @click="selectedBookNumbers = []">Unselect All
+                            <NButton
+                                class="mr-3"
+                                round
+                                size="small"
+                                @click="selectedBookNumbers = []"
+                                >Unselect All
                             </NButton>
-                            <NButton round size="small"
-                                @click="selectedBookNumbers = bibleBooks.map((book) => book.book_number)">
+                            <NButton
+                                round
+                                size="small"
+                                @click="
+                                    selectedBookNumbers = bibleBooks.map((book) => book.book_number)
+                                "
+                            >
                                 Select All
                             </NButton>
                         </div>
                         <div>
-                            <NButton class="mr-3" round size="small" @click="handleSelectedBook()"> Close </NButton>
+                            <NButton class="mr-3" round size="small" @click="handleSelectedBook()">
+                                Close
+                            </NButton>
                         </div>
                     </div>
                     <div class="max-h-90vh overflow-auto overflowing-div">
                         <NCheckboxGroup v-model:value="selectedBookNumbers">
                             <div>
                                 <template v-for="book in bibleBooks" :key="book.book_number">
-                                    <div v-if="book.title == 'Matthew'" class="w-full py-3 font-bold">New Testament
+                                    <div
+                                        v-if="book.title == 'Matthew'"
+                                        class="w-full py-3 font-bold"
+                                    >
+                                        New Testament
                                     </div>
-                                    <div v-else-if="book.title == 'Genesis'" class="w-full py-3 font-bold">Old Testament
+                                    <div
+                                        v-else-if="book.title == 'Genesis'"
+                                        class="w-full py-3 font-bold"
+                                    >
+                                        Old Testament
                                     </div>
-                                    <NCheckbox class="p-1" :label="book.title" :value="book.book_number" />
+                                    <NCheckbox
+                                        class="p-1"
+                                        :label="book.title"
+                                        :value="book.book_number"
+                                    />
                                 </template>
                             </div>
                         </NCheckboxGroup>
                     </div>
                 </div>
             </div>
-            <div id="inputTextSearch"
+            <div
+                id="inputTextSearch"
                 class="h-[calc(100%-85px)] flex flex-col gap-15px show-chapter-verses bg-[var(--n-color)] w-full min-h-20vh max-h-75vh overflow-y-auto overflowing-div"
-                style="background-color: var(--theme-bg-main, var(--n-color));"
+                style="background-color: var(--theme-bg-main, var(--n-color))"
             >
-                <div v-if="!searchedVerses.length || !search" class="flex justify-center items-center mt-10">
+                <div
+                    v-if="!searchedVerses.length || !search"
+                    class="flex justify-center items-center mt-10"
+                >
                     {{ $t('Search Bible') }}
                 </div>
                 <template v-else>
                     <template v-for="(verse, tabIndex) in searchedVerses">
-                        <div v-if="bibleStore.isBookExist(verse.book_number)" :tabindex="tabIndex"
+                        <div
+                            v-if="bibleStore.isBookExist(verse.book_number)"
+                            :tabindex="tabIndex"
                             class="p-3 transition-all duration-200 ease-in-out hover:bg-[var(--n-color-hover)] rounded-sm cursor-pointer hover:underline decoration-[var(--primary-color)] decoration-2 underline-offset-4"
-                            @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)">
+                            @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)"
+                        >
                             <div class="font-700">
                                 {{ bibleStore.getBookShortName(verse.book_number).title }}
                                 {{ verse.chapter }}:{{ verse.verse }}
                             </div>
                             <div>
                                 <div v-for="version in verse.version">
-                                    <span class="mr-7px text-[var(--primary-color)] italic">{{ version.version }}</span>
+                                    <span class="mr-7px text-[var(--primary-color)] italic">{{
+                                        version.version
+                                    }}</span>
                                     <div class="input-text-search" v-html="version.text"></div>
                                 </div>
                             </div>
@@ -196,21 +261,31 @@ const selectedBooksForSearchString = computed(() => {
                     </template>
                 </template>
             </div>
-            <div v-show="searchedVerses.length && search && search.trim() !== ''" class="flex justify-between px-10px select-none">
+            <div
+                v-show="searchedVerses.length && search && search.trim() !== ''"
+                class="flex justify-between px-10px select-none"
+            >
                 <div>
-                    <span v-show="page > 1" class="cursor-pointer hover:text-[var(--primary-color)]" @click="
-                        page--;
-                    submitSearch();
-                    ">
+                    <span
+                        v-show="page > 1"
+                        class="cursor-pointer hover:text-[var(--primary-color)]"
+                        @click="
+                            page--;
+                            submitSearch();
+                        "
+                    >
                         {{ $t('Before') }}
                     </span>
                 </div>
                 <div>
-                    <span v-show="searchedVerses.length > 0 && searchedVerses.length == limit"
-                        class="cursor-pointer hover:text-[var(--primary-color)]" @click="
+                    <span
+                        v-show="searchedVerses.length > 0 && searchedVerses.length == limit"
+                        class="cursor-pointer hover:text-[var(--primary-color)]"
+                        @click="
                             page++;
-                        submitSearch();
-                        ">
+                            submitSearch();
+                        "
+                    >
                         {{ $t('Next') }}
                     </span>
                 </div>
