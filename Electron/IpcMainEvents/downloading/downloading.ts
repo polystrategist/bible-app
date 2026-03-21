@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { app } from 'electron';
 import { download } from 'electron-dl';
+import Log from 'electron-log';
 import { setupPortableMode } from '../../util/portable';
 import fs from 'fs';
 import extract from 'extract-zip';
@@ -42,32 +43,31 @@ async function extractZip(zipPath: string, destPath: string, file_name: string):
 
             // Move and rename the file to the main destPath
             fs.renameSync(fullExtractedPath, newFilePath);
-            console.log(`Renamed & moved: ${file} → ${newFileName}`);
+            Log.info(`Renamed & moved: ${file} → ${newFileName}`);
         }
 
-        // Optional: clean up extracted folder
-        // fs.rmSync(extractToPath, { recursive: true, force: true });
+        // Clean up extracted folder
         fs.rmSync(extractToPath, { recursive: true, force: true });
-        console.log(`Removed temporary folder: ${extractToPath}`);
+        Log.info(`Removed temporary folder: ${extractToPath}`);
 
         return true;
     } catch (err) {
-        console.error('extractZip error:', err);
+        Log.error('extractZip error:', err);
         return false;
     }
 }
 
 async function ensureDirectoryExists(dirPath: string) {
     if (!fs.existsSync(dirPath)) {
-        await fs.mkdirSync(dirPath, { recursive: true });
-        console.log('Created directory:', dirPath);
+        await fs.promises.mkdir(dirPath, { recursive: true });
+        Log.info('Created directory:', dirPath);
     }
 }
 
 function moveFilesWithCommentaries(dir: string) {
     fs.readdir(dir, (err, files) => {
         if (err) {
-            console.error('Failed to read directory:', err);
+            Log.error('Failed to read directory:', err);
             return;
         }
 
@@ -75,7 +75,7 @@ function moveFilesWithCommentaries(dir: string) {
             const filePath = path.join(dir, file);
             fs.stat(filePath, (err, stat) => {
                 if (err) {
-                    console.error('Error reading file stats:', err);
+                    Log.error('Error reading file stats:', err);
                     return;
                 }
 
@@ -89,9 +89,9 @@ function moveFilesWithCommentaries(dir: string) {
 
                     fs.rename(filePath, destinationPath, (err) => {
                         if (err) {
-                            console.error('Failed to move file:', filePath, err);
+                            Log.error('Failed to move file:', filePath, err);
                         } else {
-                            console.log(`Moved: ${filePath} → ${destinationPath}`);
+                            Log.info(`Moved: ${filePath} → ${destinationPath}`);
                         }
                     });
                 }
@@ -169,6 +169,9 @@ export default (mainWindow: BrowserWindow) => {
         is_zipped: boolean;
         file_name: string;
     }) => {
-        await downloadModuleUrls(mainWindow, urls, moduleData);
+        await downloadModuleUrls(mainWindow, urls, moduleData).catch((err) => {
+            Log.error('Download module error:', err);
+            mainWindow.webContents.send('download-module-error', err.message);
+        });
     });
 };

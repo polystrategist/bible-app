@@ -3,21 +3,17 @@ import { DictionaryDB } from '../../DataBase/DataBase';
 
 export default () => {
     ipcMain.handle('searchDictionary', async (event, search: string) => {
-        return await DictionaryDB.select('word')
+        const results = await DictionaryDB.select('word')
             .from('entries')
             .groupBy('word')
             .where('word', 'like', `${search}%`)
-            .limit(50)
-            .then((row) => {
-                return row;
-            });
+            .limit(50);
+        return results;
     });
 
     ipcMain.handle('getDefinitions', async (event, word: string) => {
-        return await DictionaryDB.from('entries')
-            .where('word', '=', word)
-            .then((row) => {
-                return row;
-            });
+        const results = await DictionaryDB.from('entries')
+            .where('word', '=', word);
+        return results;
     });
 };

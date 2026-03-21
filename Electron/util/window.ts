@@ -6,10 +6,11 @@ let resizeOrMoveTimeout: NodeJS.Timeout | null = null;
 function onAfterResizeOrMove(win: BrowserWindow) {
     if (resizeOrMoveTimeout) clearTimeout(resizeOrMoveTimeout);
 
+    // Reduced timeout from 1000ms to 500ms for better responsiveness
     resizeOrMoveTimeout = setTimeout(() => {
         const bounds = win.getBounds();
         appConfig.set('setting.appBounds', bounds);
-    }, 1000);
+    }, 500);
 }
 
 export function attachResizeListener(win: BrowserWindow) {

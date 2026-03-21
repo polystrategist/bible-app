@@ -180,7 +180,7 @@ const selectedBooksForSearchString = computed(() => {
                 <template v-else>
                     <template v-for="(verse, tabIndex) in searchedVerses">
                         <div v-if="bibleStore.isBookExist(verse.book_number)" :tabindex="tabIndex"
-                            class="p-3 hover:bg-[var(--n-color-hover)] rounded-sm cursor-pointer"
+                            class="p-3 transition-all duration-200 ease-in-out hover:bg-[var(--n-color-hover)] rounded-sm cursor-pointer hover:underline decoration-[var(--primary-color)] decoration-2 underline-offset-4"
                             @click="selectAVerse(verse.book_number, verse.chapter, verse.verse)">
                             <div class="font-700">
                                 {{ bibleStore.getBookShortName(verse.book_number).title }}

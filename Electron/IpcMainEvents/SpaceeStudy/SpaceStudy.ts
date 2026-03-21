@@ -11,11 +11,8 @@ export async function getSelectedSpaceStudy() {
 
 export default () => {
     ipcMain.handle('getSpaceStudyList', async (event, args) => {
-        return await StoreDB.select('*')
-            .from('study_spaces')
-            .then((data) => {
-                return data;
-            });
+        const data = await StoreDB.select('*').from('study_spaces');
+        return data;
     });
 
     ipcMain.handle('storeSpaceStudy', async (event, args) => {
@@ -59,11 +56,8 @@ export default () => {
     });
 
     ipcMain.handle('deleteSpaceStudy', async (event, id) => {
-        const count = await StoreDB('study_spaces')
-            .count('id as rowCount')
-            .then((data) => {
-                return data[0].rowCount;
-            });
+        const countResult = await StoreDB('study_spaces').count('id as rowCount').first();
+        const count = countResult?.rowCount ?? 0;
 
         if (count == 1) {
             return {
@@ -75,8 +69,9 @@ export default () => {
             };
         }
 
+        const data = await StoreDB('study_spaces').where('id', id).del();
         return {
-            data: await StoreDB('study_spaces').where('id', id).del(),
+            data,
             error: null,
         };
     });

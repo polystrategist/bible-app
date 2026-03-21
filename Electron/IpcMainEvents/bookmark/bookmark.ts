@@ -1,19 +1,7 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
-import UPath from 'upath';
-import knex from 'knex';
+import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
-import { setupPortableMode } from '../../util/portable';
-
-setupPortableMode();
-const dataPath = app.getPath('userData');
-const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
-const StoreDB = knex({
-    client: 'sqlite3',
-    useNullAsDefault: false,
-    connection: {
-        filename: filePath,
-    },
-});
+import { StoreDB } from '../../DataBase/DataBase';
 
 const saveVersesInBookmark = async ({
     book_number,
@@ -47,7 +35,8 @@ const saveVersesInBookmark = async ({
 
         return await getVersesSavedBookmarks();
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        Log.error(e);
+        return {};
     }
 };
 
@@ -60,13 +49,14 @@ const getVersesSavedBookmarks = async () => {
             .where('study_space_id', selectedSpaceStudy.id);
 
         const result: any = {};
-        for (const item of data) {
+        data.forEach((item: any) => {
             result[item.key] = item;
-        }
+        });
 
         return result;
     } catch (e) {
-        if (e instanceof Error) console.log(e.message);
+        Log.error(e);
+        return {};
     }
 };
 

@@ -1,5 +1,6 @@
 import { app } from 'electron';
 import knex from 'knex';
+import Log from 'electron-log';
 import { setupPortableMode } from '../util/portable';
 
 
@@ -52,7 +53,7 @@ export async function updateOrCreate(
             return { action: 'created', data: newRecord };
         }
     } catch (error) {
-        console.error('Error in updateOrCreate:', error);
+        Log.error('Error in updateOrCreate:', error);
         throw error;
     }
 }
@@ -75,22 +76,22 @@ export async function removeUniqueConstraint(tableName: string, columnName: stri
         }
 
         if (uniqueIndexName) {
-            console.log(
+            Log.info(
                 `The '${columnName}' column in table '${tableName}' has a unique constraint. Dropping it.`
             );
             await StoreDB.schema.alterTable(tableName, (table) => {
                 table.dropUnique([columnName, uniqueIndexName]);
             });
-            console.log(
+            Log.info(
                 `Unique constraint removed from the '${columnName}' column in table '${tableName}'.`
             );
         } else {
-            console.log(
+            Log.info(
                 `The '${columnName}' column in table '${tableName}' does not have a unique constraint. Skipping.`
             );
         }
     } catch (error: any) {
-        console.error(`Error checking or removing unique constraint: ${error.message}`);
+        Log.error(`Error checking or removing unique constraint: ${error.message}`);
     } finally {
         // await StoreDB.destroy(); // Close the database connection
     }

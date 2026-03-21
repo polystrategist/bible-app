@@ -1,20 +1,8 @@
 import { app, ipcMain } from 'electron';
-import knex from 'knex';
-import UPath from 'upath';
+import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
-import { setupPortableMode } from '../../util/portable';
-
-setupPortableMode();
-const dataPath = app.getPath('userData');
-const filePath = UPath.join(dataPath, `StoreDB`, `Store.db`);
-const StoreDB = knex({
-    client: 'sqlite3',
-    useNullAsDefault: false,
-    connection: {
-        filename: filePath,
-    },
-});
+import { StoreDB } from '../../DataBase/DataBase';
 
 export default () => {
     ipcMain.handle(
@@ -28,20 +16,15 @@ export default () => {
             }
         ) => {
             const selectedSpaceStudy = await getSelectedSpaceStudy();
+            const offset = args.page == 1 ? 0 : args.page * args.limit - args.limit;
 
-            let data: Array<any> = [];
-            let offset = args.page == 1 ? 0 : args.page * args.limit - args.limit;
-
-            await StoreDB.select()
+            const data = await StoreDB.select()
                 .from('clip_notes')
                 .whereLike('content', `%${args.search ? args.search : ''}%`)
                 .where('study_space_id', selectedSpaceStudy.id)
                 .orderBy('id', 'desc')
                 .limit(args.limit ? args.limit : 50)
-                .offset(offset)
-                .then((row) => {
-                    row.forEach((row: any, index: any) => data.push(row));
-                });
+                .offset(offset);
 
             return data;
         }
@@ -101,21 +84,20 @@ export default () => {
         'getChapterClipNotes',
         async (event, { book_number, chapter }: { book_number: number; chapter: number }) => {
             try {
-                let data: any = {};
-
-                await StoreDB('clip_notes')
+                const data = await StoreDB('clip_notes')
                     .select()
                     .where('book_number', book_number)
-                    .where('chapter', chapter)
-                    .then((row) => {
-                        row.forEach((row: any, index: any) => {
-                            data[row.key] = row;
-                        });
-                    });
+                    .where('chapter', chapter);
 
-                return data;
+                const result: any = {};
+                data.forEach((row: any) => {
+                    result[row.key] = row;
+                });
+
+                return result;
             } catch (e) {
-                console.log(e);
+                Log.error(e);
+                return {};
             }
         }
     );
