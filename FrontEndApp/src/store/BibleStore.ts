@@ -6,6 +6,7 @@ import SESSION from '../util/session';
 import { bibleBooks } from '../util/books';
 import { useSettingStore } from './settingStore';
 import { removeHighlight } from '../util/hilitor';
+import { getBibleService } from '../services/BibleService';
 
 type BookInterface = {
     title: string;
@@ -82,9 +83,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             book_number: selectedBookNumber.value,
             chapter: selectedChapter.value,
         };
-        chapterHighlights.value = await window.browserWindow.getChapterHighlights(
-            JSON.stringify(args)
-        );
+        const bibleService = getBibleService();
+        chapterHighlights.value = await bibleService.getChapterHighlights(args);
     }
 
     async function getVerses() {
@@ -96,7 +96,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         await getChapterHighlights();
         await clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
         selectedBook.value = getBook(selectedBookNumber.value);
-        verses.value = await window.browserWindow.getVerses(JSON.stringify(arg));
+        const bibleService = getBibleService();
+        verses.value = await bibleService.getVerses(arg);
     }
 
     function saveVersesToStorage() {
