@@ -4,6 +4,7 @@ import bookmarksMigration from './StoreDB/bookmarks.migration';
 import study_spacesMigration from './StoreDB/study_spaces.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
 import notesMigration from './StoreDB/notes.migration';
+import syncLogsMigration from './StoreDB/sync_logs.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -25,6 +26,9 @@ export default async () => {
 
         // set note migration
         await notesMigration();
+
+        // setup sync_logs
+        await syncLogsMigration();
     } catch (e) {
         try {
             Log.error(e);

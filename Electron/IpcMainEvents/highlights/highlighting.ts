@@ -103,21 +103,25 @@ export default () => {
                         }
                     );
 
-                    // Log sync change
-                    await logSyncChange({
-                        table_name: 'highlights',
-                        record_key: key,
-                        action: existingHighlight ? 'updated' : 'created',
-                        payload: {
-                            key,
-                            book_number,
-                            chapter,
-                            verse,
-                            content,
-                            study_space_id: selectedSpaceStudy.id,
-                        },
-                        synced: 0,
-                    });
+                    try {
+                        // Log sync change
+                        await logSyncChange({
+                            table_name: 'highlights',
+                            record_key: key,
+                            action: existingHighlight ? 'updated' : 'created',
+                            payload: {
+                                key,
+                                book_number,
+                                chapter,
+                                verse,
+                                content,
+                                study_space_id: selectedSpaceStudy.id,
+                            },
+                            synced: 0,
+                        });
+                    } catch (e) {
+                        Log.error('Failed to log sync change for highlight:', e);
+                    }
                 } else {
                     // Highlight being removed
                     const existingHighlight = await StoreDB('highlights')
@@ -125,20 +129,24 @@ export default () => {
                         .first();
 
                     if (existingHighlight) {
-                        // Log sync change before deletion
-                        await logSyncChange({
-                            table_name: 'highlights',
-                            record_key: key,
-                            action: 'deleted',
-                            payload: {
-                                key,
-                                book_number,
-                                chapter,
-                                verse,
-                                content: existingHighlight.content,
-                            },
-                            synced: 0,
-                        });
+                        try {
+                            // Log sync change before deletion
+                            await logSyncChange({
+                                table_name: 'highlights',
+                                record_key: key,
+                                action: 'deleted',
+                                payload: {
+                                    key,
+                                    book_number,
+                                    chapter,
+                                    verse,
+                                    content: existingHighlight.content,
+                                },
+                                synced: 0,
+                            });
+                        } catch (e) {
+                            Log.error('Failed to log sync change for highlight deletion:', e);
+                        }
                     }
 
                     await StoreDB('highlights').where('key', key).del();
@@ -162,13 +170,17 @@ export default () => {
 
                 if (existingHighlight) {
                     // Log sync change before deletion
-                    await logSyncChange({
-                        table_name: 'highlights',
-                        record_key: args.key,
-                        action: 'deleted',
-                        payload: existingHighlight,
-                        synced: 0,
-                    });
+                    try {
+                        await logSyncChange({
+                            table_name: 'highlights',
+                            record_key: args.key,
+                            action: 'deleted',
+                            payload: existingHighlight,
+                            synced: 0,
+                        });
+                    } catch (e) {
+                        Log.error('Failed to log sync change for highlight deletion:', e);
+                    }
                 }
 
                 return await StoreDB('highlights')

@@ -79,21 +79,25 @@ export default () => {
                 );
 
                 // Log sync change
-                await logSyncChange({
-                    table_name: 'clip_notes',
-                    record_key: key,
-                    action: existingClipNote ? 'updated' : 'created',
-                    payload: {
-                        key,
-                        book_number,
-                        chapter,
-                        verse,
-                        content,
-                        color,
-                        study_space_id: selectedSpaceStudy.id,
-                    },
-                    synced: 0,
-                });
+                try {
+                    await logSyncChange({
+                        table_name: 'clip_notes',
+                        record_key: key,
+                        action: existingClipNote ? 'updated' : 'created',
+                        payload: {
+                            key,
+                            book_number,
+                            chapter,
+                            verse,
+                            content,
+                            color,
+                            study_space_id: selectedSpaceStudy.id,
+                        },
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for clip note:', e);
+                }
 
                 return StoreDB('clip_notes')
                     .where('key', key)
@@ -140,14 +144,18 @@ export default () => {
                     .first();
 
                 if (existingClipNote) {
-                    // Log sync change before deletion
-                    await logSyncChange({
-                        table_name: 'clip_notes',
-                        record_key: key,
-                        action: 'deleted',
-                        payload: existingClipNote,
-                        synced: 0,
-                    });
+                    try {
+                        // Log sync change before deletion
+                        await logSyncChange({
+                            table_name: 'clip_notes',
+                            record_key: key,
+                            action: 'deleted',
+                            payload: existingClipNote,
+                            synced: 0,
+                        });
+                    } catch (e) {
+                        Log.error('Failed to log sync change for clip note deletion:', e);
+                    }
                 }
 
                 return await StoreDB('clip_notes')

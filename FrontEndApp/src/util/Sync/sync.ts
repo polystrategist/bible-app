@@ -23,6 +23,8 @@ export interface SyncResponse {
  */
 export async function syncData(payload: SyncPayload): Promise<SyncResponse> {
     const userStore = useUserStore();
+
+    console.log('Syncing data with payload:', payload);
     
     // Check if sync is enabled
     if (!userStore.syncData) {
@@ -136,9 +138,10 @@ export async function triggerSync(
         timestamp: new Date().toISOString(),
     };
 
-    // Log to local sync_logs table via IPC
-    await window.browserWindow.logSyncChange(syncPayload);
+    // Optionally: Log to local sync_logs table via IPC if you have such an API
+    // await window.browserWindow.logSyncChange(syncPayload);
     
     // Send to backend
+    console.log('Triggering sync with payload:', syncPayload);
     await syncData(syncPayload);
 }

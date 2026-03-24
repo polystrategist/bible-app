@@ -23,7 +23,7 @@ const saveVersesInBookmark = async ({
             .first();
 
         const key = `${book_number}_${chapter}_${verse}`;
-        
+
         if (!existingBookmark) {
             await StoreDB('bookmarks').insert({
                 key,
@@ -36,19 +36,23 @@ const saveVersesInBookmark = async ({
             });
 
             // Log sync change for new bookmark
-            await logSyncChange({
-                table_name: 'bookmarks',
-                record_key: key,
-                action: 'created',
-                payload: {
-                    key,
-                    book_number,
-                    chapter,
-                    verse,
-                    study_space_id: selectedSpaceStudy.id,
-                },
-                synced: 0,
-            });
+            try {
+                await logSyncChange({
+                    table_name: 'bookmarks',
+                    record_key: key,
+                    action: 'created',
+                    payload: {
+                        key,
+                        book_number,
+                        chapter,
+                        verse,
+                        study_space_id: selectedSpaceStudy.id,
+                    },
+                    synced: 0,
+                });
+            } catch (e) {
+                Log.error('Failed to log sync change for bookmark creation:', e);
+            }
         }
 
         return await getVersesSavedBookmarks();
@@ -92,19 +96,23 @@ const deleteVerseInSavedBookmarks = async ({
         const selectedSpaceStudy = await getSelectedSpaceStudy();
 
         // Log sync change before deletion
-        await logSyncChange({
-            table_name: 'bookmarks',
-            record_key: key,
-            action: 'deleted',
-            payload: {
-                key,
-                book_number,
-                chapter,
-                verse,
-                study_space_id: selectedSpaceStudy.id,
-            },
-            synced: 0,
-        });
+        try {
+            await logSyncChange({
+                table_name: 'bookmarks',
+                record_key: key,
+                action: 'deleted',
+                payload: {
+                    key,
+                    book_number,
+                    chapter,
+                    verse,
+                    study_space_id: selectedSpaceStudy.id,
+                },
+                synced: 0,
+            });
+        } catch (e) {
+            Log.error('Failed to log sync change for bookmark deletion:', e);
+        }
 
         await StoreDB('bookmarks')
             .where('book_number', book_number)
