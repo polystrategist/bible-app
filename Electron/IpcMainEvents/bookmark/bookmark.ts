@@ -2,6 +2,7 @@ import { ipcMain, BrowserWindow, app } from 'electron';
 import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { StoreDB } from '../../DataBase/DataBase';
+import { logSyncChange } from '../../DataBase/SyncDB';
 
 const saveVersesInBookmark = async ({
     book_number,
@@ -21,15 +22,32 @@ const saveVersesInBookmark = async ({
             .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
             .first();
 
+        const key = `${book_number}_${chapter}_${verse}`;
+        
         if (!existingBookmark) {
             await StoreDB('bookmarks').insert({
-                key: `${book_number}_${chapter}_${verse}`,
+                key,
                 book_number,
                 chapter,
                 verse,
                 study_space_id: selectedSpaceStudy.id,
                 updated_at: new Date(),
                 created_at: new Date(),
+            });
+
+            // Log sync change for new bookmark
+            await logSyncChange({
+                table_name: 'bookmarks',
+                record_key: key,
+                action: 'created',
+                payload: {
+                    key,
+                    book_number,
+                    chapter,
+                    verse,
+                    study_space_id: selectedSpaceStudy.id,
+                },
+                synced: 0,
             });
         }
 
@@ -70,6 +88,24 @@ const deleteVerseInSavedBookmarks = async ({
     verse: number;
 }) => {
     try {
+        const key = `${book_number}_${chapter}_${verse}`;
+        const selectedSpaceStudy = await getSelectedSpaceStudy();
+
+        // Log sync change before deletion
+        await logSyncChange({
+            table_name: 'bookmarks',
+            record_key: key,
+            action: 'deleted',
+            payload: {
+                key,
+                book_number,
+                chapter,
+                verse,
+                study_space_id: selectedSpaceStudy.id,
+            },
+            synced: 0,
+        });
+
         await StoreDB('bookmarks')
             .where('book_number', book_number)
             .andWhere('chapter', chapter)

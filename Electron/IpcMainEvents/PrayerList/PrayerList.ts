@@ -1,16 +1,65 @@
 import { ipcMain } from 'electron';
 import Log from 'electron-log';
 import { StoreDB } from '../../DataBase/DataBase';
+import { logSyncChange } from '../../DataBase/SyncDB';
+
 const tableName = 'prayer_lists';
+
 export default () => {
     ipcMain.handle('resetPrayerListItems', async (event, args: { status: 'ongoing' | 'done'; data: Array<any> }) => {
         try {
             if (args.status == 'ongoing') {
+                // Log deletions for old items
+                const oldItems = await StoreDB(tableName).where('status', '<>', 'done').select();
+                for (const item of oldItems) {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'deleted',
+                        payload: item,
+                        synced: 0,
+                    });
+                }
+                
                 await StoreDB(tableName).where('status', '<>', 'done').del();
                 await StoreDB(tableName).insert(args.data);
+                
+                // Log new items
+                for (const item of args.data) {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'created',
+                        payload: item,
+                        synced: 0,
+                    });
+                }
             } else if (args.status == 'done') {
+                // Log deletions for old items
+                const oldItems = await StoreDB(tableName).where('status', '<>', 'ongoing').select();
+                for (const item of oldItems) {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'deleted',
+                        payload: item,
+                        synced: 0,
+                    });
+                }
+                
                 await StoreDB(tableName).where('status', '<>', 'ongoing').del();
                 await StoreDB(tableName).insert(args.data);
+                
+                // Log new items
+                for (const item of args.data) {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'created',
+                        payload: item,
+                        synced: 0,
+                    });
+                }
             }
         } catch (e) {
             Log.error(e);
@@ -19,6 +68,19 @@ export default () => {
 
     ipcMain.handle('deletePrayerListItem', async (event, key: string | number) => {
         try {
+            const existingItem = await StoreDB(tableName).where('key', String(key)).first();
+            
+            if (existingItem) {
+                // Log sync change before deletion
+                await logSyncChange({
+                    table_name: 'prayer_lists',
+                    record_key: String(key),
+                    action: 'deleted',
+                    payload: existingItem,
+                    synced: 0,
+                });
+            }
+            
             return await StoreDB(tableName).where('key', key).del();
         } catch (e) {
             Log.error(e);
@@ -49,7 +111,20 @@ export default () => {
             args: { title: string | null; content: string; group: string | null; key: string; status: null | 'done' | 'ongoing' }
         ) => {
             try {
-                return await StoreDB(tableName).insert(args).onConflict('key').merge();
+                const existingItem = await StoreDB(tableName).where('key', args.key).first();
+                
+                const result = await StoreDB(tableName).insert(args).onConflict('key').merge();
+                
+                // Log sync change
+                await logSyncChange({
+                    table_name: 'prayer_lists',
+                    record_key: args.key,
+                    action: existingItem ? 'updated' : 'created',
+                    payload: args,
+                    synced: 0,
+                });
+                
+                return result;
             } catch (e) {
                 Log.error(e);
             }

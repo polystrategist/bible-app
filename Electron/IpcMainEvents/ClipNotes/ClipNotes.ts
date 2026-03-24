@@ -3,6 +3,7 @@ import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
 import { StoreDB } from '../../DataBase/DataBase';
+import { logSyncChange } from '../../DataBase/SyncDB';
 
 export default () => {
     ipcMain.handle(
@@ -53,6 +54,13 @@ export default () => {
 
                 const key = `key_${book_number}_${chapter}_${verse}`;
 
+                const existingClipNote = await StoreDB('clip_notes')
+                    .where({
+                        key,
+                        study_space_id: selectedSpaceStudy.id,
+                    })
+                    .first();
+
                 const result = await updateOrCreate(
                     'clip_notes',
                     {
@@ -69,6 +77,23 @@ export default () => {
                         created_at: new Date(),
                     }
                 );
+
+                // Log sync change
+                await logSyncChange({
+                    table_name: 'clip_notes',
+                    record_key: key,
+                    action: existingClipNote ? 'updated' : 'created',
+                    payload: {
+                        key,
+                        book_number,
+                        chapter,
+                        verse,
+                        content,
+                        color,
+                        study_space_id: selectedSpaceStudy.id,
+                    },
+                    synced: 0,
+                });
 
                 return StoreDB('clip_notes')
                     .where('key', key)
@@ -109,6 +134,22 @@ export default () => {
             { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number }
         ) => {
             try {
+                const key = `key_${book_number}_${chapter}_${verse}`;
+                const existingClipNote = await StoreDB('clip_notes')
+                    .where('key', key)
+                    .first();
+
+                if (existingClipNote) {
+                    // Log sync change before deletion
+                    await logSyncChange({
+                        table_name: 'clip_notes',
+                        record_key: key,
+                        action: 'deleted',
+                        payload: existingClipNote,
+                        synced: 0,
+                    });
+                }
+
                 return await StoreDB('clip_notes')
                     .select()
                     .where('book_number', book_number)

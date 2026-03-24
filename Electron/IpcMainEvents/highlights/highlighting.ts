@@ -3,6 +3,7 @@ import { app, ipcMain } from 'electron';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
 import { StoreDB } from '../../DataBase/DataBase';
+import { logSyncChange } from '../../DataBase/SyncDB';
 
 export type GetVerseArgs = {
     bible_versions: Array<string>;
@@ -81,6 +82,13 @@ export default () => {
                 if (content.includes('HasHighlightSpan')) {
                     const selectedSpaceStudy = await getSelectedSpaceStudy();
 
+                    const existingHighlight = await StoreDB('highlights')
+                        .where({
+                            key,
+                            study_space_id: selectedSpaceStudy.id,
+                        })
+                        .first();
+
                     const result = await updateOrCreate(
                         'highlights',
                         {
@@ -94,7 +102,45 @@ export default () => {
                             content,
                         }
                     );
+
+                    // Log sync change
+                    await logSyncChange({
+                        table_name: 'highlights',
+                        record_key: key,
+                        action: existingHighlight ? 'updated' : 'created',
+                        payload: {
+                            key,
+                            book_number,
+                            chapter,
+                            verse,
+                            content,
+                            study_space_id: selectedSpaceStudy.id,
+                        },
+                        synced: 0,
+                    });
                 } else {
+                    // Highlight being removed
+                    const existingHighlight = await StoreDB('highlights')
+                        .where('key', key)
+                        .first();
+
+                    if (existingHighlight) {
+                        // Log sync change before deletion
+                        await logSyncChange({
+                            table_name: 'highlights',
+                            record_key: key,
+                            action: 'deleted',
+                            payload: {
+                                key,
+                                book_number,
+                                chapter,
+                                verse,
+                                content: existingHighlight.content,
+                            },
+                            synced: 0,
+                        });
+                    }
+
                     await StoreDB('highlights').where('key', key).del();
                 }
 
@@ -110,6 +156,21 @@ export default () => {
         'deleteHighlight',
         async (event, args: { study_space_id: number | string; key: string }) => {
             try {
+                const existingHighlight = await StoreDB('highlights')
+                    .where('key', args.key)
+                    .first();
+
+                if (existingHighlight) {
+                    // Log sync change before deletion
+                    await logSyncChange({
+                        table_name: 'highlights',
+                        record_key: args.key,
+                        action: 'deleted',
+                        payload: existingHighlight,
+                        synced: 0,
+                    });
+                }
+
                 return await StoreDB('highlights')
                     .where('key', args.key)
                     .where('study_space_id', args.study_space_id)
