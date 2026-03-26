@@ -12,6 +12,10 @@ export default () => {
         'saveNote',
         async (event, { space_study_id, note }: { space_study_id: number; note: string }) => {
             try {
+                const existingNote = await StoreDB('notes')
+                    .where('study_space_id', space_study_id)
+                    .first();
+
                 await updateOrCreate(
                     'notes',
                     {
@@ -23,17 +27,19 @@ export default () => {
                     }
                 );
 
-                // Log sync change for notes
+                const studySpace = await StoreDB('study_spaces').where('id', space_study_id).first();
+
                 try {
                     await logSyncChange({
                         table_name: 'notes',
                         record_key: String(space_study_id),
-                        action: 'updated',
+                        action: existingNote ? 'updated' : 'created',
                         payload: {
                             study_space_id: space_study_id,
-                            content: note
+                            study_space_name: studySpace?.title ?? 'default',
+                            content: note,
                         },
-                        synced: 0
+                        synced: 0,
                     });
                 } catch (syncErr) {
                     Log.error('Failed to log sync change for note update:', syncErr);

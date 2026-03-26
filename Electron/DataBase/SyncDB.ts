@@ -23,13 +23,15 @@ export type SyncSetting = {
  * Log a data change for sync tracking
  */
 export async function logSyncChange(entry: SyncLogEntry): Promise<{ action: string; id: number }> {
+    const now = new Date();
     const data = {
         table_name: entry.table_name,
         record_key: entry.record_key,
         action: entry.action,
         payload: entry.payload,
         synced: 0,
-        updated_at: new Date(),
+        created_at: now,
+        updated_at: now,
     };
 
     const id = await StoreDB('sync_logs').insert(data);

@@ -8,73 +8,48 @@ const tableName = 'prayer_lists';
 export default () => {
     ipcMain.handle('resetPrayerListItems', async (event, args: { status: 'ongoing' | 'done'; data: Array<any> }) => {
         try {
-            if (args.status == 'ongoing') {
-                // Log deletions for old items
-                const oldItems = await StoreDB(tableName).where('status', '<>', 'done').select();
-                for (const item of oldItems) {
-                    try {
-                        await logSyncChange({
-                            table_name: 'prayer_lists',
-                            record_key: item.key,
-                            action: 'deleted',
-                            payload: item,
-                            synced: 0,
-                        });
-                    } catch (e) {
-                        Log.error('Failed to log sync change for prayer list item deletion:', e);
-                    }
+            // Snapshot old items before the transaction for sync logging
+            const oldItems = args.status === 'ongoing'
+                ? await StoreDB(tableName).where('status', 'ongoing').select()
+                : await StoreDB(tableName).where('status', 'done').select();
+
+            // Atomic replace: delete old items and insert new ones in a single transaction
+            await StoreDB.transaction(async (trx) => {
+                if (args.status === 'ongoing') {
+                    await trx(tableName).where('status', 'ongoing').del();
+                } else {
+                    await trx(tableName).where('status', 'done').del();
                 }
-
-                await StoreDB(tableName).where('status', '<>', 'done').del();
-                await StoreDB(tableName).insert(args.data);
-
-                // Log new items
-                for (const item of args.data) {
-                    try {
-                        await logSyncChange({
-                            table_name: 'prayer_lists',
-                            record_key: item.key,
-                            action: 'created',
-                            payload: item,
-                            synced: 0,
-                        });
-                    } catch (e) {
-                        Log.error('Failed to log sync change for prayer list item creation:', e);
-                    }
+                if (args.data.length > 0) {
+                    await trx(tableName).insert(args.data);
                 }
-            } else if (args.status == 'done') {
-                // Log deletions for old items
-                const oldItems = await StoreDB(tableName).where('status', '<>', 'ongoing').select();
-                for (const item of oldItems) {
-                    try {
-                        await logSyncChange({
-                            table_name: 'prayer_lists',
-                            record_key: item.key,
-                            action: 'deleted',
-                            payload: item,
-                            synced: 0,
-                        });
-                    } catch (e) {
-                        Log.error('Failed to log sync change for prayer list item deletion:', e);
-                    }
+            });
+
+            // Log sync changes only after transaction commits successfully
+            for (const item of oldItems) {
+                try {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'deleted',
+                        payload: item,
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for prayer list item deletion:', e);
                 }
-
-                await StoreDB(tableName).where('status', '<>', 'ongoing').del();
-                await StoreDB(tableName).insert(args.data);
-
-                // Log new items
-                for (const item of args.data) {
-                    try {
-                        await logSyncChange({
-                            table_name: 'prayer_lists',
-                            record_key: item.key,
-                            action: 'created',
-                            payload: item,
-                            synced: 0,
-                        });
-                    } catch (e) {
-                        Log.error('Failed to log sync change for prayer list item creation:', e);
-                    }
+            }
+            for (const item of args.data) {
+                try {
+                    await logSyncChange({
+                        table_name: 'prayer_lists',
+                        record_key: item.key,
+                        action: 'created',
+                        payload: item,
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for prayer list item creation:', e);
                 }
             }
         } catch (e) {

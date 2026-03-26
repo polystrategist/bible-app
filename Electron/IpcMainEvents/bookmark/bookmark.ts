@@ -47,6 +47,7 @@ const saveVersesInBookmark = async ({
                         chapter,
                         verse,
                         study_space_id: selectedSpaceStudy.id,
+                        study_space_name: selectedSpaceStudy.title,
                     },
                     synced: 0,
                 });
@@ -95,7 +96,23 @@ const deleteVerseInSavedBookmarks = async ({
         const key = `${book_number}_${chapter}_${verse}`;
         const selectedSpaceStudy = await getSelectedSpaceStudy();
 
-        // Log sync change before deletion
+        const existingBookmark = await StoreDB('bookmarks')
+            .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
+            .first();
+
+        if (!existingBookmark) {
+            return true;
+        }
+
+        // Delete scoped to the current study space
+        await StoreDB('bookmarks')
+            .where('book_number', book_number)
+            .andWhere('chapter', chapter)
+            .andWhere('verse', verse)
+            .andWhere('study_space_id', selectedSpaceStudy.id)
+            .delete();
+
+        // Log sync change AFTER successful delete
         try {
             await logSyncChange({
                 table_name: 'bookmarks',
@@ -107,18 +124,13 @@ const deleteVerseInSavedBookmarks = async ({
                     chapter,
                     verse,
                     study_space_id: selectedSpaceStudy.id,
+                    study_space_name: selectedSpaceStudy.title,
                 },
                 synced: 0,
             });
         } catch (e) {
             Log.error('Failed to log sync change for bookmark deletion:', e);
         }
-
-        await StoreDB('bookmarks')
-            .where('book_number', book_number)
-            .andWhere('chapter', chapter)
-            .andWhere('verse', verse)
-            .delete();
 
         return true;
     } catch (e) {
