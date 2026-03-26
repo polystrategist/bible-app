@@ -2,6 +2,7 @@ import { ipcMain, BrowserWindow, app } from 'electron';
 import Log from 'electron-log';
 import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { StoreDB } from '../../DataBase/DataBase';
+import { logSyncChange } from '../../DataBase/SyncDB';
 
 const saveVersesInBookmark = async ({
     book_number,
@@ -21,9 +22,11 @@ const saveVersesInBookmark = async ({
             .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
             .first();
 
+        const key = `${book_number}_${chapter}_${verse}`;
+
         if (!existingBookmark) {
             await StoreDB('bookmarks').insert({
-                key: `${book_number}_${chapter}_${verse}`,
+                key,
                 book_number,
                 chapter,
                 verse,
@@ -31,6 +34,26 @@ const saveVersesInBookmark = async ({
                 updated_at: new Date(),
                 created_at: new Date(),
             });
+
+            // Log sync change for new bookmark
+            try {
+                await logSyncChange({
+                    table_name: 'bookmarks',
+                    record_key: key,
+                    action: 'created',
+                    payload: {
+                        key,
+                        book_number,
+                        chapter,
+                        verse,
+                        study_space_id: selectedSpaceStudy.id,
+                        study_space_name: selectedSpaceStudy.title,
+                    },
+                    synced: 0,
+                });
+            } catch (e) {
+                Log.error('Failed to log sync change for bookmark creation:', e);
+            }
         }
 
         return await getVersesSavedBookmarks();
@@ -70,11 +93,44 @@ const deleteVerseInSavedBookmarks = async ({
     verse: number;
 }) => {
     try {
+        const key = `${book_number}_${chapter}_${verse}`;
+        const selectedSpaceStudy = await getSelectedSpaceStudy();
+
+        const existingBookmark = await StoreDB('bookmarks')
+            .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
+            .first();
+
+        if (!existingBookmark) {
+            return true;
+        }
+
+        // Delete scoped to the current study space
         await StoreDB('bookmarks')
             .where('book_number', book_number)
             .andWhere('chapter', chapter)
             .andWhere('verse', verse)
+            .andWhere('study_space_id', selectedSpaceStudy.id)
             .delete();
+
+        // Log sync change AFTER successful delete
+        try {
+            await logSyncChange({
+                table_name: 'bookmarks',
+                record_key: key,
+                action: 'deleted',
+                payload: {
+                    key,
+                    book_number,
+                    chapter,
+                    verse,
+                    study_space_id: selectedSpaceStudy.id,
+                    study_space_name: selectedSpaceStudy.title,
+                },
+                synced: 0,
+            });
+        } catch (e) {
+            Log.error('Failed to log sync change for bookmark deletion:', e);
+        }
 
         return true;
     } catch (e) {

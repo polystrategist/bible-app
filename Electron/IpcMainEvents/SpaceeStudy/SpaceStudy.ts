@@ -1,6 +1,8 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { StoreDB } from '../../DataBase/DataBase';
 import { DAYJS } from '../../util/dayjs';
+import Log from 'electron-log';
+import { logSyncChange } from '../../DataBase/SyncDB';
 
 export async function getSelectedSpaceStudy() {
     return await StoreDB.select('*')
@@ -23,6 +25,18 @@ export default () => {
                 args.updated_at = DAYJS().utc().format();
 
                 const newData = await StoreDB('study_spaces').insert(args).returning('*');
+                // Log sync change for create
+                try {
+                    await logSyncChange({
+                        table_name: 'study_spaces',
+                        record_key: String(newData[0].id),
+                        action: 'created',
+                        payload: newData[0],
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for study space creation:', e);
+                }
                 return {
                     data: newData[0],
                     error: null,
@@ -36,7 +50,18 @@ export default () => {
                 .onConflict('id')
                 .merge()
                 .returning('*');
-
+            // Log sync change for update
+            try {
+                await logSyncChange({
+                    table_name: 'study_spaces',
+                    record_key: String(updatedData[0].id),
+                    action: 'updated',
+                    payload: updatedData[0],
+                    synced: 0,
+                });
+            } catch (e) {
+                Log.error('Failed to log sync change for study space update:', e);
+            }
             return {
                 data: updatedData[0],
                 error: null,
@@ -69,7 +94,23 @@ export default () => {
             };
         }
 
+        // Get the study space before deleting for sync log
+        const existing = await StoreDB('study_spaces').where('id', id).first();
         const data = await StoreDB('study_spaces').where('id', id).del();
+        // Log sync change for delete
+        if (existing) {
+            try {
+                await logSyncChange({
+                    table_name: 'study_spaces',
+                    record_key: String(id),
+                    action: 'deleted',
+                    payload: existing,
+                    synced: 0,
+                });
+            } catch (e) {
+                Log.error('Failed to log sync change for study space deletion:', e);
+            }
+        }
         return {
             data,
             error: null,

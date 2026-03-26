@@ -10,6 +10,7 @@ import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 import SpaceStudy from './SpaceeStudy/SpaceStudy';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
+import { SyncHandlers } from './Sync/SyncHandlers';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -44,4 +45,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // dictionary events
     dictionaries();
+
+    // sync handlers
+    SyncHandlers(BrowserWindow);
 };

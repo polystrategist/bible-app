@@ -19,6 +19,7 @@ import LogoComponent from './../LogoComponent.vue';
 import ThemeChangerDrawer from '../ThemeChanger/ThemeChangerDrawer.vue';
 import { useMenuStore } from '../../store/menu';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
+import ProfileDropdown from './Partials/ProfileDropdown.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
@@ -98,7 +99,7 @@ onBeforeMount(async () => {
                 </NIcon>
             </NButton>
             <ThemeChangerDrawer />
-            <!-- <ProfileDropdown /> -->
+            <ProfileDropdown />
             <NButton
                 v-show="isElectron"
                 size="tiny"

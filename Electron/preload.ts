@@ -81,4 +81,13 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Dictionary
     searchDictionary: (args: any) => ipcRenderer.invoke('searchDictionary', args),
     getDefinitions: (word: string) => ipcRenderer.invoke('getDefinitions', word),
+
+    // Sync Operations
+    logSyncChange: (entry: any) => ipcRenderer.invoke('logSyncChange', entry),
+    getUnsyncedChanges: () => ipcRenderer.invoke('getUnsyncedChanges'),
+    markAsSynced: (ids: number[]) => ipcRenderer.invoke('markAsSynced', ids),
+    getLastSyncTimestamp: () => ipcRenderer.invoke('getLastSyncTimestamp'),
+    updateLastSyncTimestamp: (timestamp: string) => ipcRenderer.invoke('updateLastSyncTimestamp', timestamp),
+    getSyncSetting: (key: string) => ipcRenderer.invoke('getSyncSetting', key),
+    setSyncSetting: (key: string, value: any) => ipcRenderer.invoke('setSyncSetting', key, value),
 });
