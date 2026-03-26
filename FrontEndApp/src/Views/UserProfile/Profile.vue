@@ -1,31 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { isSignedIn } from './../../util/SupaBase/Auth/Auth';
-import { useMenuStore } from '../../store/menu';
+import { onMounted } from 'vue';
+import { useAuthStore } from './../../store/authStore';
 
-const loginModalRef = ref<{
-    toggleModal: Function;
-} | null>(null);
-const menuStore = useMenuStore();
-const user = ref<any>(null);
-const loading = ref(false);
+const authStore = useAuthStore();
 
-async function isUserAlreadySignedIn() {
-    loading.value = true;
-    const userData = await isSignedIn();
-    if (userData) user.value = userData;
-    else {
-        if (loginModalRef.value) loginModalRef.value.toggleModal();
-    }
-    loading.value = false;
-}
-
-watch(
-    () => menuStore.menuSelected,
-    (selectedMenu) => {
-        if (selectedMenu === '/profile') isUserAlreadySignedIn();
-    }
-);
+onMounted(() => {
+    authStore.initAuth();
+});
 </script>
 <template>
     <div class="h-100% w-100% p-2">
