@@ -1,6 +1,7 @@
 import Log from 'electron-log';
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
+import installExtension from 'electron-devtools-installer';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
@@ -33,7 +34,7 @@ async function createWindow() {
         icon: iconPath,
         webPreferences: {
             preload: __dirname + '/preload.js',
-            devTools: isNightly,
+            devTools: isDev || isNightly,
         },
         show: false,
         alwaysOnTop: true,
@@ -89,6 +90,15 @@ async function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+    if (isDev) {
+        try {
+            await installExtension('nhdogjmejiglipccpnnnanhbledajbpd');
+            Log.info('Vue DevTools installed');
+        } catch (e) {
+            Log.warn('Vue DevTools failed to install:', e);
+        }
+    }
+
     // check and set up the database
     try {
         await setupDefault;

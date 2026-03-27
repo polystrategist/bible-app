@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import axios from 'axios';
-import { supabase } from '../../util/SupaBase/SupaBase';
 import { useMenuStore } from '../../store/menu';
 import Editor from '../../components/Editor/Editor.vue';
 import { NButton, NIcon, NInput, NSelect } from 'naive-ui';
@@ -83,89 +81,7 @@ const getYoutubeVideoDetails = async (
 };
 
 async function submitSermon() {
-    loading.value = true;
-    const session = await supabase.auth.getSession();
-    if (selectedType.value == 'youtube') {
-        if (!youtubeId.value || !source.value) {
-            alert('please check fields!');
-            loading.value = false;
-            return;
-        }
-        // get data from api
-        getYoutubeVideoDetails(youtubeId.value as any)
-            .then(async ({ data }) => {
-                if (!data || !data.items) {
-                    alert('Fetching Video Details Error');
-                    loading.value = false;
-                    return;
-                }
-
-                const youtubeDetails = data.items[0];
-                let dataToEnter = {
-                    type: 'youtube',
-                    thumbnail: youtubeDetails.snippet.thumbnails.medium.url,
-                    // date_time: new Date(),
-                    description: youtubeDetails.snippet.description,
-                    title: youtubeDetails.snippet.title,
-                    youtube_embed: `https://www.youtube.com/embed/${youtubeDetails.id}`,
-                    youtube_video_id: youtubeDetails.id,
-                    language: language.value,
-                    source: source.value,
-                    added_by: session.data.session?.user.id,
-                    is_published: isPublished.value,
-                };
-                const { error } = sermonId.value
-                    ? await supabase.from('sermons').update(dataToEnter).match({ id: sermonId.value })
-                    : await supabase.from('sermons').insert(dataToEnter);
-
-                if (error) {
-                    alert(error.message);
-                    loading.value = false;
-                    return;
-                }
-
-                resetForm();
-                alert('Data Successfully Added!');
-                await menuStore.setMenu('sermons');
-            })
-            .catch((e) => {
-                let message =
-                    e.response && e.response.data && e.response.data.error && e.response.data.error.message
-                        ? e.response.data.error.message
-                        : 'Their is an Error Getting Youtube Details!';
-                alert(message);
-            });
-    } else if (selectedType.value == 'text') {
-        let dataToInsert = {
-            type: 'text',
-            // date_time: new Date().toDateString(),
-            description: description.value,
-            title: title.value,
-            content: content.value,
-            scripture: scripture.value,
-            created_at: DAYJS(),
-            author: author.value,
-            denomination: denomination.value,
-            language: language.value,
-            source: source.value,
-            added_by: session.data.session?.user.id,
-            is_published: isPublished.value,
-        };
-        const { error } = sermonId.value
-            ? await supabase.from('sermons').update(dataToInsert).match({ id: sermonId.value })
-            : await supabase.from('sermons').insert(dataToInsert);
-
-        if (error) {
-            alert(error.message);
-            loading.value = false;
-            return;
-        }
-        resetForm();
-        alert('Data Successfully Added!');
-        await menuStore.setMenu('sermons');
-    }
-
-    loading.value = false;
+    alert('Sermon submission is not yet available.');
 }
 
 const selectTypeOptions = [

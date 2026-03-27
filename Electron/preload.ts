@@ -90,4 +90,5 @@ contextBridge.exposeInMainWorld('browserWindow', {
     updateLastSyncTimestamp: (timestamp: string) => ipcRenderer.invoke('updateLastSyncTimestamp', timestamp),
     getSyncSetting: (key: string) => ipcRenderer.invoke('getSyncSetting', key),
     setSyncSetting: (key: string, value: any) => ipcRenderer.invoke('setSyncSetting', key, value),
+    applyPullData: (data: any) => ipcRenderer.invoke('applyPullData', data),
 });

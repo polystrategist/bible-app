@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NButton, NCard, NForm, NFormItem, NInput, useMessage } from 'naive-ui';
+import { NButton, NCard, NForm, NFormItem, NInput, NSwitch, useMessage } from 'naive-ui';
 import { ref } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
@@ -19,6 +19,11 @@ async function logout() {
         message.warning('Logged out (offline).');
     }
 }
+
+async function onSyncToggle(enabled: boolean) {
+    await authStore.setSyncEnabled(enabled);
+    message.success(enabled ? 'Sync enabled.' : 'Sync disabled.');
+}
 </script>
 <template>
     <div>
@@ -33,6 +38,17 @@ async function logout() {
                 </NFormItem>
                 <NFormItem label="Email">
                     <NInput :value="authStore.user.email" disabled />
+                </NFormItem>
+                <NFormItem label="Enable Sync">
+                    <div class="flex items-center gap-2">
+                        <NSwitch
+                            :value="authStore.syncEnabled"
+                            @update:value="onSyncToggle"
+                        />
+                        <span class="text-sm text-gray-500">
+                            {{ authStore.syncEnabled ? 'Your data syncs to the cloud.' : 'Data stays local only.' }}
+                        </span>
+                    </div>
                 </NFormItem>
                 <NButton type="error" @click="logout" :disabled="loading" :loading="loading">
                     <template #icon>

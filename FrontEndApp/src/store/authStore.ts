@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import axios from 'axios';
+import { runSync } from '../util/Sync/sync';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -8,6 +9,7 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    sync_enabled: boolean;
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
@@ -145,9 +147,8 @@ export const useAuthStore = defineStore('authStore', () => {
      * Get current user info
      */
     async function getUser(): Promise<User | null> {
-        if (!token.value) {
-            return null;
-        }
+        if (user.value) return user.value;
+        if (!token.value) return null;
 
         try {
             const response = await axios.get(`${API_BASE_URL}/auth/user`, {
@@ -158,9 +159,11 @@ export const useAuthStore = defineStore('authStore', () => {
 
             if (response.data.status === 'success') {
                 user.value = response.data.user;
+                // Apply sync preference from backend (source of truth)
+                syncEnabled.value = response.data.user.sync_enabled === true;
                 return response.data.user;
             }
-            
+
             return null;
         } catch (error: any) {
             console.error('Get user error:', error);
@@ -187,24 +190,82 @@ export const useAuthStore = defineStore('authStore', () => {
     }
 
     /**
-     * Check if user is synced
+     * Whether syncing is enabled (persisted via sync_settings table)
      */
-    const syncData = ref(false);
+    const syncEnabled = ref(false);
+    let syncInterval: ReturnType<typeof setInterval> | null = null;
 
-    function toggleSync() {
-        syncData.value = !syncData.value;
+    function startSyncInterval() {
+        if (syncInterval) return;
+        runSync(); // run immediately on enable
+        syncInterval = setInterval(runSync, 30_000);
+        window.addEventListener('focus', runSync);
     }
+
+    function stopSyncInterval() {
+        if (syncInterval) {
+            clearInterval(syncInterval);
+            syncInterval = null;
+        }
+        window.removeEventListener('focus', runSync);
+    }
+
+    async function loadSyncEnabled() {
+        try {
+            const value = await window.browserWindow.getSyncSetting('sync_enabled');
+            syncEnabled.value = value === '1' || value === 1 || value === true;
+        } catch {
+            syncEnabled.value = false;
+        }
+    }
+
+    async function setSyncEnabled(enabled: boolean) {
+        syncEnabled.value = enabled;
+        // Persist locally
+        try {
+            await window.browserWindow.setSyncSetting('sync_enabled', enabled ? '1' : '0');
+        } catch {
+            // best-effort
+        }
+        // Persist to backend (source of truth)
+        if (token.value) {
+            try {
+                const response = await axios.patch(`${API_BASE_URL}/auth/preferences`, { sync_enabled: enabled }, {
+                    headers: { Authorization: `Bearer ${token.value}` },
+                });
+                if (response.data.status === 'success') {
+                    user.value = response.data.user;
+                }
+            } catch {
+                // best-effort — local state is already updated
+            }
+        }
+    }
+
+    watch(syncEnabled, (enabled) => {
+        if (enabled && isAuthenticated.value) {
+            startSyncInterval();
+        } else {
+            stopSyncInterval();
+        }
+    });
+
+    watch(isAuthenticated, (authenticated) => {
+        if (!authenticated) stopSyncInterval();
+        else if (syncEnabled.value) startSyncInterval();
+    });
 
     return {
         user,
         token,
         isAuthenticated,
-        syncData,
+        syncEnabled,
         register,
         login,
         logout,
         getUser,
         initAuth,
-        toggleSync,
+        loadSyncEnabled,
+        setSyncEnabled,
     };
 });

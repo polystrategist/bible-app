@@ -1,147 +1,92 @@
 import axios from 'axios';
-import { useUserStore } from '../../store/userStore';
+import { useAuthStore } from '../../store/authStore';
 
-const API_BASE_URL = 'http://localhost:8000/api'; // Backend server URL
+const API_BASE_URL = 'http://localhost:8000/api';
 
-export interface SyncPayload {
-    table_name: string;
-    record_key: string;
-    action: 'created' | 'updated' | 'deleted';
-    payload: any;
-    timestamp: string;
-}
+let isSyncing = false;
 
-export interface SyncResponse {
-    status: 'success' | 'error';
-    message?: string;
-    synced_items?: number;
+/**
+ * Push all unsynced local changes to the backend.
+ * Returns the number of items synced, or -1 on failure.
+ */
+async function pushSync(token: string): Promise<number> {
+    const unsyncedChanges: any[] = await window.browserWindow.getUnsyncedChanges();
+
+    if (!unsyncedChanges.length) return 0;
+
+    const payload = unsyncedChanges.map((entry: any) => ({
+        table_name: entry.table_name,
+        record_key: entry.record_key,
+        action: entry.action,
+        payload: typeof entry.payload === 'string' ? JSON.parse(entry.payload) : entry.payload,
+        timestamp: entry.created_at,
+    }));
+
+    const response = await axios.post(
+        `${API_BASE_URL}/sync`,
+        { sync_logs: payload },
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (response.data.status === 'success') {
+        const ids = unsyncedChanges.map((e: any) => e.id);
+        await window.browserWindow.markAsSynced(ids);
+        console.info(`[Sync] Pushed ${ids.length} change(s) to backend.`);
+        return ids.length;
+    }
+
+    console.warn('[Sync] Push rejected by backend:', response.data);
+    return -1;
 }
 
 /**
- * Sync data to backend server
- * Called when local data changes (create/update/delete)
+ * Pull remote changes since the last sync timestamp and apply them locally.
  */
-export async function syncData(payload: SyncPayload): Promise<SyncResponse> {
-    const userStore = useUserStore();
+async function pullSync(token: string): Promise<void> {
+    const lastTimestamp: string = await window.browserWindow.getLastSyncTimestamp();
 
-    console.log('Syncing data with payload:', payload);
-    
-    // Check if sync is enabled
-    if (!userStore.syncData) {
-        return { status: 'success', message: 'Sync disabled' };
+    const response = await axios.get(`${API_BASE_URL}/sync/pull`, {
+        params: { since: lastTimestamp },
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.data.status !== 'success') return;
+
+    const { bookmarks, highlights, clip_notes, prayer_lists, study_spaces, notes, last_sync_timestamp } = response.data;
+
+    await window.browserWindow.applyPullData({
+        study_spaces,
+        bookmarks,
+        highlights,
+        clip_notes,
+        prayer_lists,
+        notes,
+    });
+
+    if (last_sync_timestamp) {
+        await window.browserWindow.updateLastSyncTimestamp(last_sync_timestamp);
     }
+}
 
-    // Check if user is authenticated
-    if (!userStore.user || !userStore.user.token) {
-        console.warn('User not authenticated, sync skipped');
-        return { status: 'error', message: 'User not authenticated' };
-    }
+/**
+ * Run a full sync cycle: push local changes, then pull remote changes.
+ * Safe to call repeatedly — skips if already running or conditions not met.
+ */
+export async function runSync(): Promise<void> {
+    if (isSyncing) return;
 
+    const authStore = useAuthStore();
+    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+
+    isSyncing = true;
     try {
-        const response = await axios.post(`${API_BASE_URL}/sync`, {
-            sync_logs: [payload],
-            user_id: userStore.user.id,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${userStore.user.token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return response.data as SyncResponse;
+        await pushSync(authStore.token);
+        await pullSync(authStore.token);
     } catch (error: any) {
-        console.error('Sync error:', error);
-        return {
-            status: 'error',
-            message: error.response?.data?.message || error.message,
-        };
+        const status = error?.response?.status;
+        const data = error?.response?.data;
+        console.error(`[Sync] Error (HTTP ${status ?? 'network'}):`, data ?? error?.message ?? error);
+    } finally {
+        isSyncing = false;
     }
-}
-
-/**
- * Batch sync multiple changes
- */
-export async function batchSyncData(payloads: SyncPayload[]): Promise<SyncResponse> {
-    const userStore = useUserStore();
-    
-    if (!userStore.syncData || !userStore.user || !userStore.user.token) {
-        return { status: 'success', message: 'Sync disabled or not authenticated' };
-    }
-
-    try {
-        const response = await axios.post(`${API_BASE_URL}/sync`, {
-            sync_logs: payloads,
-            user_id: userStore.user.id,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${userStore.user.token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return response.data as SyncResponse;
-    } catch (error: any) {
-        console.error('Batch sync error:', error);
-        return {
-            status: 'error',
-            message: error.response?.data?.message || error.message,
-        };
-    }
-}
-
-/**
- * Pull changes from backend (download sync data)
- */
-export async function pullSyncData(lastSyncTimestamp?: string): Promise<any> {
-    const userStore = useUserStore();
-    
-    if (!userStore.syncData || !userStore.user || !userStore.user.token) {
-        return { status: 'error', message: 'Sync disabled or not authenticated' };
-    }
-
-    try {
-        const response = await axios.get(`${API_BASE_URL}/sync/pull`, {
-            params: {
-                since: lastSyncTimestamp || '0',
-            },
-            headers: {
-                'Authorization': `Bearer ${userStore.user.token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return response.data;
-    } catch (error: any) {
-        console.error('Pull sync error:', error);
-        return {
-            status: 'error',
-            message: error.response?.data?.message || error.message,
-        };
-    }
-}
-
-/**
- * Trigger sync for specific data types
- */
-export async function triggerSync(
-    tableName: string,
-    recordKey: string,
-    action: 'created' | 'updated' | 'deleted',
-    payload: any
-): Promise<void> {
-    // This will be called from IPC handlers after local DB operations
-    const syncPayload: SyncPayload = {
-        table_name: tableName,
-        record_key: recordKey,
-        action,
-        payload,
-        timestamp: new Date().toISOString(),
-    };
-
-    // Optionally: Log to local sync_logs table via IPC if you have such an API
-    // await window.browserWindow.logSyncChange(syncPayload);
-    
-    // Send to backend
-    console.log('Triggering sync with payload:', syncPayload);
-    await syncData(syncPayload);
 }

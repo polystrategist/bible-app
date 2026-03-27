@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { computed, onBeforeMount, ref, watch } from 'vue';
-import { fetchSermons } from '../util/SupaBase/Tables/Sermons';
 
 type StringNumberType = string | number | null;
 export type SERMON_TYPE = {
@@ -33,21 +32,8 @@ export const userSermonStore = defineStore('useSermonStore', () => {
         if (loading.value == true || NoMoreData.value) return;
         loading.value = true;
 
-        const { data, error } = await fetchSermons(search.value, limit.value, page.value);
-
-        if (error) {
-            loading.value = false;
-            return;
-        }
-
-        if (!data.length) {
-            NoMoreData.value = true;
-            loading.value = false;
-            return;
-        }
-
-        if (!isFresh) sermons.value = [...sermons.value, ...(data as Array<any>)];
-        else sermons.value = data as Array<any>;
+        // Sermon fetching is not yet implemented in the new backend
+        NoMoreData.value = true;
         loading.value = false;
     }
 
