@@ -23,12 +23,10 @@ import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
-import { useUserStore } from './store/userStore';
 import { useAuthStore } from './store/authStore';
 import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
 
 const isMounted = ref(false);
-const userStore = useUserStore();
 const authStore = useAuthStore();
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();

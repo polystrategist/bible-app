@@ -5,11 +5,11 @@ import { useMenuStore } from '../../store/menu';
 import Editor from '../../components/Editor/Editor.vue';
 import { NButton, NInput, NSelect } from 'naive-ui';
 import { DAYJS } from '../../util/dayjs';
-import { useUserStore } from '../../store/userStore';
+import { useAuthStore } from '../../store/authStore';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const sermonId = ref(null);
 const selectedType = ref('youtube');
@@ -182,7 +182,7 @@ function resetForm() {
                     </div>
                 </div>
                 <div class="mb-10">
-                    <NButton v-if="userStore.user" :disabled="loading" :loading="loading" type="primary"
+                    <NButton v-if="authStore.user" :disabled="loading" :loading="loading" type="primary"
                         @click="submitSermon()">
                         Create
                     </NButton>
