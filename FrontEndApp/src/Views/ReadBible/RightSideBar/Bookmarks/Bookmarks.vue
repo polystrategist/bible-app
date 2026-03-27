@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
+import { runSync } from '../../../../util/Sync/sync';
 import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
 import { TrashCan } from '@vicons/carbon';
 import { NIcon, NPopconfirm } from 'naive-ui';
@@ -20,6 +21,7 @@ function selectBookVerse(key: string, { book_number, chapter, verse }: { book_nu
 async function deleteBookmark(verse: any) {
     const delItem = await window.browserWindow.deleteBookmark(JSON.stringify(verse));
     await bookmarkStore.getBookmarks();
+    runSync();
 }
 </script>
 <template>

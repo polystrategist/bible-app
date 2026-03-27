@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import SpaceStudyStore from './SpaceStudyStore';
+import { runSync } from '../util/Sync/sync';
 
 type NoteItem = {
     id: string;
@@ -192,6 +193,7 @@ export default defineStore('useNotesStore', () => {
             note: serializePayload(),
             space_study_id: selectedSpaceId,
         });
+        runSync();
     }
 
     watch(

@@ -152,7 +152,10 @@ export async function saveHighlight(args: {
     verse: number;
     content: string;
 }) {
-    return await window.browserWindow.saveHighlight(JSON.stringify(args));
+    const result = await window.browserWindow.saveHighlight(JSON.stringify(args));
+    const { runSync } = await import('./Sync/sync');
+    runSync();
+    return result;
 }
 
 export const colors = [

@@ -6,6 +6,7 @@ import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
 import SpaceStudyStore from '../../../../store/SpaceStudyStore';
+import { runSync } from '../../../../util/Sync/sync';
 
 const spaceStudyStore = SpaceStudyStore();
 const bibleStore = useBibleStore();
@@ -35,6 +36,7 @@ async function clickContextMenu(key: string) {
         bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
             JSON.stringify(props.data)
         );
+        runSync();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
     } else if (key == 'clear-highlight') {
