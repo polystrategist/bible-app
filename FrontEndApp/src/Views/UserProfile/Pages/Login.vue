@@ -75,12 +75,9 @@ async function submit() {
 }
 
 onMounted(async () => {
-    loading.value = true;
-    authStore.initAuth();
     if (authStore.isAuthenticated) {
         await router.push('/profile/profile');
     }
-    loading.value = false;
 });
 </script>
 <template>

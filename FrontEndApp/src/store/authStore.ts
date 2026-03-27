@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 import axios from 'axios';
 import { runSync } from '../util/Sync/sync';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 export interface User {
     id: number;
@@ -143,37 +143,39 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
+    let getUserPromise: Promise<User | null> | null = null;
+
     /**
      * Get current user info
      */
-    async function getUser(): Promise<User | null> {
-        if (user.value) return user.value;
-        if (!token.value) return null;
+    function getUser(): Promise<User | null> {
+        if (user.value) return Promise.resolve(user.value);
+        if (!token.value) return Promise.resolve(null);
 
-        try {
-            const response = await axios.get(`${API_BASE_URL}/auth/user`, {
-                headers: {
-                    Authorization: `Bearer ${token.value}`,
-                },
-            });
+        // Deduplicate concurrent calls — return the in-flight promise if one exists
+        if (getUserPromise) return getUserPromise;
 
+        getUserPromise = axios.get(`${API_BASE_URL}/auth/user`, {
+            headers: { Authorization: `Bearer ${token.value}` },
+        }).then((response) => {
             if (response.data.status === 'success') {
                 user.value = response.data.user;
-                // Apply sync preference from backend (source of truth)
                 syncEnabled.value = response.data.user.sync_enabled === true;
-                return response.data.user;
+                return response.data.user as User;
             }
-
             return null;
-        } catch (error: any) {
+        }).catch((error: any) => {
             console.error('Get user error:', error);
-            // Token might be invalid
             user.value = null;
             token.value = null;
             isAuthenticated.value = false;
             localStorage.removeItem('auth_token');
             return null;
-        }
+        }).finally(() => {
+            getUserPromise = null;
+        });
+
+        return getUserPromise;
     }
 
     /**
