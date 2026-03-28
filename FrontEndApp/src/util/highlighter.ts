@@ -1,3 +1,5 @@
+import { runSync } from './Sync/sync';
+
 const getSelectionParentElement = () => {
     let parentEl = null,
         sel;
@@ -153,7 +155,6 @@ export async function saveHighlight(args: {
     content: string;
 }) {
     const result = await window.browserWindow.saveHighlight(JSON.stringify(args));
-    const { runSync } = await import('./Sync/sync');
     runSync();
     return result;
 }

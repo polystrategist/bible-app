@@ -7,7 +7,7 @@ const module: MODULE_BIBLE_TYPE = {
     language_full: `tamil`,
     title: `Tamil Bible TBC 2017`,
     description: `தமிழ் பைபிள்`,
-    download_link: `https://github.com/Bible-Projects/believers-sword-next/raw/main/Modules/Bible/${file_name}`,
+    download_link: `https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/${file_name}`,
 }
 
 export default module;

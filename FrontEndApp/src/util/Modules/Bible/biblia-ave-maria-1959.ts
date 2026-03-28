@@ -9,5 +9,5 @@ export default {
         <br/>
         Encontrou algum erro no módulo? <br/>
         Escreva para: mybiblebr@gmail.com <br/>`,
-    download_link: `https://github.com/Bible-Projects/believers-sword-next/raw/main/Modules/Bible/Bíblia Ave-Maria 1959.SQLite3`
+    download_link: `https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Bíblia Ave-Maria 1959.SQLite3`
 };

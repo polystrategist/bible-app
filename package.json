@@ -33,7 +33,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Bible-Projects"
+        "owner": "JenuelDev"
       }
     ],
     "nsis": {
