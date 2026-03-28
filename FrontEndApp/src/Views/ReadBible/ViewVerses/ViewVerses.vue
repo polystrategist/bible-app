@@ -15,22 +15,21 @@ import VerseSelector from '../../../components/VerseSelector.vue';
 import { useI18n } from 'vue-i18n';
 import { FastForward20Regular, SlideSearch28Regular } from '@vicons/fluent';
 import { SlideSearch28Filled } from '@vicons/fluent';
-import { Mic24Regular, Mic24Filled } from '@vicons/fluent';
 import { Note24Regular, Note28Filled } from '@vicons/fluent';
 import { useThemeStore } from '../../../store/theme';
 import useNoteStore from '../../../store/useNoteStore';
-import AudioBiblePlayer from './AudioBiblePlayer.vue';
+import { useTTSStore } from '../../../store/ttsStore';
+import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
 const noteStore = useNoteStore();
+const ttsStore = useTTSStore();
 const dialog = useDialog();
 const clipNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
-const showAudioBibleStorageKey = 'show-audio-bible-player';
 const bibleStore = useBibleStore();
 const fontSize = ref(15);
-const showAudioBiblePlayer = ref(false);
 const showContextMenu = ref(false);
 const contextMenuPositionX = ref<number>(0);
 const contextMenuPositionY = ref<number>(0);
@@ -67,11 +66,10 @@ watch(
     }
 );
 
+// Stop TTS when the chapter or book changes
 watch(
-    () => showAudioBiblePlayer.value,
-    (showAudioBible: boolean) => {
-        SESSION.set(showAudioBibleStorageKey, showAudioBible);
-    }
+    () => [bibleStore.selectedChapter, bibleStore.selectedBookNumber],
+    () => { if (ttsStore.isActive) ttsStore.stop(); }
 );
 
 function navigateChapter(action: 'next' | 'before') {
@@ -140,9 +138,6 @@ function deleteClipNote(args: { book_number: number; chapter: number; verse: num
 onBeforeMount(() => {
     const savedFontSize = SESSION.get(fontSizeOfShowChapter);
     if (savedFontSize) fontSize.value = savedFontSize;
-
-    const savedShowAudioBible = SESSION.get(showAudioBibleStorageKey);
-    if (typeof savedShowAudioBible === 'boolean') showAudioBiblePlayer.value = savedShowAudioBible;
 });
 
 onMounted(() => {
@@ -241,17 +236,6 @@ onMounted(() => {
                         <NIcon :component="noteStore.showNote ? Note28Filled : Note24Regular" size="20" />
                     </template>
                 </NButton>
-                <NButton
-                    size="small"
-                    quaternary
-                    circle
-                    :title="showAudioBiblePlayer ? 'Hide Audio Bible' : 'Show Audio Bible'"
-                    @click="showAudioBiblePlayer = !showAudioBiblePlayer"
-                >
-                    <template #icon>
-                        <NIcon :component="showAudioBiblePlayer ? Mic24Filled : Mic24Regular" size="20" />
-                    </template>
-                </NButton>
             </div>
             <div>
                 <div
@@ -263,7 +247,6 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <AudioBiblePlayer v-if="showAudioBiblePlayer" />
         <div
             id="view-verses-container"
             class="w-full flex-1 min-h-0 scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div pb-20px"
@@ -289,7 +272,7 @@ onMounted(() => {
                 </div>
             </div>
             <div
-                v-for="verse in bibleStore.renderVerses"
+                v-for="(verse, verseIndex) in bibleStore.renderVerses"
                 :key="verse.verse"
                 class="flex flex-col w-full max-w-1200px mx-auto"
             >
@@ -311,7 +294,7 @@ onMounted(() => {
                                 `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
                             ).color
                         }`"
-                        class="flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-2 relative"
+                        class="group flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-2 relative"
                         @click="
                             bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)
                         "
@@ -322,12 +305,32 @@ onMounted(() => {
                             title="Selected Verse"
                         ></div>
                         <div class="flex flex-col items-center gap-2 min-w-8">
-                            <span
-                                v-show="verse.version.length > 3"
-                                class="font-700 select-none text-size-30px opacity-60 dark:opacity-70"
-                            >
-                                {{ verse.verse }}
-                            </span>
+                            <div v-show="verse.version.length > 3" class="flex flex-col items-center gap-1">
+                                <span
+                                    class="font-700 select-none text-size-30px opacity-60 dark:opacity-70"
+                                >
+                                    {{ verse.verse }}
+                                </span>
+                                <!-- TTS: speaking indicator (>3 versions, beside large verse number) -->
+                                <Icon
+                                    v-if="ttsStore.activeVerseNumber === verse.verse"
+                                    icon="mdi:account-voice"
+                                    style="font-size: 20px;"
+                                    class="text-[var(--primary-color)] animate-pulse"
+                                    title="Reading this verse"
+                                />
+                                <NButton
+                                    v-else
+                                    size="tiny"
+                                    quaternary
+                                    circle
+                                    class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Read from this verse"
+                                    @click.stop="ttsStore.playFromVerse(verseIndex)"
+                                >
+                                    <Icon icon="mdi:play" style="font-size: 14px;" />
+                                </NButton>
+                            </div>
                             <div
                                 v-show="
                                     bookmarkStore.isBookmarkExists(
@@ -346,7 +349,7 @@ onMounted(() => {
                             :class="{ '!flex-col': bibleStore.selectedBibleVersions.length > 3 }"
                         >
                             <div
-                                v-for="version in verse.version"
+                                v-for="(version, versionIndex) in verse.version"
                                 :key="version.key"
                                 :style="`width: calc(100%/${
                                     bibleStore.selectedBibleVersions.length > 3
@@ -369,6 +372,30 @@ onMounted(() => {
                                     >
                                         {{ verse.verse }}.
                                     </span>
+                                    <!-- TTS: inline beside verse number (≤3 versions) -->
+                                    <template v-if="verse.version.length <= 3">
+                                        <!-- Speaking icon: only in the column that is being played -->
+                                        <Icon
+                                            v-if="ttsStore.activeVerseNumber === verse.verse && versionIndex === ttsStore.selectedVersionIndex"
+                                            icon="mdi:account-voice"
+                                            :style="`font-size: ${fontSize}px; vertical-align: middle;`"
+                                            class="text-[var(--primary-color)] animate-pulse mx-0.5"
+                                            title="Reading this verse"
+                                        />
+                                        <!-- Play button: in every column on hover, but hidden when speaking -->
+                                        <NButton
+                                            v-else-if="ttsStore.activeVerseNumber !== verse.verse"
+                                            size="tiny"
+                                            quaternary
+                                            circle
+                                            class="opacity-0 group-hover:opacity-100 transition-opacity"
+                                            style="vertical-align: middle; margin: 0 1px;"
+                                            title="Read from this verse"
+                                            @click.stop="ttsStore.playFromVerse(verseIndex, versionIndex)"
+                                        >
+                                            <Icon icon="mdi:play" :style="`font-size: ${fontSize - 3}px;`" />
+                                        </NButton>
+                                    </template>
                                     <span
                                         :data-bible-version="version.version"
                                         :data-book="verse.book_number"

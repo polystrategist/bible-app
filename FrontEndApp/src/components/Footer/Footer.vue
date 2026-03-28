@@ -9,9 +9,12 @@ import { useBibleStore } from '../../store/BibleStore';
 import { Book24Regular, Note24Regular, Note28Filled, PointScan24Filled } from '@vicons/fluent';
 import useNoteStore from '../../store/useNoteStore';
 import { useSettingStore } from '../../store/settingStore';
+import { useTTSStore } from '../../store/ttsStore';
+import TTSFooterPlayer from '../TTS/TTSFooterPlayer.vue';
 
 const noteStore = useNoteStore();
 const bibleStore = useBibleStore();
+const ttsStore = useTTSStore();
 const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
@@ -69,31 +72,35 @@ onMounted(() => {
         <div
             class="w-full text-center z-50 font-700 flex items-center justify-center flex items-center gap-2"
         >
-            <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
-                <template #icon>
-                    <NIcon>
-                        <Book24Regular />
-                    </NIcon>
-                </template>
-                {{ $t(bibleStore.getSelectedData.book) }}
-                {{ bibleStore.getSelectedData.chapter }}
-            </VerseSelectorButton>
-            <NButton
-                v-if="menuStore.menuSelected === 'read-bible'"
-                secondary
-                size="tiny"
-                :type="noteStore.showNote ? 'primary' : 'default'"
-                :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
-                @click="noteStore.showNote = !noteStore.showNote"
-            >
-                <template #icon>
-                    <NIcon>
-                        <Note28Filled v-if="noteStore.showNote" />
-                        <Note24Regular v-else />
-                    </NIcon>
-                </template>
-                 {{ noteStore.showNote ? $t('hide-notes') : $t('show-notes') }}
-            </NButton>
+            <!-- TTS player takes over center when active -->
+            <TTSFooterPlayer v-if="ttsStore.isActive && menuStore.menuSelected === 'read-bible'" />
+            <template v-else>
+                <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
+                    <template #icon>
+                        <NIcon>
+                            <Book24Regular />
+                        </NIcon>
+                    </template>
+                    {{ $t(bibleStore.getSelectedData.book) }}
+                    {{ bibleStore.getSelectedData.chapter }}
+                </VerseSelectorButton>
+                <NButton
+                    v-if="menuStore.menuSelected === 'read-bible'"
+                    secondary
+                    size="tiny"
+                    :type="noteStore.showNote ? 'primary' : 'default'"
+                    :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
+                    @click="noteStore.showNote = !noteStore.showNote"
+                >
+                    <template #icon>
+                        <NIcon>
+                            <Note28Filled v-if="noteStore.showNote" />
+                            <Note24Regular v-else />
+                        </NIcon>
+                    </template>
+                    {{ noteStore.showNote ? $t('hide-notes') : $t('show-notes') }}
+                </NButton>
+            </template>
         </div>
         <div class="flex items-center w-full max-w-300px justify-end pr-2">
             <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">
