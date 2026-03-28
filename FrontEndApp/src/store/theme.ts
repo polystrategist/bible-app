@@ -3,6 +3,7 @@ import { onBeforeMount, ref, watch } from 'vue';
 import SESSION from '../util/session';
 import { getTheme, themesOptions, typeNameInterface } from '../util/themes';
 import { appearanceThemeOptions, backgroundThemeType } from '../util/appearanceThemes';
+import { useAuthStore } from './authStore';
 
 export const useThemeStore = defineStore('useThemeStore', () => {
     const showThemeChangerDrawer = ref(false);
@@ -51,6 +52,16 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             isDark: itsDark,
             backgroundTheme: backgroundTheme.value,
         });
+
+        // Persist to backend if authenticated (best-effort)
+        const authStore = useAuthStore();
+        if (authStore.isAuthenticated) {
+            authStore.updateSettings({
+                selected_theme: selectedTheme.value,
+                is_dark: itsDark,
+                background_theme: backgroundTheme.value,
+            });
+        }
     }
 
     watch(
@@ -78,8 +89,25 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         }
 
         applyBodyThemeClass();
-
         changeTheRootProperty();
+
+        // When remote settings load (after login/initAuth), apply them
+        const authStore = useAuthStore();
+        watch(() => authStore.remoteSettings, (settings) => {
+            if (!settings) return;
+            selectedTheme.value = settings.selected_theme as typeNameInterface;
+            isDark.value = settings.is_dark;
+            backgroundTheme.value = settings.background_theme as backgroundThemeType;
+            themeOverrides.value.common = (themesOptions as any)[selectedTheme.value][isDark.value ? 'dark' : 'light'];
+            applyBodyThemeClass();
+            changeTheRootProperty();
+            // Keep localStorage in sync
+            SESSION.set(saveThemeStorageKey, {
+                selectedTheme: selectedTheme.value,
+                isDark: isDark.value,
+                backgroundTheme: backgroundTheme.value,
+            });
+        });
     });
 
     function changeTheRootProperty() {

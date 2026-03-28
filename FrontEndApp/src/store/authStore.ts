@@ -20,10 +20,18 @@ export interface AuthTokens {
     refreshToken?: string;
 }
 
+export interface UserSettings {
+    id?: number;
+    selected_theme: string;
+    is_dark: boolean;
+    background_theme: string;
+}
+
 export const useAuthStore = defineStore('authStore', () => {
     const user = ref<User | null>(null);
     const token = ref<string | null>(null);
     const isAuthenticated = ref(false);
+    const remoteSettings = ref<UserSettings | null>(null);
 
     /**
      * Register a new user
@@ -90,6 +98,9 @@ export const useAuthStore = defineStore('authStore', () => {
                 // Store token in localStorage
                 localStorage.setItem('auth_token', response.data.token);
 
+                // Load remote settings after login
+                loadSettings();
+
                 return {
                     success: true,
                     message: response.data.message,
@@ -119,6 +130,7 @@ export const useAuthStore = defineStore('authStore', () => {
         token.value = null;
         isAuthenticated.value = false;
         syncEnabled.value = false;
+        remoteSettings.value = null;
         localStorage.removeItem('auth_token');
 
         if (!currentToken) {
@@ -177,6 +189,42 @@ export const useAuthStore = defineStore('authStore', () => {
     }
 
     /**
+     * Load user settings from the backend
+     */
+    async function loadSettings(): Promise<UserSettings | null> {
+        if (!token.value) return null;
+        try {
+            const response = await axios.get(`${API_BASE_URL}/settings`, {
+                headers: { Authorization: `Bearer ${token.value}` },
+            });
+            if (response.data.status === 'success') {
+                remoteSettings.value = response.data.settings;
+                return response.data.settings as UserSettings;
+            }
+        } catch {
+            // best-effort
+        }
+        return null;
+    }
+
+    /**
+     * Persist one or more user setting fields to the backend
+     */
+    async function updateSettings(data: Partial<UserSettings>): Promise<void> {
+        if (!token.value) return;
+        try {
+            const response = await axios.patch(`${API_BASE_URL}/settings`, data, {
+                headers: { Authorization: `Bearer ${token.value}` },
+            });
+            if (response.data.status === 'success') {
+                remoteSettings.value = response.data.settings;
+            }
+        } catch {
+            // best-effort — local theme state is already applied
+        }
+    }
+
+    /**
      * Initialize auth state from localStorage
      */
     function initAuth() {
@@ -184,8 +232,10 @@ export const useAuthStore = defineStore('authStore', () => {
         if (savedToken) {
             token.value = savedToken;
             isAuthenticated.value = true;
-            // Fetch user info
-            getUser();
+            // Fetch user info then settings in sequence
+            getUser().then((u) => {
+                if (u) loadSettings();
+            });
         }
     }
 
@@ -198,7 +248,7 @@ export const useAuthStore = defineStore('authStore', () => {
     function startSyncInterval() {
         if (syncInterval) return;
         runSync(); // run immediately on enable
-        syncInterval = setInterval(runSync, 30_000);
+        syncInterval = setInterval(runSync, 5 * 60 * 1_000);
         window.addEventListener('focus', runSync);
     }
 
@@ -260,6 +310,7 @@ export const useAuthStore = defineStore('authStore', () => {
         token,
         isAuthenticated,
         syncEnabled,
+        remoteSettings,
         register,
         login,
         logout,
@@ -267,5 +318,7 @@ export const useAuthStore = defineStore('authStore', () => {
         initAuth,
         loadSyncEnabled,
         setSyncEnabled,
+        loadSettings,
+        updateSettings,
     };
 });
