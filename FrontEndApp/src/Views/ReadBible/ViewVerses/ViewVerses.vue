@@ -379,7 +379,7 @@ onMounted(() => {
                                             v-if="ttsStore.activeVerseNumber === verse.verse && versionIndex === ttsStore.selectedVersionIndex"
                                             icon="mdi:account-voice"
                                             :style="`font-size: ${fontSize}px; vertical-align: middle;`"
-                                            class="text-[var(--primary-color)] animate-pulse mx-0.5"
+                                            class="text-[var(--primary-color)] animate-pulse mx-5px"
                                             title="Reading this verse"
                                         />
                                         <!-- Play button: in every column on hover, but hidden when speaking -->
@@ -391,7 +391,7 @@ onMounted(() => {
                                             class="opacity-0 group-hover:opacity-100 transition-opacity"
                                             style="vertical-align: middle; margin: 0 1px;"
                                             title="Read from this verse"
-                                            @click.stop="ttsStore.playFromVerse(verseIndex, versionIndex)"
+                                            @click.stop="ttsStore.playFromVerse(verseIndex, versionIndex as any)"
                                         >
                                             <Icon icon="mdi:play" :style="`font-size: ${fontSize - 3}px;`" />
                                         </NButton>
