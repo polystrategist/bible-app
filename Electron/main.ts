@@ -72,11 +72,11 @@ async function createWindow() {
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
 
     if (wasFullScreen) {
-        mainWindow.show();
-        // Show first, then apply fullscreen — setting fullscreen on a hidden window
-        // is unreliable on Windows and may silently fail.
+        // Register listener BEFORE show() — on Windows the 'show' event can fire
+        // synchronously inside show(), so registering after would miss it entirely.
         mainWindow.once('show', () => mainWindow.setFullScreen(true));
-    } else if (appBounds !== undefined && appBounds !== null && appBounds.width > width && appBounds.height > height)
+        mainWindow.show();
+    } else if (appBounds !== undefined && appBounds !== null && appBounds.width >= width && appBounds.height >= height)
         mainWindow.maximize();
     else mainWindow.show();
 

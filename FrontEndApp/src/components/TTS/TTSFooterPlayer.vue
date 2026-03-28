@@ -3,9 +3,13 @@ import { computed } from 'vue';
 import { NButton, NSelect } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { useTTSStore } from '../../store/ttsStore';
+import { usePiperTTSStore } from '../../store/piperTTSStore';
+import { useSettingStore } from '../../store/settingStore';
 import { useBibleStore } from '../../store/BibleStore';
 
 const ttsStore = useTTSStore();
+const piperStore = usePiperTTSStore();
+const settingStore = useSettingStore();
 const bibleStore = useBibleStore();
 
 const rateOptions = [
@@ -17,8 +21,13 @@ const rateOptions = [
     { label: '2×', value: 2 },
 ];
 
+// Use whichever store is active
+const store = computed(() =>
+    settingStore.verseReaderMode === 'piper-tts' ? piperStore : ttsStore
+);
+
 const currentVerse = computed(() => {
-    const idx = ttsStore.currentVerseIndex;
+    const idx = store.value.currentVerseIndex;
     if (idx < 0) return null;
     return bibleStore.renderVerses[idx] ?? null;
 });
@@ -32,7 +41,7 @@ const verseLabel = computed(() => {
 const verseSnippet = computed(() => {
     const v = currentVerse.value;
     if (!v) return '';
-    const raw = v.version[ttsStore.selectedVersionIndex]?.text ?? v.version[0]?.text ?? '';
+    const raw = v.version[store.value.selectedVersionIndex]?.text ?? v.version[0]?.text ?? '';
     const tmp = document.createElement('div');
     tmp.innerHTML = raw;
     const text = tmp.textContent || tmp.innerText || '';
@@ -53,7 +62,7 @@ const verseSnippet = computed(() => {
         <Icon
             icon="mdi:account-voice"
             class="flex-shrink-0 text-[var(--primary-color)]"
-            :class="ttsStore.isPlaying ? 'animate-pulse' : 'opacity-60'"
+            :class="store.isPlaying ? 'animate-pulse' : 'opacity-60'"
             style="font-size: 18px;"
         />
 
@@ -67,22 +76,22 @@ const verseSnippet = computed(() => {
 
         <!-- Playback controls -->
         <div class="flex items-center gap-0 flex-shrink-0">
-            <NButton size="tiny" quaternary circle title="Previous verse" @click="ttsStore.previous()">
+            <NButton size="tiny" quaternary circle title="Previous verse" @click="store.previous()">
                 <Icon icon="mdi:skip-previous" style="font-size: 15px;" />
             </NButton>
             <NButton
                 size="tiny"
                 quaternary
                 circle
-                :title="ttsStore.isPlaying ? 'Pause' : 'Resume'"
-                @click="ttsStore.togglePlayback()"
+                :title="store.isPlaying ? 'Pause' : 'Resume'"
+                @click="store.togglePlayback()"
             >
-                <Icon :icon="ttsStore.isPlaying ? 'mdi:pause' : 'mdi:play'" style="font-size: 15px;" />
+                <Icon :icon="store.isPlaying ? 'mdi:pause' : 'mdi:play'" style="font-size: 15px;" />
             </NButton>
-            <NButton size="tiny" quaternary circle title="Next verse" @click="ttsStore.next()">
+            <NButton size="tiny" quaternary circle title="Next verse" @click="store.next()">
                 <Icon icon="mdi:skip-next" style="font-size: 15px;" />
             </NButton>
-            <NButton size="tiny" quaternary circle title="Stop" @click="ttsStore.stop()">
+            <NButton size="tiny" quaternary circle title="Stop" @click="store.stop()">
                 <Icon icon="mdi:stop" style="font-size: 15px;" />
             </NButton>
         </div>
@@ -91,12 +100,12 @@ const verseSnippet = computed(() => {
         <div class="flex items-center gap-1 flex-shrink-0">
             <span class="text-xs opacity-40">Speed</span>
             <NSelect
-                :value="ttsStore.playbackRate"
+                :value="store.playbackRate"
                 :options="rateOptions"
                 size="tiny"
                 style="width: 62px;"
                 :consistent-menu-width="false"
-                @update:value="ttsStore.setRate"
+                @update:value="store.setRate"
             />
         </div>
     </div>

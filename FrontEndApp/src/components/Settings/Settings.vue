@@ -5,14 +5,19 @@ import LanguageSetting from './Language/Language.vue';
 import PrimaryColor from './PrimaryColor/PrimaryColor.vue';
 import Theme from './Theme/Theme.vue';
 import TabSetting from './Tabs/TabSetting.vue';
-import { ref } from 'vue';
 import SyncData from './Sync/SyncData.vue';
 import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
 import Scale from './Scale/Scale.vue';
 import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
 import { Icon } from '@iconify/vue';
+import { useMainStore } from '../../store/main';
+import { computed } from 'vue';
 
-const name = ref('General');
+const mainStore = useMainStore();
+const name = computed({
+    get: () => mainStore.settingsTab,
+    set: (v) => { mainStore.settingsTab = v; },
+});
 </script>
 <template>
     <NCard size="small">

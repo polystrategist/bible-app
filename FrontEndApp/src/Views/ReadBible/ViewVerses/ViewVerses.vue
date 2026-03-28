@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, onMounted, ref, watch, h } from 'vue';
+import { onBeforeMount, onMounted, ref, watch, h, computed } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
 import { NButton, NIcon, NPopover, NSelect, NSlider, useDialog, useMessage } from 'naive-ui';
 import { Attachment, BookmarkFilled, Copy, Delete, Edit } from '@vicons/carbon';
@@ -19,24 +19,53 @@ import { Note24Regular, Note28Filled } from '@vicons/fluent';
 import { useThemeStore } from '../../../store/theme';
 import useNoteStore from '../../../store/useNoteStore';
 import { useTTSStore } from '../../../store/ttsStore';
+import { usePiperTTSStore } from '../../../store/piperTTSStore';
 import { useSettingStore } from '../../../store/settingStore';
+import { useMainStore } from '../../../store/main';
 import { Icon } from '@iconify/vue';
+import PiperModelsModal from '../../../components/Settings/VerseReader/PiperModelsModal.vue';
 
 const { t } = useI18n();
+const showPiperModels = ref(false);
+
+const piperVoiceLabel = computed(() => {
+    const id = settingStore.piperActiveModel;
+    const parts = id.split('-');
+    // parts: ['en_US', 'ryan', 'high'] → 'Ryan · High'
+    const name = parts[1] ?? '';
+    const quality = parts[2] ?? '';
+    return `${name.charAt(0).toUpperCase() + name.slice(1)} · ${quality.charAt(0).toUpperCase() + quality.slice(1)}`;
+});
 const themeStore = useThemeStore();
 const noteStore = useNoteStore();
 const ttsStore = useTTSStore();
+const piperStore = usePiperTTSStore();
 const settingStore = useSettingStore();
+const mainStore = useMainStore();
+
+function activeStore() {
+    return settingStore.verseReaderMode === 'piper-tts' ? piperStore : ttsStore;
+}
 
 function playVerse(verseIndex: number, versionIndex: number) {
     switch (settingStore.verseReaderMode) {
+        case 'piper-tts':
+            if (!piperStore.isInstalled) {
+                dialog.warning({
+                    title: 'Piper Not Installed',
+                    content: 'Piper Neural TTS needs to be downloaded before use. Go to Settings → Verse Reader to install it.',
+                    positiveText: 'Open Settings',
+                    negativeText: 'Cancel',
+                    onPositiveClick: () => { mainStore.settingsTab = 'VerseReader'; mainStore.showSettings = true; },
+                });
+                return;
+            }
+            piperStore.playFromVerse(verseIndex, versionIndex);
+            break;
         case 'browser-tts':
         default:
             ttsStore.playFromVerse(verseIndex, versionIndex);
             break;
-        // Future readers plug in here:
-        // case 'ai-model': aiReaderStore.playFromVerse(verseIndex, versionIndex); break;
-        // case 'audio-link': audioLinkStore.playFromVerse(verseIndex, versionIndex); break;
     }
 }
 const dialog = useDialog();
@@ -83,7 +112,7 @@ watch(
 // Stop TTS when the chapter or book changes — unless TTS itself triggered the chapter advance
 watch(
     () => [bibleStore.selectedChapter, bibleStore.selectedBookNumber],
-    () => { if (ttsStore.isActive && !ttsStore.autoAdvancing) ttsStore.stop(); }
+    () => { const s = activeStore(); if (s.isActive && !s.autoAdvancing) s.stop(); }
 );
 
 function navigateChapter(action: 'next' | 'before') {
@@ -155,6 +184,8 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
+    piperStore.checkInstalled();
+
     // set initial font family
     const savedFontFamily = SESSION.get('font-family-of-show-chapter');
     if (savedFontFamily) {
@@ -250,6 +281,18 @@ onMounted(() => {
                         <NIcon :component="noteStore.showNote ? Note28Filled : Note24Regular" size="20" />
                     </template>
                 </NButton>
+                <NButton
+                    v-if="settingStore.verseReaderMode === 'piper-tts' && piperStore.isInstalled"
+                    size="small"
+                    quaternary
+                    title="Voice Models"
+                    @click="showPiperModels = true"
+                >
+                    <template #icon>
+                        <Icon icon="mdi:account-voice" style="font-size: 18px;" />
+                    </template>
+                    <span class="text-xs">{{ piperVoiceLabel }}</span>
+                </NButton>
             </div>
             <div>
                 <div
@@ -327,7 +370,7 @@ onMounted(() => {
                                 </span>
                                 <!-- TTS: speaking indicator (>3 versions, beside large verse number) -->
                                 <Icon
-                                    v-if="ttsStore.activeVerseNumber === verse.verse"
+                                    v-if="activeStore().activeVerseNumber === verse.verse"
                                     icon="mdi:account-voice"
                                     style="font-size: 20px;"
                                     class="text-[var(--primary-color)] animate-pulse"
@@ -390,7 +433,7 @@ onMounted(() => {
                                     <template v-if="verse.version.length <= 3">
                                         <!-- Speaking icon: only in the column that is being played -->
                                         <Icon
-                                            v-if="ttsStore.activeVerseNumber === verse.verse && versionIndex === ttsStore.selectedVersionIndex"
+                                            v-if="activeStore().activeVerseNumber === verse.verse && versionIndex === activeStore().selectedVersionIndex"
                                             icon="mdi:account-voice"
                                             :style="`font-size: ${fontSize}px; vertical-align: middle;`"
                                             class="text-[var(--primary-color)] animate-pulse mx-5px"
@@ -398,7 +441,7 @@ onMounted(() => {
                                         />
                                         <!-- Play button: in every column on hover, but hidden when speaking -->
                                         <NButton
-                                            v-else-if="ttsStore.activeVerseNumber !== verse.verse"
+                                            v-else-if="activeStore().activeVerseNumber !== verse.verse"
                                             size="tiny"
                                             quaternary
                                             circle
@@ -532,6 +575,7 @@ onMounted(() => {
             </div>
         </NPopover>
         <CreateClipNoteVue ref="createClipNoteRef" />
+        <PiperModelsModal v-model:show="showPiperModels" />
     </div>
 </template>
 <style lang="scss" src="./ViewVersesStyle.scss"></style>

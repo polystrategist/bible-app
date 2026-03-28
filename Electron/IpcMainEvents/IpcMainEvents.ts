@@ -11,6 +11,7 @@ import SpaceStudy from './SpaceeStudy/SpaceStudy';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
 import { SyncHandlers } from './Sync/SyncHandlers';
+import { PiperTTSHandlers } from './Piper/PiperTTS';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -48,4 +49,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // sync handlers
     SyncHandlers(BrowserWindow);
+
+    // piper tts handlers
+    PiperTTSHandlers(BrowserWindow);
 };

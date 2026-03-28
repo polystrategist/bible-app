@@ -6,6 +6,7 @@ export const useMainStore = defineStore('useMainStore', () => {
     const appName = ref<string>('believers sword');
     const showAbout = ref(false);
     const showSettings = ref(false);
+    const settingsTab = ref('General');
     const showDonateModal = ref(false);
 
     async function getVersions() {
@@ -32,6 +33,7 @@ export const useMainStore = defineStore('useMainStore', () => {
 
     return {
         showSettings,
+        settingsTab,
         showAbout,
         appName,
         version,
