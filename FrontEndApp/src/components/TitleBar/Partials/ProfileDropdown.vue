@@ -1,6 +1,15 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { NAvatar, NButton, NDivider, NIcon, NPopover, useDialog, useMessage, MessageReactive } from 'naive-ui';
+import {
+    NAvatar,
+    NButton,
+    NDivider,
+    NIcon,
+    NPopover,
+    useDialog,
+    useMessage,
+    MessageReactive,
+} from 'naive-ui';
 import { Login, Logout as LogoutIcon, UserProfile as UserIcon } from '@vicons/carbon';
 import { useMenuStore } from '../../../store/menu';
 import { useAuthStore } from '../../../store/authStore';
@@ -31,6 +40,23 @@ const firstName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Account
 function goToProfile() {
     showDropdown.value = false;
     menuStore.setMenu('/profile');
+}
+
+function toggleSync() {
+    showDropdown.value = false;
+    const enabling = !authStore.syncEnabled;
+    dialog.warning({
+        title: 'Confirm',
+        content: enabling
+            ? 'Enable cloud sync? Your data will be synced to the server.'
+            : 'Disable cloud sync? Your data will no longer be synced to the server.',
+        positiveText: 'Yes',
+        negativeText: 'No',
+        onPositiveClick: async () => {
+            await authStore.setSyncEnabled(enabling);
+            message.success(enabling ? 'Sync enabled!' : 'Sync disabled!');
+        },
+    });
 }
 
 async function logout() {
@@ -64,12 +90,27 @@ async function logout() {
         trigger="click"
         placement="bottom-end"
         :show-arrow="false"
-        style="padding: 0; border-radius: 12px; overflow: hidden; min-width: 220px;"
+        style="padding: 0; border-radius: 12px; overflow: hidden; min-width: 220px"
     >
         <template #trigger>
-            <NButton size="tiny" quaternary style="gap: 6px;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #7c6af7; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; overflow: hidden;">
+            <NButton size="tiny" quaternary style="gap: 6px">
+                <div style="display: flex; align-items: center; gap: 6px">
+                    <div
+                        style="
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            background: #7c6af7;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 10px;
+                            font-weight: 700;
+                            color: white;
+                            flex-shrink: 0;
+                            overflow: hidden;
+                        "
+                    >
                         {{ initials }}
                     </div>
                     {{ firstName }}
@@ -85,7 +126,7 @@ async function logout() {
                     round
                     :size="40"
                     color="#7c6af7"
-                    style="font-size: 16px; font-weight: 700; color: white; flex-shrink: 0;"
+                    style="font-size: 16px; font-weight: 700; color: white; flex-shrink: 0"
                 >
                     {{ initials }}
                 </NAvatar>
@@ -95,23 +136,55 @@ async function logout() {
                 </div>
             </div>
 
-            <!-- Sync status -->
-            <div v-if="authStore.syncEnabled" class="mx-4 mb-2 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit">
+            <!-- Sync status badge -->
+            <div
+                v-if="authStore.syncEnabled"
+                class="mx-4 mb-2 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit"
+            >
                 <Icon icon="mdi:cloud-check" />
                 <span>Sync Enabled</span>
             </div>
 
-            <NDivider style="margin: 4px 0;" />
+            <NDivider style="margin: 0" />
 
-            <!-- Actions -->
-            <div class="flex flex-col px-2 pb-2 gap-0.5">
-                <NButton text type="primary" style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px;" @click="goToProfile">
+            <div class="flex flex-col p-2">
+                <!-- Actions -->
+                <NButton
+                    quaternary
+                    type="primary"
+                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
+                    @click="goToProfile"
+                >
                     <template #icon>
                         <NIcon><UserIcon /></NIcon>
                     </template>
                     Profile
                 </NButton>
-                <NButton text block type="error" style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px;" @click="logout">
+                <NButton
+                    quaternary
+                    :type="authStore.syncEnabled ? 'error' : 'warning'"
+                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
+                    @click="toggleSync"
+                >
+                    <template #icon>
+                        <Icon
+                            :icon="
+                                authStore.syncEnabled ? 'mdi:cloud-off-outline' : 'mdi:cloud-sync'
+                            "
+                            style="font-size: 16px"
+                        />
+                    </template>
+                    {{ authStore.syncEnabled ? 'Disable Sync' : 'Enable Sync' }}
+                </NButton>
+            </div>
+            <NDivider style="margin: 0" />
+            <div class="flex flex-col p-2">
+                <NButton
+                    quaternary
+                    type="error"
+                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
+                    @click="logout"
+                >
                     <template #icon>
                         <NIcon><LogoutIcon /></NIcon>
                     </template>
