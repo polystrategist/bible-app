@@ -1,7 +1,6 @@
 import Log from 'electron-log';
 import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
 import path from 'path';
-import installExtension from 'electron-devtools-installer';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
@@ -92,6 +91,7 @@ async function createWindow() {
 app.whenReady().then(async () => {
     if (isDev) {
         try {
+            const { default: installExtension } = await import('electron-devtools-installer');
             await installExtension('nhdogjmejiglipccpnnnanhbledajbpd');
             Log.info('Vue DevTools installed');
         } catch (e) {
