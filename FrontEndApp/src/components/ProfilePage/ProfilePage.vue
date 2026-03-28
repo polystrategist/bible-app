@@ -3,10 +3,12 @@ import { NButton, NCard, NForm, NFormItem, NInput, NSwitch, useMessage } from 'n
 import { ref } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
+import { useRouter } from 'vue-router';
 
 const loading = ref(false);
 const authStore = useAuthStore();
 const message = useMessage();
+const router = useRouter();
 
 async function logout() {
     loading.value = true;
@@ -18,6 +20,7 @@ async function logout() {
     } else {
         message.warning('Logged out (offline).');
     }
+    router.push('/profile');
 }
 
 async function onSyncToggle(enabled: boolean) {
@@ -29,10 +32,19 @@ async function onSyncToggle(enabled: boolean) {
     <div>
         <NCard size="small">
             <NForm v-if="authStore.user">
-                <h3 class="text-lg flex gap-2 items-center mb-2 font-700">
-                    <Icon icon="mdi:account-circle" />
-                    <span>Profile</span>
-                </h3>
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg flex gap-2 items-center font-700">
+                        <Icon icon="mdi:account-circle" />
+                        <span>Profile</span>
+                    </h3>
+                    <div
+                        v-if="authStore.syncEnabled"
+                        class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                    >
+                        <Icon icon="mdi:cloud-check" />
+                        <span>Sync Enabled</span>
+                    </div>
+                </div>
                 <NFormItem label="Name">
                     <NInput :value="authStore.user.name" disabled />
                 </NFormItem>

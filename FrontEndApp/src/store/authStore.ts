@@ -85,10 +85,11 @@ export const useAuthStore = defineStore('authStore', () => {
                 user.value = response.data.user;
                 token.value = response.data.token;
                 isAuthenticated.value = true;
-                
+                syncEnabled.value = response.data.user.sync_enabled === true;
+
                 // Store token in localStorage
                 localStorage.setItem('auth_token', response.data.token);
-                
+
                 return {
                     success: true,
                     message: response.data.message,
@@ -96,7 +97,7 @@ export const useAuthStore = defineStore('authStore', () => {
                     token: response.data.token,
                 };
             }
-            
+
             return { success: false, message: 'Login failed' };
         } catch (error: any) {
             console.error('Login error:', error);
@@ -111,31 +112,28 @@ export const useAuthStore = defineStore('authStore', () => {
      * Logout user
      */
     async function logout(): Promise<{ success: boolean; message: string }> {
-        if (!token.value) {
+        const currentToken = token.value;
+
+        // Always clear local state immediately
+        user.value = null;
+        token.value = null;
+        isAuthenticated.value = false;
+        syncEnabled.value = false;
+        localStorage.removeItem('auth_token');
+
+        if (!currentToken) {
             return { success: false, message: 'No token to logout' };
         }
 
         try {
             await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
                 headers: {
-                    Authorization: `Bearer ${token.value}`,
+                    Authorization: `Bearer ${currentToken}`,
                 },
             });
-
-            user.value = null;
-            token.value = null;
-            isAuthenticated.value = false;
-            localStorage.removeItem('auth_token');
-            
             return { success: true, message: 'Logged out successfully' };
         } catch (error: any) {
             console.error('Logout error:', error);
-            // Clear local state even if API call fails
-            user.value = null;
-            token.value = null;
-            isAuthenticated.value = false;
-            localStorage.removeItem('auth_token');
-            
             return {
                 success: false,
                 message: error.response?.data?.message || error.message || 'Logout failed',
