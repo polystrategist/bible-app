@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 ops_node_modules
+.env
+.env.development
+.env.production

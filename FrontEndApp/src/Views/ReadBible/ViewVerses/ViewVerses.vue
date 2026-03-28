@@ -117,7 +117,6 @@ function checkHere(this: HTMLElement): void {
                 message.info('Copied to Clipboard!');
             }
         } else {
-            console.log('prevent');
             event.preventDefault();
         }
     });

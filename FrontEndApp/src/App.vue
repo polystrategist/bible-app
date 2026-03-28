@@ -23,12 +23,11 @@ import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
-import { isSignedIn } from './util/SupaBase/Auth/Auth';
-import { useUserStore } from './store/userStore';
+import { useAuthStore } from './store/authStore';
 import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
 
 const isMounted = ref(false);
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
@@ -52,8 +51,8 @@ onBeforeMount(async () => {
 });
 
 onMounted(async () => {
-    const userData = await isSignedIn();
-    if (userData) userStore.user = userData;
+    // Initialize auth (token + user + sync state) on every app launch
+    authStore.initAuth();
 
     isMounted.value = true;
 });

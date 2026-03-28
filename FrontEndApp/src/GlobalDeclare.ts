@@ -171,6 +171,23 @@ declare global {
             searchDictionary: (search: string) => Promise<any>;
             getDefinitions: (word: string) => Promise<any>;
 
+            // Sync
+            logSyncChange: (entry: any) => Promise<any>;
+            getUnsyncedChanges: () => Promise<any[]>;
+            markAsSynced: (ids: number[]) => Promise<any>;
+            getLastSyncTimestamp: () => Promise<string>;
+            updateLastSyncTimestamp: (timestamp: string) => Promise<any>;
+            getSyncSetting: (key: string) => Promise<any>;
+            setSyncSetting: (key: string, value: any) => Promise<any>;
+            applyPullData: (data: {
+                study_spaces?: any[];
+                bookmarks?: any[];
+                highlights?: any[];
+                clip_notes?: any[];
+                prayer_lists?: any[];
+                notes?: any[];
+            }) => Promise<{ success: boolean; error?: string }>;
+
         };
     }
 }

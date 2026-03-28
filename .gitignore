@@ -7,3 +7,4 @@ up_using_window.cmd
 .idea
 web/public/app
 GenerateMyBibleModules/venv
+FrontEndApp/.env.prod

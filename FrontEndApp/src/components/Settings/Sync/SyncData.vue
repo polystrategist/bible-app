@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { NSwitch } from 'naive-ui';
-import { useUserStore } from '../../../store/userStore';
+import { useAuthStore } from '../../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useMenuStore } from '../../../store/menu';
 
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const menuStore = useMenuStore();
 </script>
 
@@ -15,18 +15,18 @@ const menuStore = useMenuStore();
             Sync Data <small>*if turned on, your data will be saved online. This way you can </small>
         </div>
         <div class="flex items-center">
-            <NSwitch v-model:value="userStore.syncData" :disabled="!userStore.user">
+            <NSwitch v-model:value="authStore.syncEnabled" :disabled="!authStore.user">
                 <template #checked> Sync</template>
                 <template #unchecked> No</template>
             </NSwitch>
             <span
-                v-show="!userStore.user"
+                v-show="!authStore.user"
                 class="ml-3 flex items-center gap-2 hover:text-[var(--primary-color)] cursor-pointer"
                 @click="menuStore.setMenu('/profile')"
             >
                 Login To Enable this Option
             </span>
-            <span v-show="userStore.syncData" class="ml-3 flex items-center gap-2">
+            <span v-show="authStore.syncEnabled" class="ml-3 flex items-center gap-2">
                 Data Is Being Sync
                 <Icon class="text-[var(--primary-color)]" icon="line-md:loading-alt-loop" />
             </span>

@@ -8,8 +8,6 @@ import TextVue from './Text/Text.vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { DAYJS } from '../../util/dayjs';
 import { useMenuStore } from '../../store/menu';
-import { useUserStore } from '../../store/userStore';
-import { supabase } from '../../util/SupaBase/SupaBase';
 import { Icon } from '@iconify/vue';
 import SermonItems from '../../components/Sermon/SermonItems.vue';
 import SelectContentToCreateModal from '../../components/Sermon/SelectContentToCreateModal.vue';
@@ -19,7 +17,6 @@ import { useThemeStore } from '../../store/theme';
 const SelectContentToCreateModalRef = ref();
 const message = useMessage();
 const dialog = useDialog();
-const userStore = useUserStore();
 const menuStore = useMenuStore();
 const sermonItems = ref<HTMLElement | null>(null);
 const sermonStore = userSermonStore();
@@ -40,55 +37,12 @@ useInfiniteScroll(
     { distance: sermonStore.limit }
 );
 
-function publishSermon(sermon: SERMON_TYPE, publish = true) {
-    dialog.info({
-        title: `${publish ? 'Publish' : 'Unpublish'} Sermon?`,
-        content: `Are you sure you want to ${publish ? 'Publish' : 'Unpublish'} this sermon?`,
-        positiveText: 'Yes',
-        negativeText: 'No, Cancel',
-        onPositiveClick: async () => {
-            message.loading('Publishing');
-            const { error } = await supabase
-                .from('sermons')
-                .update({ is_published: publish })
-                .eq('id', sermon.id);
-            message.destroyAll();
-            if (error) {
-                message.error(error.message);
-                return;
-            }
-
-            message.success('Published!');
-            await sermonStore.getSermons(true);
-        },
-        onNegativeClick: () => {
-            message.info('Canceled.');
-        },
-    });
+function publishSermon(_sermon: SERMON_TYPE, _publish = true) {
+    message.info('Publishing sermons is not yet available.');
 }
 
-function deleteSermon(sermon: SERMON_TYPE) {
-    dialog.error({
-        title: 'Delete Sermon?',
-        content: 'Are you sure you want to delete this sermon?',
-        positiveText: 'Yes',
-        negativeText: 'No, Cancel',
-        onPositiveClick: async () => {
-            message.loading('Deleting Sermon');
-            const { error } = await supabase.from('sermons').delete().eq('id', sermon.id);
-            message.destroyAll();
-            if (error) {
-                message.error(error.message);
-                return;
-            }
-
-            message.success('Sermon Deleted!');
-            await sermonStore.getSermons(true);
-        },
-        onNegativeClick: () => {
-            message.info('Canceled.');
-        },
-    });
+function deleteSermon(_sermon: SERMON_TYPE) {
+    message.info('Deleting sermons is not yet available.');
 }
 
 function handleBelieversSwordInfoDialog() {

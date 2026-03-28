@@ -15,6 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
+    Route::patch('/auth/preferences', [AuthController::class, 'updatePreferences']);
     
     // Sync routes
     Route::post('/sync', [SyncController::class, 'sync']);

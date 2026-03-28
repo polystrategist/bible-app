@@ -32,7 +32,6 @@ function clickDownload(downloadLink: string, version: any) {
     window.browserWindow.downloadModule({
         urls: [downloadLink],
         percentage: (percentage: number) => {
-            console.log(percentage);
             downloadPercentage.value = percentage;
         },
         done: async () => {

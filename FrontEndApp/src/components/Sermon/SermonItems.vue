@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { NIcon, NTag } from 'naive-ui';
-import { useUserStore } from '../../store/userStore';
+import { useAuthStore } from '../../store/authStore';
 import { DAYJS } from '../../util/dayjs';
 import { Delete, LogoYoutube, TextAlignJustify } from '@vicons/carbon';
 import { Icon } from '@iconify/vue';
 import { SERMON_TYPE } from '../../store/Sermons';
 
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const props = defineProps<{
     sermon: SERMON_TYPE
 }>();
@@ -28,7 +28,7 @@ const emit = defineEmits(['showContent','publishSermon', 'deleteSermon']);
                 {{ sermon.title }}
             </div>
 
-            <div v-if="userStore.user_id == sermon.added_by" class="absolute top-1 left-1 flex flex-col gap-1">
+            <div v-if="authStore.user?.id == sermon.added_by" class="absolute top-1 left-1 flex flex-col gap-1">
                 <div v-if="!sermon.is_published" class="bg-orange-700 px-2 rounded-md select-none text-white"
                     @click.stop="emit('publishSermon',sermon)">
                     Not Published

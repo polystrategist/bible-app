@@ -148,4 +148,24 @@ class AuthController extends Controller
             'user' => $request->user(),
         ]);
     }
+
+    /**
+     * Update user preferences (e.g. sync_enabled)
+     *
+     * PATCH /api/auth/preferences
+     */
+    public function updatePreferences(Request $request)
+    {
+        $request->validate([
+            'sync_enabled' => 'required|boolean',
+        ]);
+
+        $user = $request->user();
+        $user->update(['sync_enabled' => $request->boolean('sync_enabled')]);
+
+        return response()->json([
+            'status' => 'success',
+            'user'   => $user,
+        ]);
+    }
 }
