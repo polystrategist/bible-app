@@ -66,10 +66,10 @@ watch(
     }
 );
 
-// Stop TTS when the chapter or book changes
+// Stop TTS when the chapter or book changes — unless TTS itself triggered the chapter advance
 watch(
     () => [bibleStore.selectedChapter, bibleStore.selectedBookNumber],
-    () => { if (ttsStore.isActive) ttsStore.stop(); }
+    () => { if (ttsStore.isActive && !ttsStore.autoAdvancing) ttsStore.stop(); }
 );
 
 function navigateChapter(action: 'next' | 'before') {

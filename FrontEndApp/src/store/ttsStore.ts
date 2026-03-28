@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useBibleStore } from './BibleStore';
 
 export const useTTSStore = defineStore('ttsStore', () => {
@@ -9,6 +9,7 @@ export const useTTSStore = defineStore('ttsStore', () => {
     const activeVerseNumber = ref<number | null>(null);
     const playbackRate = ref(1);
     const selectedVersionIndex = ref(0);
+    const autoAdvancing = ref(false);
     const voices = ref<SpeechSynthesisVoice[]>([]);
     const selectedVoiceURI = ref('');
 
@@ -51,6 +52,21 @@ export const useTTSStore = defineStore('ttsStore', () => {
         } catch {
             // not available
         }
+
+        // Watch for chapter load after auto-advance
+        const bibleStore = useBibleStore();
+        watch(
+            () => bibleStore.renderVerses,
+            (verses) => {
+                if (autoAdvancing.value && verses.length > 0) {
+                    autoAdvancing.value = false;
+                    setTimeout(() => {
+                        startKeepAlive();
+                        speakVerse(0);
+                    }, 100);
+                }
+            }
+        );
     }
 
     function getSelectedVoice(): SpeechSynthesisVoice | null {
@@ -82,17 +98,31 @@ export const useTTSStore = defineStore('ttsStore', () => {
         const verses = bibleStore.renderVerses;
 
         if (index >= verses.length) {
-            isPlaying.value = false;
-            isPaused.value = false;
-            activeVerseNumber.value = null;
-            currentVerseIndex.value = -1;
-            stopKeepAlive();
+            // Try to advance to the next chapter
+            const nextChapter = bibleStore.selectedChapter + 1;
+            if (nextChapter <= bibleStore.selectedBook.chapter_count) {
+                autoAdvancing.value = true;
+                bibleStore.selectChapter(nextChapter);
+            } else {
+                // End of book
+                isPlaying.value = false;
+                isPaused.value = false;
+                activeVerseNumber.value = null;
+                currentVerseIndex.value = -1;
+                stopKeepAlive();
+            }
             return;
         }
 
         currentVerseIndex.value = index;
         const verse = verses[index];
         activeVerseNumber.value = verse.verse;
+
+        // Select and scroll to the verse being read
+        try {
+            bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse);
+            bibleStore.AutoScrollSavedPosition(100);
+        } catch { /* ignore */ }
 
         const rawText = verse.version[selectedVersionIndex.value]?.text ?? verse.version[0]?.text ?? '';
         const text = `Verse ${verse.verse}. ${stripHtml(rawText)}`;
@@ -170,6 +200,7 @@ export const useTTSStore = defineStore('ttsStore', () => {
         currentVerseIndex.value = -1;
         activeVerseNumber.value = null;
         selectedVersionIndex.value = 0;
+        autoAdvancing.value = false;
         stopKeepAlive();
     }
 
@@ -199,6 +230,7 @@ export const useTTSStore = defineStore('ttsStore', () => {
         currentVerseIndex,
         activeVerseNumber,
         selectedVersionIndex,
+        autoAdvancing,
         playbackRate,
         voices,
         voiceOptions,
