@@ -91,10 +91,12 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         applyBodyThemeClass();
         changeTheRootProperty();
 
-        // When remote settings load (after login/initAuth), apply them
+        // When remote settings load (after login/initAuth), apply them.
+        // Skip if there are pending local changes — local always wins until flushed.
         const authStore = useAuthStore();
         watch(() => authStore.remoteSettings, (settings) => {
             if (!settings) return;
+            if (authStore.pendingSettingsUpdate) return;
             selectedTheme.value = settings.selected_theme as typeNameInterface;
             isDark.value = settings.is_dark;
             backgroundTheme.value = settings.background_theme as backgroundThemeType;

@@ -84,6 +84,12 @@ export async function runSync(): Promise<void> {
         await pullSync(authStore.token);
     } catch (error: any) {
         const status = error?.response?.status;
+        if (status === 401) {
+            // Token expired or revoked — force logout so the user is prompted to log back in
+            console.warn('[Sync] Token rejected (401) — logging out.');
+            authStore.logout();
+            return;
+        }
         const data = error?.response?.data;
         console.error(`[Sync] Error (HTTP ${status ?? 'network'}):`, data ?? error?.message ?? error);
     } finally {

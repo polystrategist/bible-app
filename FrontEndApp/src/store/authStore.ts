@@ -33,6 +33,23 @@ export const useAuthStore = defineStore('authStore', () => {
     const isAuthenticated = ref(false);
     const remoteSettings = ref<UserSettings | null>(null);
 
+    // Pending settings that failed to reach the server (e.g. offline).
+    // Stored in localStorage so they survive app restarts.
+    const pendingSettingsUpdate = ref<Partial<UserSettings> | null>(
+        (() => {
+            try { return JSON.parse(localStorage.getItem('pending_theme_settings') || 'null'); }
+            catch { return null; }
+        })()
+    );
+
+    // Pending sync_enabled preference (separate endpoint from theme settings).
+    const pendingSyncEnabled = ref<boolean | null>(
+        (() => {
+            const v = localStorage.getItem('pending_sync_enabled');
+            return v === null ? null : v === '1';
+        })()
+    );
+
     /**
      * Register a new user
      */
@@ -54,10 +71,9 @@ export const useAuthStore = defineStore('authStore', () => {
                 user.value = response.data.user;
                 token.value = response.data.token;
                 isAuthenticated.value = true;
-                
-                // Store token in localStorage for persistence
+
                 localStorage.setItem('auth_token', response.data.token);
-                
+
                 return {
                     success: true,
                     message: response.data.message,
@@ -65,7 +81,7 @@ export const useAuthStore = defineStore('authStore', () => {
                     token: response.data.token,
                 };
             }
-            
+
             return { success: false, message: 'Registration failed' };
         } catch (error: any) {
             console.error('Registration error:', error);
@@ -95,10 +111,9 @@ export const useAuthStore = defineStore('authStore', () => {
                 isAuthenticated.value = true;
                 syncEnabled.value = response.data.user.sync_enabled === true;
 
-                // Store token in localStorage
                 localStorage.setItem('auth_token', response.data.token);
 
-                // Load remote settings after login
+                // Load remote settings after login (fire-and-forget)
                 loadSettings();
 
                 return {
@@ -131,7 +146,11 @@ export const useAuthStore = defineStore('authStore', () => {
         isAuthenticated.value = false;
         syncEnabled.value = false;
         remoteSettings.value = null;
+        pendingSettingsUpdate.value = null;
+        pendingSyncEnabled.value = null;
         localStorage.removeItem('auth_token');
+        localStorage.removeItem('pending_theme_settings');
+        localStorage.removeItem('pending_sync_enabled');
 
         if (!currentToken) {
             return { success: false, message: 'No token to logout' };
@@ -139,9 +158,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
         try {
             await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
-                headers: {
-                    Authorization: `Bearer ${currentToken}`,
-                },
+                headers: { Authorization: `Bearer ${currentToken}` },
             });
             return { success: true, message: 'Logged out successfully' };
         } catch (error: any) {
@@ -156,13 +173,14 @@ export const useAuthStore = defineStore('authStore', () => {
     let getUserPromise: Promise<User | null> | null = null;
 
     /**
-     * Get current user info
+     * Get current user info.
+     * Only clears auth state on 401/403 — network errors keep existing state
+     * so the user is not logged out when offline.
      */
     function getUser(): Promise<User | null> {
         if (user.value) return Promise.resolve(user.value);
         if (!token.value) return Promise.resolve(null);
 
-        // Deduplicate concurrent calls — return the in-flight promise if one exists
         if (getUserPromise) return getUserPromise;
 
         getUserPromise = axios.get(`${API_BASE_URL}/auth/user`, {
@@ -176,10 +194,15 @@ export const useAuthStore = defineStore('authStore', () => {
             return null;
         }).catch((error: any) => {
             console.error('Get user error:', error);
-            user.value = null;
-            token.value = null;
-            isAuthenticated.value = false;
-            localStorage.removeItem('auth_token');
+            const status = error?.response?.status;
+            if (status === 401 || status === 403) {
+                // Token invalid — clear auth
+                user.value = null;
+                token.value = null;
+                isAuthenticated.value = false;
+                localStorage.removeItem('auth_token');
+            }
+            // Network errors: keep existing auth state — user is just offline
             return null;
         }).finally(() => {
             getUserPromise = null;
@@ -188,11 +211,78 @@ export const useAuthStore = defineStore('authStore', () => {
         return getUserPromise;
     }
 
+    // Guard against concurrent flush calls (e.g. focus + online firing together)
+    let isFlushing = false;
+
     /**
-     * Load user settings from the backend
+     * Flush any pending settings/preferences to the backend.
+     * Called on reconnect, focus, and before loadSettings.
+     */
+    async function flushPendingSettings(): Promise<boolean> {
+        if (isFlushing || !token.value) return false;
+        if (!pendingSettingsUpdate.value && pendingSyncEnabled.value === null) return false;
+
+        isFlushing = true;
+        let allFlushed = true;
+
+        try {
+            // Flush theme settings
+            if (pendingSettingsUpdate.value) {
+                try {
+                    const response = await axios.patch(`${API_BASE_URL}/settings`, pendingSettingsUpdate.value, {
+                        headers: { Authorization: `Bearer ${token.value}` },
+                    });
+                    if (response.data.status === 'success') {
+                        remoteSettings.value = response.data.settings;
+                        pendingSettingsUpdate.value = null;
+                        localStorage.removeItem('pending_theme_settings');
+                    } else {
+                        allFlushed = false;
+                    }
+                } catch {
+                    allFlushed = false; // Still offline
+                }
+            }
+
+            // Flush sync_enabled preference
+            if (pendingSyncEnabled.value !== null) {
+                try {
+                    const response = await axios.patch(
+                        `${API_BASE_URL}/auth/preferences`,
+                        { sync_enabled: pendingSyncEnabled.value },
+                        { headers: { Authorization: `Bearer ${token.value}` } }
+                    );
+                    if (response.data.status === 'success') {
+                        user.value = response.data.user;
+                        pendingSyncEnabled.value = null;
+                        localStorage.removeItem('pending_sync_enabled');
+                    } else {
+                        allFlushed = false;
+                    }
+                } catch {
+                    allFlushed = false; // Still offline
+                }
+            }
+        } finally {
+            isFlushing = false;
+        }
+
+        return allFlushed;
+    }
+
+    /**
+     * Load user settings from the backend.
+     * Flushes any pending local changes first — local always wins.
      */
     async function loadSettings(): Promise<UserSettings | null> {
         if (!token.value) return null;
+
+        // Pending local changes take priority — flush before pulling server state
+        if (pendingSettingsUpdate.value) {
+            await flushPendingSettings();
+            return remoteSettings.value;
+        }
+
         try {
             const response = await axios.get(`${API_BASE_URL}/settings`, {
                 headers: { Authorization: `Bearer ${token.value}` },
@@ -202,54 +292,83 @@ export const useAuthStore = defineStore('authStore', () => {
                 return response.data.settings as UserSettings;
             }
         } catch {
-            // best-effort
+            // Offline — keep using local settings, no change to remoteSettings
         }
         return null;
     }
 
     /**
-     * Persist one or more user setting fields to the backend
+     * Persist theme settings to the backend.
+     * Queues the update locally so it survives offline scenarios.
      */
     async function updateSettings(data: Partial<UserSettings>): Promise<void> {
         if (!token.value) return;
+
+        // Merge into pending so rapid changes collapse into one request
+        const merged = { ...(pendingSettingsUpdate.value ?? {}), ...data };
+        pendingSettingsUpdate.value = merged;
+        localStorage.setItem('pending_theme_settings', JSON.stringify(merged));
+
+        if (isFlushing) return; // A flush is already in progress — pending will be sent then
+
         try {
-            const response = await axios.patch(`${API_BASE_URL}/settings`, data, {
+            const response = await axios.patch(`${API_BASE_URL}/settings`, merged, {
                 headers: { Authorization: `Bearer ${token.value}` },
             });
             if (response.data.status === 'success') {
                 remoteSettings.value = response.data.settings;
+                pendingSettingsUpdate.value = null;
+                localStorage.removeItem('pending_theme_settings');
             }
         } catch {
-            // best-effort — local theme state is already applied
+            // Offline — pending saved to localStorage, will flush on reconnect/focus
         }
     }
 
     /**
-     * Initialize auth state from localStorage
+     * Initialize auth state from localStorage.
      */
     function initAuth() {
         const savedToken = localStorage.getItem('auth_token');
         if (savedToken) {
             token.value = savedToken;
             isAuthenticated.value = true;
-            // Fetch user info then settings in sequence
             getUser().then((u) => {
                 if (u) loadSettings();
             });
         }
+
+        // On reconnect: flush pending changes then pull fresh settings
+        window.addEventListener('online', onOnline);
+    }
+
+    function cleanupListeners() {
+        window.removeEventListener('online', onOnline);
+    }
+
+    async function onOnline() {
+        if (!isAuthenticated.value) return;
+        await flushPendingSettings();
+        // Pull fresh settings from server in case another device made changes
+        if (!pendingSettingsUpdate.value) loadSettings();
     }
 
     /**
-     * Whether syncing is enabled (persisted via sync_settings table)
+     * Whether syncing is enabled
      */
     const syncEnabled = ref(false);
     let syncInterval: ReturnType<typeof setInterval> | null = null;
 
     function startSyncInterval() {
         if (syncInterval) return;
-        runSync(); // run immediately on enable
+        flushPendingSettings().then(() => runSync());
         syncInterval = setInterval(runSync, 5 * 60 * 1_000);
-        window.addEventListener('focus', runSync);
+        window.addEventListener('focus', onFocus);
+    }
+
+    async function onFocus() {
+        await flushPendingSettings();
+        runSync();
     }
 
     function stopSyncInterval() {
@@ -257,7 +376,7 @@ export const useAuthStore = defineStore('authStore', () => {
             clearInterval(syncInterval);
             syncInterval = null;
         }
-        window.removeEventListener('focus', runSync);
+        window.removeEventListener('focus', onFocus);
     }
 
     async function loadSyncEnabled() {
@@ -269,25 +388,37 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
+    /**
+     * Toggle cloud sync on/off.
+     * Queues the preference locally so it's not lost if offline.
+     */
     async function setSyncEnabled(enabled: boolean) {
         syncEnabled.value = enabled;
-        // Persist locally
+
         try {
             await window.browserWindow.setSyncSetting('sync_enabled', enabled ? '1' : '0');
         } catch {
             // best-effort
         }
-        // Persist to backend (source of truth)
+
+        // Save to pending in case we're offline
+        pendingSyncEnabled.value = enabled;
+        localStorage.setItem('pending_sync_enabled', enabled ? '1' : '0');
+
         if (token.value) {
             try {
-                const response = await axios.patch(`${API_BASE_URL}/auth/preferences`, { sync_enabled: enabled }, {
-                    headers: { Authorization: `Bearer ${token.value}` },
-                });
+                const response = await axios.patch(
+                    `${API_BASE_URL}/auth/preferences`,
+                    { sync_enabled: enabled },
+                    { headers: { Authorization: `Bearer ${token.value}` } }
+                );
                 if (response.data.status === 'success') {
                     user.value = response.data.user;
+                    pendingSyncEnabled.value = null;
+                    localStorage.removeItem('pending_sync_enabled');
                 }
             } catch {
-                // best-effort — local state is already updated
+                // Offline — pending saved, will flush on reconnect
             }
         }
     }
@@ -301,8 +432,12 @@ export const useAuthStore = defineStore('authStore', () => {
     });
 
     watch(isAuthenticated, (authenticated) => {
-        if (!authenticated) stopSyncInterval();
-        else if (syncEnabled.value) startSyncInterval();
+        if (!authenticated) {
+            stopSyncInterval();
+            cleanupListeners();
+        } else if (syncEnabled.value) {
+            startSyncInterval();
+        }
     });
 
     return {
@@ -311,6 +446,8 @@ export const useAuthStore = defineStore('authStore', () => {
         isAuthenticated,
         syncEnabled,
         remoteSettings,
+        pendingSettingsUpdate,
+        pendingSyncEnabled,
         register,
         login,
         logout,
@@ -320,5 +457,6 @@ export const useAuthStore = defineStore('authStore', () => {
         setSyncEnabled,
         loadSettings,
         updateSettings,
+        flushPendingSettings,
     };
 });
