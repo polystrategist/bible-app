@@ -10,11 +10,13 @@ import { Book24Regular, Note24Regular, Note28Filled, PointScan24Filled } from '@
 import useNoteStore from '../../store/useNoteStore';
 import { useSettingStore } from '../../store/settingStore';
 import { useTTSStore } from '../../store/ttsStore';
+import { usePiperTTSStore } from '../../store/piperTTSStore';
 import TTSFooterPlayer from '../TTS/TTSFooterPlayer.vue';
 
 const noteStore = useNoteStore();
 const bibleStore = useBibleStore();
 const ttsStore = useTTSStore();
+const piperStore = usePiperTTSStore();
 const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
@@ -73,7 +75,7 @@ onMounted(() => {
             class="w-full text-center z-50 font-700 flex items-center justify-center flex items-center gap-2"
         >
             <!-- TTS player takes over center when active -->
-            <TTSFooterPlayer v-if="ttsStore.isActive && menuStore.menuSelected === 'read-bible'" />
+            <TTSFooterPlayer v-if="(ttsStore.isActive || piperStore.isActive) && menuStore.menuSelected === 'read-bible'" />
             <template v-else>
                 <VerseSelectorButton v-if="menuStore.menuSelected === 'read-bible'" size="tiny">
                     <template #icon>

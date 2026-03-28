@@ -82,6 +82,23 @@ contextBridge.exposeInMainWorld('browserWindow', {
     searchDictionary: (args: any) => ipcRenderer.invoke('searchDictionary', args),
     getDefinitions: (word: string) => ipcRenderer.invoke('getDefinitions', word),
 
+    // Piper TTS
+    piperStatus: () => ipcRenderer.invoke('piper:status'),
+    piperInstall: () => ipcRenderer.invoke('piper:install'),
+    piperUninstall: () => ipcRenderer.invoke('piper:uninstall'),
+    piperSpeak: (text: string, modelId?: string) => ipcRenderer.invoke('piper:speak', text, modelId),
+    piperVoices: () => ipcRenderer.invoke('piper:voices'),
+    piperInstallModel: (voiceId: string) => ipcRenderer.invoke('piper:installModel', voiceId),
+    piperDeleteModel: (voiceId: string) => ipcRenderer.invoke('piper:deleteModel', voiceId),
+    piperOnInstallProgress: (cb: (data: { step: string; percent: number }) => void) => {
+        ipcRenderer.removeAllListeners('piper:install-progress');
+        ipcRenderer.on('piper:install-progress', (_event, data) => cb(data));
+    },
+    piperOnModelProgress: (cb: (data: { voiceId: string; percent: number }) => void) => {
+        ipcRenderer.removeAllListeners('piper:model-progress');
+        ipcRenderer.on('piper:model-progress', (_event, data) => cb(data));
+    },
+
     // Sync Operations
     logSyncChange: (entry: any) => ipcRenderer.invoke('logSyncChange', entry),
     getUnsyncedChanges: () => ipcRenderer.invoke('getUnsyncedChanges'),
