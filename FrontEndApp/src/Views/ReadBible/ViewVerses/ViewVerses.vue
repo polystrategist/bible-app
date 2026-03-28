@@ -19,12 +19,26 @@ import { Note24Regular, Note28Filled } from '@vicons/fluent';
 import { useThemeStore } from '../../../store/theme';
 import useNoteStore from '../../../store/useNoteStore';
 import { useTTSStore } from '../../../store/ttsStore';
+import { useSettingStore } from '../../../store/settingStore';
 import { Icon } from '@iconify/vue';
 
 const { t } = useI18n();
 const themeStore = useThemeStore();
 const noteStore = useNoteStore();
 const ttsStore = useTTSStore();
+const settingStore = useSettingStore();
+
+function playVerse(verseIndex: number, versionIndex: number) {
+    switch (settingStore.verseReaderMode) {
+        case 'browser-tts':
+        default:
+            ttsStore.playFromVerse(verseIndex, versionIndex);
+            break;
+        // Future readers plug in here:
+        // case 'ai-model': aiReaderStore.playFromVerse(verseIndex, versionIndex); break;
+        // case 'audio-link': audioLinkStore.playFromVerse(verseIndex, versionIndex); break;
+    }
+}
 const dialog = useDialog();
 const clipNoteStore = useClipNoteStore();
 const fontSizeOfShowChapter = 'font-size-of-show-chapter';
@@ -326,7 +340,7 @@ onMounted(() => {
                                     circle
                                     class="opacity-0 group-hover:opacity-100 transition-opacity"
                                     title="Read from this verse"
-                                    @click.stop="ttsStore.playFromVerse(verseIndex)"
+                                    @click.stop="playVerse(verseIndex, 0)"
                                 >
                                     <Icon icon="mdi:play" style="font-size: 14px;" />
                                 </NButton>
@@ -391,7 +405,7 @@ onMounted(() => {
                                             class="opacity-0 group-hover:opacity-100 transition-opacity"
                                             style="vertical-align: middle; margin: 0 1px;"
                                             title="Read from this verse"
-                                            @click.stop="ttsStore.playFromVerse(verseIndex, versionIndex as any)"
+                                            @click.stop="playVerse(verseIndex, versionIndex as number)"
                                         >
                                             <Icon icon="mdi:play" :style="`font-size: ${fontSize - 3}px;`" />
                                         </NButton>
