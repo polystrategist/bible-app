@@ -25,7 +25,9 @@ export const useTTSStore = defineStore('ttsStore', () => {
     function stripHtml(html: string): string {
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || '';
+        const text = tmp.textContent || tmp.innerText || '';
+        // Remove footnote/cross-reference markers like [5], [16], etc.
+        return text.replace(/\[\d+\]/g, '');
     }
 
     function loadVoices() {
