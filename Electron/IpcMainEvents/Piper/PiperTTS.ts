@@ -5,12 +5,31 @@ import path from 'path';
 import { spawn } from 'child_process';
 import Log from 'electron-log';
 
+const platform = process.platform; // 'win32' | 'darwin' | 'linux'
+const arch = process.arch;         // 'x64' | 'arm64'
+
 const piperDir = path.join(app.getPath('userData'), 'piper');
-const piperExe = path.join(piperDir, 'piper.exe');
+const piperExeName = platform === 'win32' ? 'piper.exe' : 'piper';
+const piperExe = path.join(piperDir, piperExeName);
 const modelsDir = path.join(piperDir, 'models');
 
-// GitHub release URLs for Piper Windows binary
-const PIPER_BINARY_URL = 'https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip';
+const PIPER_RELEASE_BASE = 'https://github.com/rhasspy/piper/releases/download/2023.11.14-2';
+
+function getPiperBinaryUrl(): string {
+    if (platform === 'win32') return `${PIPER_RELEASE_BASE}/piper_windows_amd64.zip`;
+    if (platform === 'darwin') {
+        return arch === 'arm64'
+            ? `${PIPER_RELEASE_BASE}/piper_macos_aarch64.tar.gz`
+            : `${PIPER_RELEASE_BASE}/piper_macos_x64.tar.gz`;
+    }
+    // linux
+    return arch === 'arm64'
+        ? `${PIPER_RELEASE_BASE}/piper_linux_aarch64.tar.gz`
+        : `${PIPER_RELEASE_BASE}/piper_linux_x86_64.tar.gz`;
+}
+
+const PIPER_BINARY_URL = getPiperBinaryUrl();
+const PIPER_ARCHIVE_FILENAME = platform === 'win32' ? 'piper.zip' : 'piper.tar.gz';
 
 const DEFAULT_MODEL_NAME = 'en_US-ryan-high';
 
@@ -102,48 +121,83 @@ function getPiperStatus(): { binaryReady: boolean; modelReady: boolean; modelNam
     return { binaryReady, modelReady, modelName: DEFAULT_MODEL_NAME };
 }
 
+// Recursively copy directory contents — shared by both extractors
+function copyContents(srcDir: string, destDir: string) {
+    ensureDir(destDir);
+    for (const f of fs.readdirSync(srcDir)) {
+        const full = path.join(srcDir, f);
+        const dest = path.join(destDir, f);
+        if (fs.statSync(full).isDirectory()) {
+            copyContents(full, dest);
+        } else {
+            fs.copyFileSync(full, dest);
+            Log.info('[Piper] Extracted:', f);
+        }
+    }
+}
+
+function finishExtraction(tmpDir: string, archivePath: string): void {
+    // The archive has one top-level folder; copy its contents into piperDir
+    const entries = fs.readdirSync(tmpDir);
+    const innerDir =
+        entries.length === 1 && fs.statSync(path.join(tmpDir, entries[0])).isDirectory()
+            ? path.join(tmpDir, entries[0])
+            : tmpDir;
+    copyContents(innerDir, piperDir);
+
+    if (!fs.existsSync(piperExe)) throw new Error(`${piperExeName} not found after extraction`);
+
+    // Make executable on macOS / Linux
+    if (platform !== 'win32') fs.chmodSync(piperExe, 0o755);
+
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    fs.unlinkSync(archivePath);
+    Log.info('[Piper] Binary extracted to', piperDir);
+}
+
 async function extractPiperZip(zipPath: string): Promise<boolean> {
     try {
         const extract = (await import('extract-zip')).default;
         const tmpDir = path.join(piperDir, '_tmp_extract');
         ensureDir(tmpDir);
         await extract(zipPath, { dir: tmpDir });
-
-        // Piper zip contains a subdirectory (e.g. "piper/") with piper.exe, DLLs,
-        // and espeak-ng-data/. Preserve directory structure so piper.exe can find
-        // both DLLs and espeak-ng-data/ at runtime.
-        function copyContents(srcDir: string, destDir: string) {
-            ensureDir(destDir);
-            for (const f of fs.readdirSync(srcDir)) {
-                const full = path.join(srcDir, f);
-                const dest = path.join(destDir, f);
-                if (fs.statSync(full).isDirectory()) {
-                    copyContents(full, dest);
-                } else {
-                    fs.copyFileSync(full, dest);
-                    Log.info('[Piper] Extracted:', f);
-                }
-            }
-        }
-
-        // Find the inner piper/ subdirectory (the zip has one top-level folder)
-        const entries = fs.readdirSync(tmpDir);
-        const innerDir =
-            entries.length === 1 && fs.statSync(path.join(tmpDir, entries[0])).isDirectory()
-                ? path.join(tmpDir, entries[0])
-                : tmpDir;
-        copyContents(innerDir, piperDir);
-
-        if (!fs.existsSync(piperExe)) throw new Error('piper.exe not found after extraction');
-
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        fs.unlinkSync(zipPath);
-        Log.info('[Piper] Binary and DLLs extracted to', piperDir);
+        finishExtraction(tmpDir, zipPath);
         return true;
     } catch (err) {
-        Log.error('[Piper] Extract failed:', err);
+        Log.error('[Piper] ZIP extract failed:', err);
         return false;
     }
+}
+
+function extractPiperTar(tarPath: string): Promise<boolean> {
+    return new Promise((resolve) => {
+        const tmpDir = path.join(piperDir, '_tmp_extract');
+        ensureDir(tmpDir);
+
+        const proc = spawn('tar', ['-xzf', tarPath, '-C', tmpDir]);
+
+        proc.stderr.on('data', (d: Buffer) => Log.info('[Piper tar]', d.toString()));
+
+        proc.on('close', (code) => {
+            try {
+                if (code !== 0) throw new Error(`tar exited with code ${code}`);
+                finishExtraction(tmpDir, tarPath);
+                resolve(true);
+            } catch (err) {
+                Log.error('[Piper] TAR extract failed:', err);
+                resolve(false);
+            }
+        });
+
+        proc.on('error', (err) => {
+            Log.error('[Piper] tar spawn error:', err);
+            resolve(false);
+        });
+    });
+}
+
+function extractPiperArchive(archivePath: string): Promise<boolean> {
+    return platform === 'win32' ? extractPiperZip(archivePath) : extractPiperTar(archivePath);
 }
 
 export function PiperTTSHandlers(mainWindow: BrowserWindow) {
@@ -164,11 +218,11 @@ export function PiperTTSHandlers(mainWindow: BrowserWindow) {
         try {
             // Step 1: Download piper binary zip (~4MB)
             mainWindow.webContents.send('piper:install-progress', { step: 'binary', percent: 0 });
-            const zipPath = path.join(piperDir, 'piper.zip');
+            const archivePath = path.join(piperDir, PIPER_ARCHIVE_FILENAME);
 
             await download(mainWindow, PIPER_BINARY_URL, {
                 directory: piperDir,
-                filename: 'piper.zip',
+                filename: PIPER_ARCHIVE_FILENAME,
                 saveAs: false,
                 overwrite: true,
                 onProgress: (p) => {
@@ -179,7 +233,7 @@ export function PiperTTSHandlers(mainWindow: BrowserWindow) {
                 },
             });
 
-            const extracted = await extractPiperZip(zipPath);
+            const extracted = await extractPiperArchive(archivePath);
             if (!extracted) return { success: false, error: 'Failed to extract piper binary' };
 
             // Step 2: Download default model .onnx (~63MB)
