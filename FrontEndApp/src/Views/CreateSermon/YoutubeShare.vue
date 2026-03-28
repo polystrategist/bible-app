@@ -7,6 +7,7 @@ import { DAYJS } from '../../util/dayjs';
 import { useAuthStore } from '../../store/authStore';
 import { useRouter } from 'vue-router';
 import { Close } from '@vicons/carbon';
+import axios from 'axios';
 
 const router = useRouter();
 const authStore = useAuthStore();
