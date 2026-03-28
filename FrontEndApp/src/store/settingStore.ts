@@ -5,14 +5,19 @@ import SESSION from '../util/session';
 export const useSettingStore = defineStore('settingStore', () => {
     const showDeuterocanonicalStorageKey = 'show-deuterocanonical';
     const appScaleStorageKey = 'app-scale';
+    const verseReaderModeKey = 'verse-reader-mode';
     const showDeuterocanonical = ref(false);
     const appScale = ref(1);
     const isLoadingScale = ref(false);
+    const verseReaderMode = ref<string>('browser-tts');
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
         if (showDeuterocanonicalStored) showDeuterocanonical.value = showDeuterocanonicalStored;
         else SESSION.set(showDeuterocanonicalStorageKey, showDeuterocanonical.value);
+
+        const savedVerseReaderMode = SESSION.get(verseReaderModeKey);
+        if (savedVerseReaderMode) verseReaderMode.value = savedVerseReaderMode;
 
         const savedScale = Number(SESSION.get(appScaleStorageKey));
         const fallbackScale = Number.isFinite(savedScale) ? savedScale : 1;
@@ -63,8 +68,14 @@ export const useSettingStore = defineStore('settingStore', () => {
         }
     );
 
+    watch(
+        () => verseReaderMode.value,
+        (val) => SESSION.set(verseReaderModeKey, val)
+    );
+
     return {
         showDeuterocanonical,
         appScale,
+        verseReaderMode,
     };
 });

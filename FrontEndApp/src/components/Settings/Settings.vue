@@ -9,6 +9,8 @@ import { ref } from 'vue';
 import SyncData from './Sync/SyncData.vue';
 import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
 import Scale from './Scale/Scale.vue';
+import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
+import { Icon } from '@iconify/vue';
 
 const name = ref('General');
 </script>
@@ -45,6 +47,18 @@ const name = ref('General');
                         </span>
                     </template>
                     <TabSetting />
+                </NTabPane>
+                <NTabPane class="h-full overflow-y-auto overflowing-div" name="VerseReader">
+                    <template #tab>
+                        <span class="flex items-center gap-1">
+                            <Icon icon="mdi:account-voice" style="font-size: 16px;" />
+                            Verse Reader
+                        </span>
+                    </template>
+                    <div class="py-3">
+                        <p class="text-xs opacity-50 mb-4">Choose how Bible verses are read aloud. More options will be available in future updates.</p>
+                        <VerseReaderSetting />
+                    </div>
                 </NTabPane>
             </NTabs>
         </div>

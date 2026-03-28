@@ -14,12 +14,13 @@ watch(locale, (lang) => {
 </script>
 <template>
     <div>
-        <div class="text-size-16px mb-2">
+        <div class="text-size-16px mb-1">
             <NIcon>
                 <Language />
             </NIcon>
             {{ $t('Language') }}
         </div>
+        <p class="text-xs opacity-50 mb-2">Choose the display language for the app interface.</p>
         <NSelect
             class="max-w-300px"
             size="small"
