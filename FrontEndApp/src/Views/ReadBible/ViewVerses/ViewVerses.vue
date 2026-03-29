@@ -133,14 +133,15 @@ watch(
     () => { const s = activeStore(); if (s.isActive && !s.autoAdvancing) s.stop(); }
 );
 
-function navigateChapter(action: 'next' | 'before') {
+async function navigateChapter(action: 'next' | 'before') {
     if (action == 'before' && bibleStore.selectedChapter == 1) return;
     if (action == 'next' && bibleStore.selectedChapter == bibleStore.selectedBook.chapter_count)
         return;
 
-    bibleStore.selectChapter(
+    await bibleStore.selectChapter(
         action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1
     );
+    bibleStore.AutoScrollSavedPosition();
 }
 
 function clickContextMenu(verse: Object) {

@@ -176,6 +176,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         },
         async selectChapter(chapter: number) {
             selectedChapter.value = chapter;
+            selectedVerse.value = 1;
             saveVersesToStorage();
             await getVerses();
         },
@@ -185,6 +186,10 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             selectedVerse.value = verse;
             saveVersesToStorage();
             await getVerses();
+        },
+        setActiveVerse(verse: number) {
+            selectedVerse.value = verse;
+            saveVersesToStorage();
         },
         getSelectedData: computed(() => {
             const bookChosen =
