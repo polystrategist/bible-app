@@ -97,7 +97,10 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
             const nextChapter = bibleStore.selectedChapter + 1;
             if (nextChapter <= bibleStore.selectedBook.chapter_count) {
                 autoAdvancing.value = true;
-                bibleStore.selectChapter(nextChapter);
+                bibleStore.selectChapter(nextChapter).then(() => {
+                    autoAdvancing.value = false;
+                    if (!stopped) speakVerse(0);
+                });
             } else {
                 stop();
             }
@@ -109,7 +112,7 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
         activeVerseNumber.value = verse.verse;
 
         try {
-            bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse);
+            bibleStore.setActiveVerse(verse.verse);
             bibleStore.AutoScrollSavedPosition(100);
         } catch { /* ignore */ }
 

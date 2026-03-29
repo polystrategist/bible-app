@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useBibleStore } from './BibleStore';
 import { useSettingStore } from './settingStore';
 
@@ -56,20 +56,7 @@ export const useTTSStore = defineStore('ttsStore', () => {
             // not available
         }
 
-        // Watch for chapter load after auto-advance
-        const bibleStore = useBibleStore();
-        watch(
-            () => bibleStore.renderVerses,
-            (verses) => {
-                if (autoAdvancing.value && verses.length > 0) {
-                    autoAdvancing.value = false;
-                    setTimeout(() => {
-                        startKeepAlive();
-                        speakVerse(0);
-                    }, 100);
-                }
-            }
-        );
+        // (chapter auto-advance handled via .then() in speakVerse)
     }
 
     function getSelectedVoice(): SpeechSynthesisVoice | null {
@@ -105,7 +92,11 @@ export const useTTSStore = defineStore('ttsStore', () => {
             const nextChapter = bibleStore.selectedChapter + 1;
             if (nextChapter <= bibleStore.selectedBook.chapter_count) {
                 autoAdvancing.value = true;
-                bibleStore.selectChapter(nextChapter);
+                bibleStore.selectChapter(nextChapter).then(() => {
+                    autoAdvancing.value = false;
+                    startKeepAlive();
+                    speakVerse(0);
+                });
             } else {
                 // End of book
                 isPlaying.value = false;
@@ -121,9 +112,9 @@ export const useTTSStore = defineStore('ttsStore', () => {
         const verse = verses[index];
         activeVerseNumber.value = verse.verse;
 
-        // Select and scroll to the verse being read
+        // Highlight and scroll to the verse being read (no re-fetch needed)
         try {
-            bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse);
+            bibleStore.setActiveVerse(verse.verse);
             bibleStore.AutoScrollSavedPosition(100);
         } catch { /* ignore */ }
 
