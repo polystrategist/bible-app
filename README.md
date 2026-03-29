@@ -45,15 +45,14 @@ Believers Sword is more than just a Bible reading app—it's a **digital sanctua
 | 🔍 **Search** | Find verses quickly across your Bible translations |
 | 🙏 **Prayer List** | Keep track of your prayer requests and answered prayers |
 | 🌓 **Dark Mode** | Study comfortably day or night with theme support |
+| 🎵 **Audio Bible** | **Listen to Scripture** |
+| 🔗 **Cross-References** | **Easy passage linking** |
 
 ### 🚧 Coming Soon
 
 We're working on exciting new features to enhance your Bible study experience:
-
 - 🔄 **Revamped Sermons Page** - Modern, user-friendly interface
 - 📢 **User-Generated Content** - Share sermons and study notes
-- 🔗 **Cross-References** | **Easy passage linking**
-- 🎵 **Audio Bible** | **Listen to Scripture**
 - 🤖 **AI Insights** | **Ask questions about your Bible**
 - 📅 **Daily Devotionals** | **Spiritual guidance each morning**
 - 🎮 **Bible Games** | **Test your knowledge with quizzes**
