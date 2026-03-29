@@ -43,6 +43,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      # macOS only: upscale icon.png to 512x512 and generate icon.icns
+      - name: Generate macOS icon
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p assets/icon.iconset
+          sips -z 16 16     assets/icon.png --out assets/icon.iconset/icon_16x16.png
+          sips -z 32 32     assets/icon.png --out assets/icon.iconset/icon_16x16@2x.png
+          sips -z 32 32     assets/icon.png --out assets/icon.iconset/icon_32x32.png
+          sips -z 64 64     assets/icon.png --out assets/icon.iconset/icon_32x32@2x.png
+          sips -z 128 128   assets/icon.png --out assets/icon.iconset/icon_128x128.png
+          sips -z 256 256   assets/icon.png --out assets/icon.iconset/icon_128x128@2x.png
+          sips -z 256 256   assets/icon.png --out assets/icon.iconset/icon_256x256.png
+          sips -z 512 512   assets/icon.png --out assets/icon.iconset/icon_256x256@2x.png
+          sips -z 512 512   assets/icon.png --out assets/icon.iconset/icon_512x512.png
+          iconutil -c icns assets/icon.iconset -o assets/icon.icns
+
       - name: Build & publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
