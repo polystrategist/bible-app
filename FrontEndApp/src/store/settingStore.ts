@@ -7,11 +7,13 @@ export const useSettingStore = defineStore('settingStore', () => {
     const appScaleStorageKey = 'app-scale';
     const verseReaderModeKey = 'verse-reader-mode';
     const piperActiveModelKey = 'piper-active-model';
+    const readVerseNumberKey = 'read-verse-number';
     const showDeuterocanonical = ref(false);
     const appScale = ref(1);
     const isLoadingScale = ref(false);
     const verseReaderMode = ref<string>('browser-tts');
     const piperActiveModel = ref<string>('en_US-ryan-high');
+    const readVerseNumber = ref<boolean>(true);
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
@@ -23,6 +25,10 @@ export const useSettingStore = defineStore('settingStore', () => {
 
         const savedPiperModel = SESSION.get(piperActiveModelKey);
         if (savedPiperModel) piperActiveModel.value = savedPiperModel;
+
+        const savedReadVerseNumber = SESSION.get(readVerseNumberKey);
+        if (savedReadVerseNumber !== null && savedReadVerseNumber !== undefined)
+            readVerseNumber.value = savedReadVerseNumber === true || savedReadVerseNumber === 'true';
 
         const savedScale = Number(SESSION.get(appScaleStorageKey));
         const fallbackScale = Number.isFinite(savedScale) ? savedScale : 1;
@@ -83,10 +89,16 @@ export const useSettingStore = defineStore('settingStore', () => {
         (val) => SESSION.set(piperActiveModelKey, val)
     );
 
+    watch(
+        () => readVerseNumber.value,
+        (val) => SESSION.set(readVerseNumberKey, val)
+    );
+
     return {
         showDeuterocanonical,
         appScale,
         verseReaderMode,
         piperActiveModel,
+        readVerseNumber,
     };
 });
