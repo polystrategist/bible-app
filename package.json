@@ -24,7 +24,10 @@
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
-    "up:win": "up_using_window.cmd"
+    "up:win": "up_using_window.cmd",
+    "untag": "git tag -d v$npm_package_version && git push origin :refs/tags/v$npm_package_version",
+    "release": "git tag v$npm_package_version && git push origin v$npm_package_version",
+    "rerelease": "yarn untag && yarn release"
   },
   "build": {
     "appId": "com.official-believers-sword-nightly.app",
