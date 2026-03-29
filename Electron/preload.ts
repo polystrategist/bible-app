@@ -99,6 +99,13 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.on('piper:model-progress', (_event, data) => cb(data));
     },
 
+    // Compare Verse Window
+    openCompareVerseWindow: (args: { book_number: number; chapter: number; verse: number; book_name: string }) =>
+        ipcRenderer.invoke('compareVerse:open', args),
+    compareVerseGetVerse: (args: { book_number: number; chapter: number; verse: number }) =>
+        ipcRenderer.invoke('compareVerse:getVerse', args),
+    closeCurrentWindow: () => ipcRenderer.invoke('closeCurrentWindow'),
+
     // Updates
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 

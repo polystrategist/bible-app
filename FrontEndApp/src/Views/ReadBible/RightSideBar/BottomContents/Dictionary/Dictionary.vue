@@ -86,6 +86,7 @@ onMounted(() => {
             label-field="word"
             value-field="word"
             remote
+            :virtual-scroll="false"
             :theme-overrides="dictionarySelectThemeOverrides"
             :clear-filter-after-select="false"
             @search="handleSearch"

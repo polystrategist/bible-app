@@ -7,6 +7,7 @@ import ProfileAccountPage from './../Views/UserProfile/Pages/Profile/Profile.vue
 import TextBaseSermon from '../Views/CreateSermon/TextBaseSermon.vue';
 import YoutubeShare from '../Views/CreateSermon/YoutubeShare.vue';
 import UserProfileLayout from './../Views/UserProfile/Profile.vue';
+import CompareVerse from '../Views/CompareVerse/CompareVerse.vue';
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -52,7 +53,12 @@ export const routes: Array<RouteRecordRaw> = [
         name: "CreateSermonYoutubeShare",
         path: "/create-sermon-youtube-share",
         component: YoutubeShare
-    }
+    },
+    {
+        name: 'CompareVerse',
+        path: '/compare-verse',
+        component: CompareVerse,
+    },
 ];
 const mode = import.meta.env.MODE == 'web' ? '/app/' : undefined;
 const router = createRouter({
