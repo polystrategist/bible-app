@@ -39,7 +39,7 @@ async function checkForUpdates() {
                 <template #icon><Icon icon="mdi:refresh" /></template>
                 Check for Updates
             </NButton>
-            <NTag v-if="status === 'available'" type="warning" size="small">Update available — check the download dialog</NTag>
+            <NTag v-if="status === 'available'" type="warning" size="small">Update available — a download prompt has appeared</NTag>
             <NTag v-else-if="status === 'up-to-date'" type="success" size="small">You're up to date</NTag>
             <span v-else-if="status === 'error'" class="text-xs text-red-400">{{ errorMsg }}</span>
         </div>

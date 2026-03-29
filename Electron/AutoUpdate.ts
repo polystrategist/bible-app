@@ -48,7 +48,10 @@ export default (mainWindow: BrowserWindow) => {
         ipcMain.handle('check-for-updates', async () => {
             try {
                 const result = await autoUpdater.checkForUpdates();
-                return { success: true, updateAvailable: !!result?.updateInfo };
+                const latestVersion = result?.updateInfo?.version;
+                const currentVersion = app.getVersion();
+                const updateAvailable = !!latestVersion && latestVersion !== currentVersion;
+                return { success: true, updateAvailable };
             } catch (err: any) {
                 return { success: false, error: err?.message ?? 'Failed to check for updates' };
             }
