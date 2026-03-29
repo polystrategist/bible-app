@@ -1,0 +1,49 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            build_script: "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder"
+          - os: macos-latest
+            build_script: "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder --mac"
+          - os: ubuntu-latest
+            build_script: "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder --linux"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install frontend dependencies
+        run: cd FrontEndApp && yarn install --frozen-lockfile
+
+      # Linux only: install required system libraries for Electron
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Build & publish
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: ${{ matrix.build_script }} -p always
