@@ -7,6 +7,7 @@ import PrayerList from './PrayerList/PrayerList';
 import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
+import { CompareVerseIpcEvents } from '../Windows/CompareVerseWindow';
 import SpaceStudy from './SpaceeStudy/SpaceStudy';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
@@ -37,6 +38,9 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // window opener events
     WindowOpenerIpcEvents(BrowserWindow);
+
+    // compare verse window
+    CompareVerseIpcEvents();
 
     // space study events
     SpaceStudy();

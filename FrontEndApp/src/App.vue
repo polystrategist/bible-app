@@ -25,6 +25,11 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { useAuthStore } from './store/authStore';
 import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const isPopupWindow = computed(() => route.name === 'CompareVerse');
 
 const isMounted = ref(false);
 const authStore = useAuthStore();
@@ -65,7 +70,10 @@ onMounted(async () => {
         <NDialogProvider>
             <NNotificationProvider>
                 <NMessageProvider>
-                    <NLayout class="h-[100vh] opacity-0 transition-all transform scale-50" :class="{'!opacity-100 !scale-100': isMounted}">
+                    <!-- Popup windows (e.g. Compare Verse) — no sidebar/titlebar/footer -->
+                    <RouterView v-if="isPopupWindow" />
+
+                    <NLayout v-else class="h-[100vh] opacity-0 transition-all transform scale-50" :class="{'!opacity-100 !scale-100': isMounted}">
                         <TitleBar class="h-[var(--header-height)]" />
                         <NLayout class="h-[calc(100%-(var(--header-height)+var(--footer-height)))]" has-sider>
                             <NLayoutSider

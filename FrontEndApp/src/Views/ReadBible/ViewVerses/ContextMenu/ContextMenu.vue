@@ -39,6 +39,13 @@ async function clickContextMenu(key: string) {
         runSync();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
+    } else if (key == 'compare-verse') {
+        (window as any).browserWindow.openCompareVerseWindow({
+            book_number: props.data.book_number,
+            chapter: props.data.chapter,
+            verse: props.data.verse,
+            book_name: bibleStore.selectedBook.title,
+        });
     } else if (key == 'clear-highlight') {
         if (spaceStudyStore.selectedSpaceStudy?.id)
             bibleStore.removeHighlightInDb(spaceStudyStore.selectedSpaceStudy?.id, props.data.key);
