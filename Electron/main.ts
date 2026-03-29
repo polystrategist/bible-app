@@ -45,6 +45,11 @@ async function createWindow() {
     if (!wasFullScreen && appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
     const mainWindow = new BrowserWindow(BrowserWindowOptions);
 
+    // Allow local font access so the renderer can call queryLocalFonts()
+    mainWindow.webContents.session.setPermissionRequestHandler((_wc, permission, callback) => {
+        callback((permission as string) === 'local-fonts');
+    });
+
     mainWindow.webContents.setZoomFactor(appScale);
 
 

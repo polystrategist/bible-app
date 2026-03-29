@@ -30,6 +30,30 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             borderHover: '1px solid var(--theme-border)',
             boxShadowFocus: '0 0 8px 0 rgba(124, 131, 253, 0.3)',
         },
+        // Select trigger (the closed button)
+        InternalSelection: {
+            color: 'var(--theme-bg-elevated)',
+            colorActive: 'var(--theme-bg-elevated)',
+            colorFocus: 'var(--theme-bg-soft)',
+            colorDisabled: 'var(--theme-bg-soft)',
+            textColor: 'var(--theme-text)',
+            placeholderColor: 'var(--theme-text-soft)',
+            border: '1px solid var(--theme-border)',
+            borderHover: '1px solid var(--theme-border)',
+            borderFocus: '1px solid var(--primary-color)',
+            borderActive: '1px solid var(--primary-color)',
+            caretColor: 'var(--primary-color)',
+        },
+        // Select dropdown popup
+        InternalSelectMenu: {
+            color: 'var(--theme-bg-elevated)',
+            optionTextColor: 'var(--theme-text)',
+            optionTextColorActive: 'var(--primary-color)',
+            optionTextColorPressed: 'var(--primary-color)',
+            optionColorPending: 'var(--theme-bg-soft)',
+            optionColorActive: 'var(--theme-bg-soft)',
+            groupHeaderTextColor: 'var(--theme-text-soft)',
+        },
     });
 
     function applyBodyThemeClass() {

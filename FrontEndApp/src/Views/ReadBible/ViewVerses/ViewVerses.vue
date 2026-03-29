@@ -88,11 +88,28 @@ const clipNoteRender: any = (key: any) => {
         : false;
 };
 const fontSelected = ref('Poppins');
-const fontStyles = [
-    { label: 'Poppins', value: 'Poppins', style: "font-family: Poppins;" },
-    { label: 'Inter', value: 'Inter', style: "font-family: Inter;" },
-    { label: 'Zodiac', value: 'Zodiac', style: "font-family: Zodiac;" },
+const bundledFonts = [
+    { label: 'Poppins', value: 'Poppins' },
+    { label: 'Inter', value: 'Inter' },
+    { label: 'Zodiac', value: 'Zodiac' },
 ];
+const fontOptions = ref<any[]>([...bundledFonts]);
+
+async function loadSystemFonts() {
+    try {
+        const fonts: any[] = await (window as any).queryLocalFonts();
+        const families = [...new Set(fonts.map((f) => f.family as string))].sort();
+        const systemFonts = families
+            .filter((f) => !bundledFonts.some((b) => b.value === f))
+            .map((f) => ({ label: f, value: f }));
+        fontOptions.value = [
+            { type: 'group', label: 'Bundled', key: 'bundled', children: bundledFonts },
+            { type: 'group', label: 'System Fonts', key: 'system', children: systemFonts },
+        ];
+    } catch {
+        // queryLocalFonts not available or permission denied — keep bundled fonts only
+    }
+}
 
 watch(
     () => fontSelected.value,
@@ -185,6 +202,7 @@ onBeforeMount(() => {
 
 onMounted(() => {
     piperStore.checkInstalled();
+    loadSystemFonts();
 
     // set initial font family
     const savedFontFamily = SESSION.get('font-family-of-show-chapter');
@@ -262,7 +280,14 @@ onMounted(() => {
                     {{ fontSize }}
                 </div>
                 <div class="w-100% max-w-250px">
-                    <NSelect v-model:value="fontSelected" :options="fontStyles" size="small" />
+                    <NSelect
+                        v-model:value="fontSelected"
+                        :options="fontOptions"
+                        size="small"
+                        filterable
+                        :virtual-scroll="false"
+                        :render-label="(option: any) => h('span', { style: `font-family: '${option.value}'` }, option.label as string)"
+                    />
                 </div>
                 <VerseSelector circle>
                     <NIcon
