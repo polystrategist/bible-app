@@ -171,6 +171,17 @@ declare global {
             searchDictionary: (search: string) => Promise<any>;
             getDefinitions: (word: string) => Promise<any>;
 
+            // Piper TTS
+            piperStatus: () => Promise<{ binaryReady: boolean; modelReady: boolean; modelName: string }>;
+            piperInstall: () => Promise<{ success: boolean; modelName?: string; error?: string }>;
+            piperUninstall: () => Promise<{ success: boolean; error?: string }>;
+            piperSpeak: (text: string, modelId?: string) => Promise<{ success: boolean; wav?: string; error?: string }>;
+            piperVoices: () => Promise<Array<{ id: string; name: string; language: string; gender: string; quality: string; sizeMB: number; onnxUrl: string; configUrl: string; isDownloaded?: boolean }>>;
+            piperInstallModel: (voiceId: string) => Promise<{ success: boolean; error?: string }>;
+            piperDeleteModel: (voiceId: string) => Promise<{ success: boolean; error?: string }>;
+            piperOnInstallProgress: (cb: (data: { step: string; percent: number }) => void) => void;
+            piperOnModelProgress: (cb: (data: { voiceId: string; percent: number }) => void) => void;
+
             // Sync
             logSyncChange: (entry: any) => Promise<any>;
             getUnsyncedChanges: () => Promise<any[]>;
