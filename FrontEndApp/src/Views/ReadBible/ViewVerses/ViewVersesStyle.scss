@@ -1,3 +1,9 @@
+.context-menu-active-verse .verse-select-text {
+    text-decoration: underline;
+    text-decoration-color: var(--primary-color);
+    text-underline-offset: 3px;
+}
+
 .verse-select-text {
     caret-color: transparent;
 

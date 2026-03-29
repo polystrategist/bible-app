@@ -77,6 +77,7 @@ const showContextMenu = ref(false);
 const contextMenuPositionX = ref<number>(0);
 const contextMenuPositionY = ref<number>(0);
 const contextMenuData = ref({});
+const contextMenuVerseKey = ref<string>('');
 const bookmarkStore = useBookmarkStore();
 const showPopOver = ref(false);
 const { x, y } = useMouse();
@@ -144,15 +145,21 @@ function navigateChapter(action: 'next' | 'before') {
 
 function clickContextMenu(verse: Object) {
     contextMenuData.value = verse;
+    contextMenuVerseKey.value = (verse as any).key;
 
     if (showContextMenu.value) {
         showContextMenu.value = false;
+        contextMenuVerseKey.value = '';
     } else {
         showContextMenu.value = true;
         contextMenuPositionX.value = x.value;
         contextMenuPositionY.value = y.value;
     }
 }
+
+watch(showContextMenu, (val) => {
+    if (!val) contextMenuVerseKey.value = '';
+});
 
 const copyText = () => {
     const selected = window.getSelection();
@@ -438,6 +445,7 @@ onMounted(() => {
                                         ? 1
                                         : bibleStore.selectedBibleVersions.length
                                 });`"
+                                :class="{ 'context-menu-active-verse': contextMenuVerseKey === version.key }"
                                 @contextmenu="clickContextMenu({ ...verse, key: version.key })"
                             >
                                 <div
