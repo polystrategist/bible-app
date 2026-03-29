@@ -64,8 +64,8 @@ async function createWindow() {
     // Modules
     BibleModules();
 
-    // auto updated
-    if (!isDev && !isNightly) AppUpdater(mainWindow);
+    // auto updater (always called so IPC handlers are registered; internal check skips auto-update in dev/nightly)
+    AppUpdater(mainWindow);
 
     // and load the index.html of the app.
     // win.loadFile("index.html");
