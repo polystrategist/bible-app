@@ -24,7 +24,6 @@
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
     "sqlite-rebuild": "cd node_modules/better-sqlite3 && npm run build-release",
     "postinstall": "electron-builder install-app-deps",
-    "up:win": "up_using_window.cmd",
     "untag": "node -e \"const v='v'+require('./package.json').version,e=require('child_process').execSync;e('git tag -d '+v,{stdio:'inherit'});e('git push origin :refs/tags/'+v,{stdio:'inherit'})\"",
     "release": "node -e \"const v='v'+require('./package.json').version,e=require('child_process').execSync;e('git tag '+v,{stdio:'inherit'});e('git push origin '+v,{stdio:'inherit'})\"",
     "rerelease": "yarn untag && yarn release"

@@ -99,6 +99,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.on('piper:model-progress', (_event, data) => cb(data));
     },
 
+    // Updates
+    checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+
     // Sync Operations
     logSyncChange: (entry: any) => ipcRenderer.invoke('logSyncChange', entry),
     getUnsyncedChanges: () => ipcRenderer.invoke('getUnsyncedChanges'),

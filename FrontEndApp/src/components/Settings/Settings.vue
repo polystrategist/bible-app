@@ -9,6 +9,7 @@ import SyncData from './Sync/SyncData.vue';
 import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
 import Scale from './Scale/Scale.vue';
 import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
+import Updates from './General/Updates.vue';
 import { Icon } from '@iconify/vue';
 import { useMainStore } from '../../store/main';
 import { computed } from 'vue';
@@ -40,6 +41,7 @@ const name = computed({
                         <Scale />
                         <SyncData />
                         <Deuterocanonical />
+                        <Updates />
                     </div>
                 </NTabPane>
                 <NTabPane class="flex flex-col gap-30px" name="Tab">

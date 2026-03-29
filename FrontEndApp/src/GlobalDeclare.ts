@@ -182,6 +182,9 @@ declare global {
             piperOnInstallProgress: (cb: (data: { step: string; percent: number }) => void) => void;
             piperOnModelProgress: (cb: (data: { voiceId: string; percent: number }) => void) => void;
 
+            // Updates
+            checkForUpdates: () => Promise<{ success: boolean; updateAvailable?: boolean; error?: string }>;
+
             // Sync
             logSyncChange: (entry: any) => Promise<any>;
             getUnsyncedChanges: () => Promise<any[]>;
