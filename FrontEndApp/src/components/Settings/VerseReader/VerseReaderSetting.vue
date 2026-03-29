@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NRadio, NIcon, NButton, NProgress, NTooltip } from 'naive-ui';
+import { NRadio, NIcon, NButton, NProgress, NTooltip, NSwitch } from 'naive-ui';
 import { CheckmarkCircle24Filled } from '@vicons/fluent';
 import { Icon } from '@iconify/vue';
 import { useSettingStore } from '../../../store/settingStore';
@@ -147,6 +147,15 @@ function installStepLabel(step: string, percent: number): string {
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Read verse number toggle -->
+    <div class="flex items-center justify-between p-3 rounded-lg border border-gray-500 border-opacity-30 mt-1">
+        <div>
+            <div class="font-600 text-sm">Read verse number</div>
+            <div class="text-xs opacity-50 mt-0.5">Announce the verse number before reading each verse</div>
+        </div>
+        <NSwitch v-model:value="settings.readVerseNumber" />
     </div>
 
     <PiperModelsModal v-model:show="showModelsModal" />

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { useBibleStore } from './BibleStore';
+import { useSettingStore } from './settingStore';
 
 export const useTTSStore = defineStore('ttsStore', () => {
     const isPlaying = ref(false);
@@ -127,7 +128,10 @@ export const useTTSStore = defineStore('ttsStore', () => {
         } catch { /* ignore */ }
 
         const rawText = verse.version[selectedVersionIndex.value]?.text ?? verse.version[0]?.text ?? '';
-        const text = `Verse ${verse.verse}. ${stripHtml(rawText)}`;
+        const settingStore = useSettingStore();
+        const text = settingStore.readVerseNumber
+            ? `Verse ${verse.verse}. ${stripHtml(rawText)}`
+            : stripHtml(rawText);
 
         try {
             const utterance = new SpeechSynthesisUtterance(text);

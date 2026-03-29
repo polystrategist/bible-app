@@ -114,10 +114,12 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
         } catch { /* ignore */ }
 
         const rawText = verse.version[selectedVersionIndex.value]?.text ?? verse.version[0]?.text ?? '';
-        const text = `Verse ${verse.verse}. ${stripHtml(rawText)}`;
+        const settingStore = useSettingStore();
+        const text = settingStore.readVerseNumber
+            ? `Verse ${verse.verse}. ${stripHtml(rawText)}`
+            : stripHtml(rawText);
 
         try {
-            const settingStore = useSettingStore();
             const result = await window.browserWindow.piperSpeak(text, settingStore.piperActiveModel);
             if (!result.success || !result.wav) {
                 console.error('[Piper] speak failed:', result.error);
