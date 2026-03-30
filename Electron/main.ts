@@ -1,5 +1,5 @@
 import Log from 'electron-log';
-import { app, BrowserWindow, BrowserWindowConstructorOptions, screen } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
@@ -8,16 +8,13 @@ import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
 import { setupPortableMode } from './util/portable';
-import { attachResizeListener } from './util/window';
+import { createWindowState, attachWindowStateManager } from './util/window';
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 
 // Check if running in portable mode
 setupPortableMode();
 
 async function createWindow() {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const appBounds: any = appConfig.get('setting.appBounds');
-    const wasFullScreen = Boolean(appConfig.get('setting.isFullScreen'));
     const savedScale = Number(appConfig.get('setting.appScale', 1));
     const appScale = Number.isFinite(savedScale) ? Math.min(1.5, Math.max(0.75, savedScale)) : 1;
 
@@ -25,10 +22,14 @@ async function createWindow() {
 
     if (isDev || isNightly) iconPath = path.join('assets', 'icon.ico');
 
-    const BrowserWindowOptions: BrowserWindowConstructorOptions = {
-        width: 1200,
+    const windowState = createWindowState();
+
+    const mainWindow = new BrowserWindow({
+        x: windowState.x,
+        y: windowState.y,
+        width: windowState.width,
+        height: windowState.height,
         minWidth: 900,
-        height: 750,
         minHeight: 600,
         icon: iconPath,
         webPreferences: {
@@ -38,12 +39,7 @@ async function createWindow() {
         show: false,
         alwaysOnTop: true,
         frame: false,
-    };
-
-    // Don't apply saved fullscreen-sized bounds when restoring fullscreen — the window would be
-    // created at screen dimensions already, causing setFullScreen(true) to have no effect on Windows.
-    if (!wasFullScreen && appBounds !== undefined && appBounds !== null) Object.assign(BrowserWindowOptions, appBounds);
-    const mainWindow = new BrowserWindow(BrowserWindowOptions);
+    });
 
     // Allow local font access so the renderer can call queryLocalFonts()
     mainWindow.webContents.session.setPermissionRequestHandler((_wc, permission, callback) => {
@@ -52,8 +48,8 @@ async function createWindow() {
 
     mainWindow.webContents.setZoomFactor(appScale);
 
-
-    attachResizeListener(mainWindow);
+    // Tracks resize, move, close and persists window state automatically
+    attachWindowStateManager(mainWindow, windowState);
 
     // Ensure a single instance of the app
     const gotTheLock = app.requestSingleInstanceLock();
@@ -73,17 +69,15 @@ async function createWindow() {
     AppUpdater(mainWindow);
 
     // and load the index.html of the app.
-    // win.loadFile("index.html");
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
 
-    if (wasFullScreen) {
-        // Register listener BEFORE show() — on Windows the 'show' event can fire
-        // synchronously inside show(), so registering after would miss it entirely.
-        mainWindow.once('show', () => mainWindow.setFullScreen(true));
-        mainWindow.show();
-    } else if (appBounds !== undefined && appBounds !== null && appBounds.width >= width && appBounds.height >= height)
+    mainWindow.show();
+
+    if (windowState.isFullScreen) {
+        mainWindow.setFullScreen(true);
+    } else if (windowState.isMaximized) {
         mainWindow.maximize();
-    else mainWindow.show();
+    }
 
     // this will turn off always on top after opening the application
     setTimeout(() => {

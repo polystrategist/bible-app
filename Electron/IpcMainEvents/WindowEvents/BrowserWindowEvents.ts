@@ -32,9 +32,6 @@ const maximizeWindow = (win: BrowserWindow): boolean | void => {
 };
 
 const closeWindow = (win: BrowserWindow): void => {
-    const appBounds = win.isNormal() ? win.getBounds() : win.getNormalBounds();
-    appConfig.set('setting.appBounds', appBounds);
-    appConfig.set('setting.isFullScreen', win.isFullScreen());
     win.destroy();
 };
 
