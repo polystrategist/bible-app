@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \".tables\")",
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \".schema\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT book_number, chapter, verse, text FROM verses WHERE book_number=43 AND chapter=18 AND verse=9 LIMIT 5;\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT text FROM verses WHERE text LIKE ''%[%]%'' LIMIT 5;\")",
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \"SELECT * FROM commentaries LIMIT 10;\")",
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \"SELECT * FROM commentaries WHERE book_number=43 AND chapter_number_from=18 AND verse_number_from=9 LIMIT 5;\")",
+      "Bash(sqlite3 \"New American Standard Version 2020 Commentaries.SQLite3\" \".schema\")",
+      "Bash(sqlite3 \"New American Standard Version 2020 Commentaries.SQLite3\" \"SELECT * FROM commentaries LIMIT 5;\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT text FROM verses WHERE book_number=43 AND chapter=18 AND verse=9;\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT text FROM verses WHERE text LIKE ''%<f>%'' LIMIT 5;\")",
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \"SELECT * FROM info;\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT book_number, long_name FROM books WHERE long_name LIKE ''%John%'';\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT book_number, long_name FROM books LIMIT 10;\")",
+      "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT text FROM verses WHERE book_number=500 AND chapter=18 AND verse=9;\")",
+      "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \"SELECT * FROM commentaries WHERE book_number=500 AND chapter_number_from=18 AND verse_number_from=9;\")"
+    ]
+  }
+}

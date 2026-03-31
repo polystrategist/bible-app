@@ -13,6 +13,7 @@ import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
 import { SyncHandlers } from './Sync/SyncHandlers';
 import { PiperTTSHandlers } from './Piper/PiperTTS';
+import Commentaries from '../Modules/Commentaries/Commentaries';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -56,4 +57,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // piper tts handlers
     PiperTTSHandlers(BrowserWindow);
+
+    // commentary handlers
+    Commentaries();
 };

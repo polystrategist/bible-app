@@ -106,6 +106,11 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.invoke('compareVerse:getVerse', args),
     closeCurrentWindow: () => ipcRenderer.invoke('closeCurrentWindow'),
 
+    // Commentaries
+    getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
+    hasCommentary: (version: string) => ipcRenderer.invoke('hasCommentary', version),
+    getAvailableCommentaries: () => ipcRenderer.invoke('availableCommentaries'),
+
     // Updates
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
 
