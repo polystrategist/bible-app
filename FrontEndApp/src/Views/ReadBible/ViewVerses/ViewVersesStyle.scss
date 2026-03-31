@@ -14,6 +14,20 @@
     a {
         display: none !important;
     }
+
+    f {
+        color: var(--primary-color);
+        font-size: 0.72em;
+        vertical-align: super;
+        cursor: pointer;
+        user-select: none;
+        font-style: normal;
+        margin-left: 1px;
+
+        &:hover {
+            opacity: 0.7;
+        }
+    }
 }
 
 .the-selected-verse {
