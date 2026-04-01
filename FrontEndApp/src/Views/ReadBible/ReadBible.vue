@@ -8,10 +8,12 @@ import ViewVerses from './ViewVerses/ViewVerses.vue';
 import Editor from '../../components/Editor/Editor.vue';
 import TakeNote from './TakeNote/TakeNote.vue';
 import useNoteStore from '../../store/useNoteStore';
+import { useSettingStore } from '../../store/settingStore';
 
 const storageReadBibleSavedSplitPaneSizes = 'storageReadBibleSavedSplitPaneSizes';
 const storageViewVerseSplitPaneSizes = 'storageViewVerseSplitPaneSizes';
 const noteStore = useNoteStore();
+const settingStore = useSettingStore();
 
 const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 15, max: 30, size: 20 },
@@ -25,6 +27,8 @@ const verseViewPaneSizes = ref<Array<{ min: number; max: number; size: number }>
 ]);
 
 function changeSize(sizes: Array<any>) {
+    if (sizes.length < 3) return;
+    splitPaneSizes.value = sizes;
     SESSION.set(storageReadBibleSavedSplitPaneSizes, sizes);
 }
 
@@ -48,8 +52,15 @@ onBeforeMount(() => {
 </script>
 
 <template>
-    <Splitpanes vertical :dbl-click-splitter="false" class="h-full w-full read-bible-layout" @resized="changeSize">
+    <Splitpanes
+        :key="`sb-${settingStore.showLeftSidebar}-${settingStore.showRightSidebar}`"
+        vertical
+        :dbl-click-splitter="false"
+        class="h-full w-full read-bible-layout"
+        @resized="changeSize"
+    >
         <Pane
+            v-if="settingStore.showLeftSidebar"
             class="bg-gray-100 dark:bg-dark-600 read-bible-left-panel"
             :size="splitPaneSizes[0].size"
             :min-size="splitPaneSizes[0].min"
@@ -86,6 +97,7 @@ onBeforeMount(() => {
             </Splitpanes>
         </Pane>
         <Pane
+            v-if="settingStore.showRightSidebar"
             class="bg-gray-100 dark:bg-dark-600 h-full read-bible-right-panel"
             :size="splitPaneSizes[2].size"
             :min-size="splitPaneSizes[2].min"

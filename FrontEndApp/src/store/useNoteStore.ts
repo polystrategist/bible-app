@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import SpaceStudyStore from './SpaceStudyStore';
 import { runSync } from '../util/Sync/sync';
+import SESSION from '../util/session';
 
 type NoteItem = {
     id: string;
@@ -23,6 +24,16 @@ export default defineStore('useNotesStore', () => {
     const showNote = ref<boolean>(true);
     const spaceStudyStore = SpaceStudyStore();
     const isHydrating = ref(false);
+
+    const showNoteKey = 'show-note-panel';
+
+    onMounted(() => {
+        const saved = SESSION.get(showNoteKey);
+        if (saved !== null && saved !== undefined)
+            showNote.value = saved !== false && saved !== 'false';
+    });
+
+    watch(() => showNote.value, (val) => SESSION.set(showNoteKey, val));
 
     function createDefaultNote(content = ''): NoteItem {
         const now = new Date().toISOString();
