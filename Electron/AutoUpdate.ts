@@ -8,6 +8,22 @@ export default (mainWindow: BrowserWindow) => {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
 
+        ipcMain.handle('install-update', () => {
+            autoUpdater.quitAndInstall(process.platform === 'win32', true);
+        });
+
+        ipcMain.handle('check-for-updates', async () => {
+            try {
+                const result = await autoUpdater.checkForUpdates();
+                const latestVersion = result?.updateInfo?.version;
+                const currentVersion = app.getVersion();
+                const updateAvailable = !!latestVersion && latestVersion !== currentVersion;
+                return { success: true, updateAvailable };
+            } catch (err: any) {
+                return { success: false, error: err?.message ?? 'Failed to check for updates' };
+            }
+        });
+
         if (process.platform === 'linux' && !process.env.APPIMAGE) {
             Log.warn('APPIMAGE env var not set — auto-update skipped (not running as AppImage, or AppImageLauncher did not pass the env var)');
             return;
@@ -15,17 +31,19 @@ export default (mainWindow: BrowserWindow) => {
 
         autoUpdater.checkForUpdates();
 
-        autoUpdater.on('update-available', () => {
+        autoUpdater.on('update-available', (info) => {
             dialog
                 .showMessageBox({
                     type: 'info',
-                    buttons: ['Download Update', 'Cancel'],
+                    buttons: ['Download', 'Later'],
                     title: 'Update Available',
-                    message: 'A new update is available. Do you want to download and install it?',
+                    message: `Version ${info.version} is available.`,
+                    detail: 'Do you want to download it now?',
                 })
-                .then((response) => {
-                    if (response.response === 0) {
+                .then(({ response }) => {
+                    if (response === 0) {
                         autoUpdater.downloadUpdate();
+                        mainWindow.webContents.send('update-available');
                     }
                 });
         });
@@ -40,32 +58,22 @@ export default (mainWindow: BrowserWindow) => {
             dialog
                 .showMessageBox({
                     type: 'info',
-                    buttons: ['Install and Restart', 'Later'],
+                    buttons: ['Install Now', 'Later'],
                     title: 'Update Ready',
-                    message: 'The update has been downloaded. Do you want to install and restart the application?',
+                    message: 'A new update has been downloaded and is ready to install.',
+                    detail: 'The app will restart automatically after installation.',
                 })
                 .then(({ response }) => {
-                    if (response == 0 || response == 2) {
-                        autoUpdater.quitAndInstall();
+                    if (response === 0) {
+                        autoUpdater.quitAndInstall(process.platform === 'win32', true);
                     }
                 });
-        });
-
-        ipcMain.handle('check-for-updates', async () => {
-            try {
-                const result = await autoUpdater.checkForUpdates();
-                const latestVersion = result?.updateInfo?.version;
-                const currentVersion = app.getVersion();
-                const updateAvailable = !!latestVersion && latestVersion !== currentVersion;
-                return { success: true, updateAvailable };
-            } catch (err: any) {
-                return { success: false, error: err?.message ?? 'Failed to check for updates' };
-            }
         });
     } else {
         ipcMain.handle('check-for-updates', async () => {
             return { success: false, error: 'Updates are only available in packaged builds.' };
         });
+        ipcMain.handle('install-update', async () => {});
     }
 
     autoUpdater.on('error', (error) => {

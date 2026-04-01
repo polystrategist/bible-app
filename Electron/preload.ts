@@ -117,6 +117,19 @@ contextBridge.exposeInMainWorld('browserWindow', {
 
     // Updates
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+    installUpdate: () => ipcRenderer.invoke('install-update'),
+    onUpdateAvailable: (cb: () => void) => {
+        ipcRenderer.removeAllListeners('update-available');
+        ipcRenderer.on('update-available', cb);
+    },
+    onUpdateDownloaded: (cb: () => void) => {
+        ipcRenderer.removeAllListeners('update-downloaded');
+        ipcRenderer.on('update-downloaded', cb);
+    },
+    onUpdateProgress: (cb: (percent: number) => void) => {
+        ipcRenderer.removeAllListeners('download-progress');
+        ipcRenderer.on('download-progress', (_e, percent) => cb(percent));
+    },
 
     // Sync Operations
     logSyncChange: (entry: any) => ipcRenderer.invoke('logSyncChange', entry),
