@@ -17,6 +17,8 @@ import {
     Person24Regular,
     HeartCircle24Regular,
     Settings24Regular,
+    BookStar24Regular,
+    BookStar24Filled,
 } from '@vicons/fluent';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
@@ -46,6 +48,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             icon: renderNIcon(TaskListSquareLtr24Regular),
             iconDark: renderNIcon(TaskListSquareLtr24Filled),
         },
+        {
+            label: 'Daily Devotional',
+            key: '/daily-devotional',
+            icon: renderNIcon(BookStar24Regular),
+            iconDark: renderNIcon(BookStar24Filled),
+        },
     ]);
 
     const bottomMenuTabs = ref([
@@ -74,6 +82,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         'read-bible',
         'sermons',
         '/prayer-list',
+        '/daily-devotional',
         // '/profile',
         '/settings-page',
         '/create-sermon',

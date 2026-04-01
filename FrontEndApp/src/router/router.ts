@@ -8,6 +8,7 @@ import TextBaseSermon from '../Views/CreateSermon/TextBaseSermon.vue';
 import YoutubeShare from '../Views/CreateSermon/YoutubeShare.vue';
 import UserProfileLayout from './../Views/UserProfile/Profile.vue';
 import CompareVerse from '../Views/CompareVerse/CompareVerse.vue';
+import DailyDevotional from '../Views/DailyDevotional/DailyDevotional.vue';
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -58,6 +59,11 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'CompareVerse',
         path: '/compare-verse',
         component: CompareVerse,
+    },
+    {
+        name: 'DailyDevotional',
+        path: '/daily-devotional',
+        component: DailyDevotional,
     },
 ];
 const mode = import.meta.env.MODE == 'web' ? '/app/' : undefined;

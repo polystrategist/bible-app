@@ -186,6 +186,7 @@ const message: InternationalMessageType = {
     'references': '参考文献',
     'answered': '回答済み',
     "Believers\' Feed": "信者のフィード",
+    "Daily Devotional": "毎日のデボーション",
     "added": "追加",
     "add": "追加",    
     "bible": "聖書",

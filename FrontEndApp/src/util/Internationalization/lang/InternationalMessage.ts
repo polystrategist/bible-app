@@ -185,6 +185,7 @@ export interface InternationalMessageInterface {
     'references': string;
     'answered': string;
     "Believers\' Feed": string;
+    "Daily Devotional": string;
     "added": string;
     "add": string;
     "bible": string;
