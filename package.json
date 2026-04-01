@@ -36,7 +36,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "JenuelDev"
+        "owner": "JenuelDev",
+        "repo": "Believers-Sword"
       }
     ],
     "nsis": {
