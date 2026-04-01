@@ -7,6 +7,12 @@ export default (mainWindow: BrowserWindow) => {
     if (app.isPackaged) {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
+
+        if (process.platform === 'linux' && !process.env.APPIMAGE) {
+            Log.warn('APPIMAGE env var not set — auto-update skipped (not running as AppImage, or AppImageLauncher did not pass the env var)');
+            return;
+        }
+
         autoUpdater.checkForUpdates();
 
         autoUpdater.on('update-available', () => {
