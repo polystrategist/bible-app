@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue';
-import { NSpin, NModal, NCard } from 'naive-ui';
+import { NSpin, NModal, NSteps, NStep } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { useBibleStore } from '../../store/BibleStore';
 import { bibleBooks } from '../../util/books';
@@ -19,17 +19,21 @@ interface Devotional {
 }
 
 const steps = [
-    { key: 'pause', label: 'Pause', color: '#7c5cbf', icon: 'mdi:meditation' },
-    { key: 'listen', label: 'Listen', color: '#a08090', icon: 'mdi:ear-hearing' },
-    { key: 'think', label: 'Think', color: '#d48a9a', icon: 'mdi:head-lightbulb-outline' },
-    { key: 'pray', label: 'Pray', color: '#3db8b0', icon: 'mdi:hands-pray' },
-    { key: 'go', label: 'Go', color: '#f0c040', icon: 'mdi:run-fast' },
+    { key: 'pause', label: 'Pause', icon: 'mdi:pause-circle-outline' },
+    { key: 'listen', label: 'Listen', icon: 'mdi:ear-hearing' },
+    { key: 'think', label: 'Think', icon: 'mdi:head-lightbulb-outline' },
+    { key: 'pray', label: 'Pray', icon: 'mdi:hands-pray' },
+    { key: 'go', label: 'Go', icon: 'mdi:arrow-right-circle-outline' },
 ] as const;
 
 const devotional = ref<Devotional | null>(null);
 const loading = ref(true);
 const activeStep = ref(0);
 const bibleStore = useBibleStore();
+
+function hasVisibleText(html: string): boolean {
+    return html.replace(/<[^>]*>/g, '').trim().length > 0;
+}
 
 // Verse preview modal
 const showVerseModal = ref(false);
@@ -45,8 +49,6 @@ const dateLabel = today.toLocaleDateString(undefined, {
     day: 'numeric',
 });
 
-const activeColor = computed(() => steps[activeStep.value].color);
-
 const stepContent = computed(() => {
     if (!devotional.value) return '';
     const d = devotional.value;
@@ -59,8 +61,6 @@ const stepContent = computed(() => {
     };
     return keys[steps[activeStep.value].key] || '';
 });
-
-const stepLabel = computed(() => steps[activeStep.value].label.toLowerCase());
 
 function nextStep() {
     if (activeStep.value < steps.length - 1) {
@@ -105,7 +105,7 @@ async function openVersePreview(verseRef: string) {
             const row = rows.find((r: any) => r.verse === verseNum);
             if (row) {
                 verseModalTexts.value = (row.version || [])
-                    .filter((v: any) => v.text && v.text.trim())
+                    .filter((v: any) => v.text && hasVisibleText(v.text))
                     .map((v: any) => ({
                         version: v.version.replace('.SQLite3', ''),
                         text: v.text,
@@ -114,7 +114,7 @@ async function openVersePreview(verseRef: string) {
         } else if (rows.length) {
             verseModalTexts.value = rows.flatMap((r: any) =>
                 (r.version || [])
-                    .filter((v: any) => v.text && v.text.trim())
+                    .filter((v: any) => v.text && hasVisibleText(v.text))
                     .map((v: any) => ({
                         version: `${v.version.replace('.SQLite3', '')} — v${r.verse}`,
                         text: v.text,
@@ -137,13 +137,7 @@ onMounted(async () => {
 
 <template>
     <div class="daily-devotional h-full overflow-auto">
-        <div class="max-w-2xl mx-auto px-6 py-8">
-            <!-- Header -->
-            <div class="mb-6 text-center">
-                <h2 class="text-lg font-semibold opacity-80 mb-1">Daily Devotional &amp; Reflection</h2>
-                <p class="text-xs opacity-40">{{ dateLabel }}</p>
-            </div>
-
+        <div class="devo-container">
             <!-- Loading -->
             <div v-if="loading" class="flex justify-center py-20">
                 <NSpin size="medium" />
@@ -156,69 +150,70 @@ onMounted(async () => {
             </div>
 
             <template v-else>
-                <!-- Title + Day -->
-                <div class="text-center mb-6">
-                    <span class="devotional-day-badge">Day {{ devotional.day_number }}</span>
-                    <h1 class="text-xl font-bold mt-3 leading-snug">{{ devotional.title }}</h1>
-                </div>
+                <!-- Header -->
+                <div class="devo-header">
+                    <p class="devo-date">{{ dateLabel }}</p>
+                    <span class="devo-day-badge">Day {{ devotional.day_number }}</span>
+                    <h1 class="devo-title">{{ devotional.title }}</h1>
 
-                <!-- Verse chips -->
-                <div
-                    v-if="devotional.verses?.length"
-                    class="flex flex-wrap gap-2 justify-center mb-6"
-                >
-                    <button
-                        v-for="verse in devotional.verses"
-                        :key="verse"
-                        class="verse-chip"
-                        :title="`Read ${verse.replace(/:/g, ' ')}`"
-                        @click="openVersePreview(verse)"
-                    >
-                        <Icon icon="mdi:book-open-variant" class="text-xs" />
-                        {{ verse.replace(/:/g, ' ') }}
-                    </button>
-                </div>
-
-                <!-- Step circles -->
-                <div class="step-circles">
-                    <button
-                        v-for="(step, i) in steps"
-                        :key="step.key"
-                        class="step-circle"
-                        :class="{ active: activeStep === i, visited: i < activeStep }"
-                        :style="{
-                            background: step.color,
-                            borderColor: activeStep === i ? step.color : 'transparent',
-                        }"
-                        @click="activeStep = i"
-                    >
-                        {{ step.label }}
-                    </button>
-                </div>
-
-                <!-- Step content card -->
-                <div class="step-card" :style="{ background: activeColor }">
-                    <h3 class="step-card-label">{{ stepLabel }}</h3>
-                    <div class="step-card-body" v-html="stepContent"></div>
-
-                    <!-- Navigation -->
-                    <div class="step-card-nav">
+                    <!-- Verse chips -->
+                    <div v-if="devotional.verses?.length" class="devo-verses">
                         <button
-                            v-if="activeStep > 0"
-                            class="step-nav-btn"
-                            @click="prevStep"
+                            v-for="verse in devotional.verses"
+                            :key="verse"
+                            class="verse-chip"
+                            :title="`Read ${verse.replace(/:/g, ' ')}`"
+                            @click="openVersePreview(verse)"
                         >
-                            Back
-                        </button>
-                        <span v-else></span>
-                        <button
-                            v-if="activeStep < steps.length - 1"
-                            class="step-nav-btn"
-                            @click="nextStep"
-                        >
-                            Next
+                            <Icon icon="mdi:book-open-variant" class="text-xs" />
+                            {{ verse.replace(/:/g, ' ') }}
                         </button>
                     </div>
+                </div>
+
+                <!-- Step progress bar -->
+                <NSteps :current="activeStep + 1" class="devo-steps" size="small">
+                    <NStep
+                        v-for="(step, i) in steps"
+                        :key="step.key"
+                        :title="step.label"
+                        @click="activeStep = i"
+                        style="cursor: pointer"
+                    />
+                </NSteps>
+
+                <!-- Content area -->
+                <div class="devo-content-area">
+                    <div class="devo-content-accent" />
+                    <div class="devo-content-inner">
+                        <h3 class="devo-step-label">{{ steps[activeStep].label }}</h3>
+                        <div class="devo-step-body" v-html="stepContent"></div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="devo-nav">
+                    <button
+                        v-if="activeStep > 0"
+                        class="devo-nav-btn"
+                        @click="prevStep"
+                    >
+                        <Icon icon="mdi:arrow-left" class="text-sm" />
+                        Back
+                    </button>
+                    <span v-else />
+                    <button
+                        v-if="activeStep < steps.length - 1"
+                        class="devo-nav-btn devo-nav-btn-primary"
+                        @click="nextStep"
+                    >
+                        Next
+                        <Icon icon="mdi:arrow-right" class="text-sm" />
+                    </button>
+                    <span v-else class="devo-finished">
+                        <Icon icon="mdi:check-circle" class="text-[var(--primary-color)]" />
+                        Completed
+                    </span>
                 </div>
             </template>
         </div>
@@ -256,17 +251,49 @@ onMounted(async () => {
     font-family: var(--bible-font-family, 'Poppins'), sans-serif;
 }
 
-.devotional-day-badge {
-    display: inline-flex;
-    padding: 3px 12px;
+.devo-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+/* ---- Header ---- */
+.devo-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.devo-date {
+    font-size: 12px;
+    opacity: 0.4;
+    margin-bottom: 8px;
+}
+
+.devo-day-badge {
+    display: inline-block;
+    padding: 2px 10px;
     border-radius: 99px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-    opacity: 0.8;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 40%, transparent);
+    margin-bottom: 10px;
+}
+
+.devo-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 14px;
+}
+
+.devo-verses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
 }
 
 .verse-chip {
@@ -275,129 +302,134 @@ onMounted(async () => {
     gap: 4px;
     padding: 4px 10px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
     color: var(--primary-color);
     border: none;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: all 0.15s;
 }
 
 .verse-chip:hover {
-    opacity: 0.75;
+    background: color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
 
-/* Step circles row */
-.step-circles {
+/* ---- Step Progress Track ---- */
+.devo-steps {
+    margin-bottom: 28px;
+}
+
+/* ---- Content Area ---- */
+.devo-content-area {
     display: flex;
-    justify-content: center;
-    gap: 16px;
+    gap: 0;
     margin-bottom: 20px;
 }
 
-.step-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    color: white;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.devo-content-accent {
+    width: 3px;
+    flex-shrink: 0;
+    border-radius: 3px;
+    background: var(--primary-color);
     opacity: 0.6;
 }
 
-.step-circle.active {
-    opacity: 1;
-    transform: scale(1.12);
-    border-color: currentColor !important;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
-}
-
-.step-circle.visited {
-    opacity: 0.85;
-}
-
-/* Step content card */
-.step-card {
-    border-radius: 16px;
-    padding: 28px 28px 20px;
-    min-height: 280px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    transition: background 0.3s ease;
-}
-
-.step-card-label {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    opacity: 0.95;
-}
-
-.step-card-body {
+.devo-content-inner {
     flex: 1;
-    font-size: 15px;
-    line-height: 1.75;
-    opacity: 0.92;
+    padding: 4px 0 4px 20px;
 }
 
-.step-card-body :deep(p) {
+.devo-step-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary-color);
+    margin-bottom: 14px;
+    opacity: 0.8;
+}
+
+.devo-step-body {
+    font-size: 15px;
+    line-height: 1.8;
+    opacity: 0.82;
+}
+
+.devo-step-body :deep(p) {
     margin-bottom: 14px;
 }
 
-.step-card-body :deep(em) {
+.devo-step-body :deep(p:last-child) {
+    margin-bottom: 0;
+}
+
+.devo-step-body :deep(em) {
+    color: var(--primary-color);
     font-style: italic;
 }
 
-.step-card-body :deep(blockquote) {
-    border-left: 3px solid rgba(255, 255, 255, 0.4);
-    padding-left: 14px;
-    margin: 12px 0;
-    font-style: italic;
-    opacity: 0.9;
-}
-
-.step-card-body :deep(.verse-ref) {
+.devo-step-body :deep(.verse-ref) {
     display: block;
     text-align: right;
-    font-size: 13px;
-    opacity: 0.7;
-    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 6px;
+    font-style: italic;
 }
 
-/* Navigation buttons */
-.step-card-nav {
+/* ---- Navigation ---- */
+.devo-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(128, 128, 128, 0.1);
 }
 
-.step-nav-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 20px;
-    padding: 8px 22px;
-    color: white;
+.devo-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    background: none;
+    color: inherit;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s;
+    opacity: 0.6;
+    transition: all 0.15s;
 }
 
-.step-nav-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+.devo-nav-btn:hover {
+    opacity: 1;
+    border-color: rgba(128, 128, 128, 0.4);
 }
 
-/* Verse preview modal */
+.devo-nav-btn-primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    opacity: 1;
+}
+
+.devo-nav-btn-primary:hover {
+    opacity: 0.85;
+    border-color: var(--primary-color);
+}
+
+.devo-finished {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+/* ---- Verse Preview Modal ---- */
 .verse-preview-list {
     display: flex;
     flex-direction: column;
@@ -435,6 +467,6 @@ onMounted(async () => {
 }
 
 .verse-preview-text :deep(pb) {
-    display: none;
+    display: block;
 }
 </style>
