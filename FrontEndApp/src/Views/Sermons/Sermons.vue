@@ -103,14 +103,14 @@ function handleBelieversSwordInfoDialog() {
             </div>
         </div>
         <div ref="sermonItems"
-            class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md">
-            <div class="flex gap-7 flex-wrap px-5 justify-center">
-                <SermonItems v-for="sermon in sermonStore.sermons" :sermon="sermon"
-                    @showContent="(sermonType: any, sermon: any) => showContent(sermonType, sermon)"
-                    @publishSermon="(sermon: any, isPublish: any) => publishSermon(sermon, isPublish)"
-                    @deleteSermon="(sermon: any) => deleteSermon(sermon)" />
+            class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center gap-3 opacity-60">
+                <Icon icon="mdi:hammer-wrench" class="text-6xl" />
+                <p class="text-xl font-700">Coming Soon</p>
+                <p class="text-sm opacity-70 text-center max-w-sm">
+                    Believers' Feed is under construction. Stay tuned — something great is coming!
+                </p>
             </div>
-            <div v-show="sermonStore.loading" class="text-center py-4">LOADING MORE DATA</div>
         </div>
         <SelectContentToCreateModal ref="SelectContentToCreateModalRef" />
     </div>
