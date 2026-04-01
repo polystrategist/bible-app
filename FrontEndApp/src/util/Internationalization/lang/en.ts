@@ -186,6 +186,7 @@ const message: InternationalMessageType = {
     'references': 'references',
     'answered': 'answered',
     "Believers\' Feed": 'Believers\' Feed',
+    "Daily Devotional": 'Daily Devotional',
     "added": "added",
     "add": "add",
     "bible": "bible",

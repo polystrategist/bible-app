@@ -5,6 +5,7 @@ interface Props {
     y: number;
     marker: string;
     text: string;
+    fontSize: number;
 }
 
 defineProps<Props>();
@@ -17,7 +18,7 @@ defineEmits<{ close: [] }>();
             <div
                 v-if="show"
                 class="footnote-tooltip"
-                :style="{ top: `${y}px`, left: `${x}px` }"
+                :style="{ top: `${y}px`, left: `${x}px`, fontSize: `${fontSize}px` }"
             >
                 <div class="footnote-tooltip-body" v-html="text"></div>
                 <div class="footnote-tooltip-arrow"></div>
@@ -37,7 +38,6 @@ defineEmits<{ close: [] }>();
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     padding: 7px 10px;
-    font-size: 12.5px;
     line-height: 1.5;
     color: var(--n-text-color, #e0e0e0);
     pointer-events: none;

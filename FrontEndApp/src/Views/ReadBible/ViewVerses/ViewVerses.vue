@@ -663,6 +663,7 @@ onMounted(() => {
             :y="footnotePopover.y"
             :marker="footnotePopover.marker"
             :text="footnotePopover.text"
+            :font-size="fontSize"
         />
     </div>
 </template>
