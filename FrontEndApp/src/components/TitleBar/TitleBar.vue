@@ -5,6 +5,12 @@ import {
     BrainCircuit24Regular,
     CaretDown24Filled,
     CaretDown24Regular,
+    PanelBottom20Filled,
+    PanelBottom20Regular,
+    PanelLeft20Filled,
+    PanelLeft20Regular,
+    PanelRight20Filled,
+    PanelRight20Regular,
     Square20Regular,
     SquareMultiple20Regular,
     Subtract20Regular,
@@ -19,6 +25,8 @@ import LogoComponent from './../LogoComponent.vue';
 import ThemeChangerDrawer from '../ThemeChanger/ThemeChangerDrawer.vue';
 import { useMenuStore } from '../../store/menu';
 import SpaceStudyStore from '../../store/SpaceStudyStore';
+import { useSettingStore } from '../../store/settingStore';
+import useNoteStore from '../../store/useNoteStore';
 import ProfileDropdown from './Partials/ProfileDropdown.vue';
 
 const isMaximized = ref(false);
@@ -27,6 +35,8 @@ const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const isElectron = window.isElectron;
 const StudySpaceStore = SpaceStudyStore();
+const settingStore = useSettingStore();
+const noteStore = useNoteStore();
 
 async function minimizeWindow() {
     await window.browserWindow.minimizeWindow();
@@ -85,6 +95,53 @@ onBeforeMount(async () => {
                         </NIcon>
                     </div>
                 </NButton>
+            <template v-if="menuStore.menuSelected === 'read-bible'">
+                <NButton
+                    size="small"
+                    :type="settingStore.showLeftSidebar ? 'primary' : 'default'"
+                    :secondary="settingStore.showLeftSidebar"
+                    :quaternary="!settingStore.showLeftSidebar"
+                    :focusable="false"
+                    class="ml-4px"
+                    :title="$t('Toggle left sidebar')"
+                    @click="settingStore.showLeftSidebar = !settingStore.showLeftSidebar"
+                >
+                    <NIcon size="17">
+                        <PanelLeft20Filled v-if="settingStore.showLeftSidebar" />
+                        <PanelLeft20Regular v-else />
+                    </NIcon>
+                </NButton>
+                <NButton
+                    size="small"
+                    :type="settingStore.showRightSidebar ? 'primary' : 'default'"
+                    :secondary="settingStore.showRightSidebar"
+                    :quaternary="!settingStore.showRightSidebar"
+                    :focusable="false"
+                    class="ml-4px"
+                    :title="$t('Toggle right sidebar')"
+                    @click="settingStore.showRightSidebar = !settingStore.showRightSidebar"
+                >
+                    <NIcon size="17">
+                        <PanelRight20Filled v-if="settingStore.showRightSidebar" />
+                        <PanelRight20Regular v-else />
+                    </NIcon>
+                </NButton>
+                <NButton
+                    size="small"
+                    :type="noteStore.showNote ? 'primary' : 'default'"
+                    :secondary="noteStore.showNote"
+                    :quaternary="!noteStore.showNote"
+                    :focusable="false"
+                    class="ml-4px"
+                    :title="$t('Toggle notes panel')"
+                    @click="noteStore.showNote = !noteStore.showNote"
+                >
+                    <NIcon size="17">
+                        <PanelBottom20Filled v-if="noteStore.showNote" />
+                        <PanelBottom20Regular v-else />
+                    </NIcon>
+                </NButton>
+            </template>
             </div>
         </div>
         <div class="flex items-center w-full h-full z-50 justify-between">

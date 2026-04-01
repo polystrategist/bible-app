@@ -8,12 +8,16 @@ export const useSettingStore = defineStore('settingStore', () => {
     const verseReaderModeKey = 'verse-reader-mode';
     const piperActiveModelKey = 'piper-active-model';
     const readVerseNumberKey = 'read-verse-number';
+    const showLeftSidebarKey = 'show-left-sidebar';
+    const showRightSidebarKey = 'show-right-sidebar';
     const showDeuterocanonical = ref(false);
     const appScale = ref(1);
     const isLoadingScale = ref(false);
     const verseReaderMode = ref<string>('browser-tts');
     const piperActiveModel = ref<string>('en_US-ryan-high');
     const readVerseNumber = ref<boolean>(true);
+    const showLeftSidebar = ref(true);
+    const showRightSidebar = ref(true);
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
@@ -29,6 +33,14 @@ export const useSettingStore = defineStore('settingStore', () => {
         const savedReadVerseNumber = SESSION.get(readVerseNumberKey);
         if (savedReadVerseNumber !== null && savedReadVerseNumber !== undefined)
             readVerseNumber.value = savedReadVerseNumber === true || savedReadVerseNumber === 'true';
+
+        const savedShowLeft = SESSION.get(showLeftSidebarKey);
+        if (savedShowLeft !== null && savedShowLeft !== undefined)
+            showLeftSidebar.value = savedShowLeft !== false && savedShowLeft !== 'false';
+
+        const savedShowRight = SESSION.get(showRightSidebarKey);
+        if (savedShowRight !== null && savedShowRight !== undefined)
+            showRightSidebar.value = savedShowRight !== false && savedShowRight !== 'false';
 
         const savedScale = Number(SESSION.get(appScaleStorageKey));
         const fallbackScale = Number.isFinite(savedScale) ? savedScale : 1;
@@ -94,11 +106,23 @@ export const useSettingStore = defineStore('settingStore', () => {
         (val) => SESSION.set(readVerseNumberKey, val)
     );
 
+    watch(
+        () => showLeftSidebar.value,
+        (val) => SESSION.set(showLeftSidebarKey, val)
+    );
+
+    watch(
+        () => showRightSidebar.value,
+        (val) => SESSION.set(showRightSidebarKey, val)
+    );
+
     return {
         showDeuterocanonical,
         appScale,
         verseReaderMode,
         piperActiveModel,
         readVerseNumber,
+        showLeftSidebar,
+        showRightSidebar,
     };
 });

@@ -95,3 +95,8 @@
         display: none;
     }
 }
+
+.read-bible-layout.splitpanes--vertical > .splitpanes__pane,
+.read-bible-layout .splitpanes--horizontal > .splitpanes__pane {
+    transition: none !important;
+}
