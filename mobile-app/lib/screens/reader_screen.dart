@@ -41,7 +41,14 @@ class _ReaderScreenState extends State<ReaderScreen> {
     final bible = context.watch<BibleProvider>();
     final theme = Theme.of(context);
 
-    if (bible.availableBibles.isEmpty && !bible.isLoading) {
+    if (!bible.isInitialized) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Believers Sword')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (bible.availableBibles.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('Believers Sword')),
         body: const Center(

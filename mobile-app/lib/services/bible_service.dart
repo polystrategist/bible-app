@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -7,6 +8,11 @@ import '../models/verse.dart';
 class BibleService {
   final Map<String, Database> _cache = {};
 
+  /// Bundled Bible modules that ship with the app.
+  static const List<String> bundledModules = [
+    'King James Version - 1769.SQLite3',
+  ];
+
   Future<String> get _modulesPath async {
     final dir = await getApplicationDocumentsDirectory();
     final modulesDir = Directory(p.join(dir.path, 'modules', 'bible'));
@@ -14,6 +20,24 @@ class BibleService {
       await modulesDir.create(recursive: true);
     }
     return modulesDir.path;
+  }
+
+  /// Copy bundled Bible modules from assets to the documents directory
+  /// if they don't already exist.
+  Future<void> copyBundledModules() async {
+    final destDir = await _modulesPath;
+
+    for (final fileName in bundledModules) {
+      final destFile = File(p.join(destDir, fileName));
+      if (await destFile.exists()) continue;
+
+      final data = await rootBundle.load('assets/modules/$fileName');
+      final bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
+      await destFile.writeAsBytes(bytes, flush: true);
+    }
   }
 
   Future<List<String>> getAvailableBibles() async {

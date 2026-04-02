@@ -26,7 +26,8 @@
       "Bash(where flutter:*)",
       "Bash(flutter create:*)",
       "Bash(flutter pub:*)",
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(flutter clean:*)"
     ]
   }
 }

@@ -12,6 +12,7 @@ class BibleProvider extends ChangeNotifier {
   int _selectedChapter = 1;
   List<Verse> _verses = [];
   bool _isLoading = false;
+  bool _isInitialized = false;
   double _fontSize = 18;
 
   List<String> get availableBibles => _availableBibles;
@@ -20,17 +21,26 @@ class BibleProvider extends ChangeNotifier {
   int get selectedChapter => _selectedChapter;
   List<Verse> get verses => _verses;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
   double get fontSize => _fontSize;
 
   String get selectedVersionTitle =>
       _selectedVersion?.replaceAll('.SQLite3', '').replaceAll('.db', '') ?? 'No Bible Selected';
 
   Future<void> init() async {
-    _availableBibles = await _service.getAvailableBibles();
-    if (_availableBibles.isNotEmpty) {
-      _selectedVersion = _availableBibles.first;
-      await loadVerses();
+    try {
+      // Copy bundled Bible modules on first launch
+      await _service.copyBundledModules();
+
+      _availableBibles = await _service.getAvailableBibles();
+      if (_availableBibles.isNotEmpty) {
+        _selectedVersion = _availableBibles.first;
+        await loadVerses();
+      }
+    } catch (e) {
+      debugPrint('[BibleProvider] init error: $e');
     }
+    _isInitialized = true;
     notifyListeners();
   }
 
