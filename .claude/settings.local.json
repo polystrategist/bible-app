@@ -31,7 +31,8 @@
       "Bash(dart pub:*)",
       "Read(//c/Users/me/.pub-cache/hosted/**)",
       "Read(//c/Users/me/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
-      "Bash(find \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\FrontEndApp\\\\src\" -type f -name \"*.vue\" -exec grep -l \"logo\\\\|img\\\\|src.*=\" {} \\\\;)"
+      "Bash(find \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\FrontEndApp\\\\src\" -type f -name \"*.vue\" -exec grep -l \"logo\\\\|img\\\\|src.*=\" {} \\\\;)",
+      "Bash(wc -l /d/Projects/Personal/Believers-Sword/FrontEndApp/src/util/Modules/Bible/*.ts)"
     ],
     "additionalDirectories": [
       "d:\\Projects\\Personal\\Believers-Sword"

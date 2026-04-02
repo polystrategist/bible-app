@@ -26,6 +26,8 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { useAuthStore } from './store/authStore';
 import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
+import FlipBook from './Views/ReadBible/FlipBook/FlipBook.vue';
+import VersionSelectModal from './Views/ReadBible/FlipBook/VersionSelectModal.vue';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
@@ -157,6 +159,8 @@ onMounted(async () => {
                     <AboutModal />
                     <SettingsModal />
                     <SelectStudySpaceModal />
+                    <VersionSelectModal />
+                    <FlipBook />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>

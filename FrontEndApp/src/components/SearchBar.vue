@@ -128,7 +128,7 @@ const selectedBooksForSearchString = computed(() => {
         class="fixed top-0 left-0 h-full w-full bg-dark-800 bg-opacity-40"
         @click="focused = false"
     ></div>
-    <div class="w-400px flex justify-center top-0 z-999999999 relative">
+    <div class="flex justify-center top-0 z-999999999 relative">
         <NInput
             ref="SearchInputRef"
             size="medium"

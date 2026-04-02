@@ -25,6 +25,7 @@ import { useMainStore } from '../../../store/main';
 import { Icon } from '@iconify/vue';
 import PiperModelsModal from '../../../components/Settings/VerseReader/PiperModelsModal.vue';
 import FootnotePopover from '../../../components/FootnotePopover/FootnotePopover.vue';
+import { useFlipbookStore } from '../../../store/flipbookStore';
 
 const { t } = useI18n();
 const showPiperModels = ref(false);
@@ -47,6 +48,7 @@ const ttsStore = useTTSStore();
 const piperStore = usePiperTTSStore();
 const settingStore = useSettingStore();
 const mainStore = useMainStore();
+const flipbookStore = useFlipbookStore();
 
 function activeStore() {
     return settingStore.verseReaderMode === 'piper-tts' ? piperStore : ttsStore;
@@ -58,10 +60,14 @@ function playVerse(verseIndex: number, versionIndex: number) {
             if (!piperStore.isInstalled) {
                 dialog.warning({
                     title: 'Piper Not Installed',
-                    content: 'Piper Neural TTS needs to be downloaded before use. Go to Settings → Verse Reader to install it.',
+                    content:
+                        'Piper Neural TTS needs to be downloaded before use. Go to Settings → Verse Reader to install it.',
                     positiveText: 'Open Settings',
                     negativeText: 'Cancel',
-                    onPositiveClick: () => { mainStore.settingsTab = 'VerseReader'; mainStore.showSettings = true; },
+                    onPositiveClick: () => {
+                        mainStore.settingsTab = 'VerseReader';
+                        mainStore.showSettings = true;
+                    },
                 });
                 return;
             }
@@ -97,9 +103,10 @@ const footnotePopover = ref({
 
 async function handleFootnoteHover(event: MouseEvent, version: any, verse: any) {
     const target = event.target as HTMLElement;
-    const footnoteEl = target.tagName.toLowerCase() === 'f'
-        ? target
-        : (target.closest?.('f') as HTMLElement | null);
+    const footnoteEl =
+        target.tagName.toLowerCase() === 'f'
+            ? target
+            : (target.closest?.('f') as HTMLElement | null);
 
     if (!footnoteEl) {
         footnotePopover.value.show = false;
@@ -109,13 +116,15 @@ async function handleFootnoteHover(event: MouseEvent, version: any, verse: any) 
     const marker = footnoteEl.textContent?.trim() ?? '';
     if (!marker) return;
 
-    const footnotes: Array<{ marker: string; text: string }> = await (window as any).browserWindow.getCommentaryForVerse(
+    const footnotes: Array<{ marker: string; text: string }> = await (
+        window as any
+    ).browserWindow.getCommentaryForVerse(
         JSON.stringify({
             version: version.version,
             book_number: verse.book_number,
             chapter: verse.chapter,
             verse: verse.verse,
-        })
+        }),
     );
 
     const match = footnotes.find((f) => f.marker === marker);
@@ -166,20 +175,23 @@ watch(
     (FSelected: string) => {
         SESSION.set('font-family-of-show-chapter', FSelected);
         document.documentElement.style.setProperty('--bible-font-family', FSelected);
-    }
+    },
 );
 
 watch(
     () => fontSize.value,
     (FSize: number) => {
         SESSION.set(fontSizeOfShowChapter, FSize);
-    }
+    },
 );
 
 // Stop TTS when the chapter or book changes — unless TTS itself triggered the chapter advance
 watch(
     () => [bibleStore.selectedChapter, bibleStore.selectedBookNumber],
-    () => { const s = activeStore(); if (s.isActive && !s.autoAdvancing) s.stop(); }
+    () => {
+        const s = activeStore();
+        if (s.isActive && !s.autoAdvancing) s.stop();
+    },
 );
 
 async function navigateChapter(action: 'next' | 'before') {
@@ -188,7 +200,7 @@ async function navigateChapter(action: 'next' | 'before') {
         return;
 
     await bibleStore.selectChapter(
-        action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1
+        action == 'next' ? bibleStore.selectedChapter + 1 : bibleStore.selectedChapter - 1,
     );
     bibleStore.AutoScrollSavedPosition();
 }
@@ -241,7 +253,7 @@ function deleteClipNote(args: { book_number: number; chapter: number; verse: num
     dialog.warning({
         title: t('Confirm'),
         content: t(
-            'Are You Sure You want to remove? If you delete this clip note, you will not be able to undo it!'
+            'Are You Sure You want to remove? If you delete this clip note, you will not be able to undo it!',
         ),
         positiveText: t('Yes'),
         negativeText: t('No'),
@@ -321,29 +333,41 @@ onMounted(() => {
 </script>
 <template>
     <div class="w-full h-full show-chapter-verses flex flex-col read-bible-verses-panel">
-        <div class="h-30px dark:bg-dark-400 flex items-center pb-10px pt-10px select-none px-10px read-bible-verses-toolbar">
-            <div>
+        <div
+            class="dark:bg-dark-400 flex items-center py-6px select-none px-10px read-bible-verses-toolbar overflow-x-auto overflow-y-hidden scrollbar-thin"
+        >
+            <div class="flex-shrink-0">
                 <div
-                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer"
+                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer whitespace-nowrap"
                     @click="navigateChapter('before')"
                 >
                     <NIcon :component="FastForward20Regular" size="20" class="rotate-180" />
                     <span>{{ $t('Before') }}</span>
                 </div>
             </div>
-            <div class="flex justify-center items-center gap-5px w-full">
-                <div class="flex justify-center items-center gap-5px w-full max-w-200px">
-                    <NSlider v-model:value="fontSize" :max="35" :min="10" class="max-w-150px" />
-                    {{ fontSize }}
+            <div class="flex items-center gap-5px flex-1 min-w-0 mx-8px justify-center">
+                <div
+                    class="flex items-center gap-5px flex-shrink-0"
+                    style="width: clamp(100px, 20%, 200px)"
+                >
+                    <NSlider v-model:value="fontSize" :max="35" :min="10" class="flex-1" />
+                    <span class="text-xs flex-shrink-0">{{ fontSize }}</span>
                 </div>
-                <div class="w-100% max-w-250px">
+                <div class="flex-shrink-0" style="width: clamp(100px, 25%, 250px)">
                     <NSelect
                         v-model:value="fontSelected"
                         :options="fontOptions"
                         size="small"
                         filterable
                         :virtual-scroll="false"
-                        :render-label="(option: any) => h('span', { style: `font-family: '${option.value}'` }, option.label as string)"
+                        :render-label="
+                            (option: any) =>
+                                h(
+                                    'span',
+                                    { style: `font-family: '${option.value}'` },
+                                    option.label as string,
+                                )
+                        "
                     />
                 </div>
                 <VerseSelector circle>
@@ -356,40 +380,64 @@ onMounted(() => {
                     size="small"
                     quaternary
                     circle
-                    :title="noteStore.showNote ? 'Hide Notes (Ctrl+Shift+N)' : 'Open Notes (Ctrl+Shift+N)'"
+                    class="flex-shrink-0"
+                    :title="
+                        noteStore.showNote
+                            ? 'Hide Notes (Ctrl+Shift+N)'
+                            : 'Open Notes (Ctrl+Shift+N)'
+                    "
                     @click="noteStore.showNote = !noteStore.showNote"
                 >
                     <template #icon>
-                        <NIcon :component="noteStore.showNote ? Note28Filled : Note24Regular" size="20" />
+                        <NIcon
+                            :component="noteStore.showNote ? Note28Filled : Note24Regular"
+                            size="20"
+                        />
                     </template>
                 </NButton>
                 <NButton
                     size="small"
                     quaternary
-                    :title="voiceReaderLabel + ' — Click to change'"
-                    @click="mainStore.settingsTab = 'VerseReader'; mainStore.showSettings = true"
+                    class="flex-shrink-0 mr-4px"
+                    title="Open as Flipbook"
+                    @click="flipbookStore.openVersionSelect()"
                 >
                     <template #icon>
-                        <Icon icon="mdi:account-voice" style="font-size: 18px;" />
+                        <Icon icon="mdi:book-open-page-variant" style="font-size: 24px" />
                     </template>
-                    <span class="text-xs">{{ voiceReaderLabel }}</span>
+                </NButton>
+                <NButton
+                    size="small"
+                    quaternary
+                    class="flex-shrink-0"
+                    :title="voiceReaderLabel + ' — Click to change'"
+                    @click="
+                        mainStore.settingsTab = 'VerseReader';
+                        mainStore.showSettings = true;
+                    "
+                >
+                    <template #icon>
+                        <Icon icon="mdi:account-voice" style="font-size: 24px" />
+                    </template>
+                    <span class="text-xs whitespace-nowrap">{{ voiceReaderLabel }}</span>
                 </NButton>
                 <NButton
                     v-if="settingStore.verseReaderMode === 'piper-tts' && piperStore.isInstalled"
                     size="small"
                     quaternary
+                    class="flex-shrink-0"
                     title="Voice Models"
                     @click="showPiperModels = true"
                 >
                     <template #icon>
-                        <Icon icon="mdi:account-voice" style="font-size: 18px;" />
+                        <Icon icon="mdi:account-voice" style="font-size: 18px" />
                     </template>
-                    <span class="text-xs">{{ piperVoiceLabel }}</span>
+                    <span class="text-xs whitespace-nowrap">{{ piperVoiceLabel }}</span>
                 </NButton>
             </div>
-            <div>
+            <div class="flex-shrink-0">
                 <div
-                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer"
+                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer whitespace-nowrap"
                     @click="navigateChapter('next')"
                 >
                     <span>{{ $t('Next') }}</span>
@@ -433,7 +481,7 @@ onMounted(() => {
                             'dark:bg-opacity-5 dark:bg-light-100':
                                 verse.verse == bibleStore.selectedVerse,
                             'rounded-t-md': clipNoteRender(
-                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                             ),
                         }"
                         :data-book="verse.book_number"
@@ -441,7 +489,7 @@ onMounted(() => {
                         :data-verse="verse.verse"
                         :style="`border: 1px solid ${
                             clipNoteRender(
-                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                             ).color
                         }`"
                         class="group flex items-center gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-2 relative"
@@ -455,7 +503,10 @@ onMounted(() => {
                             title="Selected Verse"
                         ></div>
                         <div class="flex flex-col items-center gap-2 min-w-8">
-                            <div v-show="verse.version.length > 3" class="flex flex-col items-center gap-1">
+                            <div
+                                v-show="verse.version.length > 3"
+                                class="flex flex-col items-center gap-1"
+                            >
                                 <span
                                     class="font-700 select-none text-size-30px opacity-60 dark:opacity-70"
                                 >
@@ -465,7 +516,7 @@ onMounted(() => {
                                 <Icon
                                     v-if="activeStore().activeVerseNumber === verse.verse"
                                     icon="mdi:account-voice"
-                                    style="font-size: 20px;"
+                                    style="font-size: 20px"
                                     class="text-[var(--primary-color)] animate-pulse"
                                     title="Reading this verse"
                                 />
@@ -478,13 +529,13 @@ onMounted(() => {
                                     title="Read from this verse"
                                     @click.stop="playVerse(verseIndex, 0)"
                                 >
-                                    <Icon icon="mdi:play" style="font-size: 14px;" />
+                                    <Icon icon="mdi:play" style="font-size: 14px" />
                                 </NButton>
                             </div>
                             <div
                                 v-show="
                                     bookmarkStore.isBookmarkExists(
-                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                     )
                                 "
                                 title="This is Bookmarked"
@@ -506,7 +557,10 @@ onMounted(() => {
                                         ? 1
                                         : bibleStore.selectedBibleVersions.length
                                 });`"
-                                :class="{ 'context-menu-active-verse': contextMenuVerseKey === version.key }"
+                                :class="{
+                                    'context-menu-active-verse':
+                                        contextMenuVerseKey === version.key,
+                                }"
                                 @contextmenu="clickContextMenu({ ...verse, key: version.key })"
                             >
                                 <div
@@ -527,7 +581,10 @@ onMounted(() => {
                                     <template v-if="verse.version.length <= 3">
                                         <!-- Speaking icon: only in the column that is being played -->
                                         <Icon
-                                            v-if="activeStore().activeVerseNumber === verse.verse && versionIndex === activeStore().selectedVersionIndex"
+                                            v-if="
+                                                activeStore().activeVerseNumber === verse.verse &&
+                                                versionIndex === activeStore().selectedVersionIndex
+                                            "
                                             icon="mdi:account-voice"
                                             :style="`font-size: ${fontSize}px; vertical-align: middle;`"
                                             class="text-[var(--primary-color)] animate-pulse mx-5px"
@@ -535,16 +592,23 @@ onMounted(() => {
                                         />
                                         <!-- Play button: in every column on hover, but hidden when speaking -->
                                         <NButton
-                                            v-else-if="activeStore().activeVerseNumber !== verse.verse"
+                                            v-else-if="
+                                                activeStore().activeVerseNumber !== verse.verse
+                                            "
                                             size="tiny"
                                             quaternary
                                             circle
                                             class="opacity-0 group-hover:opacity-100 transition-opacity"
-                                            style="vertical-align: middle; margin: 0 1px;"
+                                            style="vertical-align: middle; margin: 0 1px"
                                             title="Read from this verse"
-                                            @click.stop="playVerse(verseIndex, versionIndex as number)"
+                                            @click.stop="
+                                                playVerse(verseIndex, versionIndex as number)
+                                            "
                                         >
-                                            <Icon icon="mdi:play" :style="`font-size: ${fontSize - 3}px;`" />
+                                            <Icon
+                                                icon="mdi:play"
+                                                :style="`font-size: ${fontSize - 3}px;`"
+                                            />
                                         </NButton>
                                     </template>
                                     <span
@@ -568,12 +632,12 @@ onMounted(() => {
                     <div
                         v-if="
                             clipNoteRender(
-                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                             )
                         "
                         :style="`background: ${
                             clipNoteRender(
-                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                             ).color
                         }`"
                         class="prose-mirror-render-html relative text-dark-900 rounded-b-md mb-3"
@@ -589,17 +653,17 @@ onMounted(() => {
                                 class="shadow-md"
                                 :style="`background: ${
                                     clipNoteRender(
-                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                     ).color
                                 }`"
                                 size="small"
                                 @click="
                                     createClipNoteRef &&
-                                        createClipNoteRef.toggleClipNoteModal(
-                                            clipNoteRender(
-                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
-                                            )
-                                        )
+                                    createClipNoteRef.toggleClipNoteModal(
+                                        clipNoteRender(
+                                            `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                        ),
+                                    )
                                 "
                                 title="Edit"
                             >
@@ -611,7 +675,7 @@ onMounted(() => {
                                 class="shadow-md"
                                 :style="`background: ${
                                     clipNoteRender(
-                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                     ).color
                                 }`"
                                 size="small"
@@ -634,7 +698,7 @@ onMounted(() => {
                             class="px-10px pb-1 view-verse-rendered-clip-note"
                             v-html="
                                 clipNoteRender(
-                                    `key_${verse.book_number}_${verse.chapter}_${verse.verse}`
+                                    `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                 ).content
                             "
                         ></div>
