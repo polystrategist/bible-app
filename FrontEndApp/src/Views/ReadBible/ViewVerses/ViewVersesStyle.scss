@@ -1,3 +1,19 @@
+.read-bible-verses-toolbar {
+    &::-webkit-scrollbar {
+        height: 3px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.3);
+        border-radius: 2px;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, 0.5);
+    }
+}
+
 .context-menu-active-verse .verse-select-text {
     text-decoration: underline;
     text-decoration-color: var(--primary-color);
