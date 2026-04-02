@@ -21,6 +21,7 @@ const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const settingStore = useSettingStore();
+
 const downloadPercentage = ref<number>(0);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];

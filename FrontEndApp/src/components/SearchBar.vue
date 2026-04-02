@@ -116,6 +116,7 @@ const selectedBooksForSearchString = computed(() => {
             size="small"
             v-model:value="search"
             :autofocus="false"
+            :input-props="{ tabindex: -1 }"
             :on-focus="() => (focused = true)"
             class="transition-all"
             :class="focused ? '!w-400px' : '!w-300px'"

@@ -16,7 +16,13 @@
       "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT book_number, long_name FROM books LIMIT 10;\")",
       "Bash(sqlite3 \"New International Version.SQLite3\" \"SELECT text FROM verses WHERE book_number=500 AND chapter=18 AND verse=9;\")",
       "Bash(sqlite3 \"New International Version.commentaries.SQLite3\" \"SELECT * FROM commentaries WHERE book_number=500 AND chapter_number_from=18 AND verse_number_from=9;\")",
-      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "WebFetch(domain:ebible.org)",
+      "Bash(grep -E \"\\\\.\\(ts|json\\)$\")",
+      "Bash(sqlite3 \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\defaults\\\\Main\\\\Store.db\" \".tables\")",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const m = require\\('@vicons/carbon'\\); console.log\\('DocumentImport:', !!m.DocumentImport, 'Checkmark:', !!m.Checkmark, 'Close:', !!m.Close\\)\")",
+      "Bash(node -e \"require\\('@iconify/vue'\\); console.log\\('ok'\\)\")"
     ]
   }
 }

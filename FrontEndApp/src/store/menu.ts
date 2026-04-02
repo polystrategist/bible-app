@@ -118,6 +118,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
 
     async function setMenu(menu: string) {
         if (menu == '/settings-page') {
+            mainStore.settingsTab = 'General';
             mainStore.showSettings = true;
             return;
         }

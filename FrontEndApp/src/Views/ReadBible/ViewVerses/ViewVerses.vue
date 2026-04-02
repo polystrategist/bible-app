@@ -29,6 +29,10 @@ import FootnotePopover from '../../../components/FootnotePopover/FootnotePopover
 const { t } = useI18n();
 const showPiperModels = ref(false);
 
+const voiceReaderLabel = computed(() => {
+    return settingStore.verseReaderMode === 'piper-tts' ? 'Piper TTS' : 'Browser TTS';
+});
+
 const piperVoiceLabel = computed(() => {
     const id = settingStore.piperActiveModel;
     const parts = id.split('-');
@@ -358,6 +362,17 @@ onMounted(() => {
                     <template #icon>
                         <NIcon :component="noteStore.showNote ? Note28Filled : Note24Regular" size="20" />
                     </template>
+                </NButton>
+                <NButton
+                    size="small"
+                    quaternary
+                    :title="voiceReaderLabel + ' — Click to change'"
+                    @click="mainStore.settingsTab = 'VerseReader'; mainStore.showSettings = true"
+                >
+                    <template #icon>
+                        <Icon icon="mdi:account-voice" style="font-size: 18px;" />
+                    </template>
+                    <span class="text-xs">{{ voiceReaderLabel }}</span>
                 </NButton>
                 <NButton
                     v-if="settingStore.verseReaderMode === 'piper-tts' && piperStore.isInstalled"

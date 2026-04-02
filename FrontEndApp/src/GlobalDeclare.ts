@@ -189,6 +189,12 @@ declare global {
             onUpdateProgress: (cb: (percent: number) => void) => void;
             onUpdateDownloaded: (cb: () => void) => void;
 
+            // Bible Import
+            importBibleSelectFile: () => Promise<{ canceled: boolean; filePath?: string }>;
+            importBibleValidate: (filePath: string) => Promise<{ valid: boolean; error?: string; verseCount?: number }>;
+            importBibleCheckDuplicate: (title: string) => Promise<{ exists: boolean }>;
+            importBible: (args: { filePath: string; title: string; description: string }) => Promise<{ success: boolean; error?: string; verseCount?: number; fileName?: string }>;
+
             // Sync
             logSyncChange: (entry: any) => Promise<any>;
             getUnsyncedChanges: () => Promise<any[]>;

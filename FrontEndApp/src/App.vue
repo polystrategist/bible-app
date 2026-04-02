@@ -19,6 +19,7 @@ import Sermons from './Views/Sermons/Sermons.vue';
 import SESSION from './util/session';
 import FooterComponent from './components/Footer/Footer.vue';
 import DownloadBible from './components/DownloadBible/DownloadBible.vue';
+import ImportBible from './components/ImportBible/ImportBible.vue';
 import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
@@ -152,6 +153,7 @@ onMounted(async () => {
                         <FooterComponent class="h-[var(--footer-height)]" size="tiny" />
                     </NLayout>
                     <DownloadBible />
+                    <ImportBible />
                     <AboutModal />
                     <SettingsModal />
                     <SelectStudySpaceModal />
