@@ -3,6 +3,6 @@ import 'package:believers_sword_mobile/main.dart';
 
 void main() {
   testWidgets('App starts', (WidgetTester tester) async {
-    await tester.pumpWidget(const BelieversWordApp());
+    await tester.pumpWidget(const MyApp());
   });
 }
