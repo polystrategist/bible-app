@@ -15,6 +15,7 @@ import { SyncHandlers } from './Sync/SyncHandlers';
 import { PiperTTSHandlers } from './Piper/PiperTTS';
 import Commentaries from '../Modules/Commentaries/Commentaries';
 import DailyDevotional from './DailyDevotional/DailyDevotional';
+import importing from './importing/importing';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -64,4 +65,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // daily devotional handlers
     DailyDevotional();
+
+    // bible import handlers
+    importing(BrowserWindow);
 };

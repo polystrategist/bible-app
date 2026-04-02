@@ -4,7 +4,7 @@ import RightSideBarContainer from './../../../../components/ReadBible/RightSideB
 import { useBibleStore } from '../../../../store/BibleStore';
 import { useModuleStore } from '../../../../store/moduleStore';
 import { useBibleDownloadStore } from '../../../../store/downloadBible';
-import { Download } from '@vicons/carbon';
+import { Download, DocumentImport } from '@vicons/carbon';
 
 const message = useMessage();
 const bibleStore = useBibleStore();
@@ -21,7 +21,7 @@ function handleCheckBox(bibleVersions: Array<any>) {
 </script>
 <template>
     <RightSideBarContainer :title="$t('Bible List')">
-        <template #rightSide>
+        <div class="flex gap-4px mb-6px">
             <NButton quaternary size="tiny" title="Download" @click="bibleDownloadStore.showBibleDownloadModal = true">
                 <template #icon>
                     <NIcon>
@@ -30,7 +30,15 @@ function handleCheckBox(bibleVersions: Array<any>) {
                 </template>
                 <span class="capitalize">{{ $t('download') }}</span>
             </NButton>
-        </template>
+            <NButton quaternary size="tiny" title="Import" @click="bibleDownloadStore.showImportBibleModal = true">
+                <template #icon>
+                    <NIcon>
+                        <DocumentImport />
+                    </NIcon>
+                </template>
+                <span class="capitalize">{{ $t('import') }}</span>
+            </NButton>
+        </div>
         <NCheckboxGroup v-model:value="bibleStore.selectedBibleVersions" @update:value="handleCheckBox" class="flex flex-col">
             <template v-for="bible in moduleStore.bibleLists">
                 <NCheckbox v-if="!bible.title.includes('commentaries')" :value="bible.file_name"
