@@ -22,7 +22,19 @@
       "Bash(sqlite3 \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\defaults\\\\Main\\\\Store.db\" \".tables\")",
       "Bash(npx tsc:*)",
       "Bash(node -e \"const m = require\\('@vicons/carbon'\\); console.log\\('DocumentImport:', !!m.DocumentImport, 'Checkmark:', !!m.Checkmark, 'Close:', !!m.Close\\)\")",
-      "Bash(node -e \"require\\('@iconify/vue'\\); console.log\\('ok'\\)\")"
+      "Bash(node -e \"require\\('@iconify/vue'\\); console.log\\('ok'\\)\")",
+      "Bash(where flutter:*)",
+      "Bash(flutter create:*)",
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter clean:*)",
+      "Bash(dart pub:*)",
+      "Read(//c/Users/me/.pub-cache/hosted/**)",
+      "Read(//c/Users/me/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
+      "Bash(find \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\FrontEndApp\\\\src\" -type f -name \"*.vue\" -exec grep -l \"logo\\\\|img\\\\|src.*=\" {} \\\\;)"
+    ],
+    "additionalDirectories": [
+      "d:\\Projects\\Personal\\Believers-Sword"
     ]
   }
 }
