@@ -14,6 +14,7 @@ class BibleProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isInitialized = false;
   double _fontSize = 18;
+  int? _targetVerse;
 
   List<String> get availableBibles => _availableBibles;
   String? get selectedVersion => _selectedVersion;
@@ -23,6 +24,14 @@ class BibleProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
   double get fontSize => _fontSize;
+  int? get targetVerse => _targetVerse;
+
+  /// Consume the target verse (returns it once, then clears).
+  int? consumeTargetVerse() {
+    final v = _targetVerse;
+    _targetVerse = null;
+    return v;
+  }
 
   String get selectedVersionTitle =>
       _selectedVersion?.replaceAll('.SQLite3', '').replaceAll('.db', '') ?? 'No Bible Selected';
@@ -74,6 +83,14 @@ class BibleProvider extends ChangeNotifier {
     }
   }
 
+  /// Navigate to a specific book, chapter, and optionally scroll to a verse.
+  Future<void> goToVerse(Book book, int chapter, {int? verse}) async {
+    _selectedBook = book;
+    _selectedChapter = chapter;
+    _targetVerse = verse;
+    await loadVerses();
+  }
+
   void setFontSize(double size) {
     _fontSize = size.clamp(12.0, 36.0);
     notifyListeners();
@@ -93,6 +110,15 @@ class BibleProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<int> getVerseCount(int bookNumber, int chapter) async {
+    if (_selectedVersion == null) return 0;
+    return _service.getVerseCount(
+      version: _selectedVersion!,
+      bookNumber: bookNumber,
+      chapter: chapter,
+    );
   }
 
   Future<List<Verse>> search(String query) async {

@@ -27,7 +27,10 @@
       "Bash(flutter create:*)",
       "Bash(flutter pub:*)",
       "Bash(flutter analyze:*)",
-      "Bash(flutter clean:*)"
+      "Bash(flutter clean:*)",
+      "Bash(dart pub:*)",
+      "Read(//c/Users/me/.pub-cache/hosted/**)",
+      "Read(//c/Users/me/AppData/Local/Pub/Cache/hosted/pub.dev/**)"
     ]
   }
 }

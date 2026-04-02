@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
 import '../providers/bible_provider.dart';
 
 class VersionSelectorScreen extends StatelessWidget {
@@ -8,11 +10,17 @@ class VersionSelectorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bible = context.watch<BibleProvider>();
+    final theme = ShadTheme.of(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Select Version')),
       body: bible.availableBibles.isEmpty
-          ? const Center(child: Text('No Bible modules found'))
+          ? Center(
+              child: Text(
+                'No Bible modules found',
+                style: theme.textTheme.muted,
+              ),
+            )
           : ListView.builder(
               itemCount: bible.availableBibles.length,
               itemBuilder: (context, index) {
@@ -25,10 +33,8 @@ class VersionSelectorScreen extends StatelessWidget {
                 return ListTile(
                   title: Text(title),
                   leading: Icon(
-                    isSelected ? Icons.check_circle : Icons.circle_outlined,
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
+                    isSelected ? LucideIcons.circleCheck : LucideIcons.circle,
+                    color: isSelected ? theme.colorScheme.primary : null,
                   ),
                   onTap: () {
                     bible.selectVersion(version);

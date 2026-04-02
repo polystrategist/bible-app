@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -64,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final theme = ShadTheme.of(context);
 
     // Already logged in — show profile
     if (auth.isAuthenticated) {
@@ -72,53 +75,62 @@ class _LoginScreenState extends State<LoginScreen> {
         body: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Card(
+            ShadCard(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Icon(Icons.account_circle, size: 64),
+                    Icon(LucideIcons.circleUserRound,
+                        size: 64, color: theme.colorScheme.primary),
                     const SizedBox(height: 8),
                     Text(
                       auth.user?['name'] ?? 'User',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                      style: theme.textTheme.large,
                     ),
                     Text(
                       auth.user?['email'] ?? '',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      style: theme.textTheme.muted,
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Cloud Sync'),
-              subtitle: const Text('Sync bookmarks, highlights, and notes'),
-              value: auth.syncEnabled,
-              onChanged: (v) => auth.setSyncEnabled(v),
-            ),
-            if (auth.syncEnabled)
-              ListTile(
-                leading: const Icon(Icons.sync),
-                title: const Text('Sync Now'),
-                onTap: () {
-                  auth.triggerSync();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Syncing...')),
-                  );
-                },
+            ShadCard(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    ShadSwitch(
+                      value: auth.syncEnabled,
+                      onChanged: (v) => auth.setSyncEnabled(v),
+                      label: const Text('Cloud Sync'),
+                    ),
+                    if (auth.syncEnabled) ...[
+                      const SizedBox(height: 8),
+                      ShadButton.outline(
+                        leading: const Icon(LucideIcons.refreshCw, size: 16),
+                        onPressed: () {
+                          auth.triggerSync();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Syncing...')),
+                          );
+                        },
+                        child: const Text('Sync Now'),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
-              onTap: () async {
+            ),
+            const SizedBox(height: 16),
+            ShadButton.destructive(
+              leading: const Icon(LucideIcons.logOut, size: 16),
+              onPressed: () async {
                 await auth.logout();
                 if (context.mounted) Navigator.pop(context);
               },
+              child: const Text('Logout'),
             ),
           ],
         ),
@@ -133,63 +145,56 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (!_isLogin)
-              TextField(
+            if (!_isLogin) ...[
+              ShadInput(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
+                placeholder: const Text('Name'),
               ),
-            if (!_isLogin) const SizedBox(height: 12),
-            TextField(
+              const SizedBox(height: 12),
+            ],
+            ShadInput(
               controller: _emailController,
+              placeholder: const Text('Email'),
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
             ),
             const SizedBox(height: 12),
-            TextField(
+            ShadInput(
               controller: _passwordController,
+              placeholder: const Text('Password'),
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
             ),
             if (!_isLogin) ...[
               const SizedBox(height: 12),
-              TextField(
+              ShadInput(
                 controller: _confirmPasswordController,
+                placeholder: const Text('Confirm Password'),
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                  border: OutlineInputBorder(),
-                ),
               ),
             ],
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                child: ShadAlert.destructive(
+                  title: Text(_error!),
                 ),
               ),
             const SizedBox(height: 20),
-            FilledButton(
-              onPressed: _isLoading ? null : _submit,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+            ShadButton(
+              enabled: !_isLoading,
+              onPressed: _submit,
+              leading: _isLoading
+                  ? SizedBox.square(
+                      dimension: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.colorScheme.primaryForeground,
+                      ),
                     )
-                  : Text(_isLogin ? 'Login' : 'Register'),
+                  : null,
+              child: Text(_isLogin ? 'Login' : 'Register'),
             ),
-            TextButton(
+            const SizedBox(height: 8),
+            ShadButton.link(
               onPressed: () => setState(() {
                 _isLogin = !_isLogin;
                 _error = null;

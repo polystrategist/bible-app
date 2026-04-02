@@ -79,6 +79,19 @@ class BibleService {
     return rows.map((r) => Verse.fromMap(r)).toList();
   }
 
+  Future<int> getVerseCount({
+    required String version,
+    required int bookNumber,
+    required int chapter,
+  }) async {
+    final db = await _getDatabase(version);
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as cnt FROM verses WHERE book_number = ? AND chapter = ?',
+      [bookNumber, chapter],
+    );
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   Future<List<Verse>> search({
     required String version,
     required String query,

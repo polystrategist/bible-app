@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
+
 import '../models/book.dart';
 import '../models/verse.dart';
 import '../providers/bible_provider.dart';
@@ -61,20 +63,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ShadTheme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
+        title: ShadInput(
           controller: _controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Search Bible...',
-            border: InputBorder.none,
-          ),
-          onSubmitted: _search,
+          placeholder: const Text('Search Bible...'),
+          onSubmitted: (v) => _search(v),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
+          ShadIconButton.ghost(
+            icon: const Icon(LucideIcons.search, size: 20),
             onPressed: () => _search(_controller.text),
           ),
         ],
@@ -87,9 +87,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     _controller.text.isEmpty
                         ? 'Type to search'
                         : 'No results found',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    style: theme.textTheme.muted,
                   ),
                 )
               : ListView.builder(
@@ -99,9 +97,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     return ListTile(
                       title: Text(
                         '${_getBookName(verse.bookNumber)} ${verse.chapter}:${verse.verse}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                        style: theme.textTheme.small.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       subtitle: Text(
@@ -114,8 +111,8 @@ class _SearchScreenState extends State<SearchScreen> {
                         final book = bibleBooks.firstWhere(
                           (b) => b.bookNumber == verse.bookNumber,
                         );
-                        bible.selectBook(book);
-                        bible.selectChapter(verse.chapter);
+                        bible.goToVerse(book, verse.chapter,
+                            verse: verse.verse);
                         Navigator.pop(context);
                       },
                     );
