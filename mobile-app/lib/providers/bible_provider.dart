@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/book.dart';
 import '../models/verse.dart';
 import '../services/bible_service.dart';
@@ -14,6 +16,7 @@ class BibleProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isInitialized = false;
   double _fontSize = 18;
+  double _scrollOffset = 0;
   int? _targetVerse;
 
   List<String> get availableBibles => _availableBibles;
@@ -24,6 +27,7 @@ class BibleProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
   double get fontSize => _fontSize;
+  double get scrollOffset => _scrollOffset;
   int? get targetVerse => _targetVerse;
 
   /// Consume the target verse (returns it once, then clears).
@@ -38,12 +42,37 @@ class BibleProvider extends ChangeNotifier {
 
   Future<void> init() async {
     try {
-      // Copy bundled Bible modules on first launch
       await _service.copyBundledModules();
-
       _availableBibles = await _service.getAvailableBibles();
+
+      // Restore saved reading position
+      final prefs = await SharedPreferences.getInstance();
+      final savedVersion = prefs.getString('reading_version');
+      final savedBookNumber = prefs.getInt('reading_book_number');
+      final savedChapter = prefs.getInt('reading_chapter');
+      final savedFontSize = prefs.getDouble('reading_font_size');
+      _scrollOffset = prefs.getDouble('reading_scroll_offset') ?? 0;
+
+      if (savedFontSize != null) {
+        _fontSize = savedFontSize.clamp(12.0, 36.0);
+      }
+
       if (_availableBibles.isNotEmpty) {
-        _selectedVersion = _availableBibles.first;
+        if (savedVersion != null && _availableBibles.contains(savedVersion)) {
+          _selectedVersion = savedVersion;
+        } else {
+          _selectedVersion = _availableBibles.first;
+        }
+
+        if (savedBookNumber != null) {
+          final book = bibleBooks.where((b) => b.bookNumber == savedBookNumber);
+          if (book.isNotEmpty) _selectedBook = book.first;
+        }
+
+        if (savedChapter != null && savedChapter <= _selectedBook.chapterCount) {
+          _selectedChapter = savedChapter;
+        }
+
         await loadVerses();
       }
     } catch (e) {
@@ -53,33 +82,59 @@ class BibleProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _saveState() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_selectedVersion != null) {
+      await prefs.setString('reading_version', _selectedVersion!);
+    }
+    await prefs.setInt('reading_book_number', _selectedBook.bookNumber);
+    await prefs.setInt('reading_chapter', _selectedChapter);
+    await prefs.setDouble('reading_font_size', _fontSize);
+  }
+
+  void saveScrollOffset(double offset) async {
+    _scrollOffset = offset;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('reading_scroll_offset', offset);
+  }
+
   Future<void> selectVersion(String version) async {
     _selectedVersion = version;
+    _scrollOffset = 0;
     await loadVerses();
+    _saveState();
   }
 
   Future<void> selectBook(Book book) async {
     _selectedBook = book;
     _selectedChapter = 1;
+    _scrollOffset = 0;
     await loadVerses();
+    _saveState();
   }
 
   Future<void> selectChapter(int chapter) async {
     _selectedChapter = chapter;
+    _scrollOffset = 0;
     await loadVerses();
+    _saveState();
   }
 
   Future<void> nextChapter() async {
     if (_selectedChapter < _selectedBook.chapterCount) {
       _selectedChapter++;
+      _scrollOffset = 0;
       await loadVerses();
+      _saveState();
     }
   }
 
   Future<void> previousChapter() async {
     if (_selectedChapter > 1) {
       _selectedChapter--;
+      _scrollOffset = 0;
       await loadVerses();
+      _saveState();
     }
   }
 
@@ -88,12 +143,15 @@ class BibleProvider extends ChangeNotifier {
     _selectedBook = book;
     _selectedChapter = chapter;
     _targetVerse = verse;
+    _scrollOffset = 0;
     await loadVerses();
+    _saveState();
   }
 
   void setFontSize(double size) {
     _fontSize = size.clamp(12.0, 36.0);
     notifyListeners();
+    _saveState();
   }
 
   Future<void> loadVerses() async {

@@ -29,7 +29,10 @@ class _VerseListState extends State<VerseList> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToTarget());
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _restoreOrScrollToTarget();
+    });
   }
 
   @override
@@ -37,18 +40,47 @@ class _VerseListState extends State<VerseList> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.verses != widget.verses) {
       _verseKeys.clear();
-      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToTarget());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _restoreOrScrollToTarget();
+      });
     }
   }
 
-  void _scrollToTarget() {
+  void _restoreOrScrollToTarget() {
     final bible = context.read<BibleProvider>();
     final target = bible.consumeTargetVerse();
-    if (target == null) return;
 
-    final key = _verseKeys[target];
+    if (target != null) {
+      _scrollToVerse(target);
+    } else if (bible.scrollOffset > 0 &&
+        _scrollController.hasClients &&
+        _scrollController.position.maxScrollExtent >= bible.scrollOffset) {
+      _scrollController.jumpTo(bible.scrollOffset);
+    }
+  }
+
+  Future<void> _scrollToVerse(int verseNumber) async {
+    // The verse might not be built yet (ListView.builder is lazy).
+    // First, estimate a scroll position to bring the verse into view,
+    // then do a precise ensureVisible once it's rendered.
+    if (!_scrollController.hasClients) return;
+
+    // Estimate: each verse is roughly (fontSize * 4) pixels tall
+    final estimatedItemHeight = widget.fontSize * 4;
+    final estimatedOffset = (verseNumber - 1) * estimatedItemHeight;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (estimatedOffset > 0) {
+      _scrollController.jumpTo(estimatedOffset.clamp(0, maxScroll));
+      // Wait for the frame to build the items at the new scroll position
+      await Future.delayed(const Duration(milliseconds: 50));
+      await WidgetsBinding.instance.endOfFrame;
+    }
+
+    // Now try precise scroll using the GlobalKey
+    final key = _verseKeys[verseNumber];
     if (key?.currentContext != null) {
-      Scrollable.ensureVisible(
+      await Scrollable.ensureVisible(
         key!.currentContext!,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -57,8 +89,13 @@ class _VerseListState extends State<VerseList> {
     }
   }
 
+  void _onScroll() {
+    context.read<BibleProvider>().saveScrollOffset(_scrollController.offset);
+  }
+
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }

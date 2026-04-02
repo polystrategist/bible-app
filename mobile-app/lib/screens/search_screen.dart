@@ -40,6 +40,46 @@ class _SearchScreenState extends State<SearchScreen> {
         .trim();
   }
 
+  Widget _buildHighlightedText(String text, String query, ShadThemeData theme) {
+    if (query.isEmpty) {
+      return Text(text, maxLines: 2, overflow: TextOverflow.ellipsis);
+    }
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+    final spans = <TextSpan>[];
+    var start = 0;
+
+    while (true) {
+      final index = lowerText.indexOf(lowerQuery, start);
+      if (index == -1) {
+        spans.add(TextSpan(text: text.substring(start)));
+        break;
+      }
+      if (index > start) {
+        spans.add(TextSpan(text: text.substring(start, index)));
+      }
+      spans.add(TextSpan(
+        text: text.substring(index, index + query.length),
+        style: TextStyle(
+          backgroundColor: theme.colorScheme.primary.withAlpha(60),
+          fontWeight: FontWeight.w600,
+          color: theme.colorScheme.primary,
+        ),
+      ));
+      start = index + query.length;
+    }
+
+    return RichText(
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: TextStyle(color: theme.colorScheme.foreground, fontSize: 14),
+        children: spans,
+      ),
+    );
+  }
+
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
       setState(() => _results = []);
@@ -101,10 +141,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      subtitle: Text(
+                      subtitle: _buildHighlightedText(
                         _stripHtml(verse.text),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        _controller.text.trim(),
+                        theme,
                       ),
                       onTap: () {
                         final bible = context.read<BibleProvider>();
