@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { NButton, NCheckbox, NCheckboxGroup, NIcon, NInput, useMessage } from 'naive-ui';
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { searchBibleType } from '../GlobalTypes';
 import { highlighter, removeHighlight } from '../util/hilitor';
 import { useBibleStore } from '../store/BibleStore';
@@ -21,6 +21,24 @@ const message = useMessage();
 const selectedBookNumbers = ref<Array<number>>(bibleBooks.map((book) => book.book_number));
 const showBookSelection = ref(false);
 const SearchInputRef = ref();
+
+function handleGlobalKeydown(e: KeyboardEvent) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        focused.value = true;
+        nextTick(() => {
+            SearchInputRef.value?.focus();
+        });
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleGlobalKeydown);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleGlobalKeydown);
+});
 
 watch(
     () => search.value,
@@ -113,7 +131,7 @@ const selectedBooksForSearchString = computed(() => {
     <div class="w-400px flex justify-center top-0 z-999999999 relative">
         <NInput
             ref="SearchInputRef"
-            size="small"
+            size="medium"
             v-model:value="search"
             :autofocus="false"
             :input-props="{ tabindex: -1 }"
@@ -121,7 +139,7 @@ const selectedBooksForSearchString = computed(() => {
             class="transition-all"
             :class="focused ? '!w-400px' : '!w-300px'"
             clearable
-            :placeholder="$t('Search Bible') + '...'"
+            :placeholder="$t('Search') + '...'"
             :round="!focused"
             @keyup="
                 (key: any) => {

@@ -30,7 +30,11 @@
       "Bash(flutter clean:*)",
       "Bash(dart pub:*)",
       "Read(//c/Users/me/.pub-cache/hosted/**)",
-      "Read(//c/Users/me/AppData/Local/Pub/Cache/hosted/pub.dev/**)"
+      "Read(//c/Users/me/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
+      "Bash(find \"d:\\\\Projects\\\\Personal\\\\Believers-Sword\\\\FrontEndApp\\\\src\" -type f -name \"*.vue\" -exec grep -l \"logo\\\\|img\\\\|src.*=\" {} \\\\;)"
+    ],
+    "additionalDirectories": [
+      "d:\\Projects\\Personal\\Believers-Sword"
     ]
   }
 }

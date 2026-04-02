@@ -20,8 +20,8 @@ defineProps({
 <template>
     <NPopover trigger="click" :placement="placement as any">
         <template #trigger>
-            <NButton round size="tiny" quaternary title="Change Theme">
-                <NIcon size="17">
+            <NButton round size="small" quaternary title="Change Theme">
+                <NIcon size="20">
                     <PaintBucket24Filled v-if="themeStore.isDark" />
                     <PaintBucket24Regular v-else />
                 </NIcon>

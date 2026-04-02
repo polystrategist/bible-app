@@ -61,13 +61,13 @@ onBeforeMount(async () => {
         bordered
         class="flex cursor-default select-none items-center pl-13px justify-between"
     >
-        <div class="whitespace-nowrap flex items-center gap-1 pl-0px">
-            <LogoComponent class="w-20px h-20px" />
-            <div class="mr-20px">{{ $t('Believers Sword') }}</div>
-            <div>
+        <div class="whitespace-nowrap flex items-center gap-2 pl-0px">
+            <LogoComponent class="w-32px h-32px" />
+            <div class="mr-10px font-semibold">{{ $t('Believers Sword') }}</div>
+            <div class="flex items-center gap-1">
                 <NButton
                     v-if="menuStore.menuSelected === 'read-bible'"
-                    size="small"
+                    size="medium"
                     icon-placement="right"
                     @click="StudySpaceStore.showSpaceStudy = true"
                     :focusable="false"
@@ -97,7 +97,7 @@ onBeforeMount(async () => {
                 </NButton>
             <template v-if="menuStore.menuSelected === 'read-bible'">
                 <NButton
-                    size="small"
+                    size="medium"
                     :type="settingStore.showLeftSidebar ? 'primary' : 'default'"
                     :secondary="settingStore.showLeftSidebar"
                     :quaternary="!settingStore.showLeftSidebar"
@@ -106,13 +106,13 @@ onBeforeMount(async () => {
                     :title="$t('Toggle left sidebar')"
                     @click="settingStore.showLeftSidebar = !settingStore.showLeftSidebar"
                 >
-                    <NIcon size="17">
+                    <NIcon size="20">
                         <PanelLeft20Filled v-if="settingStore.showLeftSidebar" />
                         <PanelLeft20Regular v-else />
                     </NIcon>
                 </NButton>
                 <NButton
-                    size="small"
+                    size="medium"
                     :type="settingStore.showRightSidebar ? 'primary' : 'default'"
                     :secondary="settingStore.showRightSidebar"
                     :quaternary="!settingStore.showRightSidebar"
@@ -121,13 +121,13 @@ onBeforeMount(async () => {
                     :title="$t('Toggle right sidebar')"
                     @click="settingStore.showRightSidebar = !settingStore.showRightSidebar"
                 >
-                    <NIcon size="17">
+                    <NIcon size="20">
                         <PanelRight20Filled v-if="settingStore.showRightSidebar" />
                         <PanelRight20Regular v-else />
                     </NIcon>
                 </NButton>
                 <NButton
-                    size="small"
+                    size="medium"
                     :type="noteStore.showNote ? 'primary' : 'default'"
                     :secondary="noteStore.showNote"
                     :quaternary="!noteStore.showNote"
@@ -136,7 +136,7 @@ onBeforeMount(async () => {
                     :title="$t('Toggle notes panel')"
                     @click="noteStore.showNote = !noteStore.showNote"
                 >
-                    <NIcon size="17">
+                    <NIcon size="20">
                         <PanelBottom20Filled v-if="noteStore.showNote" />
                         <PanelBottom20Regular v-else />
                     </NIcon>
@@ -150,8 +150,8 @@ onBeforeMount(async () => {
             <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>
         </div>
         <div class="flex items-center h-full justify-end pr-6px">
-            <NButton round size="tiny" quaternary @click="mainStore.showAbout = true" title="About">
-                <NIcon size="17">
+            <NButton round size="small" quaternary @click="mainStore.showAbout = true" title="About">
+                <NIcon size="20">
                     <Information />
                 </NIcon>
             </NButton>
@@ -159,37 +159,37 @@ onBeforeMount(async () => {
             <ProfileDropdown v-if="false" />
             <NButton
                 v-show="isElectron"
-                size="tiny"
+                size="small"
                 quaternary
                 :title="$t('minimize')"
                 @click="minimizeWindow()"
                 class="ml-5"
             >
-                <NIcon size="17">
+                <NIcon size="20">
                     <Subtract20Regular />
                 </NIcon>
             </NButton>
             <NButton
                 v-show="isElectron"
-                size="tiny"
+                size="small"
                 quaternary
                 :title="$t('maximize')"
                 @click="maximizeWindow()"
             >
-                <NIcon size="15">
+                <NIcon size="18">
                     <SquareMultiple20Regular v-if="isMaximized" />
                     <Square20Regular v-else />
                 </NIcon>
             </NButton>
             <NButton
-                size="tiny"
+                size="small"
                 quaternary
                 v-show="isElectron"
                 :title="$t('close')"
                 @click="closeWindow()"
                 class="!hover:bg-red-5"
             >
-                <NIcon size="20">
+                <NIcon size="22">
                     <Close />
                 </NIcon>
             </NButton>

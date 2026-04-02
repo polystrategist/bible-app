@@ -1,7 +1,8 @@
 :root {
-    --primary-color: #f2ad23;
-    --primary-color-light: rgba(238, 167, 24, 0.212);
-    --header-height: 40px;
+    --primary-color: #fc4201;
+    --primary-color-light: rgba(252, 66, 1, 0.212);
+    --gradient-spicy-sunrise: linear-gradient(90deg, hsla(358, 85%, 68%, 1) 0%, hsla(41, 98%, 49%, 1) 100%);
+    --header-height: 55px;
     --footer-height: 40px;
     --scrollbar-track: rgba(20, 20, 20, 0.08);
     --scrollbar-thumb: rgba(40, 40, 40, 0.28);
@@ -441,5 +442,16 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-ro
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-editor-panel {
     background-color: var(--theme-bg-soft) !important;
     border-color: var(--theme-border) !important;
+}
+
+.spicy-sunrise {
+    background: var(--gradient-spicy-sunrise);
+}
+
+.spicy-sunrise-text {
+    background: var(--gradient-spicy-sunrise);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
