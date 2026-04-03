@@ -41,13 +41,22 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const highlightLimit = ref<number>(50);
     const renderVerses = computed(() => {
         return verses.value.map((v) => {
+            // Version-independent highlight key
+            const highlightKey = `${v.book_number}_${v.chapter}_${v.verse}`;
+            const highlight = (chapterHighlights.value as any)[highlightKey];
+            // Content is now just the hex color (e.g., "#FFD26A")
+            const highlightColor = highlight?.content ?? null;
+
             const theVersions = v.version.map((ver: any) => {
                 const key = `${ver.version.replace('.SQLite3', '')}_${v.book_number}_${v.chapter}_${
                     v.verse
                 }`;
-                const highlight = (chapterHighlights.value as any)[key];
+                let text = ver.text;
+                if (highlightColor) {
+                    text = `<span class="HasHighlightSpan" style="background: ${highlightColor}">${ver.text}</span>`;
+                }
                 return {
-                    text: highlight ? highlight.content : ver.text,
+                    text,
                     version: ver.version,
                     key,
                 };
@@ -162,6 +171,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         selectedVerse,
         selectedChapter,
         getVerses,
+        getChapterHighlights,
         chapterHighlights,
         async selectBook(book: BookInterface) {
             selectedBook.value = book;

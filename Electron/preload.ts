@@ -146,4 +146,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getSyncSetting: (key: string) => ipcRenderer.invoke('getSyncSetting', key),
     setSyncSetting: (key: string, value: any) => ipcRenderer.invoke('setSyncSetting', key, value),
     applyPullData: (data: any) => ipcRenderer.invoke('applyPullData', data),
+
+    // Export
+    exportToPdf: (args: { html: string; filename: string }) => ipcRenderer.invoke('exportToPdf', args),
+    exportToDocx: (args: { html: string; filename: string }) => ipcRenderer.invoke('exportToDocx', args),
 });

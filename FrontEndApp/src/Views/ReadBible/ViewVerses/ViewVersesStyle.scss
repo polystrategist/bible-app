@@ -75,7 +75,19 @@
 
     .HasHighlightSpan {
         border-radius: 5px;
-        padding: 0 2px 0 2px;
+        padding: 2px 4px;
+        color: #1a1a2e;
+        line-height: 1.85;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+
+        &, * {
+            color: #1a1a2e !important;
+        }
+
+        j {
+            font-weight: 700 !important;
+        }
     }
 
     [contenteditable]:focus {
@@ -95,4 +107,22 @@
             font-weight: 500;
         }
     }
+}
+
+// Split view pane styles
+.split-view-panes {
+    .splitpanes__splitter {
+        background: rgba(128, 128, 128, 0.2);
+        width: 4px;
+        min-width: 4px;
+        transition: background 0.2s;
+
+        &:hover {
+            background: var(--primary-color);
+        }
+    }
+}
+
+.split-pane-header {
+    min-height: 34px;
 }

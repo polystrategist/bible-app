@@ -32,7 +32,7 @@ const maximizeWindow = (win: BrowserWindow): boolean | void => {
 };
 
 const closeWindow = (win: BrowserWindow): void => {
-    win.destroy();
+    win.close();
 };
 
 const getAppScale = (win: BrowserWindow): number => {

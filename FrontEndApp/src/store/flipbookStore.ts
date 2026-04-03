@@ -190,7 +190,9 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
     function stripHtml(html: string): string {
         const div = document.createElement('div');
         div.innerHTML = html;
-        return div.textContent || div.innerText || '';
+        div.querySelectorAll('f, s').forEach((el) => el.remove());
+        const text = div.textContent || div.innerText || '';
+        return text.replace(/\[†?\d+(?:-\d+)?\]/g, '').replace(/\s+/g, ' ').trim();
     }
 
     function downloadAsTxt() {
@@ -199,33 +201,24 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
         triggerDownload(blob, `${bookTitle.value}_${chapterNumber.value}.txt`);
     }
 
-    function downloadAsWord() {
+    function getExportHtml() {
         const title = `${bookTitle.value} ${chapterNumber.value} (${versionDisplayName.value})`;
         const versesHtml = verses.value
-            .map(v => `<p><b>${v.verse}.</b> ${v.text}</p>`)
+            .map(v => `<p style="margin:4px 0;line-height:1.6"><b>${v.verse}.</b> ${stripHtml(v.text)}</p>`)
             .join('');
-        const html = `
-            <html xmlns:o="urn:schemas-microsoft-com:office:office"
-                  xmlns:w="urn:schemas-microsoft-com:office:word"
-                  xmlns="http://www.w3.org/TR/REC-html40">
-            <head><meta charset="utf-8"><title>${title}</title></head>
-            <body>
-                <h1>${title}</h1>
-                ${versesHtml}
-            </body></html>`;
-        const blob = new Blob([html], { type: 'application/msword' });
-        triggerDownload(blob, `${bookTitle.value}_${chapterNumber.value}.doc`);
+        return { title, versesHtml };
     }
 
-    function downloadAsPdf() {
-        const title = `${bookTitle.value} ${chapterNumber.value} (${versionDisplayName.value})`;
-        const versesHtml = verses.value
-            .map(v => `<p style="margin:4px 0;line-height:1.6"><b>${v.verse}.</b> ${v.text}</p>`)
-            .join('');
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-        printWindow.document.write(`
-            <!DOCTYPE html>
+    async function downloadAsWord() {
+        const { title, versesHtml } = getExportHtml();
+        const html = `<h1>${title}</h1>${versesHtml}`;
+        const filename = `${bookTitle.value}_${chapterNumber.value}.doc`;
+        await (window as any).browserWindow.exportToDocx({ html, filename });
+    }
+
+    async function downloadAsPdf() {
+        const { title, versesHtml } = getExportHtml();
+        const html = `<!DOCTYPE html>
             <html><head><meta charset="utf-8">
             <title>${title}</title>
             <style>
@@ -236,13 +229,9 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
             <body>
                 <h1>${title}</h1>
                 ${versesHtml}
-            </body></html>
-        `);
-        printWindow.document.close();
-        printWindow.onload = () => {
-            printWindow.print();
-            printWindow.close();
-        };
+            </body></html>`;
+        const filename = `${bookTitle.value}_${chapterNumber.value}.pdf`;
+        await (window as any).browserWindow.exportToPdf({ html, filename });
     }
 
     function triggerDownload(blob: Blob, filename: string) {

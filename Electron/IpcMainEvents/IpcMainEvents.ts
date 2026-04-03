@@ -16,6 +16,7 @@ import { PiperTTSHandlers } from './Piper/PiperTTS';
 import Commentaries from '../Modules/Commentaries/Commentaries';
 import DailyDevotional from './DailyDevotional/DailyDevotional';
 import importing from './importing/importing';
+import exporting from './exporting/exporting';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -68,4 +69,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // bible import handlers
     importing(BrowserWindow);
+
+    // export handlers (PDF, DOCX)
+    exporting(BrowserWindow);
 };

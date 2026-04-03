@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import Log from 'electron-log';
+import { saveWindowState } from './util/window';
 
 let errorAlreadyShown = false;
 export default (mainWindow: BrowserWindow) => {
@@ -9,7 +10,8 @@ export default (mainWindow: BrowserWindow) => {
         autoUpdater.autoInstallOnAppQuit = true;
 
         ipcMain.handle('install-update', () => {
-            autoUpdater.quitAndInstall(process.platform === 'win32', true);
+            saveWindowState();
+                        autoUpdater.quitAndInstall(process.platform === 'win32', true);
         });
 
         ipcMain.handle('check-for-updates', async () => {
@@ -65,6 +67,7 @@ export default (mainWindow: BrowserWindow) => {
                 })
                 .then(({ response }) => {
                     if (response === 0) {
+                        saveWindowState();
                         autoUpdater.quitAndInstall(process.platform === 'win32', true);
                     }
                 });
