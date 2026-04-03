@@ -126,15 +126,18 @@ class _ReaderScreenState extends State<ReaderScreen> {
       key: const ValueKey('default'),
       leading: Builder(
         builder: (ctx) => ShadIconButton.ghost(
-          icon: const Icon(LucideIcons.menu, size: 20),
+          icon: Icon(LucideIcons.menu,
+              size: 20, color: theme.colorScheme.foreground),
           onPressed: () => Scaffold.of(ctx).openDrawer(),
         ),
       ),
+      titleSpacing: 0,
       title: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.chevronLeft, size: 20),
+          IconButton(
+            icon: Icon(LucideIcons.chevronLeft,
+                size: 20, color: theme.colorScheme.foreground),
+            visualDensity: VisualDensity.compact,
             onPressed: bible.selectedChapter > 1
                 ? () {
                     _clearSelection();
@@ -142,20 +145,30 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   }
                 : null,
           ),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const BookSelectorScreen()),
-            ),
-            child: Text(
-              '${bible.selectedBook.title} ${bible.selectedChapter}',
-              style: theme.textTheme.small
-                  .copyWith(fontWeight: FontWeight.w600),
+          Flexible(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const BookSelectorScreen()),
+              ),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+                child: Text(
+                  '${bible.selectedBook.title} ${bible.selectedChapter}',
+                  style: theme.textTheme.small
+                      .copyWith(fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
           ),
-          ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.chevronRight, size: 20),
+          IconButton(
+            icon: Icon(LucideIcons.chevronRight,
+                size: 20, color: theme.colorScheme.foreground),
+            visualDensity: VisualDensity.compact,
             onPressed:
                 bible.selectedChapter < bible.selectedBook.chapterCount
                     ? () {
@@ -169,33 +182,38 @@ class _ReaderScreenState extends State<ReaderScreen> {
       actions: [
         // Version picker
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (_) => const VersionSelectorScreen()),
           ),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 80),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    bible.selectedVersionTitle,
-                    style: theme.textTheme.muted.copyWith(fontSize: 12),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 90),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      bible.selectedVersionTitle,
+                      style: theme.textTheme.muted.copyWith(fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 2),
-                Icon(LucideIcons.chevronDown,
-                    size: 12, color: theme.colorScheme.mutedForeground),
-              ],
+                  const SizedBox(width: 2),
+                  Icon(LucideIcons.chevronDown,
+                      size: 12, color: theme.colorScheme.mutedForeground),
+                ],
+              ),
             ),
           ),
         ),
         ShadIconButton.ghost(
-          icon: const Icon(LucideIcons.search, size: 20),
+          icon: Icon(LucideIcons.search,
+              size: 20, color: theme.colorScheme.foreground),
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SearchScreen()),
