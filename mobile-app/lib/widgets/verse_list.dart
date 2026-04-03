@@ -377,8 +377,6 @@ class _VerseListState extends State<VerseList> {
                           Flexible(
                             child: Text(
                               clipNote['content'] as String? ?? '',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: widget.fontSize * 0.75,
                                 color: theme.colorScheme.foreground,

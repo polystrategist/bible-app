@@ -230,65 +230,92 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       child: Container(
                         width: isHorizontal ? handleSize : double.infinity,
                         height: isHorizontal ? double.infinity : handleSize,
-                        color: theme.colorScheme.foreground,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.muted,
+                          boxShadow: theme.brightness == Brightness.light
+                              ? [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ]
+                              : null,
+                        ),
                         child: isHorizontal
                             ? Column(
                                 children: [
-                                  _splitLabel(
-                                    theme,
-                                    bible.selectedVersionShortName,
-                                    true,
-                                    true,
-                                    () => _showVersionSwitcher(context,
-                                        isPrimary: true),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: _splitLabel(
+                                        theme,
+                                        bible.selectedVersionShortName,
+                                        true,
+                                        true,
+                                        () => _showVersionSwitcher(context,
+                                            isPrimary: true),
+                                      ),
+                                    ),
                                   ),
-                                  const Spacer(),
                                   GestureDetector(
                                     onTap: () =>
                                         bible.toggleSplitOrientation(),
                                     child: Icon(LucideIcons.columns2,
                                         size: 14,
                                         color: theme
-                                            .colorScheme.background),
+                                            .colorScheme.mutedForeground),
                                   ),
-                                  const Spacer(),
-                                  _splitLabel(
-                                    theme,
-                                    bible.splitVersionShortName,
-                                    false,
-                                    true,
-                                    () => _showVersionSwitcher(context,
-                                        isPrimary: false),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: _splitLabel(
+                                        theme,
+                                        bible.splitVersionShortName,
+                                        false,
+                                        true,
+                                        () => _showVersionSwitcher(context,
+                                            isPrimary: false),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               )
                             : Row(
                                 children: [
-                                  _splitLabel(
-                                    theme,
-                                    bible.selectedVersionShortName,
-                                    true,
-                                    false,
-                                    () => _showVersionSwitcher(context,
-                                        isPrimary: true),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: _splitLabel(
+                                        theme,
+                                        bible.selectedVersionShortName,
+                                        true,
+                                        false,
+                                        () => _showVersionSwitcher(context,
+                                            isPrimary: true),
+                                      ),
+                                    ),
                                   ),
-                                  const Spacer(),
                                   GestureDetector(
                                     onTap: () =>
                                         bible.toggleSplitOrientation(),
                                     child: Icon(LucideIcons.rows2,
                                         size: 14,
                                         color: theme
-                                            .colorScheme.background),
+                                            .colorScheme.mutedForeground),
                                   ),
-                                  const Spacer(),
-                                  _splitLabel(
-                                    theme,
-                                    bible.splitVersionShortName,
-                                    false,
-                                    false,
-                                    () => _showVersionSwitcher(context,
-                                        isPrimary: false),
+                                  Expanded(
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: _splitLabel(
+                                        theme,
+                                        bible.splitVersionShortName,
+                                        false,
+                                        false,
+                                        () => _showVersionSwitcher(context,
+                                            isPrimary: false),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -750,69 +777,80 @@ class _ReaderScreenState extends State<ReaderScreen> {
             ),
             const SizedBox(height: 16),
             Divider(height: 1, color: theme.colorScheme.border),
-            const SizedBox(height: 8),
-            _drawerItem(
-              context,
-              icon: LucideIcons.bookmark,
-              label: 'Bookmarks',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const BookmarksScreen()));
-              },
+            Expanded(
+              child: Scrollbar(
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 8),
+                    _drawerItem(
+                      context,
+                      icon: LucideIcons.bookmark,
+                      label: 'Bookmarks',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const BookmarksScreen()));
+                      },
+                    ),
+                    _drawerItem(
+                      context,
+                      icon: LucideIcons.highlighter,
+                      label: 'Highlights',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const HighlightsScreen()));
+                      },
+                    ),
+                    _drawerItem(
+                      context,
+                      icon: LucideIcons.stickyNote,
+                      label: 'Clip Notes',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const ClipNotesScreen()));
+                      },
+                    ),
+                    Divider(height: 1, color: theme.colorScheme.border),
+                    _drawerItem(
+                      context,
+                      icon: LucideIcons.search,
+                      label: 'Search',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const SearchScreen()));
+                      },
+                    ),
+                    _drawerItem(
+                      context,
+                      icon: LucideIcons.bookOpen,
+                      label: 'Bible Versions',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const VersionSelectorScreen()));
+                      },
+                    ),
+                    Divider(height: 1, color: theme.colorScheme.border),
+                    const SizedBox(height: 8),
+                    _buildSplitToggle(context, theme),
+                    const SizedBox(height: 8),
+                    Divider(height: 1, color: theme.colorScheme.border),
+                    const SizedBox(height: 8),
+                    _buildThemeSection(context, theme),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+              ),
             ),
-            _drawerItem(
-              context,
-              icon: LucideIcons.highlighter,
-              label: 'Highlights',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const HighlightsScreen()));
-              },
-            ),
-            _drawerItem(
-              context,
-              icon: LucideIcons.stickyNote,
-              label: 'Clip Notes',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ClipNotesScreen()));
-              },
-            ),
-            Divider(height: 1, color: theme.colorScheme.border),
-            _drawerItem(
-              context,
-              icon: LucideIcons.search,
-              label: 'Search',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const SearchScreen()));
-              },
-            ),
-            _drawerItem(
-              context,
-              icon: LucideIcons.bookOpen,
-              label: 'Bible Versions',
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const VersionSelectorScreen()));
-              },
-            ),
-            Divider(height: 1, color: theme.colorScheme.border),
-            const SizedBox(height: 8),
-            _buildSplitToggle(context, theme),
-            const SizedBox(height: 8),
-            Divider(height: 1, color: theme.colorScheme.border),
-            const SizedBox(height: 8),
-            _buildThemeSection(context, theme),
-            const SizedBox(height: 8),
-            const Spacer(),
             Divider(height: 1, color: theme.colorScheme.border),
             _drawerItem(
               context,
@@ -947,7 +985,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                     ? LucideIcons.chevronUp
                     : LucideIcons.chevronDown,
                 size: 10,
-                color: theme.colorScheme.background,
+                color: theme.colorScheme.mutedForeground,
               ),
             if (!isVerticalBar) const SizedBox(width: 3),
             Flexible(
@@ -955,8 +993,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 text,
                 style: TextStyle(
                   fontSize: isVerticalBar ? 10 : 11,
-                  color: theme.colorScheme.background,
-                  fontWeight: FontWeight.w500,
+                  color: theme.colorScheme.mutedForeground,
+                  fontWeight: FontWeight.w700,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

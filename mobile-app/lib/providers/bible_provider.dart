@@ -189,6 +189,9 @@ class BibleProvider extends ChangeNotifier {
 
       _allModules = list.cast<Map<String, dynamic>>();
 
+      // Short names for bundled modules that aren't in bible_modules.json
+      _shortNames['Ang Salita ng Dios 2015.SQLite3'] = 'ASD2015';
+
       for (final item in _allModules) {
         final fileName = item['file_name'] as String?;
         final shortRaw = item['version_short_name_and_date'] as String?;
