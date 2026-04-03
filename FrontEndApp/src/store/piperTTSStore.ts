@@ -24,12 +24,16 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
     let audioContext: AudioContext | null = null;
     let currentSource: AudioBufferSourceNode | null = null;
     let stopped = false;
+    let playTimeout: ReturnType<typeof setTimeout> | null = null;
+    let playGeneration = 0;
 
     function stripHtml(html: string): string {
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
+        // Remove footnote elements before extracting text
+        tmp.querySelectorAll('f, s').forEach((el) => el.remove());
         const text = tmp.textContent || tmp.innerText || '';
-        return text.replace(/\[\d+\]/g, '');
+        return text.replace(/\[†?\d+(?:-\d+)?\]/g, '').replace(/\s+/g, ' ').trim();
     }
 
     async function checkInstalled() {
@@ -87,19 +91,21 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
         return audioContext;
     }
 
-    async function speakVerse(index: number) {
+    async function speakVerse(index: number, gen?: number) {
+        const myGen = gen ?? playGeneration;
+        if (myGen !== playGeneration || stopped) return;
+
         const bibleStore = useBibleStore();
         const verses = bibleStore.renderVerses;
-
-        if (stopped) return;
 
         if (index >= verses.length) {
             const nextChapter = bibleStore.selectedChapter + 1;
             if (nextChapter <= bibleStore.selectedBook.chapter_count) {
                 autoAdvancing.value = true;
                 bibleStore.selectChapter(nextChapter).then(() => {
+                    if (myGen !== playGeneration) return;
                     autoAdvancing.value = false;
-                    if (!stopped) speakVerse(0);
+                    speakVerse(0, myGen);
                 });
             } else {
                 stop();
@@ -124,15 +130,8 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
 
         try {
             const result = await window.browserWindow.piperSpeak(text, settingStore.piperActiveModel);
-            if (!result.success || !result.wav) {
-                console.error('[Piper] speak failed:', result.error);
-                stop();
-                return;
-            }
+            if (!result.success || !result.wav || myGen !== playGeneration) return;
 
-            if (stopped) return;
-
-            // Decode base64 WAV and play via Web Audio API
             const binary = atob(result.wav);
             const bytes = new Uint8Array(binary.length);
             for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -140,7 +139,7 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
             const ctx = getAudioContext();
             const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
 
-            if (stopped) return;
+            if (myGen !== playGeneration) return;
 
             isPlaying.value = true;
             isPaused.value = false;
@@ -152,9 +151,8 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
             currentSource = source;
 
             source.onended = () => {
-                if (!stopped && !isPaused.value) {
-                    speakVerse(index + 1);
-                }
+                if (myGen !== playGeneration || isPaused.value) return;
+                speakVerse(index + 1, myGen);
             };
 
             source.start();
@@ -165,13 +163,18 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
     }
 
     function playFromVerse(verseIndex: number, versionIndex = 0) {
+        const gen = ++playGeneration;
         stopped = false;
         selectedVersionIndex.value = versionIndex;
         stopAudio();
+        if (playTimeout) { clearTimeout(playTimeout); playTimeout = null; }
         isPlaying.value = false;
         isPaused.value = false;
 
-        setTimeout(() => speakVerse(verseIndex), 50);
+        playTimeout = setTimeout(() => {
+            playTimeout = null;
+            speakVerse(verseIndex, gen);
+        }, 50);
     }
 
     function stopAudio() {
@@ -201,7 +204,9 @@ export const usePiperTTSStore = defineStore('piperTTSStore', () => {
     }
 
     function stop() {
+        ++playGeneration;
         stopped = true;
+        if (playTimeout) { clearTimeout(playTimeout); playTimeout = null; }
         stopAudio();
         isPlaying.value = false;
         isPaused.value = false;

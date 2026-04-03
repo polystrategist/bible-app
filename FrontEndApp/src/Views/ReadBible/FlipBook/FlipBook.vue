@@ -4,10 +4,14 @@ import { NButton, NIcon, NInputNumber, NDropdown, NSlider, NSpin, NScrollbar, NM
 import { Icon } from '@iconify/vue';
 import { useFlipbookStore } from '../../../store/flipbookStore';
 import { useSettingStore } from '../../../store/settingStore';
+import { useTTSStore } from '../../../store/ttsStore';
+import { usePiperTTSStore } from '../../../store/piperTTSStore';
 import { bibleBooks, type BookInfo } from '../../../util/books';
 
 const flipbookStore = useFlipbookStore();
 const settingStore = useSettingStore();
+const mainTtsStore = useTTSStore();
+const mainPiperStore = usePiperTTSStore();
 
 const goToVerseNumber = ref<number | null>(null);
 const showGoToInput = ref(false);
@@ -51,6 +55,8 @@ const ttsActiveVerse = ref<number | null>(null);
 const ttsIsActive = ref(false);
 let ttsCurrentIndex = -1;
 let ttsStopped = false;
+let ttsGeneration = 0;
+let ttsPlayTimeout: ReturnType<typeof setTimeout> | null = null;
 let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
 let piperAudioContext: AudioContext | null = null;
 let piperCurrentSource: AudioBufferSourceNode | null = null;
@@ -58,7 +64,9 @@ let piperCurrentSource: AudioBufferSourceNode | null = null;
 function stripHtml(html: string): string {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    return (tmp.textContent || tmp.innerText || '').replace(/\[\d+\]/g, '');
+    tmp.querySelectorAll('f, s').forEach((el) => el.remove());
+    const text = tmp.textContent || tmp.innerText || '';
+    return text.replace(/\[†?\d+(?:-\d+)?\]/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function startKeepAlive() {
@@ -89,7 +97,8 @@ function stopPiperAudio() {
 }
 
 // ── Browser TTS speak ──
-function speakBrowserTTS(index: number) {
+function speakBrowserTTS(index: number, gen: number) {
+    if (gen !== ttsGeneration) return;
     const verses = flipbookStore.verses;
     if (ttsStopped || index >= verses.length) { stopTTS(); return; }
 
@@ -102,11 +111,11 @@ function speakBrowserTTS(index: number) {
 
     try {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.onstart = () => { ttsIsActive.value = true; };
-        utterance.onend = () => { speakBrowserTTS(index + 1); };
+        utterance.onstart = () => { if (gen === ttsGeneration) ttsIsActive.value = true; };
+        utterance.onend = () => { if (gen === ttsGeneration) speakBrowserTTS(index + 1, gen); };
         utterance.onerror = (e) => {
             if (e.error === 'interrupted' || e.error === 'canceled') return;
-            stopTTS();
+            if (gen === ttsGeneration) stopTTS();
         };
         window.speechSynthesis.speak(utterance);
     } catch {
@@ -115,7 +124,8 @@ function speakBrowserTTS(index: number) {
 }
 
 // ── Piper TTS speak ──
-async function speakPiperTTS(index: number) {
+async function speakPiperTTS(index: number, gen: number) {
+    if (gen !== ttsGeneration) return;
     const verses = flipbookStore.verses;
     if (ttsStopped || index >= verses.length) { stopTTS(); return; }
 
@@ -128,7 +138,7 @@ async function speakPiperTTS(index: number) {
 
     try {
         const result = await (window as any).browserWindow.piperSpeak(text, settingStore.piperActiveModel);
-        if (!result.success || !result.wav || ttsStopped) { stopTTS(); return; }
+        if (!result.success || !result.wav || gen !== ttsGeneration) return;
 
         const binary = atob(result.wav);
         const bytes = new Uint8Array(binary.length);
@@ -136,7 +146,7 @@ async function speakPiperTTS(index: number) {
 
         const ctx = getPiperAudioContext();
         const audioBuffer = await ctx.decodeAudioData(bytes.buffer);
-        if (ttsStopped) return;
+        if (gen !== ttsGeneration) return;
 
         const source = ctx.createBufferSource();
         source.buffer = audioBuffer;
@@ -144,7 +154,7 @@ async function speakPiperTTS(index: number) {
         piperCurrentSource = source;
 
         source.onended = () => {
-            if (!ttsStopped) speakPiperTTS(index + 1);
+            if (gen === ttsGeneration) speakPiperTTS(index + 1, gen);
         };
         source.start();
     } catch {
@@ -156,27 +166,33 @@ function playVerse(verseNumber: number) {
     const verseIndex = flipbookStore.verses.findIndex(v => v.verse === verseNumber);
     if (verseIndex < 0) return;
 
-    // Stop any current playback first
-    ttsStopped = true;
+    const gen = ++ttsGeneration;
+    ttsStopped = false;
+    // Stop main reader TTS first
+    mainTtsStore.stop();
+    mainPiperStore.stop();
     try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
     stopPiperAudio();
     stopKeepAlive();
-
-    ttsStopped = false;
+    if (ttsPlayTimeout) { clearTimeout(ttsPlayTimeout); ttsPlayTimeout = null; }
     ttsIsActive.value = false;
 
-    setTimeout(() => {
+    ttsPlayTimeout = setTimeout(() => {
+        ttsPlayTimeout = null;
+        if (gen !== ttsGeneration) return;
         if (settingStore.verseReaderMode === 'piper-tts') {
-            speakPiperTTS(verseIndex);
+            speakPiperTTS(verseIndex, gen);
         } else {
             startKeepAlive();
-            speakBrowserTTS(verseIndex);
+            speakBrowserTTS(verseIndex, gen);
         }
     }, 50);
 }
 
 function stopTTS() {
+    ++ttsGeneration;
     ttsStopped = true;
+    if (ttsPlayTimeout) { clearTimeout(ttsPlayTimeout); ttsPlayTimeout = null; }
     try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
     stopPiperAudio();
     stopKeepAlive();
@@ -228,15 +244,13 @@ function handleKeydown(e: KeyboardEvent) {
 
 const downloadOptions = [
     { label: 'Download as PDF', key: 'pdf' },
-    { label: 'Download as Word', key: 'word' },
-    { label: 'Download as Text', key: 'txt' },
+    { label: 'Download as Word (.docx)', key: 'word' },
 ];
 
 function handleDownload(key: string) {
     switch (key) {
         case 'pdf': flipbookStore.downloadAsPdf(); break;
         case 'word': flipbookStore.downloadAsWord(); break;
-        case 'txt': flipbookStore.downloadAsTxt(); break;
     }
 }
 
@@ -249,8 +263,14 @@ onUnmounted(() => {
     stopTTS();
 });
 
-// Stop TTS when flipbook closes
-watch(() => flipbookStore.isOpen, (open) => { if (!open) stopTTS(); });
+// Stop all TTS when flipbook closes
+watch(() => flipbookStore.isOpen, (open) => {
+    if (!open) {
+        stopTTS();
+        mainTtsStore.stop();
+        mainPiperStore.stop();
+    }
+});
 
 // Auto-navigate to the page containing the verse being read
 watch(ttsActiveVerse, (verseNum) => {

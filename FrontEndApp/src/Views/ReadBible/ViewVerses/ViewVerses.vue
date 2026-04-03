@@ -241,6 +241,10 @@ function activeStore() {
 }
 
 function playVerse(verseIndex: number, versionIndex: number) {
+    // Stop both engines before playing to avoid overlap
+    ttsStore.stop();
+    piperStore.stop();
+
     switch (settingStore.verseReaderMode) {
         case 'piper-tts':
             if (!piperStore.isInstalled) {

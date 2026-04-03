@@ -16,6 +16,8 @@ export const useTTSStore = defineStore('ttsStore', () => {
 
     let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
     let initialized = false;
+    let playTimeout: ReturnType<typeof setTimeout> | null = null;
+    let playGeneration = 0;
 
     const isActive = computed(() => isPlaying.value || isPaused.value);
 
@@ -26,9 +28,11 @@ export const useTTSStore = defineStore('ttsStore', () => {
     function stripHtml(html: string): string {
         const tmp = document.createElement('div');
         tmp.innerHTML = html;
+        // Remove footnote elements before extracting text
+        tmp.querySelectorAll('f, s').forEach((el) => el.remove());
         const text = tmp.textContent || tmp.innerText || '';
-        // Remove footnote/cross-reference markers like [5], [16], etc.
-        return text.replace(/\[\d+\]/g, '');
+        // Remove footnote/cross-reference markers like [5], [16], [†5], etc.
+        return text.replace(/\[†?\d+(?:-\d+)?\]/g, '').replace(/\s+/g, ' ').trim();
     }
 
     function loadVoices() {
@@ -83,22 +87,24 @@ export const useTTSStore = defineStore('ttsStore', () => {
         }
     }
 
-    function speakVerse(index: number) {
+    function speakVerse(index: number, gen?: number) {
+        const myGen = gen ?? playGeneration;
+        if (myGen !== playGeneration) return; // stale chain, abort
+
         const bibleStore = useBibleStore();
         const verses = bibleStore.renderVerses;
 
         if (index >= verses.length) {
-            // Try to advance to the next chapter
             const nextChapter = bibleStore.selectedChapter + 1;
             if (nextChapter <= bibleStore.selectedBook.chapter_count) {
                 autoAdvancing.value = true;
                 bibleStore.selectChapter(nextChapter).then(() => {
+                    if (myGen !== playGeneration) return;
                     autoAdvancing.value = false;
                     startKeepAlive();
-                    speakVerse(0);
+                    speakVerse(0, myGen);
                 });
             } else {
-                // End of book
                 isPlaying.value = false;
                 isPaused.value = false;
                 activeVerseNumber.value = null;
@@ -112,7 +118,6 @@ export const useTTSStore = defineStore('ttsStore', () => {
         const verse = verses[index];
         activeVerseNumber.value = verse.verse;
 
-        // Highlight and scroll to the verse being read (no re-fetch needed)
         try {
             bibleStore.setActiveVerse(verse.verse);
             bibleStore.AutoScrollSavedPosition(100);
@@ -132,16 +137,19 @@ export const useTTSStore = defineStore('ttsStore', () => {
             if (voice) utterance.voice = voice;
 
             utterance.onstart = () => {
+                if (myGen !== playGeneration) return;
                 isPlaying.value = true;
                 isPaused.value = false;
             };
 
             utterance.onend = () => {
-                speakVerse(index + 1);
+                if (myGen !== playGeneration) return;
+                speakVerse(index + 1, myGen);
             };
 
             utterance.onerror = (e) => {
                 if (e.error === 'interrupted' || e.error === 'canceled') return;
+                if (myGen !== playGeneration) return;
                 console.error('[TTS] Error:', e.error);
                 isPlaying.value = false;
                 isPaused.value = false;
@@ -159,15 +167,18 @@ export const useTTSStore = defineStore('ttsStore', () => {
 
     function playFromVerse(verseIndex: number, versionIndex = 0) {
         ensureInitialized();
+        const gen = ++playGeneration;
         selectedVersionIndex.value = versionIndex;
         try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
         stopKeepAlive();
+        if (playTimeout) { clearTimeout(playTimeout); playTimeout = null; }
         isPlaying.value = false;
         isPaused.value = false;
 
-        setTimeout(() => {
+        playTimeout = setTimeout(() => {
+            playTimeout = null;
             startKeepAlive();
-            speakVerse(verseIndex);
+            speakVerse(verseIndex, gen);
         }, 50);
     }
 
@@ -191,6 +202,8 @@ export const useTTSStore = defineStore('ttsStore', () => {
     }
 
     function stop() {
+        ++playGeneration;
+        if (playTimeout) { clearTimeout(playTimeout); playTimeout = null; }
         try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
         isPlaying.value = false;
         isPaused.value = false;
