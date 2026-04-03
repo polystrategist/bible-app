@@ -96,3 +96,21 @@
         }
     }
 }
+
+// Split view pane styles
+.split-view-panes {
+    .splitpanes__splitter {
+        background: rgba(128, 128, 128, 0.2);
+        width: 4px;
+        min-width: 4px;
+        transition: background 0.2s;
+
+        &:hover {
+            background: var(--primary-color);
+        }
+    }
+}
+
+.split-pane-header {
+    min-height: 34px;
+}
