@@ -5,6 +5,7 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/bible_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/user_data_provider.dart';
 import 'screens/reader_screen.dart';
 import 'services/store_service.dart';
@@ -17,6 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => BibleProvider()..init()),
         ChangeNotifierProvider(create: (_) => AuthProvider(storeService)..init()),
         ChangeNotifierProvider(create: (_) => UserDataProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()..init()),
       ],
       child: const MyApp(),
     ),
@@ -28,15 +30,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProv = context.watch<ThemeProvider>();
     return ShadApp.custom(
-      themeMode: ThemeMode.system,
+      themeMode: themeProv.themeMode,
       theme: ShadThemeData(
         brightness: Brightness.light,
-        colorScheme: const ShadSlateColorScheme.light(),
+        colorScheme: ShadColorScheme.fromName(themeProv.colorSchemeName),
       ),
       darkTheme: ShadThemeData(
         brightness: Brightness.dark,
-        colorScheme: const ShadSlateColorScheme.dark(),
+        colorScheme: ShadColorScheme.fromName(
+          themeProv.colorSchemeName,
+          brightness: Brightness.dark,
+        ),
       ),
       appBuilder: (context) {
         return MaterialApp(
