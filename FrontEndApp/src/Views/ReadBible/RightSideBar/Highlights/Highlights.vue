@@ -1,14 +1,16 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { NButton, NIcon, NPopconfirm } from 'naive-ui';
 import { Delete16Filled, Delete16Regular } from '@vicons/fluent';
 import { useThemeStore } from '../../../../store/theme';
+import { getBibleService } from '../../../../services/BibleService';
 
 const themeStore = useThemeStore();
 const bibleStore = useBibleStore();
 const selectedHighlight = ref<string | null>(null);
+const versePreviews = ref<Record<string, string>>({});
 
 function selectBookVerse(
     key: string,
@@ -33,19 +35,53 @@ function handleRemoveHighlight(highlight: any) {
     bibleStore.removeHighlightInDb(highlight.study_space_id, highlight.key);
 }
 
-function getVersePreview(highlight: any): string {
-    // Find the verse in renderVerses and return the first version's raw text
-    const verse = bibleStore.renderVerses.find(
-        (v: any) =>
-            v.book_number === highlight.book_number &&
-            v.chapter === highlight.chapter &&
-            v.verse === highlight.verse,
-    );
-    if (!verse || !verse.version[0]) return '';
-    // Strip HTML tags to get plain text
-    const text = verse.version[0].text.replace(/<[^>]*>/g, '');
-    return text.length > 80 ? text.slice(0, 80) + '...' : text;
+async function loadVersePreviews() {
+    if (!bibleStore.allHighlights.length || !bibleStore.selectedBibleVersions.length) return;
+
+    const firstVersion = bibleStore.selectedBibleVersions[0];
+    const bibleService = getBibleService();
+    const previews: Record<string, string> = {};
+
+    // Group highlights by book+chapter to batch fetches
+    const chapters = new Map<string, { book_number: number; chapter: number }>();
+    for (const hl of bibleStore.allHighlights) {
+        const chKey = `${hl.book_number}_${hl.chapter}`;
+        if (!chapters.has(chKey)) {
+            chapters.set(chKey, { book_number: hl.book_number, chapter: hl.chapter });
+        }
+    }
+
+    // Fetch each chapter once
+    for (const [, { book_number, chapter }] of chapters) {
+        try {
+            const verses = await bibleService.getVerses({
+                bible_versions: [firstVersion],
+                book_number,
+                selected_chapter: chapter,
+            });
+            for (const v of verses) {
+                const key = `${book_number}_${chapter}_${v.verse}`;
+                if (v.version?.[0]?.text) {
+                    const raw = v.version[0].text.replace(/<[^>]*>/g, '');
+                    previews[key] = raw.length > 60 ? raw.slice(0, 60) + '...' : raw;
+                }
+            }
+        } catch {
+            // Skip on error
+        }
+    }
+
+    versePreviews.value = previews;
 }
+
+// Reload previews when highlights or selected version changes
+watch(
+    () => [bibleStore.allHighlights, bibleStore.selectedBibleVersions[0]],
+    () => {
+        loadVersePreviews();
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -98,8 +134,11 @@ function getVersePreview(highlight: any): string {
                                 Remove This Highlight?
                             </NPopconfirm>
                         </div>
-                        <div class="text-sm opacity-70 mt-2px">
-                            {{ getVersePreview(highlight) }}
+                        <div
+                            v-if="versePreviews[highlight.key]"
+                            class="text-xs opacity-60 mt-2px ml-18px"
+                        >
+                            {{ versePreviews[highlight.key] }}
                         </div>
                     </div>
                 </div>

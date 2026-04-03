@@ -59,7 +59,6 @@ const storageScrollPositionKey = 'verse-scroll-position';
 const splitPaneSizes = ref<number[]>([100]);
 const scrollPaneRefs = ref<(HTMLElement | null)[]>([]);
 let activePaneIndex: number | null = null;
-let scrollRafId: number | null = null;
 let saveScrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function versionOptionsForPane(paneIndex: number) {
@@ -113,18 +112,30 @@ function onSplitResized(sizes: Array<{ size: number }>) {
 }
 
 function getTopVisibleVerse(scrollEl: HTMLElement): { verse: number; proportion: number } | null {
-    const containerTop = scrollEl.getBoundingClientRect().top;
-    const verseEls = Array.from(scrollEl.querySelectorAll<HTMLElement>('[data-verse]'));
-    for (const el of verseEls) {
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom > containerTop) {
-            return {
-                verse: Number(el.dataset.verse),
-                proportion: (containerTop - rect.top) / (rect.height || 1),
-            };
+    const scrollTop = scrollEl.scrollTop;
+    const paneTop = scrollEl.offsetTop;
+    const children = scrollEl.children;
+    // Binary search for the first verse element whose bottom is below scrollTop
+    let lo = 0;
+    let hi = children.length - 1;
+    while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        const el = children[mid] as HTMLElement;
+        if (el.offsetTop - paneTop + el.offsetHeight <= scrollTop) {
+            lo = mid + 1;
+        } else {
+            hi = mid;
         }
     }
-    return null;
+    const el = children[lo] as HTMLElement | undefined;
+    if (!el) return null;
+    const verseEl = el.querySelector<HTMLElement>('[data-verse]');
+    if (!verseEl) return null;
+    const elTop = verseEl.offsetTop - paneTop;
+    return {
+        verse: Number(verseEl.dataset.verse),
+        proportion: (scrollTop - elTop) / (verseEl.offsetHeight || 1),
+    };
 }
 
 function scrollPaneToVerse(scrollEl: HTMLElement, verse: number, proportion: number) {
@@ -167,24 +178,19 @@ function onPaneMouseEnter(paneIndex: number) {
 
 function syncScroll(sourcePaneIndex: number) {
     if (activePaneIndex !== sourcePaneIndex) return;
-    if (scrollRafId !== null) return;
-    scrollRafId = requestAnimationFrame(() => {
-        scrollRafId = null;
-        const source = scrollPaneRefs.value[sourcePaneIndex];
-        if (!source || activePaneIndex !== sourcePaneIndex) return;
+    const source = scrollPaneRefs.value[sourcePaneIndex];
+    if (!source) return;
 
-        // Always save scroll position (debounced)
-        saveScrollPosition(source as HTMLElement);
+    const pos = getTopVisibleVerse(source as HTMLElement);
+    if (!pos) return;
 
-        const pos = getTopVisibleVerse(source as HTMLElement);
-        if (!pos) return;
+    const panes = scrollPaneRefs.value;
+    for (let i = 0; i < panes.length; i++) {
+        if (i === sourcePaneIndex || !panes[i]) continue;
+        scrollPaneToVerse(panes[i] as HTMLElement, pos.verse, pos.proportion);
+    }
 
-        // Sync other panes to the same verse + proportion
-        scrollPaneRefs.value.forEach((el, i) => {
-            if (i === sourcePaneIndex || !el) return;
-            scrollPaneToVerse(el as HTMLElement, pos.verse, pos.proportion);
-        });
-    });
+    saveScrollPosition(source as HTMLElement);
 }
 
 function setScrollPaneRef(index: number, el: any) {
@@ -204,22 +210,27 @@ function initSplitSizes() {
 
 function scrollAllPanesToVerse(verseNumber: number) {
     if (isRestoringScroll) return;
+
+    function doScroll() {
+        scrollPaneRefs.value.forEach((el) => {
+            if (!el) return;
+            const pane = el as HTMLElement;
+            const verseEl = pane.querySelector<HTMLElement>(`[data-verse="${verseNumber}"]`);
+            if (!verseEl) return;
+            const paneRect = pane.getBoundingClientRect();
+            const verseRect = verseEl.getBoundingClientRect();
+            pane.scrollTop += verseRect.top - paneRect.top - 10;
+        });
+        const firstPane = scrollPaneRefs.value[0] as HTMLElement | null;
+        if (firstPane) {
+            const pos = getTopVisibleVerse(firstPane);
+            if (pos) SESSION.set(storageScrollPositionKey, pos);
+        }
+    }
+
+    // Always wait for DOM to settle after verse data changes
     nextTick(() => {
-        setTimeout(() => {
-            scrollPaneRefs.value.forEach((el) => {
-                if (!el) return;
-                const pane = el as HTMLElement;
-                const verseEl = pane.querySelector<HTMLElement>(`[data-verse="${verseNumber}"]`);
-                if (!verseEl) return;
-                pane.scrollTop = verseEl.offsetTop - pane.offsetTop - 50;
-            });
-            // Save position
-            const firstPane = scrollPaneRefs.value[0] as HTMLElement | null;
-            if (firstPane) {
-                const pos = getTopVisibleVerse(firstPane);
-                if (pos) SESSION.set(storageScrollPositionKey, pos);
-            }
-        }, 200);
+        requestAnimationFrame(doScroll);
     });
 }
 
