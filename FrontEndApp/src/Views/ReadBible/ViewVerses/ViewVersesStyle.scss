@@ -75,7 +75,19 @@
 
     .HasHighlightSpan {
         border-radius: 5px;
-        padding: 0 2px 0 2px;
+        padding: 2px 4px;
+        color: #1a1a2e;
+        line-height: 1.85;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+
+        &, * {
+            color: #1a1a2e !important;
+        }
+
+        j {
+            font-weight: 700 !important;
+        }
     }
 
     [contenteditable]:focus {

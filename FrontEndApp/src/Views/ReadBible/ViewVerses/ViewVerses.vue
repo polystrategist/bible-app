@@ -7,7 +7,6 @@ import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';
 import { useBookmarkStore } from '../../../store/bookmark';
-import HighlightOptions from './../../../components/HighlightOptions/HighlightOptions.vue';
 import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
 import { useClipNoteStore } from '../../../store/ClipNotes';
 import { getSelectionParentElement } from '../../../util/ElementUtil';
@@ -56,33 +55,35 @@ const moduleStore = useModuleStore();
 
 // --- Split View ---
 const storageSplitPaneSizesKey = 'verse-split-pane-sizes';
+const storageScrollPositionKey = 'verse-scroll-position';
 const splitPaneSizes = ref<number[]>([100]);
 const scrollPaneRefs = ref<(HTMLElement | null)[]>([]);
 let activePaneIndex: number | null = null;
+let scrollRafId: number | null = null;
+let saveScrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
-const versionOptions = computed(() => {
+function versionOptionsForPane(paneIndex: number) {
+    const usedByOtherPanes = bibleStore.selectedBibleVersions.filter(
+        (_: string, i: number) => i !== paneIndex,
+    );
     return moduleStore.bibleLists
-        .filter((b: any) => !b.title.includes('commentaries'))
+        .filter(
+            (b: any) =>
+                !b.title.includes('commentaries') && !usedByOtherPanes.includes(b.file_name),
+        )
         .map((b: any) => ({
             label: b.title,
             value: b.file_name,
         }));
-});
+}
 
 function changeVersion(paneIndex: number, newVersion: string) {
-    // Prevent duplicate versions across panes
-    const existing = bibleStore.selectedBibleVersions.indexOf(newVersion);
-    if (existing !== -1 && existing !== paneIndex) {
-        // Swap versions between panes
-        const oldVersion = bibleStore.selectedBibleVersions[paneIndex];
-        bibleStore.selectedBibleVersions[existing] = oldVersion;
-    }
     bibleStore.selectedBibleVersions[paneIndex] = newVersion;
     bibleStore.getVerses();
 }
 
 function addSplit() {
-    if (bibleStore.selectedBibleVersions.length >= 3) return;
+    if (bibleStore.selectedBibleVersions.length >= 6) return;
     // Pick first version not already selected
     const available = moduleStore.bibleLists
         .filter((b: any) => !b.title.includes('commentaries'))
@@ -111,42 +112,78 @@ function onSplitResized(sizes: Array<{ size: number }>) {
     SESSION.set(storageSplitPaneSizesKey, splitPaneSizes.value);
 }
 
+function getTopVisibleVerse(scrollEl: HTMLElement): { verse: number; proportion: number } | null {
+    const containerTop = scrollEl.getBoundingClientRect().top;
+    const verseEls = Array.from(scrollEl.querySelectorAll<HTMLElement>('[data-verse]'));
+    for (const el of verseEls) {
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom > containerTop) {
+            return {
+                verse: Number(el.dataset.verse),
+                proportion: (containerTop - rect.top) / (rect.height || 1),
+            };
+        }
+    }
+    return null;
+}
+
+function scrollPaneToVerse(scrollEl: HTMLElement, verse: number, proportion: number) {
+    const targetVerseEl = scrollEl.querySelector<HTMLElement>(`[data-verse="${verse}"]`);
+    if (!targetVerseEl) return;
+    scrollEl.scrollTop = targetVerseEl.offsetTop - scrollEl.offsetTop + proportion * targetVerseEl.offsetHeight;
+}
+
+function saveScrollPosition(scrollEl: HTMLElement) {
+    if (saveScrollTimeout) clearTimeout(saveScrollTimeout);
+    saveScrollTimeout = setTimeout(() => {
+        const pos = getTopVisibleVerse(scrollEl);
+        if (pos) SESSION.set(storageScrollPositionKey, pos);
+    }, 200);
+}
+
+let isRestoringScroll = false;
+
+function restoreScrollPosition() {
+    const saved = SESSION.get(storageScrollPositionKey);
+    if (!saved) return;
+    isRestoringScroll = true;
+    // Wait for DOM to render verses
+    nextTick(() => {
+        setTimeout(() => {
+            scrollPaneRefs.value.forEach((el) => {
+                if (el) scrollPaneToVerse(el as HTMLElement, saved.verse, saved.proportion);
+            });
+            // Keep the flag on briefly so the renderVerses watcher doesn't override
+            setTimeout(() => {
+                isRestoringScroll = false;
+            }, 300);
+        }, 100);
+    });
+}
+
 function onPaneMouseEnter(paneIndex: number) {
     activePaneIndex = paneIndex;
 }
 
 function syncScroll(sourcePaneIndex: number) {
-    // Only the pane the user is hovering on can drive scroll sync
     if (activePaneIndex !== sourcePaneIndex) return;
-    const source = scrollPaneRefs.value[sourcePaneIndex];
-    if (!source) return;
+    if (scrollRafId !== null) return;
+    scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = null;
+        const source = scrollPaneRefs.value[sourcePaneIndex];
+        if (!source || activePaneIndex !== sourcePaneIndex) return;
 
-    // Find the topmost visible verse in the source pane
-    const containerTop = source.getBoundingClientRect().top;
-    const verseEls = source.querySelectorAll<HTMLElement>('[data-verse]');
-    let topVerse: number | null = null;
-    let proportion = 0;
+        // Always save scroll position (debounced)
+        saveScrollPosition(source as HTMLElement);
 
-    for (const el of verseEls) {
-        const rect = el.getBoundingClientRect();
-        // This verse is at or above the container top — it's the current top verse
-        if (rect.bottom > containerTop) {
-            topVerse = Number(el.dataset.verse);
-            // How far into this verse we've scrolled (0 = top visible, 1 = fully past)
-            proportion = (containerTop - rect.top) / (rect.height || 1);
-            break;
-        }
-    }
+        const pos = getTopVisibleVerse(source as HTMLElement);
+        if (!pos) return;
 
-    if (topVerse === null) return;
-
-    // Sync other panes to the same verse + proportion
-    scrollPaneRefs.value.forEach((el, i) => {
-        if (i === sourcePaneIndex || !el) return;
-        const targetVerseEl = el.querySelector<HTMLElement>(`[data-verse="${topVerse}"]`);
-        if (!targetVerseEl) return;
-        const targetTop = targetVerseEl.offsetTop - el.offsetTop;
-        el.scrollTop = targetTop + proportion * targetVerseEl.offsetHeight;
+        // Sync other panes to the same verse + proportion
+        scrollPaneRefs.value.forEach((el, i) => {
+            if (i === sourcePaneIndex || !el) return;
+            scrollPaneToVerse(el as HTMLElement, pos.verse, pos.proportion);
+        });
     });
 }
 
@@ -164,6 +201,29 @@ function initSplitSizes() {
         splitPaneSizes.value = Array(count).fill(100 / count);
     }
 }
+
+function scrollAllPanesToVerse(verseNumber: number) {
+    if (isRestoringScroll) return;
+    nextTick(() => {
+        setTimeout(() => {
+            scrollPaneRefs.value.forEach((el) => {
+                if (!el) return;
+                const pane = el as HTMLElement;
+                const verseEl = pane.querySelector<HTMLElement>(`[data-verse="${verseNumber}"]`);
+                if (!verseEl) return;
+                pane.scrollTop = verseEl.offsetTop - pane.offsetTop - 50;
+            });
+            // Save position
+            const firstPane = scrollPaneRefs.value[0] as HTMLElement | null;
+            if (firstPane) {
+                const pos = getTopVisibleVerse(firstPane);
+                if (pos) SESSION.set(storageScrollPositionKey, pos);
+            }
+        }, 200);
+    });
+}
+
+// Watcher for verse/chapter scroll sync — registered in onMounted to avoid setup errors
 
 function activeStore() {
     return settingStore.verseReaderMode === 'piper-tts' ? piperStore : ttsStore;
@@ -399,6 +459,15 @@ onBeforeMount(() => {
 onMounted(() => {
     piperStore.checkInstalled();
     loadSystemFonts();
+    restoreScrollPosition();
+
+    // Scroll all panes when verse data changes (new chapter/book loaded)
+    watch(
+        () => bibleStore.verses,
+        () => {
+            scrollAllPanesToVerse(bibleStore.selectedVerse);
+        },
+    );
 
     // set initial font family
     const savedFontFamily = SESSION.get('font-family-of-show-chapter');
@@ -558,7 +627,7 @@ onMounted(() => {
                     <span class="text-xs whitespace-nowrap">{{ piperVoiceLabel }}</span>
                 </NButton>
                 <NButton
-                    v-if="bibleStore.selectedBibleVersions.length < 3"
+                    v-if="bibleStore.selectedBibleVersions.length < 6"
                     size="small"
                     quaternary
                     class="flex-shrink-0"
@@ -590,7 +659,7 @@ onMounted(() => {
                 @resized="onSplitResized"
             >
                 <Pane
-                    v-for="(versionFile, paneIndex) in bibleStore.selectedBibleVersions.slice(0, 3)"
+                    v-for="(versionFile, paneIndex) in bibleStore.selectedBibleVersions.slice(0, 6)"
                     :key="versionFile"
                     :size="splitPaneSizes[paneIndex] ?? (100 / bibleStore.selectedBibleVersions.length)"
                 >
@@ -599,10 +668,11 @@ onMounted(() => {
                         <div class="flex items-center gap-4px px-6px py-4px dark:bg-dark-400 bg-gray-100 border-b border-gray-200 dark:border-dark-200 select-none split-pane-header">
                             <NSelect
                                 :value="versionFile"
-                                :options="versionOptions"
+                                :options="versionOptionsForPane(paneIndex)"
                                 size="small"
                                 filterable
-                                class="flex-1"
+                                :virtual-scroll="false"
+                                to="body"
                                 @update:value="(v: string) => changeVersion(paneIndex, v)"
                             />
                             <NButton
@@ -632,10 +702,7 @@ onMounted(() => {
                             >
                                 <div class="mx-10px">
                                     <div
-                                        :id="paneIndex === 0 && verse.verse == bibleStore.selectedVerse ? 'the-selected-verse' : ''"
                                         :class="{
-                                            'dark:bg-opacity-5 dark:bg-light-100':
-                                                verse.verse == bibleStore.selectedVerse,
                                             'rounded-t-md': clipNoteRender(
                                                 `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ),
@@ -648,30 +715,8 @@ onMounted(() => {
                                                 `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ).color
                                         }`"
-                                        class="group flex items-start gap-3 dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-10px py-2 relative"
-                                        @click="
-                                            bibleStore.selectVerse(verse.book_number, verse.chapter, verse.verse)
-                                        "
+                                        class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative"
                                     >
-                                        <div
-                                            :class="{ '!h-full': verse.verse == bibleStore.selectedVerse }"
-                                            class="h-0 w-5px bg-[var(--primary-color)] absolute left-[-5px] top-0 opacity-60 transition-all"
-                                            title="Selected Verse"
-                                        ></div>
-                                        <div class="flex flex-col items-center gap-2 min-w-8">
-                                            <div
-                                                v-show="
-                                                    bookmarkStore.isBookmarkExists(
-                                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`,
-                                                    )
-                                                "
-                                                title="This is Bookmarked"
-                                            >
-                                                <NIcon size="20">
-                                                    <BookmarkFilled />
-                                                </NIcon>
-                                            </div>
-                                        </div>
                                         <div
                                             v-if="verse.version[paneIndex]"
                                             class="w-full"
@@ -731,13 +776,21 @@ onMounted(() => {
                                                     @mouseover="handleFootnoteHover($event, verse.version[paneIndex], verse)"
                                                     @mouseleave="footnotePopover.show = false"
                                                 ></span>
+                                                <NIcon
+                                                    v-if="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
+                                                    size="16"
+                                                    class="text-[var(--primary-color)] ml-4px"
+                                                    style="vertical-align: middle; display: inline-flex;"
+                                                    title="Bookmarked"
+                                                >
+                                                    <BookmarkFilled />
+                                                </NIcon>
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Clip notes: only show in first pane to avoid duplication -->
+                                    <!-- Clip notes -->
                                     <div
                                         v-if="
-                                            paneIndex === 0 &&
                                             clipNoteRender(
                                                 `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             )
@@ -834,7 +887,6 @@ onMounted(() => {
             trigger="click"
         >
             <div id="buttons" class="flex items-center gap-10px">
-                <HighlightOptions @setHighlight="showPopOver = false" />
                 <NButton round size="small" secondary title="Copy" @click="copyText">
                     <template #icon>
                         <NIcon>

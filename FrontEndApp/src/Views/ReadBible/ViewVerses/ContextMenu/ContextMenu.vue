@@ -7,12 +7,15 @@ import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
 import SpaceStudyStore from '../../../../store/SpaceStudyStore';
 import { runSync } from '../../../../util/Sync/sync';
+import { colors } from '../../../../util/highlighter';
 
 const spaceStudyStore = SpaceStudyStore();
 const bibleStore = useBibleStore();
 const contextMenuRef = ref(null);
 const emits = defineEmits(['close', 'create-clip-note']);
 const bookmarkStore = useBookmarkStore();
+const showColorPicker = ref(false);
+
 const props = defineProps({
     showContextMenu: {
         type: Boolean,
@@ -31,14 +34,32 @@ const props = defineProps({
         default: {},
     },
 });
+
+async function highlightVerse(color: string) {
+    const { book_number, chapter, verse } = props.data;
+    // Version-independent key (matches mobile app format)
+    const key = `${book_number}_${chapter}_${verse}`;
+
+    await window.browserWindow.saveHighlight(
+        JSON.stringify({ key, book_number, chapter, verse, content: color }),
+    );
+    await bibleStore.getChapterHighlights();
+    runSync();
+    showColorPicker.value = false;
+    emits('close');
+}
+
 async function clickContextMenu(key: string) {
     if (key == 'add-to-bookmark') {
         bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
-            JSON.stringify(props.data)
+            JSON.stringify(props.data),
         );
         runSync();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
+    } else if (key == 'highlight-verse') {
+        showColorPicker.value = !showColorPicker.value;
+        return; // Don't close menu
     } else if (key == 'compare-verse') {
         (window as any).browserWindow.openCompareVerseWindow({
             book_number: props.data.book_number,
@@ -47,12 +68,27 @@ async function clickContextMenu(key: string) {
             book_name: bibleStore.selectedBook.title,
         });
     } else if (key == 'clear-highlight') {
-        if (spaceStudyStore.selectedSpaceStudy?.id)
-            bibleStore.removeHighlightInDb(spaceStudyStore.selectedSpaceStudy?.id, props.data.key);
+        if (spaceStudyStore.selectedSpaceStudy?.id) {
+            // Try version-independent key first, then legacy version-specific key
+            const verseKey = `${props.data.book_number}_${props.data.chapter}_${props.data.verse}`;
+            await bibleStore.removeHighlightInDb(
+                spaceStudyStore.selectedSpaceStudy?.id,
+                verseKey,
+            );
+            // Also clear legacy version-specific highlight if exists
+            await bibleStore.removeHighlightInDb(
+                spaceStudyStore.selectedSpaceStudy?.id,
+                props.data.key,
+            );
+        }
     }
+    showColorPicker.value = false;
     emits('close');
 }
-onClickOutside(contextMenuRef, (event) => emits('close'));
+onClickOutside(contextMenuRef, (event) => {
+    showColorPicker.value = false;
+    emits('close');
+});
 </script>
 <template>
     <NPopover
@@ -65,7 +101,7 @@ onClickOutside(contextMenuRef, (event) => emits('close'));
     >
         <div
             ref="contextMenuRef"
-            class="w-200px max-h-200px overflow-y-auto overflowing-div flex flex-col select-none p-5px"
+            class="w-200px max-h-250px overflow-y-auto overflowing-div flex flex-col select-none p-5px"
         >
             <div
                 v-for="option in ContextMenuOptions"
@@ -76,6 +112,17 @@ onClickOutside(contextMenuRef, (event) => emits('close'));
                     <NIcon size="15" :component="option.icon" />
                 </div>
                 <span class="text-size-15px whitespace-nowrap">{{ $t(option.label) }}</span>
+            </div>
+            <!-- Color picker for highlight -->
+            <div v-if="showColorPicker" class="flex flex-wrap gap-5px px-7px py-6px border-t border-gray-500 border-opacity-30 mt-4px">
+                <button
+                    v-for="c in colors"
+                    :key="c.color"
+                    :style="`background: ${c.color}`"
+                    class="h-24px w-24px rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all hover:scale-110"
+                    :title="c.name"
+                    @click="highlightVerse(c.color)"
+                ></button>
             </div>
         </div>
     </NPopover>

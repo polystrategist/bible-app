@@ -83,80 +83,45 @@ export default () => {
             try {
                 const selectedSpaceStudy = await getSelectedSpaceStudy();
 
-                if (content.includes('HasHighlightSpan')) {
-                    const existingHighlight = await StoreDB('highlights')
-                        .where({
-                            key,
-                            study_space_id: selectedSpaceStudy.id,
-                        })
-                        .first();
+                const existingHighlight = await StoreDB('highlights')
+                    .where({
+                        key,
+                        study_space_id: selectedSpaceStudy.id,
+                    })
+                    .first();
 
-                    await updateOrCreate(
-                        'highlights',
-                        {
+                await updateOrCreate(
+                    'highlights',
+                    {
+                        key,
+                        study_space_id: selectedSpaceStudy.id,
+                    },
+                    {
+                        book_number,
+                        chapter,
+                        verse,
+                        content,
+                    }
+                );
+
+                try {
+                    await logSyncChange({
+                        table_name: 'highlights',
+                        record_key: key,
+                        action: existingHighlight ? 'updated' : 'created',
+                        payload: {
                             key,
-                            study_space_id: selectedSpaceStudy.id,
-                        },
-                        {
                             book_number,
                             chapter,
                             verse,
                             content,
-                        }
-                    );
-
-                    try {
-                        await logSyncChange({
-                            table_name: 'highlights',
-                            record_key: key,
-                            action: existingHighlight ? 'updated' : 'created',
-                            payload: {
-                                key,
-                                book_number,
-                                chapter,
-                                verse,
-                                content,
-                                study_space_id: selectedSpaceStudy.id,
-                                study_space_name: selectedSpaceStudy.title,
-                            },
-                            synced: 0,
-                        });
-                    } catch (e) {
-                        Log.error('Failed to log sync change for highlight:', e);
-                    }
-                } else {
-                    // Highlight being removed — scope lookup and delete to current study space
-                    const existingHighlight = await StoreDB('highlights')
-                        .where('key', key)
-                        .where('study_space_id', selectedSpaceStudy.id)
-                        .first();
-
-                    if (existingHighlight) {
-                        try {
-                            await logSyncChange({
-                                table_name: 'highlights',
-                                record_key: key,
-                                action: 'deleted',
-                                payload: {
-                                    key,
-                                    book_number,
-                                    chapter,
-                                    verse,
-                                    content: existingHighlight.content,
-                                    study_space_id: selectedSpaceStudy.id,
-                                    study_space_name: selectedSpaceStudy.title,
-                                },
-                                synced: 0,
-                            });
-                        } catch (e) {
-                            Log.error('Failed to log sync change for highlight deletion:', e);
-                        }
-                    }
-
-                    await StoreDB('highlights')
-                        .where('key', key)
-                        .where('study_space_id', selectedSpaceStudy.id)
-                        .del();
+                            study_space_id: selectedSpaceStudy.id,
+                            study_space_name: selectedSpaceStudy.title,
+                        },
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for highlight:', e);
                 }
 
                 return 1;

@@ -11,10 +11,20 @@ const bibleStore = useBibleStore();
 const moduleStore = useModuleStore();
 const bibleDownloadStore = useBibleDownloadStore();
 
+const MAX_SPLIT_VERSIONS = 6;
+
 function handleCheckBox(bibleVersions: Array<any>) {
     if (!bibleVersions.length) {
         message.warning('Oops.. Default to have 1 selected.');
         bibleStore.selectedBibleVersions = [bibleStore.DefaultSelectedVersion];
+        bibleStore.getVerses();
+        return;
+    }
+    if (bibleVersions.length > MAX_SPLIT_VERSIONS) {
+        message.error(`You can only select up to ${MAX_SPLIT_VERSIONS} Bible versions at a time.`);
+        bibleStore.selectedBibleVersions = bibleVersions.slice(0, MAX_SPLIT_VERSIONS);
+        bibleStore.getVerses();
+        return;
     }
     bibleStore.getVerses();
 }
