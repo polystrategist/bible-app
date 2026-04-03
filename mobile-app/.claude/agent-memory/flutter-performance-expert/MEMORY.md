@@ -1,1 +1,0 @@
-- [Bible Version Download Feature](project_bible_download.md) — Download/delete Bible modules: BibleService streaming download + zip extraction, BibleProvider state, VersionSelectorScreen two-tab UI
