@@ -45,6 +45,8 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.5.5
   share_plus: ^12.0.2
+  archive: ^4.0.9
+  flutter_svg: ^2.2.4
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +79,9 @@ flutter:
 
   assets:
     - "assets/modules/King James Version - 1769.SQLite3"
+    - "assets/bible_modules.json"
+    - "assets/icon/app_icon.png"
+    - "assets/icon/logo.svg"
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

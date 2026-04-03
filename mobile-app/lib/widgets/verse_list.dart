@@ -99,9 +99,16 @@ class _VerseListState extends State<VerseList> {
 
   String _stripHtml(String html) {
     return html
+        // Remove Strong's numbers: <S>1234</S>, <s>1234</s>
+        .replaceAll(RegExp(r'<[Ss]>\d+</[Ss]>'), '')
+        // Remove footnotes: <f>[1]</f>, <f>text</f>
+        .replaceAll(RegExp(r'<f>.*?</f>', caseSensitive: false), '')
+        // Remove remaining HTML tags
         .replaceAll(RegExp(r'<[^>]*>'), '')
         .replaceAll('&nbsp;', ' ')
         .replaceAll(RegExp(r'\[\d+\]'), '')
+        // Collapse multiple spaces
+        .replaceAll(RegExp(r' {2,}'), ' ')
         .trim();
   }
 

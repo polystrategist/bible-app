@@ -199,9 +199,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="1"
-     inkscape:cx="2128.4999"
-     inkscape:cy="416.49998"
+     inkscape:zoom="0.25000001"
+     inkscape:cx="1626"
+     inkscape:cy="-33.999999"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="4472"
@@ -217,9 +217,9 @@
        margin="0"
        bleed="0"
        inkscape:label="Pure Black White Background"
-       inkscape:export-filename="white gradient background.png"
-       inkscape:export-xdpi="196.608"
-       inkscape:export-ydpi="196.608" />
+       inkscape:export-filename="..\..\assets\logo.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <inkscape:page
        x="510"
        y="0"

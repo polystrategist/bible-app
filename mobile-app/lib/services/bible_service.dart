@@ -1,14 +1,18 @@
 import 'dart:io';
+
+import 'package:archive/archive.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
 import '../models/verse.dart';
 
 class BibleService {
   final Map<String, Database> _cache = {};
 
-  /// Bundled Bible modules that ship with the app.
+  /// Bundled Bible modules that ship with the app — these must never be deleted.
   static const List<String> bundledModules = [
     'King James Version - 1769.SQLite3',
   ];
@@ -51,6 +55,97 @@ class BibleService {
         .map((f) => p.basename(f.path))
         .toList()
       ..sort();
+  }
+
+  /// Downloads a zipped Bible module from [url], extracts the first
+  /// `.SQLite3`/`.db` file found in the zip, and saves it as [fileName]
+  /// in the modules directory.
+  ///
+  /// [onProgress] receives values 0.0–1.0 as data is received. The download
+  /// phase is 0–0.9 and the extraction phase is 0.9–1.0.
+  Future<void> downloadBible(
+    String url,
+    String fileName, {
+    void Function(double progress)? onProgress,
+  }) async {
+    final destDir = await _modulesPath;
+    final destFile = File(p.join(destDir, fileName));
+
+    // --- Download with progress ---
+    final request = http.Request('GET', Uri.parse(url));
+    final response = await request.send();
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Download failed with HTTP ${response.statusCode}: $url',
+      );
+    }
+
+    final totalBytes = response.contentLength ?? 0;
+    var receivedBytes = 0;
+    final chunks = <List<int>>[];
+
+    await for (final chunk in response.stream) {
+      chunks.add(chunk);
+      receivedBytes += chunk.length;
+      if (totalBytes > 0) {
+        // Reserve the last 10% for extraction
+        onProgress?.call((receivedBytes / totalBytes) * 0.9);
+      }
+    }
+
+    // Flatten all chunks into a single byte array
+    final rawBytes = Uint8List(receivedBytes);
+    var offset = 0;
+    for (final chunk in chunks) {
+      rawBytes.setRange(offset, offset + chunk.length, chunk);
+      offset += chunk.length;
+    }
+
+    // --- Extract the SQLite file from the zip ---
+    onProgress?.call(0.9);
+    final archive = ZipDecoder().decodeBytes(rawBytes);
+
+    ArchiveFile? target;
+    for (final file in archive) {
+      final name = file.name.toLowerCase();
+      if (!file.isFile) continue;
+      if (name.endsWith('.sqlite3') || name.endsWith('.db')) {
+        target = file;
+        break;
+      }
+    }
+
+    if (target == null) {
+      throw Exception(
+        'No SQLite3 file found inside the downloaded archive for $fileName',
+      );
+    }
+
+    await destFile.writeAsBytes(target.content as List<int>, flush: true);
+    onProgress?.call(1.0);
+  }
+
+  /// Deletes a downloaded Bible module. Bundled modules are protected and
+  /// cannot be removed through this method.
+  Future<void> deleteBible(String fileName) async {
+    if (bundledModules.contains(fileName)) {
+      throw StateError('Bundled module "$fileName" cannot be deleted.');
+    }
+
+    final destDir = await _modulesPath;
+    final file = File(p.join(destDir, fileName));
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    // Close and evict the cached database connection so subsequent
+    // lookups don't try to open a now-deleted file.
+    if (_cache.containsKey(fileName)) {
+      await _cache[fileName]!.close();
+      _cache.remove(fileName);
+    }
   }
 
   Future<Database> _getDatabase(String fileName) async {

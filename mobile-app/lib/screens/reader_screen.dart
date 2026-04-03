@@ -197,7 +197,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                 children: [
                   Flexible(
                     child: Text(
-                      bible.selectedVersionTitle,
+                      bible.selectedVersionShortName,
                       style: theme.textTheme.muted.copyWith(fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -519,16 +519,23 @@ class _ReaderScreenState extends State<ReaderScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-              child: Text(
-                'Believers Sword',
-                style: theme.textTheme.h4,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Bible Study App',
-                style: theme.textTheme.muted,
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    'assets/icon/logo.svg',
+                    width: 36,
+                    height: 36,
+                    colorFilter: ColorFilter.mode(
+                      theme.colorScheme.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Believers Sword',
+                    style: theme.textTheme.h4,
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),

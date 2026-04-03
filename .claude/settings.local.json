@@ -42,7 +42,19 @@
       "Read(//d/Projects/Personal/Tracksy/**)",
       "Bash(dart analyze:*)",
       "Bash(flutter devices:*)",
-      "Bash(flutter run:*)"
+      "Bash(flutter run:*)",
+      "Bash(sqlite3 \"d:/Projects/Personal/Believers-Sword/mobile-app/assets/modules/King James Version - 1769.SQLite3\" \"SELECT text FROM verses WHERE book_number=51 AND chapter=3 AND verse=1 LIMIT 1;\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"d:/Projects/Personal/Believers-Sword/mobile-app/assets/modules/King James Version - 1769.SQLite3\" \"SELECT text FROM verses LIMIT 3;\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/★New American Standard Bible.SQLite3\" \"SELECT text FROM verses WHERE book_number=51 AND chapter=3 LIMIT 5;\")",
+      "Read(//c/Users/me/AppData/Roaming/believers-sword/modules/bible/**)",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/New American Standard Version 2020.SQLite3\" \"SELECT text FROM verses WHERE book_number=51 AND chapter=3 LIMIT 5;\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/New American Standard Version 2020.SQLite3\" \".tables\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/New American Standard Version 2020.SQLite3\" \".schema verses\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/New American Standard Version 2020.SQLite3\" \"SELECT text FROM verses WHERE book_number=51 AND chapter=3 AND verse BETWEEN 1 AND 5;\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/New American Standard Version 2020.SQLite3\" \"SELECT book_number, chapter, verse, substr\\(text,1,80\\) FROM verses LIMIT 5;\")",
+      "Bash(cp \"C:/Users/me/AppData/Roaming/believers-sword/modules/bible/★New American Standard Bible.SQLite3\" /tmp/nasb.db)",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 /tmp/nasb.db \"SELECT book_number, chapter, verse, substr\\(text,1,120\\) FROM verses WHERE book_number=51 AND chapter=3 AND verse BETWEEN 1 AND 5;\")",
+      "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 /tmp/nasb.db \"SELECT book_number, chapter, verse, substr\\(text,1,150\\) FROM verses LIMIT 5;\")"
     ],
     "additionalDirectories": [
       "d:\\Projects\\Personal\\Believers-Sword"
