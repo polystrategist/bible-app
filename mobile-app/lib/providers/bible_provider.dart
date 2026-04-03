@@ -27,6 +27,8 @@ class BibleProvider extends ChangeNotifier {
   bool _splitEnabled = false;
   String? _splitVersion;
   List<Verse> _splitVerses = [];
+  bool _splitHorizontal = false; // false = vertical (top/bottom), true = horizontal (side by side)
+  double _splitProportion = 0.5; // 0.0–1.0, proportion of space for primary pane
 
   /// Full module list from assets/bible_modules.json.
   List<Map<String, dynamic>> _allModules = [];
@@ -57,6 +59,8 @@ class BibleProvider extends ChangeNotifier {
   bool get splitEnabled => _splitEnabled;
   String? get splitVersion => _splitVersion;
   List<Verse> get splitVerses => _splitVerses;
+  bool get splitHorizontal => _splitHorizontal;
+  double get splitProportion => _splitProportion;
 
   String get splitVersionShortName {
     if (_splitVersion == null) return '';
@@ -165,6 +169,8 @@ class BibleProvider extends ChangeNotifier {
           _splitEnabled = true;
           _splitVersion = savedSplitVersion;
         }
+        _splitHorizontal = prefs.getBool('split_horizontal') ?? false;
+        _splitProportion = prefs.getDouble('split_proportion') ?? 0.5;
 
         await loadVerses();
       }
@@ -291,6 +297,20 @@ class BibleProvider extends ChangeNotifier {
     await prefs.setBool('split_enabled', false);
     await prefs.remove('split_version');
     notifyListeners();
+  }
+
+  void toggleSplitOrientation() async {
+    _splitHorizontal = !_splitHorizontal;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('split_horizontal', _splitHorizontal);
+  }
+
+  void setSplitProportion(double prop) async {
+    _splitProportion = prop.clamp(0.2, 0.8);
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('split_proportion', _splitProportion);
   }
 
   Future<void> _loadSplitVerses() async {

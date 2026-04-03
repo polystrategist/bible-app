@@ -39,6 +39,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
   final ValueNotifier<VerseScrollPosition?> _syncToSplit =
       ValueNotifier(null);
 
+  // Split drag state
+  double? _dragProportion;
+  double _dragStartProp = 0;
+  double _dragStartPos = 0;
+
   void _onVerseTap(int verseNumber) {
     setState(() {
       if (_selectedVerses.contains(verseNumber)) {
@@ -125,101 +130,195 @@ class _ReaderScreenState extends State<ReaderScreen> {
       body: bible.isLoading
           ? const Center(child: CircularProgressIndicator())
           : bible.splitEnabled
-              ? Column(
-                  children: [
-                    // Primary version
-                    Expanded(
-                      child: VerseList(
-                        verses: bible.verses,
-                        fontSize: bible.fontSize,
-                        selectedVerses: _selectedVerses,
-                        onVerseTap: _onVerseTap,
-                        syncScrollNotifier: _syncToPrimary,
-                        onVerseScroll: (verse) {
-                          _syncToSplit.value = verse;
-                        },
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isHorizontal = bible.splitHorizontal;
+                    final prop = _dragProportion ?? bible.splitProportion;
+                    const handleSize = 28.0;
+                    final totalSize = isHorizontal
+                        ? constraints.maxWidth
+                        : constraints.maxHeight;
+                    final primarySize =
+                        (totalSize - handleSize) * prop;
+
+                    final primaryPane = VerseList(
+                      verses: bible.verses,
+                      fontSize: bible.fontSize,
+                      selectedVerses: _selectedVerses,
+                      onVerseTap: _onVerseTap,
+                      syncScrollNotifier: _syncToPrimary,
+                      onVerseScroll: (pos) {
+                        _syncToSplit.value = pos;
+                      },
+                    );
+
+                    final secondaryPane = VerseList(
+                      verses: bible.splitVerses,
+                      fontSize: bible.fontSize,
+                      selectedVerses: _selectedVerses,
+                      onVerseTap: _onVerseTap,
+                      persistScroll: false,
+                      syncScrollNotifier: _syncToSplit,
+                      onVerseScroll: (pos) {
+                        _syncToPrimary.value = pos;
+                      },
+                    );
+
+                    final handle = GestureDetector(
+                      onVerticalDragStart: !isHorizontal
+                          ? (details) {
+                              _dragStartProp = prop;
+                              _dragStartPos =
+                                  details.globalPosition.dy;
+                            }
+                          : null,
+                      onVerticalDragUpdate: !isHorizontal
+                          ? (details) {
+                              final delta =
+                                  details.globalPosition.dy -
+                                      _dragStartPos;
+                              setState(() {
+                                _dragProportion =
+                                    (_dragStartProp +
+                                            delta /
+                                                (totalSize -
+                                                    handleSize))
+                                        .clamp(0.2, 0.8);
+                              });
+                            }
+                          : null,
+                      onVerticalDragEnd: !isHorizontal
+                          ? (_) {
+                              if (_dragProportion != null) {
+                                bible.setSplitProportion(
+                                    _dragProportion!);
+                                _dragProportion = null;
+                              }
+                            }
+                          : null,
+                      onHorizontalDragStart: isHorizontal
+                          ? (details) {
+                              _dragStartProp = prop;
+                              _dragStartPos =
+                                  details.globalPosition.dx;
+                            }
+                          : null,
+                      onHorizontalDragUpdate: isHorizontal
+                          ? (details) {
+                              final delta =
+                                  details.globalPosition.dx -
+                                      _dragStartPos;
+                              setState(() {
+                                _dragProportion =
+                                    (_dragStartProp +
+                                            delta /
+                                                (totalSize -
+                                                    handleSize))
+                                        .clamp(0.2, 0.8);
+                              });
+                            }
+                          : null,
+                      onHorizontalDragEnd: isHorizontal
+                          ? (_) {
+                              if (_dragProportion != null) {
+                                bible.setSplitProportion(
+                                    _dragProportion!);
+                                _dragProportion = null;
+                              }
+                            }
+                          : null,
+                      child: Container(
+                        width: isHorizontal ? handleSize : double.infinity,
+                        height: isHorizontal ? double.infinity : handleSize,
+                        color: theme.colorScheme.foreground,
+                        child: isHorizontal
+                            ? Column(
+                                children: [
+                                  _splitLabel(
+                                    theme,
+                                    bible.selectedVersionShortName,
+                                    true,
+                                    true,
+                                    () => _showVersionSwitcher(context,
+                                        isPrimary: true),
+                                  ),
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () =>
+                                        bible.toggleSplitOrientation(),
+                                    child: Icon(LucideIcons.columns2,
+                                        size: 14,
+                                        color: theme
+                                            .colorScheme.background),
+                                  ),
+                                  const Spacer(),
+                                  _splitLabel(
+                                    theme,
+                                    bible.splitVersionShortName,
+                                    false,
+                                    true,
+                                    () => _showVersionSwitcher(context,
+                                        isPrimary: false),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  _splitLabel(
+                                    theme,
+                                    bible.selectedVersionShortName,
+                                    true,
+                                    false,
+                                    () => _showVersionSwitcher(context,
+                                        isPrimary: true),
+                                  ),
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () =>
+                                        bible.toggleSplitOrientation(),
+                                    child: Icon(LucideIcons.rows2,
+                                        size: 14,
+                                        color: theme
+                                            .colorScheme.background),
+                                  ),
+                                  const Spacer(),
+                                  _splitLabel(
+                                    theme,
+                                    bible.splitVersionShortName,
+                                    false,
+                                    false,
+                                    () => _showVersionSwitcher(context,
+                                        isPrimary: false),
+                                  ),
+                                ],
+                              ),
                       ),
-                    ),
-                    // Divider handle
-                    Container(
-                      height: 28,
-                      color: theme.colorScheme.muted,
-                      child: Row(
+                    );
+
+                    if (isHorizontal) {
+                      return Row(
                         children: [
-                          // Primary version label — tap to change
-                          Expanded(
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => _showVersionSwitcher(
-                                context, isPrimary: true),
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 12),
-                                  Icon(LucideIcons.chevronUp,
-                                      size: 12,
-                                      color: theme
-                                          .colorScheme.mutedForeground),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      bible.selectedVersionShortName,
-                                      style: theme.textTheme.muted
-                                          .copyWith(fontSize: 11),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          SizedBox(
+                            width: primarySize,
+                            child: primaryPane,
                           ),
-                          Icon(LucideIcons.columns2,
-                              size: 14,
-                              color: theme.colorScheme.mutedForeground),
-                          // Split version label — tap to change
-                          Expanded(
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => _showVersionSwitcher(
-                                context, isPrimary: false),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      bible.splitVersionShortName,
-                                      style: theme.textTheme.muted
-                                          .copyWith(fontSize: 11),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(LucideIcons.chevronDown,
-                                      size: 12,
-                                      color: theme
-                                          .colorScheme.mutedForeground),
-                                  const SizedBox(width: 12),
-                                ],
-                              ),
-                            ),
-                          ),
+                          handle,
+                          Expanded(child: secondaryPane),
                         ],
-                      ),
-                    ),
-                    // Secondary version
-                    Expanded(
-                      child: VerseList(
-                        verses: bible.splitVerses,
-                        fontSize: bible.fontSize,
-                        selectedVerses: _selectedVerses,
-                        onVerseTap: _onVerseTap,
-                        persistScroll: false,
-                        syncScrollNotifier: _syncToSplit,
-                        onVerseScroll: (verse) {
-                          _syncToPrimary.value = verse;
-                        },
-                      ),
-                    ),
-                  ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          SizedBox(
+                            height: primarySize,
+                            child: primaryPane,
+                          ),
+                          handle,
+                          Expanded(child: secondaryPane),
+                        ],
+                      );
+                    }
+                  },
                 )
               : VerseList(
                   verses: bible.verses,
@@ -822,6 +921,55 @@ class _ReaderScreenState extends State<ReaderScreen> {
         ),
       ),
     );
+  }
+
+  Widget _splitLabel(
+    ShadThemeData theme,
+    String text,
+    bool isPrimary,
+    bool isVerticalBar,
+    VoidCallback onTap,
+  ) {
+    final label = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isVerticalBar ? 4 : 12,
+          vertical: isVerticalBar ? 8 : 4,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!isVerticalBar)
+              Icon(
+                isPrimary
+                    ? LucideIcons.chevronUp
+                    : LucideIcons.chevronDown,
+                size: 10,
+                color: theme.colorScheme.background,
+              ),
+            if (!isVerticalBar) const SizedBox(width: 3),
+            Flexible(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: isVerticalBar ? 10 : 11,
+                  color: theme.colorScheme.background,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (isVerticalBar) {
+      return RotatedBox(quarterTurns: isPrimary ? 3 : 1, child: label);
+    }
+    return label;
   }
 
   Widget _buildSplitToggle(BuildContext context, ShadThemeData theme) {
