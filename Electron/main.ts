@@ -8,7 +8,7 @@ import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
 import BibleModules from './Modules/Bible/Bible';
 import AppUpdater from './AutoUpdate';
 import { setupPortableMode } from './util/portable';
-import { createWindowState, attachWindowStateManager } from './util/window';
+import { createWindowState, attachWindowStateManager, saveWindowState } from './util/window';
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 
 // Check if running in portable mode
@@ -131,6 +131,7 @@ app.on('window-all-closed', () => {
 
 // Clean up resources before quitting
 app.on('before-quit', () => {
+    saveWindowState();
     clearBibleVersionCache();
     Log.info('Application cleanup completed');
 });
