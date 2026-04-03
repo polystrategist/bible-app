@@ -8,3 +8,4 @@ up_using_window.cmd
 web/public/app
 GenerateMyBibleModules/venv
 FrontEndApp/.env.prod
+settings.local.json

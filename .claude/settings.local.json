@@ -61,7 +61,8 @@
       "Bash(/c/Users/me/AppData/Local/Android/Sdk/platform-tools/sqlite3 /tmp/rsv.db \"SELECT book_number, chapter, verse FROM verses LIMIT 5;\")",
       "Bash(curl -L -o /tmp/rsv_test.zip \"https://www.ph4.org/_dl.php?back=bbl&a=RSV&b=mybible&c\")",
       "Bash(python3 -c \"import zipfile; z=zipfile.ZipFile\\('/tmp/rsv_test.zip'\\); [print\\(f.filename, f.file_size\\) for f in z.filelist]\")",
-      "Bash(unzip -l /tmp/rsv_test.zip)"
+      "Bash(unzip -l /tmp/rsv_test.zip)",
+      "Read(//d/Projects/Personal/androidbible/**)"
     ],
     "additionalDirectories": [
       "d:\\Projects\\Personal\\Believers-Sword"

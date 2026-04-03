@@ -15,6 +15,7 @@ class BibleService {
   /// Bundled Bible modules that ship with the app — these must never be deleted.
   static const List<String> bundledModules = [
     'King James Version - 1769.SQLite3',
+    'Ang Salita ng Dios 2015.SQLite3',
   ];
 
   Future<String> get _modulesPath async {

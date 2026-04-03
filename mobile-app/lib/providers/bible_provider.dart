@@ -23,6 +23,11 @@ class BibleProvider extends ChangeNotifier {
   int? _targetVerse;
   final Map<String, String> _shortNames = {};
 
+  // --- Split screen ---
+  bool _splitEnabled = false;
+  String? _splitVersion;
+  List<Verse> _splitVerses = [];
+
   /// Full module list from assets/bible_modules.json.
   List<Map<String, dynamic>> _allModules = [];
 
@@ -48,6 +53,20 @@ class BibleProvider extends ChangeNotifier {
   bool get isDownloading => _downloadingFileName != null;
   String? get downloadingFileName => _downloadingFileName;
   double get downloadProgress => _downloadProgress;
+
+  bool get splitEnabled => _splitEnabled;
+  String? get splitVersion => _splitVersion;
+  List<Verse> get splitVerses => _splitVerses;
+
+  String get splitVersionShortName {
+    if (_splitVersion == null) return '';
+    if (_shortNames.containsKey(_splitVersion)) {
+      return _shortNames[_splitVersion]!;
+    }
+    return _splitVersion!
+        .replaceAll('.SQLite3', '')
+        .replaceAll('.db', '');
+  }
 
   /// All modules from the JSON that have a non-null download link AND are
   /// not already present in the modules directory.
@@ -135,6 +154,16 @@ class BibleProvider extends ChangeNotifier {
         if (savedChapter != null &&
             savedChapter <= _selectedBook.chapterCount) {
           _selectedChapter = savedChapter;
+        }
+
+        // Restore split state
+        final savedSplitEnabled = prefs.getBool('split_enabled') ?? false;
+        final savedSplitVersion = prefs.getString('split_version');
+        if (savedSplitEnabled &&
+            savedSplitVersion != null &&
+            _availableBibles.contains(savedSplitVersion)) {
+          _splitEnabled = true;
+          _splitVersion = savedSplitVersion;
         }
 
         await loadVerses();
@@ -242,6 +271,45 @@ class BibleProvider extends ChangeNotifier {
     }
   }
 
+  // --- Split screen ---
+
+  Future<void> enableSplit(String version) async {
+    _splitEnabled = true;
+    _splitVersion = version;
+    await _loadSplitVerses();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('split_enabled', true);
+    await prefs.setString('split_version', version);
+    notifyListeners();
+  }
+
+  void disableSplit() async {
+    _splitEnabled = false;
+    _splitVersion = null;
+    _splitVerses = [];
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('split_enabled', false);
+    await prefs.remove('split_version');
+    notifyListeners();
+  }
+
+  Future<void> _loadSplitVerses() async {
+    if (_splitVersion == null || !_splitEnabled) {
+      _splitVerses = [];
+      return;
+    }
+    try {
+      _splitVerses = await _service.getVerses(
+        version: _splitVersion!,
+        bookNumber: _selectedBook.bookNumber,
+        chapter: _selectedChapter,
+      );
+    } catch (e) {
+      debugPrint('[BibleProvider] Split verses error: $e');
+      _splitVerses = [];
+    }
+  }
+
   Future<void> _saveState() async {
     final prefs = await SharedPreferences.getInstance();
     if (_selectedVersion != null) {
@@ -325,6 +393,10 @@ class BibleProvider extends ChangeNotifier {
       bookNumber: _selectedBook.bookNumber,
       chapter: _selectedChapter,
     );
+
+    if (_splitEnabled) {
+      await _loadSplitVerses();
+    }
 
     _isLoading = false;
     notifyListeners();

@@ -33,6 +33,12 @@ class _ReaderScreenState extends State<ReaderScreen> {
   int? _lastChapter;
   final Set<int> _selectedVerses = {};
 
+  // Split scroll sync
+  final ValueNotifier<VerseScrollPosition?> _syncToPrimary =
+      ValueNotifier(null);
+  final ValueNotifier<VerseScrollPosition?> _syncToSplit =
+      ValueNotifier(null);
+
   void _onVerseTap(int verseNumber) {
     setState(() {
       if (_selectedVerses.contains(verseNumber)) {
@@ -45,6 +51,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
 
   void _clearSelection() {
     setState(() => _selectedVerses.clear());
+  }
+
+  @override
+  void dispose() {
+    _syncToPrimary.dispose();
+    _syncToSplit.dispose();
+    super.dispose();
   }
 
   @override
@@ -111,12 +124,109 @@ class _ReaderScreenState extends State<ReaderScreen> {
       drawer: hasSelection ? null : _buildDrawer(context, theme),
       body: bible.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : VerseList(
-              verses: bible.verses,
-              fontSize: bible.fontSize,
-              selectedVerses: _selectedVerses,
-              onVerseTap: _onVerseTap,
-            ),
+          : bible.splitEnabled
+              ? Column(
+                  children: [
+                    // Primary version
+                    Expanded(
+                      child: VerseList(
+                        verses: bible.verses,
+                        fontSize: bible.fontSize,
+                        selectedVerses: _selectedVerses,
+                        onVerseTap: _onVerseTap,
+                        syncScrollNotifier: _syncToPrimary,
+                        onVerseScroll: (verse) {
+                          _syncToSplit.value = verse;
+                        },
+                      ),
+                    ),
+                    // Divider handle
+                    Container(
+                      height: 28,
+                      color: theme.colorScheme.muted,
+                      child: Row(
+                        children: [
+                          // Primary version label — tap to change
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => _showVersionSwitcher(
+                                context, isPrimary: true),
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 12),
+                                  Icon(LucideIcons.chevronUp,
+                                      size: 12,
+                                      color: theme
+                                          .colorScheme.mutedForeground),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      bible.selectedVersionShortName,
+                                      style: theme.textTheme.muted
+                                          .copyWith(fontSize: 11),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Icon(LucideIcons.columns2,
+                              size: 14,
+                              color: theme.colorScheme.mutedForeground),
+                          // Split version label — tap to change
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => _showVersionSwitcher(
+                                context, isPrimary: false),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      bible.splitVersionShortName,
+                                      style: theme.textTheme.muted
+                                          .copyWith(fontSize: 11),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(LucideIcons.chevronDown,
+                                      size: 12,
+                                      color: theme
+                                          .colorScheme.mutedForeground),
+                                  const SizedBox(width: 12),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Secondary version
+                    Expanded(
+                      child: VerseList(
+                        verses: bible.splitVerses,
+                        fontSize: bible.fontSize,
+                        selectedVerses: _selectedVerses,
+                        onVerseTap: _onVerseTap,
+                        persistScroll: false,
+                        syncScrollNotifier: _syncToSplit,
+                        onVerseScroll: (verse) {
+                          _syncToPrimary.value = verse;
+                        },
+                      ),
+                    ),
+                  ],
+                )
+              : VerseList(
+                  verses: bible.verses,
+                  fontSize: bible.fontSize,
+                  selectedVerses: _selectedVerses,
+                  onVerseTap: _onVerseTap,
+                ),
     );
   }
 
@@ -180,7 +290,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
         ],
       ),
       actions: [
-        // Version picker
+        // Version picker — hidden in split mode (shown in split bar)
+        if (!bible.splitEnabled)
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => Navigator.push(
@@ -596,6 +707,10 @@ class _ReaderScreenState extends State<ReaderScreen> {
             ),
             Divider(height: 1, color: theme.colorScheme.border),
             const SizedBox(height: 8),
+            _buildSplitToggle(context, theme),
+            const SizedBox(height: 8),
+            Divider(height: 1, color: theme.colorScheme.border),
+            const SizedBox(height: 8),
             _buildThemeSection(context, theme),
             const SizedBox(height: 8),
             const Spacer(),
@@ -628,6 +743,174 @@ class _ReaderScreenState extends State<ReaderScreen> {
       leading: Icon(icon, size: 20, color: theme.colorScheme.foreground),
       title: Text(label, style: theme.textTheme.small),
       onTap: onTap,
+    );
+  }
+
+  void _showVersionSwitcher(BuildContext context,
+      {required bool isPrimary}) {
+    final bible = context.read<BibleProvider>();
+    final theme = ShadTheme.of(context);
+
+    // Exclude the version already used in the other pane
+    final excludeVersion =
+        isPrimary ? bible.splitVersion : bible.selectedVersion;
+    final installed = bible.availableBibles
+        .where((v) => v != excludeVersion)
+        .toList();
+
+    showShadSheet(
+      side: ShadSheetSide.bottom,
+      context: context,
+      builder: (sheetContext) => ShadSheet(
+        title: Text(isPrimary ? 'Primary Version' : 'Split Version'),
+        child: Material(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...installed.map((fileName) {
+                  final title = fileName
+                      .replaceAll('.SQLite3', '')
+                      .replaceAll('.db', '');
+                  final current = isPrimary
+                      ? bible.selectedVersion
+                      : bible.splitVersion;
+                  final isSelected = fileName == current;
+                  return ListTile(
+                    leading: Icon(
+                      isSelected
+                          ? LucideIcons.circleCheck
+                          : LucideIcons.circle,
+                      size: 20,
+                      color:
+                          isSelected ? theme.colorScheme.primary : null,
+                    ),
+                    title: Text(title),
+                    onTap: () {
+                      if (isPrimary) {
+                        bible.selectVersion(fileName);
+                      } else {
+                        bible.enableSplit(fileName);
+                      }
+                      Navigator.pop(sheetContext);
+                    },
+                  );
+                }),
+                Divider(
+                    height: 1,
+                    color:
+                        theme.colorScheme.border.withValues(alpha: 0.5)),
+                ListTile(
+                  leading: Icon(LucideIcons.download,
+                      size: 20, color: theme.colorScheme.primary),
+                  title: const Text('Download more versions'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const VersionSelectorScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSplitToggle(BuildContext context, ShadThemeData theme) {
+    final bible = context.read<BibleProvider>();
+    return _drawerItem(
+      context,
+      icon: LucideIcons.columns2,
+      label: bible.splitEnabled ? 'Split (On)' : 'Split',
+      onTap: () {
+        Navigator.pop(context);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _showSplitVersionPicker(this.context);
+        });
+      },
+    );
+  }
+
+  void _showSplitVersionPicker(BuildContext context) {
+    final bible = context.read<BibleProvider>();
+    final theme = ShadTheme.of(context);
+    final versions = bible.availableBibles
+        .where((v) => v != bible.selectedVersion)
+        .toList();
+
+    showShadSheet(
+      side: ShadSheetSide.bottom,
+      context: context,
+      builder: (sheetContext) => ShadSheet(
+        title: const Text('Split View'),
+        child: Material(
+          color: Colors.transparent,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Disable option
+              if (bible.splitEnabled)
+                ListTile(
+                  leading: Icon(LucideIcons.x,
+                      size: 20, color: theme.colorScheme.destructive),
+                  title: Text('Disable Split',
+                      style: TextStyle(
+                          color: theme.colorScheme.destructive)),
+                  onTap: () {
+                    bible.disableSplit();
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+              if (bible.splitEnabled)
+                Divider(
+                    height: 1,
+                    color: theme.colorScheme.border
+                        .withValues(alpha: 0.5)),
+              if (versions.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    'Download more versions to use split view.',
+                    style: theme.textTheme.muted,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ...versions.map((fileName) {
+                final title = fileName
+                    .replaceAll('.SQLite3', '')
+                    .replaceAll('.db', '');
+                final isCurrentSplit = fileName == bible.splitVersion;
+                return ListTile(
+                  leading: Icon(
+                    isCurrentSplit
+                        ? LucideIcons.circleCheck
+                        : LucideIcons.circle,
+                    size: 20,
+                    color: isCurrentSplit ? theme.colorScheme.primary : null,
+                  ),
+                  title: Text(title),
+                  onTap: () {
+                    bible.enableSplit(fileName);
+                    Navigator.pop(sheetContext);
+                  },
+                );
+              }),
+            ],
+          ),
+        ),
+        ),
+      ),
     );
   }
 
