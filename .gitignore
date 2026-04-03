@@ -9,3 +9,4 @@ web/public/app
 GenerateMyBibleModules/venv
 FrontEndApp/.env.prod
 settings.local.json
+.claude/settings.local.json
