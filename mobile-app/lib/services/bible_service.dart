@@ -110,6 +110,8 @@ class BibleService {
     for (final file in archive) {
       final name = file.name.toLowerCase();
       if (!file.isFile) continue;
+      // Skip commentaries files — they don't contain verses
+      if (name.contains('commentaries')) continue;
       if (name.endsWith('.sqlite3') || name.endsWith('.db')) {
         target = file;
         break;
