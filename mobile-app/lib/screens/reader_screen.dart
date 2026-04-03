@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../providers/bible_provider.dart';
 import '../providers/theme_provider.dart';
@@ -29,6 +31,21 @@ class ReaderScreen extends StatefulWidget {
 class _ReaderScreenState extends State<ReaderScreen> {
   int? _lastBook;
   int? _lastChapter;
+  final Set<int> _selectedVerses = {};
+
+  void _onVerseTap(int verseNumber) {
+    setState(() {
+      if (_selectedVerses.contains(verseNumber)) {
+        _selectedVerses.remove(verseNumber);
+      } else {
+        _selectedVerses.add(verseNumber);
+      }
+    });
+  }
+
+  void _clearSelection() {
+    setState(() => _selectedVerses.clear());
+  }
 
   @override
   void didChangeDependencies() {
@@ -38,6 +55,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
         bible.selectedChapter != _lastChapter) {
       _lastBook = bible.selectedBook.bookNumber;
       _lastChapter = bible.selectedChapter;
+      _selectedVerses.clear();
       context.read<UserDataProvider>().loadChapterData(
             bible.selectedBook.bookNumber,
             bible.selectedChapter,
@@ -49,6 +67,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   Widget build(BuildContext context) {
     final bible = context.watch<BibleProvider>();
     final theme = ShadTheme.of(context);
+    final hasSelection = _selectedVerses.isNotEmpty;
 
     if (!bible.isInitialized) {
       return Scaffold(
@@ -75,104 +94,402 @@ class _ReaderScreenState extends State<ReaderScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        leading: Builder(
-          builder: (ctx) => ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.menu, size: 20),
-            onPressed: () => Scaffold.of(ctx).openDrawer(),
-          ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          transitionBuilder: (child, animation) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          child: hasSelection
+              ? _buildSelectionAppBar(context, bible, theme)
+              : _buildDefaultAppBar(context, bible, theme),
         ),
-        title: GestureDetector(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const VersionSelectorScreen()),
-          ),
-          child: Text(
-            bible.selectedVersionTitle,
-            style: theme.textTheme.small,
-            overflow: TextOverflow.ellipsis,
-          ),
+      ),
+      drawer: hasSelection ? null : _buildDrawer(context, theme),
+      body: bible.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : VerseList(
+              verses: bible.verses,
+              fontSize: bible.fontSize,
+              selectedVerses: _selectedVerses,
+              onVerseTap: _onVerseTap,
+            ),
+    );
+  }
+
+  PreferredSizeWidget _buildDefaultAppBar(
+      BuildContext context, BibleProvider bible, ShadThemeData theme) {
+    return AppBar(
+      key: const ValueKey('default'),
+      leading: Builder(
+        builder: (ctx) => ShadIconButton.ghost(
+          icon: const Icon(LucideIcons.menu, size: 20),
+          onPressed: () => Scaffold.of(ctx).openDrawer(),
         ),
-        actions: [
+      ),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
           ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.search, size: 20),
-            onPressed: () => Navigator.push(
+            icon: const Icon(LucideIcons.chevronLeft, size: 20),
+            onPressed: bible.selectedChapter > 1
+                ? () {
+                    _clearSelection();
+                    bible.previousChapter();
+                  }
+                : null,
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const SearchScreen()),
+              MaterialPageRoute(
+                  builder: (_) => const BookSelectorScreen()),
+            ),
+            child: Text(
+              '${bible.selectedBook.title} ${bible.selectedChapter}',
+              style: theme.textTheme.small
+                  .copyWith(fontWeight: FontWeight.w600),
             ),
           ),
           ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.aLargeSmall, size: 20),
-            onPressed: () => _showFontSizeSheet(context, bible),
-          ),
-          ShadIconButton.ghost(
-            icon: const Icon(LucideIcons.user, size: 20),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-            ),
+            icon: const Icon(LucideIcons.chevronRight, size: 20),
+            onPressed:
+                bible.selectedChapter < bible.selectedBook.chapterCount
+                    ? () {
+                        _clearSelection();
+                        bible.nextChapter();
+                      }
+                    : null,
           ),
         ],
       ),
-      drawer: _buildDrawer(context, theme),
-      body: Column(
-        children: [
-          // Navigation bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.muted,
-              border: Border(
-                bottom: BorderSide(color: theme.colorScheme.border, width: 1),
-              ),
-            ),
+      actions: [
+        // Version picker
+        GestureDetector(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => const VersionSelectorScreen()),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 80),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                ShadIconButton.ghost(
-                  icon: const Icon(LucideIcons.chevronLeft, size: 20),
-                  onPressed: bible.selectedChapter > 1
-                      ? () => bible.previousChapter()
-                      : null,
-                ),
-                Expanded(
-                  child: Center(
-                    child: ShadButton.ghost(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BookSelectorScreen(),
-                        ),
-                      ),
-                      child: Text(
-                        '${bible.selectedBook.title}  ${bible.selectedChapter}',
-                        style: theme.textTheme.small.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                Flexible(
+                  child: Text(
+                    bible.selectedVersionTitle,
+                    style: theme.textTheme.muted.copyWith(fontSize: 12),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
-                ShadIconButton.ghost(
-                  icon: const Icon(LucideIcons.chevronRight, size: 20),
-                  onPressed:
-                      bible.selectedChapter < bible.selectedBook.chapterCount
-                          ? () => bible.nextChapter()
-                          : null,
-                ),
+                const SizedBox(width: 2),
+                Icon(LucideIcons.chevronDown,
+                    size: 12, color: theme.colorScheme.mutedForeground),
               ],
             ),
           ),
-          // Verses
-          Expanded(
-            child: bible.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : VerseList(
-                    verses: bible.verses,
-                    fontSize: bible.fontSize,
-                  ),
+        ),
+        ShadIconButton.ghost(
+          icon: const Icon(LucideIcons.search, size: 20),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SearchScreen()),
+          ),
+        ),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildSelectionAppBar(
+      BuildContext context, BibleProvider bible, ShadThemeData theme) {
+    final count = _selectedVerses.length;
+    final userData = context.read<UserDataProvider>();
+    final sortedVerses = _selectedVerses.toList()..sort();
+    final verseLabel = sortedVerses.join(', ');
+
+    return AppBar(
+      key: const ValueKey('selection'),
+      leading: ShadIconButton.ghost(
+        icon: const Icon(LucideIcons.x, size: 20),
+        onPressed: _clearSelection,
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${bible.selectedBook.title} ${bible.selectedChapter}:$verseLabel',
+            style: theme.textTheme.small.copyWith(fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            '$count verse${count > 1 ? 's' : ''} selected',
+            style: theme.textTheme.muted.copyWith(fontSize: 12),
           ),
         ],
       ),
+      actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(LucideIcons.plus, size: 22),
+          onSelected: (value) {
+            switch (value) {
+              case 'bookmark':
+                userData.toggleBookmark(bible.selectedBook.bookNumber,
+                    bible.selectedChapter, sortedVerses.first);
+                _clearSelection();
+              case 'highlight':
+                _showHighlightPicker(context, bible, userData, sortedVerses);
+              case 'clipnote':
+                final v = sortedVerses.first;
+                final clipNote = userData.getClipNote(
+                    bible.selectedBook.bookNumber, bible.selectedChapter, v);
+                _showClipNoteDialog(
+                  context,
+                  bible,
+                  userData,
+                  v,
+                  clipNote?['content'] as String? ?? '',
+                  clipNote?['color'] as String? ?? '#FFD700',
+                );
+            }
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'bookmark',
+              child: Row(
+                children: [
+                  Icon(LucideIcons.bookmark, size: 18),
+                  SizedBox(width: 12),
+                  Text('Bookmark'),
+                ],
+              ),
+            ),
+            if (count == 1)
+              const PopupMenuItem(
+                value: 'clipnote',
+                child: Row(
+                  children: [
+                    Icon(LucideIcons.stickyNote, size: 18),
+                    SizedBox(width: 12),
+                    Text('Clip Note'),
+                  ],
+                ),
+              ),
+            const PopupMenuItem(
+              value: 'highlight',
+              child: Row(
+                children: [
+                  Icon(LucideIcons.highlighter, size: 18),
+                  SizedBox(width: 12),
+                  Text('Highlight'),
+                ],
+              ),
+            ),
+          ],
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(LucideIcons.ellipsisVertical, size: 22),
+          onSelected: (value) {
+            final verseTexts = sortedVerses.map((v) {
+              final verse = bible.verses.firstWhere((vs) => vs.verse == v);
+              return '${verse.verse} ${verse.text.replaceAll(RegExp(r'<[^>]*>'), '').replaceAll('&nbsp;', ' ').replaceAll(RegExp(r'\[\d+\]'), '').trim()}';
+            }).join('\n');
+            final ref =
+                '${bible.selectedBook.title} ${bible.selectedChapter}:${sortedVerses.join(', ')}';
+            final fullText = '$verseTexts\n— $ref';
+
+            switch (value) {
+              case 'copy':
+                Clipboard.setData(ClipboardData(text: fullText));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Verse copied'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                _clearSelection();
+              case 'share':
+                SharePlus.instance.share(ShareParams(text: fullText));
+                _clearSelection();
+            }
+          },
+          itemBuilder: (context) => const [
+            PopupMenuItem(
+              value: 'copy',
+              child: Row(
+                children: [
+                  Icon(LucideIcons.copy, size: 18),
+                  SizedBox(width: 12),
+                  Text('Copy verse'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'share',
+              child: Row(
+                children: [
+                  Icon(LucideIcons.share2, size: 18),
+                  SizedBox(width: 12),
+                  Text('Share'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _showHighlightPicker(BuildContext context, BibleProvider bible,
+      UserDataProvider userData, List<int> verses) {
+    const colors = [
+      ('Yellow', '#FFEB3B'),
+      ('Green', '#A5D6A7'),
+      ('Blue', '#90CAF9'),
+      ('Pink', '#F48FB1'),
+      ('Orange', '#FFCC80'),
+    ];
+
+    showShadSheet(
+      side: ShadSheetSide.bottom,
+      context: context,
+      builder: (sheetContext) => ShadSheet(
+        title: const Text('Choose Highlight Color'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: colors.map((opt) {
+              final color =
+                  Color(int.parse('FF${opt.$2.substring(1)}', radix: 16));
+              return GestureDetector(
+                onTap: () {
+                  for (final v in verses) {
+                    userData.setHighlight(bible.selectedBook.bookNumber,
+                        bible.selectedChapter, v, opt.$2);
+                  }
+                  Navigator.pop(sheetContext);
+                  _clearSelection();
+                },
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: ShadTheme.of(sheetContext).colorScheme.border,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showClipNoteDialog(BuildContext context, BibleProvider bible,
+      UserDataProvider userData, int verse, String content, String color) {
+    final controller = TextEditingController(text: content);
+    final bookName = bible.selectedBook.title;
+    final chapter = bible.selectedChapter;
+    final bookNumber = bible.selectedBook.bookNumber;
+
+    showShadDialog(
+      context: context,
+      builder: (ctx) {
+        String selectedColor = color;
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final theme = ShadTheme.of(ctx);
+            const clipNoteColors = [
+              ('Gold', '#FFD700'),
+              ('Yellow', '#FFEB3B'),
+              ('Green', '#A5D6A7'),
+              ('Blue', '#90CAF9'),
+              ('Pink', '#F48FB1'),
+              ('Orange', '#FFCC80'),
+            ];
+
+            return ShadDialog(
+              title: Text('Clip Note — $bookName $chapter:$verse'),
+              actions: [
+                ShadButton.outline(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel'),
+                ),
+                ShadButton(
+                  onPressed: () {
+                    final text = controller.text.trim();
+                    if (text.isNotEmpty) {
+                      userData.saveClipNote(
+                          bookNumber, chapter, verse, text, selectedColor);
+                    }
+                    Navigator.pop(ctx);
+                    _clearSelection();
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShadInput(
+                      controller: controller,
+                      placeholder: const Text('Write your note...'),
+                      maxLines: 4,
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Color', style: theme.textTheme.small),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: clipNoteColors.map((opt) {
+                        final c = Color(int.parse(
+                            'FF${opt.$2.substring(1)}',
+                            radix: 16));
+                        final isSelected = opt.$2 == selectedColor;
+                        return GestureDetector(
+                          onTap: () =>
+                              setDialogState(() => selectedColor = opt.$2),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? theme.colorScheme.foreground
+                                    : theme.colorScheme.border,
+                                width: isSelected ? 2.5 : 1,
+                              ),
+                            ),
+                            child: isSelected
+                                ? Icon(LucideIcons.check,
+                                    size: 16,
+                                    color: theme.colorScheme.foreground)
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
