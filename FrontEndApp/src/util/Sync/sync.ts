@@ -68,10 +68,9 @@ async function pullSync(token: string): Promise<void> {
 
         if (response.data.status !== 'success') return;
 
-        const { bookmarks, highlights, clip_notes, prayer_lists, study_spaces, notes, has_more, next_cursor, last_sync_timestamp } = response.data;
+        const { bookmarks, highlights, clip_notes, prayer_lists, notes, has_more, next_cursor, last_sync_timestamp } = response.data;
 
         await window.browserWindow.applyPullData({
-            study_spaces,
             bookmarks,
             highlights,
             clip_notes,

@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 import { NIcon, NLayoutHeader, NButton } from 'naive-ui';
 import {
-    BrainCircuit24Filled,
-    BrainCircuit24Regular,
-    CaretDown24Filled,
-    CaretDown24Regular,
     PanelBottom20Filled,
     PanelBottom20Regular,
     PanelLeft20Filled,
@@ -24,7 +20,6 @@ import LogoComponent from './../LogoComponent.vue';
 // import ProfileDropdown from './Partials/ProfileDropdown.vue';
 import ThemeChangerDrawer from '../ThemeChanger/ThemeChangerDrawer.vue';
 import { useMenuStore } from '../../store/menu';
-import SpaceStudyStore from '../../store/SpaceStudyStore';
 import { useSettingStore } from '../../store/settingStore';
 import useNoteStore from '../../store/useNoteStore';
 import ProfileDropdown from './Partials/ProfileDropdown.vue';
@@ -34,7 +29,6 @@ const themeStore = useThemeStore();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const isElectron = window.isElectron;
-const StudySpaceStore = SpaceStudyStore();
 const settingStore = useSettingStore();
 const noteStore = useNoteStore();
 
@@ -65,36 +59,6 @@ onBeforeMount(async () => {
             <LogoComponent class="w-32px h-32px" />
             <div class="mr-10px font-semibold">{{ $t('Believers Sword') }}</div>
             <div class="flex items-center gap-1">
-                <NButton
-                    v-if="menuStore.menuSelected === 'read-bible'"
-                    size="medium"
-                    icon-placement="right"
-                    @click="StudySpaceStore.showSpaceStudy = true"
-                    :focusable="false"
-                    type="primary"
-                    secondary
-                >
-                    <div class="min-w-150px flex items-center justify-between">
-                        <div class="flex items-center">
-                            <NIcon class="mr-10px">
-                                <BrainCircuit24Filled v-if="themeStore.isDark" />
-                                <BrainCircuit24Regular v-else />
-                            </NIcon>
-                            <div>
-                                {{
-                                    StudySpaceStore.lists.length &&
-                                    StudySpaceStore.selectedSpaceStudy?.title
-                                        ? StudySpaceStore.selectedSpaceStudy.title
-                                        : $t('Study Space')
-                                }}
-                            </div>
-                        </div>
-                        <NIcon class="ml-10px">
-                            <CaretDown24Filled v-if="themeStore.isDark" />
-                            <CaretDown24Regular v-else />
-                        </NIcon>
-                    </div>
-                </NButton>
             <template v-if="menuStore.menuSelected === 'read-bible'">
                 <NButton
                     size="medium"

@@ -5,11 +5,9 @@ import { ref } from 'vue';
 import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
-import SpaceStudyStore from '../../../../store/SpaceStudyStore';
 import { runSync } from '../../../../util/Sync/sync';
 import { colors } from '../../../../util/highlighter';
 
-const spaceStudyStore = SpaceStudyStore();
 const bibleStore = useBibleStore();
 const contextMenuRef = ref(null);
 const emits = defineEmits(['close', 'create-clip-note']);
@@ -68,19 +66,11 @@ async function clickContextMenu(key: string) {
             book_name: bibleStore.selectedBook.title,
         });
     } else if (key == 'clear-highlight') {
-        if (spaceStudyStore.selectedSpaceStudy?.id) {
-            // Try version-independent key first, then legacy version-specific key
-            const verseKey = `${props.data.book_number}_${props.data.chapter}_${props.data.verse}`;
-            await bibleStore.removeHighlightInDb(
-                spaceStudyStore.selectedSpaceStudy?.id,
-                verseKey,
-            );
-            // Also clear legacy version-specific highlight if exists
-            await bibleStore.removeHighlightInDb(
-                spaceStudyStore.selectedSpaceStudy?.id,
-                props.data.key,
-            );
-        }
+        // Try version-independent key first, then legacy version-specific key
+        const verseKey = `${props.data.book_number}_${props.data.chapter}_${props.data.verse}`;
+        await bibleStore.removeHighlightInDb(verseKey);
+        // Also clear legacy version-specific highlight if exists
+        await bibleStore.removeHighlightInDb(props.data.key);
     }
     showColorPicker.value = false;
     emits('close');

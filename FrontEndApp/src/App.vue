@@ -25,7 +25,6 @@ import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import { useAuthStore } from './store/authStore';
-import SelectStudySpaceModal from './components/StudySpace/SelectStudySpaceModal.vue';
 import FlipBook from './Views/ReadBible/FlipBook/FlipBook.vue';
 import VersionSelectModal from './Views/ReadBible/FlipBook/VersionSelectModal.vue';
 import { useRoute } from 'vue-router';
@@ -158,7 +157,6 @@ onMounted(async () => {
                     <ImportBible />
                     <AboutModal />
                     <SettingsModal />
-                    <SelectStudySpaceModal />
                     <VersionSelectModal />
                     <FlipBook />
                 </NMessageProvider>

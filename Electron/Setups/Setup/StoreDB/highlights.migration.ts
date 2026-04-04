@@ -8,7 +8,6 @@ export default async () => {
                 await StoreDB.schema
                     .createTable('highlights', function (table) {
                         table.increments('id').primary();
-                        table.integer('study_space_id');
                         table.string('key');
                         table.integer('book_number');
                         table.integer('chapter');
@@ -19,19 +18,6 @@ export default async () => {
                     .then();
             } else {
                 await removeUniqueConstraint('highlights', 'key');
-
-                // updates if table exists check if column study_space_id exists
-                await StoreDB.schema
-                    .hasColumn('highlights', 'study_space_id')
-                    .then(async (exists) => {
-                        if (!exists) {
-                            await StoreDB.schema
-                                .table('highlights', function (table) {
-                                    table.integer('study_space_id').after('id');
-                                })
-                                .then();
-                        }
-                    });
 
                 // Migrate old version-specific highlights to version-independent format
                 await migrateOldHighlights();
@@ -72,10 +58,9 @@ async function migrateOldHighlights() {
             // Build version-independent key
             const newKey = `${hl.book_number}_${hl.chapter}_${hl.verse}`;
 
-            // Check if a new-format highlight already exists for this verse + study space
+            // Check if a new-format highlight already exists for this verse
             const existing = await StoreDB('highlights')
                 .where('key', newKey)
-                .where('study_space_id', hl.study_space_id)
                 .first();
 
             if (existing) {

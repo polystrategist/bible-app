@@ -65,7 +65,6 @@ declare global {
              */
             saveHighlight: (args: string) => Promise<any>;
             deleteHighlight: (args: {
-                study_space_id: number | string;
                 key: string;
             }) => Promise<any>;
 
@@ -124,48 +123,14 @@ declare global {
 
             openDonateWindow: () => void;
 
-            /**
-             * Space Studies Events
-             */
-            getSpaceStudyList: (search: string | null | undefined) => Promise<any>;
-            storeSpaceStudy: (args: string) => Promise<{
-                data: null | {
-                    id: number;
-                    title: string;
-                    is_selected: boolean | number;
-                    description: string;
-                    created_at: string;
-                    updated_at: string;
-                };
-                error: null | { errno?: number; code?: string; message: string };
-            }>;
-            deleteSpaceStudy: (
-                id: number
-            ) => Promise<{ data: any; error: { message: string;[key: string]: any } }>;
-            selectStudySpace: (
-                id: number | string
-            ) => Promise<{ data: any; error: { message: string;[key: string]: any } }>;
-            getSelectedSpaceStudy: () => Promise<{
-                data: null | {
-                    id: number;
-                    title: string;
-                    is_selected: boolean | number;
-                    description: string;
-                    created_at: string;
-                    updated_at: string;
-                };
-                error: null | { errno?: number; code?: string; message: string };
-            }>;
-
             // Note
-            getNote: (space_study_id: number) => Promise<{
+            getNote: () => Promise<{
                 content: string;
                 created_at: null | number | string;
                 id: number;
-                study_space_id: number;
                 updated_at: number | string | null;
             }>;
-            saveNote: (args: { space_study_id: number | string; note: string }) => Promise<any>;
+            saveNote: (args: { note: string }) => Promise<any>;
 
             // Dictionary
             searchDictionary: (search: string) => Promise<any>;
@@ -204,7 +169,6 @@ declare global {
             getSyncSetting: (key: string) => Promise<any>;
             setSyncSetting: (key: string, value: any) => Promise<any>;
             applyPullData: (data: {
-                study_spaces?: any[];
                 bookmarks?: any[];
                 highlights?: any[];
                 clip_notes?: any[];

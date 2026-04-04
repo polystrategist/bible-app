@@ -1,6 +1,5 @@
 import { app, ipcMain } from 'electron';
 import Log from 'electron-log';
-import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
 import { StoreDB } from '../../DataBase/DataBase';
 import { logSyncChange } from '../../DataBase/SyncDB';
@@ -16,13 +15,11 @@ export default () => {
                 limit: number;
             }
         ) => {
-            const selectedSpaceStudy = await getSelectedSpaceStudy();
             const offset = args.page == 1 ? 0 : args.page * args.limit - args.limit;
 
             const data = await StoreDB.select()
                 .from('clip_notes')
                 .whereLike('content', `%${args.search ? args.search : ''}%`)
-                .where('study_space_id', selectedSpaceStudy.id)
                 .orderBy('id', 'desc')
                 .limit(args.limit ? args.limit : 50)
                 .offset(offset);
@@ -50,23 +47,15 @@ export default () => {
             }
         ) => {
             try {
-                const selectedSpaceStudy = await getSelectedSpaceStudy();
-
                 const key = `${book_number}_${chapter}_${verse}`;
 
                 const existingClipNote = await StoreDB('clip_notes')
-                    .where({
-                        key,
-                        study_space_id: selectedSpaceStudy.id,
-                    })
+                    .where({ key })
                     .first();
 
                 const result = await updateOrCreate(
                     'clip_notes',
-                    {
-                        key,
-                        study_space_id: selectedSpaceStudy.id,
-                    },
+                    { key },
                     {
                         book_number,
                         chapter,
@@ -91,8 +80,6 @@ export default () => {
                             verse,
                             content,
                             color,
-                            study_space_id: selectedSpaceStudy.id,
-                            study_space_name: selectedSpaceStudy.title,
                         },
                         synced: 0,
                     });
@@ -102,7 +89,6 @@ export default () => {
 
                 return StoreDB('clip_notes')
                     .where('key', key)
-                    .where('study_space_id', selectedSpaceStudy.id)
                     .first();
             } catch (e) {
                 console.log(e);
@@ -114,12 +100,10 @@ export default () => {
         'getChapterClipNotes',
         async (event, { book_number, chapter }: { book_number: number; chapter: number }) => {
             try {
-                const selectedSpaceStudy = await getSelectedSpaceStudy();
                 const data = await StoreDB('clip_notes')
                     .select()
                     .where('book_number', book_number)
-                    .where('chapter', chapter)
-                    .where('study_space_id', selectedSpaceStudy.id);
+                    .where('chapter', chapter);
 
                 const result: any = {};
                 data.forEach((row: any) => {
@@ -142,11 +126,9 @@ export default () => {
         ) => {
             try {
                 const key = `${book_number}_${chapter}_${verse}`;
-                const selectedSpaceStudy = await getSelectedSpaceStudy();
 
                 const existingClipNote = await StoreDB('clip_notes')
                     .where('key', key)
-                    .where('study_space_id', selectedSpaceStudy.id)
                     .first();
 
                 if (existingClipNote) {
@@ -155,10 +137,7 @@ export default () => {
                             table_name: 'clip_notes',
                             record_key: key,
                             action: 'deleted',
-                            payload: {
-                                ...existingClipNote,
-                                study_space_name: selectedSpaceStudy.title,
-                            },
+                            payload: existingClipNote,
                             synced: 0,
                         });
                     } catch (e) {
@@ -170,7 +149,6 @@ export default () => {
                     .where('book_number', book_number)
                     .where('chapter', chapter)
                     .where('verse', verse)
-                    .where('study_space_id', selectedSpaceStudy.id)
                     .del();
             } catch (e) {
                 console.log(e);

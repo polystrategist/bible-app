@@ -32,7 +32,7 @@ function nextPage() {
 }
 
 function handleRemoveHighlight(highlight: any) {
-    bibleStore.removeHighlightInDb(highlight.study_space_id, highlight.key);
+    bibleStore.removeHighlightInDb(highlight.key);
 }
 
 async function loadVersePreviews() {

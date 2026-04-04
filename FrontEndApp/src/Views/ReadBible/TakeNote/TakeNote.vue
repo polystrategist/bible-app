@@ -5,10 +5,8 @@ import { NButton, NCard, NDropdown, NEmpty, NIcon, NInput, NModal, useDialog } f
 import { Add, TrashCan } from '@vicons/carbon';
 import Editor from '../../../components/Editor/Editor.vue';
 import useNoteStore from '../../../store/useNoteStore';
-import SpaceStudyStore from '../../../store/SpaceStudyStore';
 import SESSION from '../../../util/session';
 
-const spaceStudyStore = SpaceStudyStore();
 const EditorRef = ref<{
     setContent: Function;
 }>();
@@ -41,17 +39,6 @@ const contextMenuOptions = [
     },
 ];
 
-async function setNoteWhenSelectingADifferentSpace() {
-    await noteStore.loadNoteForSelectedSpace(spaceStudyStore.selectedSpaceStudy?.id as number);
-}
-
-watch(
-    () => spaceStudyStore.selectedSpaceStudy,
-    async () => {
-        await setNoteWhenSelectingADifferentSpace();
-    },
-);
-
 watch(
     () => noteStore.selectedNoteId,
     () => {
@@ -60,7 +47,7 @@ watch(
 );
 
 onMounted(async () => {
-    await setNoteWhenSelectingADifferentSpace();
+    await noteStore.loadNote();
 });
 
 onBeforeMount(() => {

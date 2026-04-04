@@ -16,7 +16,7 @@ import { StoreDB } from '../../DataBase/DataBase';
  * IPC Handlers for Sync Operations
  */
 export const SyncHandlers = (win: BrowserWindow) => {
-    
+
     /**
      * Log a sync change to the local database
      */
@@ -110,10 +110,9 @@ export const SyncHandlers = (win: BrowserWindow) => {
 
     /**
      * Apply pulled data from the server to local SQLite tables.
-     * Does NOT log sync changes — this is a one-way remote→local write.
+     * Does NOT log sync changes — this is a one-way remote->local write.
      */
     ipcMain.handle('applyPullData', async (event, pullData: {
-        study_spaces?: any[];
         bookmarks?: any[];
         highlights?: any[];
         clip_notes?: any[];
@@ -122,74 +121,46 @@ export const SyncHandlers = (win: BrowserWindow) => {
     }) => {
         const now = new Date();
 
-        async function getStudySpaceId(spaceName: string): Promise<number | null> {
-            const space = await StoreDB('study_spaces').where('title', spaceName).first();
-            return space?.id ?? null;
-        }
-
         try {
-            // 1. Study spaces
-            for (const space of pullData.study_spaces ?? []) {
-                const existing = await StoreDB('study_spaces').where('title', space.name).first();
-                if (existing) {
-                    await StoreDB('study_spaces').where('title', space.name)
-                        .update({ description: space.description ?? null, updated_at: now });
-                } else {
-                    await StoreDB('study_spaces').insert({
-                        title: space.name,
-                        description: space.description ?? null,
-                        is_selected: false,
-                        created_at: now,
-                        updated_at: now,
-                    });
-                }
-            }
-
-            // 2. Bookmarks
+            // 1. Bookmarks
             for (const bm of pullData.bookmarks ?? []) {
-                const spaceId = await getStudySpaceId(bm.study_space_name);
-                if (spaceId == null) continue;
-                const existing = await StoreDB('bookmarks').where({ key: bm.key, study_space_id: spaceId }).first();
+                const existing = await StoreDB('bookmarks').where({ key: bm.key }).first();
                 if (existing) {
-                    await StoreDB('bookmarks').where({ key: bm.key, study_space_id: spaceId })
+                    await StoreDB('bookmarks').where({ key: bm.key })
                         .update({ book_number: bm.book_number, chapter: bm.chapter, verse: bm.verse, updated_at: now });
                 } else {
                     await StoreDB('bookmarks').insert({
-                        key: bm.key, study_space_id: spaceId,
+                        key: bm.key,
                         book_number: bm.book_number, chapter: bm.chapter, verse: bm.verse,
                         created_at: now, updated_at: now,
                     });
                 }
             }
 
-            // 3. Highlights
+            // 2. Highlights
             for (const hl of pullData.highlights ?? []) {
-                const spaceId = await getStudySpaceId(hl.study_space_name);
-                if (spaceId == null) continue;
-                const existing = await StoreDB('highlights').where({ key: hl.key, study_space_id: spaceId }).first();
+                const existing = await StoreDB('highlights').where({ key: hl.key }).first();
                 if (existing) {
-                    await StoreDB('highlights').where({ key: hl.key, study_space_id: spaceId })
+                    await StoreDB('highlights').where({ key: hl.key })
                         .update({ book_number: hl.book_number, chapter: hl.chapter, verse: hl.verse, content: hl.content, updated_at: now });
                 } else {
                     await StoreDB('highlights').insert({
-                        key: hl.key, study_space_id: spaceId,
+                        key: hl.key,
                         book_number: hl.book_number, chapter: hl.chapter, verse: hl.verse, content: hl.content,
                         created_at: now, updated_at: now,
                     });
                 }
             }
 
-            // 4. Clip notes
+            // 3. Clip notes
             for (const cn of pullData.clip_notes ?? []) {
-                const spaceId = await getStudySpaceId(cn.study_space_name);
-                if (spaceId == null) continue;
-                const existing = await StoreDB('clip_notes').where({ key: cn.key, study_space_id: spaceId }).first();
+                const existing = await StoreDB('clip_notes').where({ key: cn.key }).first();
                 if (existing) {
-                    await StoreDB('clip_notes').where({ key: cn.key, study_space_id: spaceId })
+                    await StoreDB('clip_notes').where({ key: cn.key })
                         .update({ book_number: cn.book_number, chapter: cn.chapter, verse: cn.verse, content: cn.content, color: cn.color, updated_at: now });
                 } else {
                     await StoreDB('clip_notes').insert({
-                        key: cn.key, study_space_id: spaceId,
+                        key: cn.key,
                         book_number: cn.book_number, chapter: cn.chapter, verse: cn.verse,
                         content: cn.content, color: cn.color ?? '#FFD700',
                         created_at: now, updated_at: now,
@@ -197,7 +168,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
                 }
             }
 
-            // 5. Prayer lists
+            // 4. Prayer lists
             for (const pl of pullData.prayer_lists ?? []) {
                 const existing = await StoreDB('prayer_lists').where('key', pl.key).first();
                 if (existing) {
@@ -212,17 +183,15 @@ export const SyncHandlers = (win: BrowserWindow) => {
                 }
             }
 
-            // 6. Notes (keyed by study_space_id, one note per space)
+            // 5. Notes (single note per user, no study space scoping)
             for (const note of pullData.notes ?? []) {
-                const spaceId = await getStudySpaceId(note.study_space_name);
-                if (spaceId == null) continue;
-                const existing = await StoreDB('notes').where('study_space_id', spaceId).first();
+                const existing = await StoreDB('notes').first();
                 if (existing) {
-                    await StoreDB('notes').where('study_space_id', spaceId)
+                    await StoreDB('notes').where('id', existing.id)
                         .update({ content: note.content, updated_at: now });
                 } else {
                     await StoreDB('notes').insert({
-                        study_space_id: spaceId, content: note.content,
+                        content: note.content,
                         created_at: now, updated_at: now,
                     });
                 }

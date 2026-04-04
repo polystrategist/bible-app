@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
-import SpaceStudyStore from './SpaceStudyStore';
 import { runSync } from '../util/Sync/sync';
 import SESSION from '../util/session';
 
@@ -22,7 +21,6 @@ export default defineStore('useNotesStore', () => {
     const notes = ref<Array<NoteItem>>([]);
     const selectedNoteId = ref<string>('');
     const showNote = ref<boolean>(true);
-    const spaceStudyStore = SpaceStudyStore();
     const isHydrating = ref(false);
 
     const showNoteKey = 'show-note-panel';
@@ -154,15 +152,9 @@ export default defineStore('useNotesStore', () => {
         isHydrating.value = false;
     }
 
-    async function loadNoteForSelectedSpace(spaceStudyId?: number | string | null) {
-        const targetSpaceId = (spaceStudyId || spaceStudyStore.selectedSpaceStudy?.id) as number | string;
-        if (!targetSpaceId) {
-            hydrateFromStoredContent('');
-            return;
-        }
-
+    async function loadNote() {
         try {
-            const storedNote = await window.browserWindow.getNote(Number(targetSpaceId));
+            const storedNote = await window.browserWindow.getNote();
             hydrateFromStoredContent(storedNote?.content || '');
         } catch (error) {
             hydrateFromStoredContent('');
@@ -194,15 +186,8 @@ export default defineStore('useNotesStore', () => {
     }
 
     function storeNote() {
-        const selectedSpaceId = spaceStudyStore.selectedSpaceStudy?.id as number | string;
-        if (!selectedSpaceId) {
-            return;
-        }
-
-        // NOTE: save note to database table
         window.browserWindow.saveNote({
             note: serializePayload(),
-            space_study_id: selectedSpaceId,
         });
         runSync();
     }
@@ -230,7 +215,7 @@ export default defineStore('useNotesStore', () => {
         renameNote,
         deleteNote,
         selectNote,
-        loadNoteForSelectedSpace,
+        loadNote,
         storeNote,
         showNote,
     };

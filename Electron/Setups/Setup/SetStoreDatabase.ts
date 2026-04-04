@@ -1,7 +1,6 @@
 import clip_noteMigration from './StoreDB/clip_note.migration';
 import prayerListMigration from './StoreDB/prayerList.migration';
 import bookmarksMigration from './StoreDB/bookmarks.migration';
-import study_spacesMigration from './StoreDB/study_spaces.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
 import notesMigration from './StoreDB/notes.migration';
 import syncLogsMigration from './StoreDB/sync_logs.migration';
@@ -21,9 +20,6 @@ export default async () => {
 
         // setup highlights
         await highlightsMigration();
-
-        // setup study space
-        await study_spacesMigration();
 
         // set note migration
         await notesMigration();

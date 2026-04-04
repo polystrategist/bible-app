@@ -1,6 +1,5 @@
 import Log from 'electron-log';
 import { app, ipcMain } from 'electron';
-import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { updateOrCreate } from '../../DataBase/DataBase';
 import { StoreDB } from '../../DataBase/DataBase';
 import { logSyncChange } from '../../DataBase/SyncDB';
@@ -22,13 +21,11 @@ export default () => {
                 limit: number;
             }
         ) => {
-            const selectedSpaceStudy = await getSelectedSpaceStudy();
             const offset = args.page == 1 ? 0 : args.page * args.limit - args.limit;
 
             const data = await StoreDB.select()
                 .from('highlights')
                 .whereLike('content', `%${args.search ? args.search : ''}%`)
-                .where('study_space_id', selectedSpaceStudy.id)
                 .orderBy('id', 'desc')
                 .limit(args.limit ? args.limit : 50)
                 .offset(offset);
@@ -46,12 +43,10 @@ export default () => {
                 chapter: number;
             }
         ) => {
-            const selectedSpaceStudy = await getSelectedSpaceStudy();
             const data = await StoreDB.select()
                 .from('highlights')
                 .where('book_number', args.book_number)
-                .where('chapter', args.chapter)
-                .where('study_space_id', selectedSpaceStudy.id);
+                .where('chapter', args.chapter);
 
             const result: any = {};
             data.forEach((row: any) => {
@@ -81,21 +76,13 @@ export default () => {
             }
         ) => {
             try {
-                const selectedSpaceStudy = await getSelectedSpaceStudy();
-
                 const existingHighlight = await StoreDB('highlights')
-                    .where({
-                        key,
-                        study_space_id: selectedSpaceStudy.id,
-                    })
+                    .where({ key })
                     .first();
 
                 await updateOrCreate(
                     'highlights',
-                    {
-                        key,
-                        study_space_id: selectedSpaceStudy.id,
-                    },
+                    { key },
                     {
                         book_number,
                         chapter,
@@ -115,8 +102,6 @@ export default () => {
                             chapter,
                             verse,
                             content,
-                            study_space_id: selectedSpaceStudy.id,
-                            study_space_name: selectedSpaceStudy.title,
                         },
                         synced: 0,
                     });
@@ -134,26 +119,19 @@ export default () => {
 
     ipcMain.handle(
         'deleteHighlight',
-        async (event, args: { study_space_id: number | string; key: string }) => {
+        async (event, args: { key: string }) => {
             try {
                 const existingHighlight = await StoreDB('highlights')
                     .where('key', args.key)
-                    .where('study_space_id', args.study_space_id)
                     .first();
 
                 if (existingHighlight) {
-                    const studySpace = await StoreDB('study_spaces')
-                        .where('id', args.study_space_id)
-                        .first();
                     try {
                         await logSyncChange({
                             table_name: 'highlights',
                             record_key: args.key,
                             action: 'deleted',
-                            payload: {
-                                ...existingHighlight,
-                                study_space_name: studySpace?.title ?? 'default',
-                            },
+                            payload: existingHighlight,
                             synced: 0,
                         });
                     } catch (e) {
@@ -163,7 +141,6 @@ export default () => {
 
                 return await StoreDB('highlights')
                     .where('key', args.key)
-                    .where('study_space_id', args.study_space_id)
                     .del();
             } catch (e) {
                 console.log(e);

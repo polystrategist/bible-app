@@ -4,39 +4,37 @@ import { StoreDB, updateOrCreate } from '../../DataBase/DataBase';
 import { logSyncChange } from '../../DataBase/SyncDB';
 
 export default () => {
-    ipcMain.handle('getNote', async (event, space_study_id: number) => {
-        return await StoreDB.select().from('notes').where('study_space_id', space_study_id).first();
+    ipcMain.handle('getNote', async (event) => {
+        return await StoreDB.select().from('notes').first();
     });
 
     ipcMain.handle(
         'saveNote',
-        async (event, { space_study_id, note }: { space_study_id: number; note: string }) => {
+        async (event, { note }: { note: string }) => {
             try {
-                const existingNote = await StoreDB('notes')
-                    .where('study_space_id', space_study_id)
-                    .first();
+                const existingNote = await StoreDB('notes').first();
 
-                await updateOrCreate(
-                    'notes',
-                    {
-                        study_space_id: space_study_id,
-                    },
-                    {
+                if (existingNote) {
+                    await StoreDB('notes')
+                        .where('id', existingNote.id)
+                        .update({
+                            content: note,
+                            updated_at: new Date(),
+                        });
+                } else {
+                    await StoreDB('notes').insert({
                         content: note,
                         updated_at: new Date(),
-                    }
-                );
-
-                const studySpace = await StoreDB('study_spaces').where('id', space_study_id).first();
+                        created_at: new Date(),
+                    });
+                }
 
                 try {
                     await logSyncChange({
                         table_name: 'notes',
-                        record_key: String(space_study_id),
+                        record_key: 'user_note',
                         action: existingNote ? 'updated' : 'created',
                         payload: {
-                            study_space_id: space_study_id,
-                            study_space_name: studySpace?.title ?? 'default',
                             content: note,
                         },
                         synced: 0,

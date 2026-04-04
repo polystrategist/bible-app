@@ -1,6 +1,5 @@
-import { ipcMain, BrowserWindow, app } from 'electron';
+import { ipcMain, BrowserWindow } from 'electron';
 import Log from 'electron-log';
-import { getSelectedSpaceStudy } from '../SpaceeStudy/SpaceStudy';
 import { StoreDB } from '../../DataBase/DataBase';
 import { logSyncChange } from '../../DataBase/SyncDB';
 
@@ -16,13 +15,11 @@ const saveVersesInBookmark = async ({
     version: Array<any> | null | undefined;
 }) => {
     try {
-        const selectedSpaceStudy = await getSelectedSpaceStudy();
+        const key = `${book_number}_${chapter}_${verse}`;
 
         const existingBookmark = await StoreDB('bookmarks')
-            .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
+            .where({ book_number, chapter, verse })
             .first();
-
-        const key = `${book_number}_${chapter}_${verse}`;
 
         if (!existingBookmark) {
             await StoreDB('bookmarks').insert({
@@ -30,7 +27,6 @@ const saveVersesInBookmark = async ({
                 book_number,
                 chapter,
                 verse,
-                study_space_id: selectedSpaceStudy.id,
                 updated_at: new Date(),
                 created_at: new Date(),
             });
@@ -46,8 +42,6 @@ const saveVersesInBookmark = async ({
                         book_number,
                         chapter,
                         verse,
-                        study_space_id: selectedSpaceStudy.id,
-                        study_space_name: selectedSpaceStudy.title,
                     },
                     synced: 0,
                 });
@@ -65,11 +59,7 @@ const saveVersesInBookmark = async ({
 
 const getVersesSavedBookmarks = async () => {
     try {
-        const selectedSpaceStudy = await getSelectedSpaceStudy();
-
-        const data = await StoreDB('bookmarks')
-            .select()
-            .where('study_space_id', selectedSpaceStudy.id);
+        const data = await StoreDB('bookmarks').select();
 
         const result: any = {};
         data.forEach((item: any) => {
@@ -94,22 +84,19 @@ const deleteVerseInSavedBookmarks = async ({
 }) => {
     try {
         const key = `${book_number}_${chapter}_${verse}`;
-        const selectedSpaceStudy = await getSelectedSpaceStudy();
 
         const existingBookmark = await StoreDB('bookmarks')
-            .where({ book_number, chapter, verse, study_space_id: selectedSpaceStudy.id })
+            .where({ book_number, chapter, verse })
             .first();
 
         if (!existingBookmark) {
             return true;
         }
 
-        // Delete scoped to the current study space
         await StoreDB('bookmarks')
             .where('book_number', book_number)
             .andWhere('chapter', chapter)
             .andWhere('verse', verse)
-            .andWhere('study_space_id', selectedSpaceStudy.id)
             .delete();
 
         // Log sync change AFTER successful delete
@@ -123,8 +110,6 @@ const deleteVerseInSavedBookmarks = async ({
                     book_number,
                     chapter,
                     verse,
-                    study_space_id: selectedSpaceStudy.id,
-                    study_space_name: selectedSpaceStudy.title,
                 },
                 synced: 0,
             });

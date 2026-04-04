@@ -220,8 +220,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         getBookShortName: (book_number: number) => {
             return bibleBooks[bibleBooks.findIndex((book) => book.book_number == book_number)];
         },
-        removeHighlightInDb: async (study_space_id: number | string, key: string) => {
-            await window.browserWindow.deleteHighlight({ study_space_id, key });
+        removeHighlightInDb: async (key: string) => {
+            await window.browserWindow.deleteHighlight({ key });
             await getHighlights();
             await getChapterHighlights();
             runSync();

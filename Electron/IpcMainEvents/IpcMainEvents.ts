@@ -8,7 +8,6 @@ import { ipcVersionEvents } from './Versions/Versions';
 import { windowBrowserEvents } from './WindowEvents/BrowserWindowEvents';
 import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 import { CompareVerseIpcEvents } from '../Windows/CompareVerseWindow';
-import SpaceStudy from './SpaceeStudy/SpaceStudy';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
 import { SyncHandlers } from './Sync/SyncHandlers';
@@ -45,9 +44,6 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // compare verse window
     CompareVerseIpcEvents();
-
-    // space study events
-    SpaceStudy();
 
     // notes events
     notesEvents();
