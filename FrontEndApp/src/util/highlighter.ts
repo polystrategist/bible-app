@@ -48,96 +48,29 @@ export const highlight = async (color: string) => {
     try {
         const selectedParentElement: any = getSelectionParentElement();
 
-        const Children = selectedParentElement.children;
-        if (Children.length > 0) {
-            for (const elem of Children) {
-                if (elem.textContent === '') elem.remove();
-            }
-        }
+        const bookNumber = selectedParentElement.getAttribute('data-book');
+        const chapterNumber = selectedParentElement.getAttribute('data-chapter');
+        const verseNumber = selectedParentElement.getAttribute('data-verse');
 
-        const allHighlights = (selectedParentElement.parentElement as HTMLElement).querySelectorAll(
-            '.HasHighlightSpan'
-        );
-
-        for (const elem of allHighlights as any) {
-            if (elem.textContent === '') elem.remove();
-        }
-
-        const selected = window.getSelection();
-        const selection = selected?.getRangeAt(0);
-        const selectedContent = selection?.extractContents().textContent;
-        const span = document.createElement('span');
-
-        span.style.backgroundColor = color;
-
-        if (color != 'remove') span.style.color = '#111827';
-        if (color != 'remove') span.className = 'imOnlyOne HasHighlightSpan';
-        if (selectedContent) span.textContent = selectedContent;
-        if (selection) selection.insertNode(span);
-
-        let key = selectedParentElement.getAttribute('data-key');
-        let bibleVersion = selectedParentElement.getAttribute('data-bible-version');
-        let bookNumber = selectedParentElement.getAttribute('data-book');
-        let chapterNumber = selectedParentElement.getAttribute('data-chapter');
-        let verseNumber = selectedParentElement.getAttribute('data-verse');
-        let content = selectedParentElement.innerHTML;
-
-        if (!key || !bookNumber || !chapterNumber || !verseNumber) {
+        if (!bookNumber || !chapterNumber || !verseNumber) {
             window.message.error('Error: Cant Save Highlight.');
             window.getSelection()?.empty();
-
             return;
         }
 
-        if (color === 'remove') {
-            const parentElem = selectedParentElement;
-            const classList = parentElem.classList.value;
+        // Version-independent key (matches mobile app format)
+        const key = `${bookNumber}_${chapterNumber}_${verseNumber}`;
 
-            if (classList.includes('HasHighlightSpan')) {
-                parentElem.className = '';
-                parentElem.style.removeProperty('background-color');
-                parentElem.style.removeProperty('color');
-            }
-
-            const rootParent = selectedParentElement.parentElement;
-            const rootParentClassList = rootParent.classList.value;
-
-            if (rootParentClassList.includes('verse-select-text cursor-text')) {
-                key = rootParent.getAttribute('data-key');
-                bibleVersion = rootParent.getAttribute('data-bible-version');
-                bookNumber = rootParent.getAttribute('data-book');
-                chapterNumber = rootParent.getAttribute('data-chapter');
-                verseNumber = rootParent.getAttribute('data-verse');
-                content = rootParent.innerHTML;
-            }
-
-            // if (rootParent) {
-            //     // remove all span within root parent with empty content
-            //     const spanElements = rootParent.querySelectorAll('span');
-
-            //     // Loop through each <span> and remove those with empty content
-            //     spanElements.forEach((span: HTMLSpanElement, spanIndex: number) => {
-            //         const hasContent = span.textContent?.trim().length ?? 0 > 0;
-
-            //         if (!hasContent) {
-            //             span.remove();
-            //         }
-            //     });
-
-            //     content = rootParent.innerHTML;
-            // }
-        }
-
+        // Save just the hex color, not HTML — keeps sync compatible across platforms
         await saveHighlight({
             key,
             book_number: bookNumber,
             chapter: chapterNumber,
             verse: verseNumber,
-            content,
+            content: color,
         });
 
         window.getSelection()?.empty();
-        selectedParentElement.click();
     } catch (e) {
         window.message.error('Their is An Error Saving Highlight.');
     }
@@ -165,11 +98,11 @@ export const colors = [
         name: 'orange',
     },
     {
-        color: 'lightpink',
+        color: '#FFB6C1',
         name: 'lightpink',
     },
     {
-        color: 'lightblue',
+        color: '#ADD8E6',
         name: 'lightblue',
     },
     {
