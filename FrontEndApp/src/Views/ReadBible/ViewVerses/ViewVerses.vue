@@ -719,7 +719,7 @@ onMounted(() => {
                                     <div
                                         :class="{
                                             'rounded-t-md': clipNoteRender(
-                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ),
                                         }"
                                         :data-book="verse.book_number"
@@ -727,7 +727,7 @@ onMounted(() => {
                                         :data-verse="verse.verse"
                                         :style="`border: 1px solid ${
                                             clipNoteRender(
-                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ).color
                                         }`"
                                         class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative"
@@ -807,12 +807,12 @@ onMounted(() => {
                                     <div
                                         v-if="
                                             clipNoteRender(
-                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             )
                                         "
                                         :style="`background: ${
                                             clipNoteRender(
-                                                `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ).color
                                         }`"
                                         class="prose-mirror-render-html relative text-dark-900 rounded-b-md mb-3"
@@ -828,7 +828,7 @@ onMounted(() => {
                                                 class="shadow-md"
                                                 :style="`background: ${
                                                     clipNoteRender(
-                                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                                     ).color
                                                 }`"
                                                 size="small"
@@ -836,7 +836,7 @@ onMounted(() => {
                                                     createClipNoteRef &&
                                                     createClipNoteRef.toggleClipNoteModal(
                                                         clipNoteRender(
-                                                            `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                            `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                                         ),
                                                     )
                                                 "
@@ -850,7 +850,7 @@ onMounted(() => {
                                                 class="shadow-md"
                                                 :style="`background: ${
                                                     clipNoteRender(
-                                                        `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                        `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                                     ).color
                                                 }`"
                                                 size="small"
@@ -873,7 +873,7 @@ onMounted(() => {
                                             class="px-10px pb-1 view-verse-rendered-clip-note"
                                             v-html="
                                                 clipNoteRender(
-                                                    `key_${verse.book_number}_${verse.chapter}_${verse.verse}`,
+                                                    `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                                 ).content
                                             "
                                         ></div>

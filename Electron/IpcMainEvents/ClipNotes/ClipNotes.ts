@@ -52,7 +52,7 @@ export default () => {
             try {
                 const selectedSpaceStudy = await getSelectedSpaceStudy();
 
-                const key = `key_${book_number}_${chapter}_${verse}`;
+                const key = `${book_number}_${chapter}_${verse}`;
 
                 const existingClipNote = await StoreDB('clip_notes')
                     .where({
@@ -141,7 +141,7 @@ export default () => {
             { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number }
         ) => {
             try {
-                const key = `key_${book_number}_${chapter}_${verse}`;
+                const key = `${book_number}_${chapter}_${verse}`;
                 const selectedSpaceStudy = await getSelectedSpaceStudy();
 
                 const existingClipNote = await StoreDB('clip_notes')
