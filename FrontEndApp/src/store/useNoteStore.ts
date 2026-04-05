@@ -3,18 +3,12 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { runSync } from '../util/Sync/sync';
 import SESSION from '../util/session';
 
-type NoteItem = {
-    id: string;
+export type NoteItem = {
+    id: string;        // = note_id in DB
     title: string;
     content: string;
     created_at: string;
     updated_at: string;
-};
-
-type StoredMultiNotePayload = {
-    type: 'multi-note-v1';
-    selected_note_id: string;
-    notes: Array<NoteItem>;
 };
 
 export default defineStore('useNotesStore', () => {
@@ -33,171 +27,137 @@ export default defineStore('useNotesStore', () => {
 
     watch(() => showNote.value, (val) => SESSION.set(showNoteKey, val));
 
-    function createDefaultNote(content = ''): NoteItem {
+    function createDefaultNote(): NoteItem {
         const now = new Date().toISOString();
         return {
             id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             title: 'Note 1',
-            content,
+            content: '',
             created_at: now,
             updated_at: now,
         };
     }
 
-    function normalizeTitle(content: string, fallback: string) {
+    function normalizeTitle(content: string, fallback: string): string {
         const plainText = content
             .replace(/<[^>]+>/g, ' ')
             .replace(/&nbsp;/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
-
-        if (!plainText) {
-            return fallback;
-        }
-
-        return plainText.slice(0, 28);
+        return plainText ? plainText.slice(0, 28) : fallback;
     }
 
     function ensureSelectedNote() {
         if (!notes.value.length) {
-            const first = createDefaultNote('');
+            const first = createDefaultNote();
             notes.value = [first];
             selectedNoteId.value = first.id;
             return;
         }
-
-        const selectedExists = notes.value.some((noteItem) => noteItem.id === selectedNoteId.value);
-        if (!selectedExists) {
-            selectedNoteId.value = notes.value[0].id;
-        }
+        const exists = notes.value.some((n) => n.id === selectedNoteId.value);
+        if (!exists) selectedNoteId.value = notes.value[0].id;
     }
 
     const selectedNote = computed(() => {
         ensureSelectedNote();
-        return notes.value.find((noteItem) => noteItem.id === selectedNoteId.value) || notes.value[0];
+        return notes.value.find((n) => n.id === selectedNoteId.value) ?? notes.value[0];
     });
 
     const currentNoteContent = computed({
-        get() {
-            return selectedNote.value?.content || '';
-        },
+        get() { return selectedNote.value?.content ?? ''; },
         set(value: string) {
             const selected = selectedNote.value;
-            if (!selected) {
-                return;
-            }
-
+            if (!selected) return;
             selected.content = value;
             selected.updated_at = new Date().toISOString();
         },
     });
 
-    function renameNote(noteId: string, title: string) {
-        const noteToRename = notes.value.find((noteItem) => noteItem.id === noteId);
-        if (!noteToRename) {
-            return;
-        }
-
-        const cleaned = (title || '').trim();
-        noteToRename.title = cleaned.slice(0, 60) || 'Untitled Note';
-        noteToRename.updated_at = new Date().toISOString();
-    }
-
-    function serializePayload(): string {
-        const payload: StoredMultiNotePayload = {
-            type: 'multi-note-v1',
-            selected_note_id: selectedNoteId.value,
-            notes: notes.value,
-        };
-
-        return JSON.stringify(payload);
-    }
-
-    function hydrateFromStoredContent(content?: string | null) {
-        isHydrating.value = true;
-
-        if (!content) {
-            const defaultNote = createDefaultNote('');
-            notes.value = [defaultNote];
-            selectedNoteId.value = defaultNote.id;
-            isHydrating.value = false;
-            return;
-        }
-
-        try {
-            const parsed = JSON.parse(content) as StoredMultiNotePayload;
-            if (parsed?.type === 'multi-note-v1' && Array.isArray(parsed.notes)) {
-                const normalized = parsed.notes.map((noteItem, index) => ({
-                    id: noteItem.id || `note-${Date.now()}-${index}`,
-                    title: noteItem.title || `Note ${index + 1}`,
-                    content: noteItem.content || '',
-                    created_at: noteItem.created_at || new Date().toISOString(),
-                    updated_at: noteItem.updated_at || new Date().toISOString(),
-                }));
-
-                notes.value = normalized.length ? normalized : [createDefaultNote('')];
-                selectedNoteId.value = parsed.selected_note_id || notes.value[0].id;
-                ensureSelectedNote();
-                isHydrating.value = false;
-                return;
-            }
-        } catch (error) {
-            // Old content is plain HTML/string, so we treat it as a single existing note.
-        }
-
-        const singleNote = createDefaultNote(content);
-        singleNote.title = normalizeTitle(content, 'Note 1');
-        notes.value = [singleNote];
-        selectedNoteId.value = singleNote.id;
-        isHydrating.value = false;
-    }
+    // ─── Load ───────────────────────────────────────────────────
 
     async function loadNote() {
+        isHydrating.value = true;
         try {
-            const storedNote = await window.browserWindow.getNote();
-            hydrateFromStoredContent(storedNote?.content || '');
+            const rows: any[] = await window.browserWindow.getNotes();
+            if (rows && rows.length > 0) {
+                notes.value = rows.map((r) => ({
+                    id: r.note_id,
+                    title: r.title ?? '',
+                    content: r.content ?? '',
+                    created_at: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
+                    updated_at: r.updated_at ? new Date(r.updated_at).toISOString() : new Date().toISOString(),
+                }));
+                ensureSelectedNote();
+            } else {
+                const first = createDefaultNote();
+                notes.value = [first];
+                selectedNoteId.value = first.id;
+                await _persistNote(first);
+            }
         } catch (error) {
-            hydrateFromStoredContent('');
+            const first = createDefaultNote();
+            notes.value = [first];
+            selectedNoteId.value = first.id;
+        } finally {
+            isHydrating.value = false;
         }
     }
+
+    // ─── CRUD ────────────────────────────────────────────────────
 
     function selectNote(noteId: string) {
         selectedNoteId.value = noteId;
     }
 
     function addNote(title?: string) {
+        const note = createDefaultNote();
         const nextNumber = notes.value.length + 1;
-        const newNote = createDefaultNote('');
-        const cleanedTitle = (title || '').trim();
-        newNote.title = cleanedTitle ? cleanedTitle.slice(0, 60) : `Note ${nextNumber}`;
-        notes.value = [...notes.value, newNote];
-        selectedNoteId.value = newNote.id;
+        const cleaned = (title ?? '').trim();
+        note.title = cleaned ? cleaned.slice(0, 60) : `Note ${nextNumber}`;
+        notes.value = [...notes.value, note];
+        selectedNoteId.value = note.id;
+    }
+
+    function renameNote(noteId: string, title: string) {
+        const note = notes.value.find((n) => n.id === noteId);
+        if (!note) return;
+        const cleaned = (title ?? '').trim();
+        note.title = cleaned.slice(0, 60) || 'Untitled Note';
+        note.updated_at = new Date().toISOString();
     }
 
     function deleteNote(noteId: string) {
-        if (notes.value.length <= 1) {
-            notes.value = [createDefaultNote('')];
-            selectedNoteId.value = notes.value[0].id;
-            return;
-        }
-
-        notes.value = notes.value.filter((noteItem) => noteItem.id !== noteId);
+        notes.value = notes.value.filter((n) => n.id !== noteId);
         ensureSelectedNote();
+        window.browserWindow.deleteNote({ note_id: noteId });
+        runSync();
+    }
+
+    // ─── Persistence ─────────────────────────────────────────────
+
+    async function _persistNote(note: NoteItem) {
+        await window.browserWindow.upsertNote({
+            note_id: note.id,
+            title: note.title,
+            content: note.content,
+        });
     }
 
     function storeNote() {
-        window.browserWindow.saveNote({
-            note: serializePayload(),
-        });
+        for (const note of notes.value) {
+            window.browserWindow.upsertNote({
+                note_id: note.id,
+                title: note.title,
+                content: note.content,
+            });
+        }
         runSync();
     }
 
     watch(
         () => [notes.value, selectedNoteId.value],
         () => {
-            if (isHydrating.value) {
-                return;
-            }
+            if (isHydrating.value) return;
             clearTimeout(window.takingNoteTimeOut);
             window.takingNoteTimeOut = setTimeout(() => {
                 storeNote();
@@ -218,5 +178,6 @@ export default defineStore('useNotesStore', () => {
         loadNote,
         storeNote,
         showNote,
+        normalizeTitle,
     };
 });

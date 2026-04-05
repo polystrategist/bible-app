@@ -67,9 +67,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // WINDOW OPENERS
     openDonateWindow: () => ipcRenderer.invoke('open-donate-window'),
 
-    // Note
-    getNote: () => ipcRenderer.invoke('getNote'),
-    saveNote: (args: any) => ipcRenderer.invoke('saveNote', args),
+    // Notes
+    getNotes: () => ipcRenderer.invoke('getNotes'),
+    upsertNote: (args: any) => ipcRenderer.invoke('upsertNote', args),
+    deleteNote: (args: any) => ipcRenderer.invoke('deleteNote', args),
 
     // Dictionary
     searchDictionary: (args: any) => ipcRenderer.invoke('searchDictionary', args),

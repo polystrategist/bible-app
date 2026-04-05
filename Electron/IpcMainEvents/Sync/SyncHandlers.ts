@@ -183,16 +183,21 @@ export const SyncHandlers = (win: BrowserWindow) => {
                 }
             }
 
-            // 5. Notes (single note per user, no study space scoping)
+            // 5. Notes (one row per note, keyed by note_id)
             for (const note of pullData.notes ?? []) {
-                const existing = await StoreDB('notes').first();
+                const noteId = note.note_id;
+                if (!noteId) continue;
+                const existing = await StoreDB('notes').where('note_id', noteId).first();
                 if (existing) {
-                    await StoreDB('notes').where('id', existing.id)
-                        .update({ content: note.content, updated_at: now });
+                    await StoreDB('notes').where('note_id', noteId)
+                        .update({ title: note.title ?? '', content: note.content ?? '', updated_at: now });
                 } else {
                     await StoreDB('notes').insert({
-                        content: note.content,
-                        created_at: now, updated_at: now,
+                        note_id: noteId,
+                        title: note.title ?? '',
+                        content: note.content ?? '',
+                        created_at: now,
+                        updated_at: now,
                     });
                 }
             }
