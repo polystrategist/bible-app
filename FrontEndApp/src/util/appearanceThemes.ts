@@ -9,7 +9,17 @@ export type backgroundThemeType =
     | 'rosepaper'
     | 'oceanic'
     | 'graphite'
-    | 'sandstone';
+    | 'sandstone'
+    | 'parchment'
+    | 'cream'
+    | 'arctic'
+    | 'lavender'
+    | 'moss'
+    | 'abyss'
+    | 'mocha'
+    | 'emerald'
+    | 'crimson'
+    | 'amethyst';
 
 export type appearanceThemeOption = {
     key: string;
@@ -103,5 +113,75 @@ export const appearanceThemeOptions: appearanceThemeOption[] = [
         isDark: false,
         backgroundTheme: 'sandstone',
         swatch: '#b68f5d',
+    },
+    {
+        key: 'parchment',
+        label: 'parchment',
+        isDark: false,
+        backgroundTheme: 'parchment',
+        swatch: '#c4a96a',
+    },
+    {
+        key: 'cream',
+        label: 'cream',
+        isDark: false,
+        backgroundTheme: 'cream',
+        swatch: '#d4cfc0',
+    },
+    {
+        key: 'arctic',
+        label: 'arctic',
+        isDark: false,
+        backgroundTheme: 'arctic',
+        swatch: '#7aaec8',
+    },
+    {
+        key: 'lavender',
+        label: 'lavender',
+        isDark: false,
+        backgroundTheme: 'lavender',
+        swatch: '#9b80d0',
+    },
+    {
+        key: 'moss',
+        label: 'moss',
+        isDark: false,
+        backgroundTheme: 'moss',
+        swatch: '#6a9860',
+    },
+    {
+        key: 'abyss',
+        label: 'abyss',
+        isDark: true,
+        backgroundTheme: 'abyss',
+        swatch: '#3d5a80',
+    },
+    {
+        key: 'mocha',
+        label: 'mocha',
+        isDark: true,
+        backgroundTheme: 'mocha',
+        swatch: '#8c6040',
+    },
+    {
+        key: 'emerald',
+        label: 'emerald',
+        isDark: true,
+        backgroundTheme: 'emerald',
+        swatch: '#2a7a50',
+    },
+    {
+        key: 'crimson',
+        label: 'crimson',
+        isDark: true,
+        backgroundTheme: 'crimson',
+        swatch: '#8c2535',
+    },
+    {
+        key: 'amethyst',
+        label: 'amethyst',
+        isDark: true,
+        backgroundTheme: 'amethyst',
+        swatch: '#6030a0',
     },
 ];
