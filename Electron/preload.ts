@@ -140,6 +140,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getSyncSetting: (key: string) => ipcRenderer.invoke('getSyncSetting', key),
     setSyncSetting: (key: string, value: any) => ipcRenderer.invoke('setSyncSetting', key, value),
     applyPullData: (data: any) => ipcRenderer.invoke('applyPullData', data),
+    onSyncBeforeQuit: (cb: () => void) => ipcRenderer.on('app:sync-before-quit', cb),
+    notifySyncBeforeQuitDone: () => ipcRenderer.send('app:sync-before-quit-done'),
 
     // Export
     exportToPdf: (args: { html: string; filename: string }) => ipcRenderer.invoke('exportToPdf', args),

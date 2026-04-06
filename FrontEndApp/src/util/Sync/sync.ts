@@ -102,14 +102,51 @@ async function pullSync(token: string): Promise<void> {
 
 /**
  * Debounced sync — resets a 3-second timer on each call, fires once after
- * the user stops making changes. Pushes local changes then pulls remote state.
+ * the user stops making changes. Pushes local changes only — no pull,
+ * no loadNote, so active editing is never interrupted.
  */
 export function debouncedRunSync(): void {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         debounceTimer = null;
-        runSync();
+        runPushSync();
     }, 3_000);
+}
+
+/**
+ * Push-only sync — pushes local unsynced changes without pulling remote state.
+ * Used by debouncedRunSync after user actions so active editing is never interrupted.
+ */
+export async function runPushSync(): Promise<void> {
+    if (isSyncing) return;
+    if (Date.now() < backoffUntil) return;
+
+    const authStore = useAuthStore();
+    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+
+    isSyncing = true;
+    try {
+        await pushSync(authStore.token);
+        consecutiveFailures = 0;
+        backoffUntil = 0;
+        authStore.loadLastSyncAt();
+    } catch (error: any) {
+        const status = error?.response?.status;
+        if (status === 401) {
+            console.warn('[Sync] Token rejected (401) — logging out.');
+            consecutiveFailures = 0;
+            backoffUntil = 0;
+            authStore.logout();
+            return;
+        }
+        consecutiveFailures++;
+        const delaySec = Math.min(300 * Math.pow(2, consecutiveFailures - 1), 3600);
+        backoffUntil = Date.now() + delaySec * 1000;
+        const data = error?.response?.data;
+        console.error(`[Sync] Push error (HTTP ${status ?? 'network'}), retry in ${delaySec}s:`, data ?? error?.message ?? error);
+    } finally {
+        isSyncing = false;
+    }
 }
 
 /**

@@ -175,6 +175,8 @@ declare global {
                 prayer_lists?: any[];
                 notes?: any[];
             }) => Promise<{ success: boolean; error?: string }>;
+            onSyncBeforeQuit: (cb: () => void) => void;
+            notifySyncBeforeQuitDone: () => void;
 
         };
     }

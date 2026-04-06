@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { debouncedRunSync } from '../util/Sync/sync';
 import SESSION from '../util/session';
 
@@ -94,9 +94,11 @@ export default defineStore('useNotesStore', () => {
         } catch (error) {
             notes.value = [];
             selectedNoteId.value = '';
-        } finally {
-            isHydrating.value = false;
         }
+        // Wait for Vue's watcher flush before clearing the hydration guard,
+        // so the watch callback sees isHydrating = true and skips storeNote().
+        await nextTick();
+        isHydrating.value = false;
     }
 
     // ─── CRUD ────────────────────────────────────────────────────

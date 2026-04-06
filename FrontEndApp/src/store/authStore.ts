@@ -340,6 +340,15 @@ export const useAuthStore = defineStore('authStore', () => {
 
         // On reconnect: flush pending changes then pull fresh settings
         window.addEventListener('online', onOnline);
+
+        // On app quit: push any unsynced changes before closing
+        window.browserWindow.onSyncBeforeQuit(async () => {
+            try {
+                await runSync();
+            } finally {
+                window.browserWindow.notifySyncBeforeQuitDone();
+            }
+        });
     }
 
     function cleanupListeners() {
@@ -349,8 +358,9 @@ export const useAuthStore = defineStore('authStore', () => {
     async function onOnline() {
         if (!isAuthenticated.value) return;
         await flushPendingSettings();
-        // Pull fresh settings from server in case another device made changes
         if (!pendingSettingsUpdate.value) loadSettings();
+        // Push all accumulated offline changes and pull any remote changes.
+        if (syncEnabled.value) runSync();
     }
 
     /**
@@ -359,6 +369,7 @@ export const useAuthStore = defineStore('authStore', () => {
     const syncEnabled = ref(false);
     const lastSyncAt = ref<string | null>(null);
     let syncInterval: ReturnType<typeof setInterval> | null = null;
+    let lastFocusPullAt = 0;
 
     function startSyncInterval() {
         if (syncInterval) return;
@@ -370,7 +381,10 @@ export const useAuthStore = defineStore('authStore', () => {
     }
 
     async function onFocus() {
-        // On window focus: pull remote changes to stay up to date
+        // Throttle: don't pull more than once per minute on focus
+        const now = Date.now();
+        if (now - lastFocusPullAt < 60_000) return;
+        lastFocusPullAt = now;
         await flushPendingSettings();
         runPullSync();
     }

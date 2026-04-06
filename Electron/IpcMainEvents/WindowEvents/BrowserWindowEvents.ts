@@ -32,7 +32,14 @@ const maximizeWindow = (win: BrowserWindow): boolean | void => {
 };
 
 const closeWindow = (win: BrowserWindow): void => {
-    win.close();
+    // Signal renderer to run a final sync before closing.
+    // Give it up to 5 seconds; close regardless after timeout.
+    win.webContents.send('app:sync-before-quit');
+    const timer = setTimeout(() => win.close(), 5000);
+    ipcMain.once('app:sync-before-quit-done', () => {
+        clearTimeout(timer);
+        win.close();
+    });
 };
 
 const getAppScale = (win: BrowserWindow): number => {
