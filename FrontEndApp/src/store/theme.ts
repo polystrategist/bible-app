@@ -8,6 +8,7 @@ import { useAuthStore } from './authStore';
 export const useThemeStore = defineStore('useThemeStore', () => {
     const showThemeChangerDrawer = ref(false);
     const saveThemeStorageKey = 'savedThemeStorage';
+    let settingsDebounceTimer: ReturnType<typeof setTimeout> | null = null;
     const isDark = ref(true);
     const backgroundTheme = ref<backgroundThemeType>('default');
     const selectedTheme = ref<typeNameInterface>('default');
@@ -77,14 +78,19 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             backgroundTheme: backgroundTheme.value,
         });
 
-        // Persist to backend if authenticated (best-effort)
+        // Persist to backend if authenticated — debounced to avoid a request
+        // on every tap when the user is browsing through theme options.
         const authStore = useAuthStore();
         if (authStore.isAuthenticated) {
-            authStore.updateSettings({
-                selected_theme: selectedTheme.value,
-                is_dark: itsDark,
-                background_theme: backgroundTheme.value,
-            });
+            if (settingsDebounceTimer) clearTimeout(settingsDebounceTimer);
+            settingsDebounceTimer = setTimeout(() => {
+                settingsDebounceTimer = null;
+                authStore.updateSettings({
+                    selected_theme: selectedTheme.value,
+                    is_dark: itsDark,
+                    background_theme: backgroundTheme.value,
+                });
+            }, 3000);
         }
     }
 
