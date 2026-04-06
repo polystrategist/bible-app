@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import {
     NAvatar,
     NButton,
@@ -16,6 +16,16 @@ import { useAuthStore } from '../../../store/authStore';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
+function formatLastSync(ts: string | null): string {
+    if (!ts) return 'Never';
+    const date = new Date(ts);
+    if (isNaN(date.getTime())) return 'Never';
+    return new Intl.DateTimeFormat(undefined, {
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+    }).format(date);
+}
+
 const router = useRouter();
 const dialog = useDialog();
 const authStore = useAuthStore();
@@ -24,6 +34,8 @@ const menuStore = useMenuStore();
 let loadingReactive: MessageReactive | null = null;
 
 const showDropdown = ref(false);
+
+onMounted(() => authStore.loadLastSyncAt());
 
 const initials = computed(() => {
     const name = authStore.user?.name ?? '';
@@ -40,23 +52,6 @@ const firstName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Account
 function goToProfile() {
     showDropdown.value = false;
     menuStore.setMenu('/profile');
-}
-
-function toggleSync() {
-    showDropdown.value = false;
-    const enabling = !authStore.syncEnabled;
-    dialog.warning({
-        title: 'Confirm',
-        content: enabling
-            ? 'Enable cloud sync? Your data will be synced to the server.'
-            : 'Disable cloud sync? Your data will no longer be synced to the server.',
-        positiveText: 'Yes',
-        negativeText: 'No',
-        onPositiveClick: async () => {
-            await authStore.setSyncEnabled(enabling);
-            message.success(enabling ? 'Sync enabled!' : 'Sync disabled!');
-        },
-    });
 }
 
 async function logout() {
@@ -136,13 +131,19 @@ async function logout() {
                 </div>
             </div>
 
-            <!-- Sync status badge -->
-            <div
-                v-if="authStore.syncEnabled"
-                class="mx-4 mb-2 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit"
-            >
-                <Icon icon="mdi:cloud-check" />
-                <span>Sync Enabled</span>
+            <!-- Sync status -->
+            <div class="mx-4 mb-2 flex flex-col gap-1">
+                <div
+                    v-if="authStore.syncEnabled"
+                    class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit"
+                >
+                    <Icon icon="mdi:cloud-check" />
+                    <span>Sync Enabled</span>
+                </div>
+                <div class="flex items-center gap-1 text-xs opacity-40 px-1">
+                    <Icon icon="mdi:clock-outline" style="font-size: 12px" />
+                    <span>Last sync: {{ formatLastSync(authStore.lastSyncAt) }}</span>
+                </div>
             </div>
 
             <NDivider style="margin: 0" />
@@ -159,22 +160,6 @@ async function logout() {
                         <NIcon><UserIcon /></NIcon>
                     </template>
                     Profile
-                </NButton>
-                <NButton
-                    quaternary
-                    :type="authStore.syncEnabled ? 'error' : 'warning'"
-                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
-                    @click="toggleSync"
-                >
-                    <template #icon>
-                        <Icon
-                            :icon="
-                                authStore.syncEnabled ? 'mdi:cloud-off-outline' : 'mdi:cloud-sync'
-                            "
-                            style="font-size: 16px"
-                        />
-                    </template>
-                    {{ authStore.syncEnabled ? 'Disable Sync' : 'Enable Sync' }}
                 </NButton>
             </div>
             <NDivider style="margin: 0" />

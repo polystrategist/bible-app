@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import axios from 'axios';
-import { runSync } from '../util/Sync/sync';
+import { runSync, runPullSync } from '../util/Sync/sync';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -357,18 +357,22 @@ export const useAuthStore = defineStore('authStore', () => {
      * Whether syncing is enabled
      */
     const syncEnabled = ref(false);
+    const lastSyncAt = ref<string | null>(null);
     let syncInterval: ReturnType<typeof setInterval> | null = null;
 
     function startSyncInterval() {
         if (syncInterval) return;
+        // On login/startup: push any pending local changes, then pull remote state
         flushPendingSettings().then(() => runSync());
-        syncInterval = setInterval(runSync, 5 * 60 * 1_000);
+        // Periodic pull-only every 5 minutes — never auto-pushes without user action
+        syncInterval = setInterval(runPullSync, 5 * 60 * 1_000);
         window.addEventListener('focus', onFocus);
     }
 
     async function onFocus() {
+        // On window focus: pull remote changes to stay up to date
         await flushPendingSettings();
-        runSync();
+        runPullSync();
     }
 
     function stopSyncInterval() {
@@ -377,6 +381,15 @@ export const useAuthStore = defineStore('authStore', () => {
             syncInterval = null;
         }
         window.removeEventListener('focus', onFocus);
+    }
+
+    async function loadLastSyncAt() {
+        try {
+            const ts = await window.browserWindow.getLastSyncTimestamp();
+            lastSyncAt.value = ts && ts !== '0' ? ts : null;
+        } catch {
+            // best-effort
+        }
     }
 
     async function loadSyncEnabled() {
@@ -445,6 +458,8 @@ export const useAuthStore = defineStore('authStore', () => {
         token,
         isAuthenticated,
         syncEnabled,
+        lastSyncAt,
+        loadLastSyncAt,
         remoteSettings,
         pendingSettingsUpdate,
         pendingSyncEnabled,

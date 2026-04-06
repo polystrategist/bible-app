@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
+import useNoteStore from '../../store/useNoteStore';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -101,7 +102,7 @@ async function pullSync(token: string): Promise<void> {
 
 /**
  * Debounced sync — resets a 3-second timer on each call, fires once after
- * the user stops making changes.
+ * the user stops making changes. Pushes local changes then pulls remote state.
  */
 export function debouncedRunSync(): void {
     if (debounceTimer) clearTimeout(debounceTimer);
@@ -112,8 +113,47 @@ export function debouncedRunSync(): void {
 }
 
 /**
- * Run a full sync cycle: push local changes, then pull remote changes.
- * Safe to call repeatedly — skips if already running or conditions not met.
+ * Pull-only sync — fetches remote changes without pushing local ones.
+ * Used by the periodic timer so the desktop never auto-pushes without user action.
+ */
+export async function runPullSync(): Promise<void> {
+    if (isSyncing) return;
+    if (Date.now() < backoffUntil) return;
+
+    const authStore = useAuthStore();
+    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+
+    isSyncing = true;
+    try {
+        await pullSync(authStore.token);
+        consecutiveFailures = 0;
+        backoffUntil = 0;
+        authStore.loadLastSyncAt();
+        useNoteStore().loadNote();
+    } catch (error: any) {
+        const status = error?.response?.status;
+        if (status === 401) {
+            console.warn('[Sync] Token rejected (401) — logging out.');
+            consecutiveFailures = 0;
+            backoffUntil = 0;
+            authStore.logout();
+            return;
+        }
+
+        consecutiveFailures++;
+        const delaySec = Math.min(300 * Math.pow(2, consecutiveFailures - 1), 3600);
+        backoffUntil = Date.now() + delaySec * 1000;
+
+        const data = error?.response?.data;
+        console.error(`[Sync] Pull error (HTTP ${status ?? 'network'}), retry in ${delaySec}s:`, data ?? error?.message ?? error);
+    } finally {
+        isSyncing = false;
+    }
+}
+
+/**
+ * Full sync — push local changes then pull remote state.
+ * Called by debouncedRunSync after user actions.
  */
 export async function runSync(): Promise<void> {
     if (isSyncing) return;
@@ -130,6 +170,8 @@ export async function runSync(): Promise<void> {
         await pullSync(authStore.token);
         consecutiveFailures = 0;
         backoffUntil = 0;
+        authStore.loadLastSyncAt();
+        useNoteStore().loadNote();
     } catch (error: any) {
         const status = error?.response?.status;
         if (status === 401) {
