@@ -120,7 +120,7 @@ onBeforeMount(async () => {
                 </NIcon>
             </NButton>
             <ThemeChangerDrawer />
-            <ProfileDropdown v-if="false" />
+            <ProfileDropdown />
             <NButton
                 v-show="isElectron"
                 size="small"

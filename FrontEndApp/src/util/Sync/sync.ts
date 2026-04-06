@@ -16,7 +16,16 @@ async function pushSync(token: string): Promise<number> {
 
     if (!unsyncedChanges.length) return 0;
 
-    const payload = unsyncedChanges.map((entry: any) => ({
+    // Discard legacy entries with no record_key (old single-blob note model)
+    const stale = unsyncedChanges.filter((e: any) => !e.record_key);
+    if (stale.length) {
+        await window.browserWindow.markAsSynced(stale.map((e: any) => e.id));
+    }
+
+    const valid = unsyncedChanges.filter((e: any) => !!e.record_key);
+    if (!valid.length) return 0;
+
+    const payload = valid.map((entry: any) => ({
         table_name: entry.table_name,
         record_key: entry.record_key,
         action: entry.action,
@@ -33,8 +42,8 @@ async function pushSync(token: string): Promise<number> {
     if (response.data.status === 'success') {
         const failedKeys: string[] = response.data.failed_keys ?? [];
         const syncedEntries = failedKeys.length
-            ? unsyncedChanges.filter((e: any) => !failedKeys.includes(e.record_key))
-            : unsyncedChanges;
+            ? valid.filter((e: any) => !failedKeys.includes(e.record_key))
+            : valid;
 
         if (syncedEntries.length) {
             const ids = syncedEntries.map((e: any) => e.id);
