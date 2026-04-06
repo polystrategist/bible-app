@@ -49,9 +49,7 @@ export default defineStore('useNotesStore', () => {
 
     function ensureSelectedNote() {
         if (!notes.value.length) {
-            const first = createDefaultNote();
-            notes.value = [first];
-            selectedNoteId.value = first.id;
+            selectedNoteId.value = '';
             return;
         }
         const exists = notes.value.some((n) => n.id === selectedNoteId.value);
@@ -59,6 +57,7 @@ export default defineStore('useNotesStore', () => {
     }
 
     const selectedNote = computed(() => {
+        if (!notes.value.length) return undefined;
         ensureSelectedNote();
         return notes.value.find((n) => n.id === selectedNoteId.value) ?? notes.value[0];
     });
@@ -89,15 +88,12 @@ export default defineStore('useNotesStore', () => {
                 }));
                 ensureSelectedNote();
             } else {
-                const first = createDefaultNote();
-                notes.value = [first];
-                selectedNoteId.value = first.id;
-                await _persistNote(first);
+                notes.value = [];
+                selectedNoteId.value = '';
             }
         } catch (error) {
-            const first = createDefaultNote();
-            notes.value = [first];
-            selectedNoteId.value = first.id;
+            notes.value = [];
+            selectedNoteId.value = '';
         } finally {
             isHydrating.value = false;
         }
