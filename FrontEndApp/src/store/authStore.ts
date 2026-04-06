@@ -420,6 +420,10 @@ export const useAuthStore = defineStore('authStore', () => {
      * Queues the preference locally so it's not lost if offline.
      */
     async function setSyncEnabled(enabled: boolean) {
+        if (enabled) {
+            return;
+        }
+
         syncEnabled.value = enabled;
 
         try {
