@@ -6,6 +6,7 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 let isSyncing = false;
 let consecutiveFailures = 0;
 let backoffUntil = 0;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * Push all unsynced local changes to the backend.
@@ -96,6 +97,18 @@ async function pullSync(token: string): Promise<void> {
             break;
         }
     }
+}
+
+/**
+ * Debounced sync — resets a 3-second timer on each call, fires once after
+ * the user stops making changes.
+ */
+export function debouncedRunSync(): void {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        debounceTimer = null;
+        runSync();
+    }, 3_000);
 }
 
 /**

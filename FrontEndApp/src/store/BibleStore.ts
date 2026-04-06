@@ -1,6 +1,6 @@
 import { useClipNoteStore } from './ClipNotes';
 import { defineStore } from 'pinia';
-import { runSync } from '../util/Sync/sync';
+import { debouncedRunSync } from '../util/Sync/sync';
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
@@ -224,7 +224,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             await window.browserWindow.deleteHighlight({ key });
             await getHighlights();
             await getChapterHighlights();
-            runSync();
+            debouncedRunSync();
         },
     };
 });

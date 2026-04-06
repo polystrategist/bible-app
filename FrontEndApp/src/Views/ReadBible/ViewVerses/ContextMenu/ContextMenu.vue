@@ -5,7 +5,7 @@ import { ref } from 'vue';
 import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
-import { runSync } from '../../../../util/Sync/sync';
+import { debouncedRunSync } from '../../../../util/Sync/sync';
 import { colors } from '../../../../util/highlighter';
 
 const bibleStore = useBibleStore();
@@ -42,7 +42,7 @@ async function highlightVerse(color: string) {
         JSON.stringify({ key, book_number, chapter, verse, content: color }),
     );
     await bibleStore.getChapterHighlights();
-    runSync();
+    debouncedRunSync();
     showColorPicker.value = false;
     emits('close');
 }
@@ -52,7 +52,7 @@ async function clickContextMenu(key: string) {
         bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
             JSON.stringify(props.data),
         );
-        runSync();
+        debouncedRunSync();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
     } else if (key == 'highlight-verse') {

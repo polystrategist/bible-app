@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, onMounted } from 'vue';
 import { SAVED_CLIP_NOTE_TYPE } from '../GlobalTypes';
-import { runSync } from '../util/Sync/sync';
+import { debouncedRunSync } from '../util/Sync/sync';
 
 export const useClipNoteStore = defineStore('useClipNoteStore', () => {
     const clipNotes = ref<Array<any>>([]);
@@ -28,14 +28,14 @@ export const useClipNoteStore = defineStore('useClipNoteStore', () => {
     async function storeClipNote(args: { book_number: number; chapter: number; verse: number; content: string; color: string }) {
         const stored = await window.browserWindow.storeClipNote(JSON.stringify(args));
         await getClipNotes();
-        runSync();
+        debouncedRunSync();
         return stored;
     }
 
     async function deleteClipNote(args: { book_number: number; chapter: number, verse: number }) {
         const isDeleted = await window.browserWindow.deleteChapterClipNotes(JSON.stringify(args));
         await getClipNotes();
-        runSync();
+        debouncedRunSync();
         return isDeleted;
     }
 

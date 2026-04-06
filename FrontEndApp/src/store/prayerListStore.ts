@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, onBeforeMount } from 'vue';
-import { runSync } from '../util/Sync/sync';
+import { debouncedRunSync } from '../util/Sync/sync';
 
 export const usePrayerListStore = defineStore('prayerListStoreId', () => {
     const prayerList = ref<Array<any>>([]);
@@ -63,7 +63,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         else {
             if (data.status != 'done') prayerList.value.push(data);
         }
-        runSync();
+        debouncedRunSync();
     }
 
     /**
@@ -78,7 +78,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
             if (doneIndex > -1) donePrayerList.value.splice(findIndex, 1);
 
             await deletePrayerItem(key as string);
-            runSync();
+            debouncedRunSync();
         } catch (e) {
             console.error('removePrayerItem', e);
         }

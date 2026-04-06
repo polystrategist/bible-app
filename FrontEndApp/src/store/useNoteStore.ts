@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, onMounted, ref, watch } from 'vue';
-import { runSync } from '../util/Sync/sync';
+import { debouncedRunSync } from '../util/Sync/sync';
 import SESSION from '../util/session';
 
 export type NoteItem = {
@@ -126,7 +126,7 @@ export default defineStore('useNotesStore', () => {
         notes.value = notes.value.filter((n) => n.id !== noteId);
         ensureSelectedNote();
         window.browserWindow.deleteNote({ note_id: noteId });
-        runSync();
+        debouncedRunSync();
     }
 
     // ─── Persistence ─────────────────────────────────────────────
@@ -147,7 +147,7 @@ export default defineStore('useNotesStore', () => {
                 content: note.content,
             });
         }
-        runSync();
+        debouncedRunSync();
     }
 
     watch(
