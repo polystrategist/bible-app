@@ -162,7 +162,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     await StoreDB('clip_notes').insert({
                         key: cn.key,
                         book_number: cn.book_number, chapter: cn.chapter, verse: cn.verse,
-                        content: cn.content, color: cn.color ?? '#FFD700',
+                        content: cn.content, color: cn.color ?? '#FFD26A',
                         created_at: now, updated_at: now,
                     });
                 }
