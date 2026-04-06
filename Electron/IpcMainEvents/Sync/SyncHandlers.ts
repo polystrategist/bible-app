@@ -17,6 +17,13 @@ import { StoreDB } from '../../DataBase/DataBase';
  */
 export const SyncHandlers = (win: BrowserWindow) => {
 
+    // Purge sync_logs that were already pushed and are older than 7 days.
+    (() => {
+        const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        StoreDB('sync_logs').where('synced', 1).where('created_at', '<', cutoff).delete()
+            .catch((err: any) => Log.error('sync_logs cleanup failed:', err));
+    })();
+
     /**
      * Log a sync change to the local database
      */
