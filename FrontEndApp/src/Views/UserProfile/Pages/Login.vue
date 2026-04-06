@@ -86,6 +86,9 @@ onMounted(async () => {
             <h5 class="text-center font-800 text-size-25px">
                 {{ isRegister ? 'Sign Up' : 'Sign In' }}
             </h5>
+            <p class="text-center text-sm opacity-60 mt-1 mb-2">
+                Sign in to access your Believers Sword account. With an account, you can enable cloud sync for your bookmarks, highlights, clip notes, and notes from your account settings whenever you're ready.
+            </p>
             Email Address:
             <NInput v-model:value="form.email" placeholder="Email" />
             Password:
