@@ -21,6 +21,81 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `dist/` | Compiled Electron output (TypeScript → JS) |
 | `dist_electron/` | Final packaged Electron app output |
 
+### Electron Sub-directories
+
+| Directory | Purpose |
+|---|---|
+| `Electron/DataBase/` | Knex.js DB helpers — `DataBase.ts` (StoreDB, DictionaryDB, setDB), `SyncDB.ts` (sync log CRUD) |
+| `Electron/ElectronStore/` | `electron-store` wrappers — `Configuration.ts` (window bounds, app scale, settings) |
+| `Electron/IpcMainEvents/` | All IPC handlers, one sub-folder per feature (see below) |
+| `Electron/IpcMainEvents/bookmark/` | Save, get, delete bookmarks |
+| `Electron/IpcMainEvents/ClipNotes/` | Get, store, delete verse-attached clip notes |
+| `Electron/IpcMainEvents/DailyDevotional/` | Get today's / a specific day's devotional |
+| `Electron/IpcMainEvents/dictionaries/` | Search dictionary, get word definitions |
+| `Electron/IpcMainEvents/downloading/` | Download Bible/commentary module files |
+| `Electron/IpcMainEvents/exporting/` | Export notes to PDF/DOCX |
+| `Electron/IpcMainEvents/highlights/` | Save, get, delete verse highlights |
+| `Electron/IpcMainEvents/importing/` | Import a Bible module from a local file |
+| `Electron/IpcMainEvents/notes/` | Upsert, get, delete notes (per-note rows keyed by `note_id`) |
+| `Electron/IpcMainEvents/Piper/` | Piper TTS binary management and speech synthesis |
+| `Electron/IpcMainEvents/PrayerList/` | CRUD for prayer list items |
+| `Electron/IpcMainEvents/SpaceeStudy/` | Study space management |
+| `Electron/IpcMainEvents/Sync/` | Sync log, unsynced changes, apply pull data, sync settings |
+| `Electron/IpcMainEvents/Versions/` | List available Bible translations/modules |
+| `Electron/IpcMainEvents/WindowEvents/` | Minimize, maximize, close, zoom, scale |
+| `Electron/Modules/Bible/` | Bible module loader — reads verses from `.db` files, caches versions |
+| `Electron/Modules/Commentaries/` | Commentary module loader — reads commentary data from `.db` files |
+| `Electron/Setups/` | App startup logic — DB migrations, default data seeding, index creation |
+| `Electron/Windows/` | Secondary window creation (CompareVerse window) |
+| `Electron/util/` | Shared utilities — `dayjs.ts`, `portable.ts`, `window.ts` (window state) |
+
+### FrontEndApp Sub-directories
+
+| Directory | Purpose |
+|---|---|
+| `FrontEndApp/src/Views/` | Full-page route views (one folder per page) |
+| `FrontEndApp/src/Views/ReadBible/` | Main Bible reader — verses, left/right sidebars, TakeNote panel, FlipBook |
+| `FrontEndApp/src/Views/ReadBible/ViewVerses/` | Verse display and context menu (highlight, bookmark, clip note, compare) |
+| `FrontEndApp/src/Views/ReadBible/LeftSideBar/` | Navigation sidebar (book/chapter selector) |
+| `FrontEndApp/src/Views/ReadBible/RightSideBar/` | Bookmarks, highlights, clip notes, multiple Bibles, dictionary panel |
+| `FrontEndApp/src/Views/ReadBible/TakeNote/` | Full notes editor (list + rich text editor) |
+| `FrontEndApp/src/Views/ReadBible/FlipBook/` | Flip-book verse presentation mode |
+| `FrontEndApp/src/Views/DailyDevotional/` | Daily devotional page (5-step: pause/listen/think/pray/go) |
+| `FrontEndApp/src/Views/PrayerList/` | Prayer list management page |
+| `FrontEndApp/src/Views/UserProfile/` | Profile page (auth, sync toggle, settings) |
+| `FrontEndApp/src/Views/CreateSermon/` | Sermon creation editor |
+| `FrontEndApp/src/Views/Sermons/` | Sermon list/viewer |
+| `FrontEndApp/src/Views/CompareVerse/` | Secondary window — compare a verse across translations |
+| `FrontEndApp/src/components/` | Reusable components shared across views |
+| `FrontEndApp/src/components/Editor/` | Rich text editor (Tiptap-based) used in notes and sermons |
+| `FrontEndApp/src/components/Settings/` | Settings panels (appearance, Bible reader, TTS, updates) |
+| `FrontEndApp/src/components/TitleBar/` | Custom frameless window title bar |
+| `FrontEndApp/src/components/TTS/` | Text-to-speech UI controls |
+| `FrontEndApp/src/components/ThemeChanger/` | Theme and background picker |
+| `FrontEndApp/src/components/ProfilePage/` | Profile dropdown and auth UI |
+| `FrontEndApp/src/store/` | Pinia stores — one per feature (see key stores below) |
+| `FrontEndApp/src/util/` | Shared utilities |
+| `FrontEndApp/src/util/Sync/` | `sync.ts` — `runPushSync`, `runPullSync`, `runSync`, `debouncedRunSync` |
+| `FrontEndApp/src/util/Modules/` | Bible module helpers (`FeBibleController.ts`) |
+| `FrontEndApp/src/services/` | Service layer wrappers (e.g. `BibleService.ts`) |
+| `FrontEndApp/src/router/` | Vue Router config — hash history for Electron, route definitions |
+| `FrontEndApp/src/assets/` | Static assets — styles, JSON data files |
+
+### Key Pinia Stores
+
+| Store file | Responsibility |
+|---|---|
+| `authStore.ts` | Auth state, token, sync enabled flag, sync interval, settings flush, quit-sync hook |
+| `BibleStore.ts` | Active translation, chapter verses, highlights |
+| `useNoteStore.ts` | Notes CRUD, auto-save watch, hydration guard (`isHydrating`) |
+| `ClipNotes.ts` | Verse-attached clip notes CRUD |
+| `bookmark.ts` | Bookmark list |
+| `prayerListStore.ts` | Prayer list CRUD |
+| `theme.ts` | Theme state, dark mode, background theme, remote settings watcher |
+| `settingStore.ts` | App-wide settings (font size, scale, reader options) |
+| `piperTTSStore.ts` | Piper TTS binary state, voice selection, speak/stop |
+| `ttsStore.ts` | Web Speech API TTS (online fallback) |
+
 ---
 
 ## Development Commands
@@ -82,6 +157,22 @@ Vue Component → Pinia Store → window.ipcRenderer.invoke('channel', payload)
 - **Bible modules** — individual `.db` files in `Modules/`, loaded dynamically via `Electron/Modules/Bible/`
 - All DB access uses Knex.js helpers from `Electron/DataBase/DataBase.ts` (`StoreDB`, `DictionaryDB`, `setDB`)
 - DB tables are initialized at startup in `Electron/Setups/setup.ts`
+
+### Cloud Sync
+
+Sync runs via `/api/sync` (POST push) and `/api/sync/pull` (GET pull) against the Laravel backend.
+
+| Function | Where called | What it does |
+|---|---|---|
+| `runPushSync()` | `debouncedRunSync` → user actions | Push unsynced local changes only — no pull, no `loadNote` |
+| `runPullSync()` | 5-min interval, window focus (throttled 1/min) | Pull remote changes + `loadNote` to refresh UI |
+| `runSync()` | App start, app quit, coming back online | Full push + pull + `loadNote` |
+| `debouncedRunSync()` | All user actions (edit, bookmark, highlight, etc.) | 3s debounce → calls `runPushSync` |
+
+- `isSyncing` flag prevents concurrent runs across all four functions (shared module-level var)
+- Exponential backoff (`backoffUntil`) on network failures: 5min → 10min → 20min → max 60min
+- 401 from any sync call → auto-logout
+- `isHydrating` guard in `useNoteStore` — `loadNote()` sets it before writing `notes.value` and clears it after `nextTick()` so the auto-save watcher never fires during a pull-triggered reload
 
 ### Frontend State
 
