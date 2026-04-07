@@ -6,7 +6,7 @@ import { useNetwork } from '@vueuse/core';
 import VerseSelectorButton from './../VerseSelector.vue';
 import { useMenuStore } from '../../store/menu';
 import { useBibleStore } from '../../store/BibleStore';
-import { Book24Regular, PointScan24Filled } from '@vicons/fluent';
+import { Book24Regular } from '@vicons/fluent';
 import useNoteStore from '../../store/useNoteStore';
 import { useSettingStore } from '../../store/settingStore';
 import { useTTSStore } from '../../store/ttsStore';
@@ -22,7 +22,11 @@ const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const settingStore = useSettingStore();
 
-const downloadPercentage = ref<number>(0);
+type UpdateStatus = 'idle' | 'available' | 'downloading' | 'ready';
+
+const updateStatus = ref<UpdateStatus>('idle');
+const updateVersion = ref('');
+const downloadPercent = ref(0);
 const selectedFaceForToday = ref('😁');
 const faceForToday = ['😁', '✊', '😍', '💖', '😇', '😂', '😲', '(❁´◡`❁)', '✋', '📂', '😎'];
 
@@ -32,14 +36,22 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-    window.browserWindow.updateDownloadProgress({
-        percentage: (percentage: number) => {
-            downloadPercentage.value = percentage;
-        },
-        done: () => {
-            downloadPercentage.value = 0;
-        },
-    });
+    if (window.isElectron) {
+        window.browserWindow.onUpdateAvailable((version: string) => {
+            updateVersion.value = version;
+            updateStatus.value = 'available';
+        });
+
+        window.browserWindow.onUpdateProgress((percent: number) => {
+            downloadPercent.value = percent;
+            updateStatus.value = 'downloading';
+        });
+
+        window.browserWindow.onUpdateDownloaded(() => {
+            updateStatus.value = 'ready';
+            downloadPercent.value = 100;
+        });
+    }
 
     if (network.isSupported) {
     } else {
@@ -63,6 +75,16 @@ onMounted(() => {
         }
     });
 });
+
+function startDownload() {
+    updateStatus.value = 'downloading';
+    downloadPercent.value = 0;
+    window.browserWindow.downloadUpdate();
+}
+
+function installUpdate() {
+    window.browserWindow.installUpdate();
+}
 </script>
 <template>
     <NLayoutFooter
@@ -89,12 +111,30 @@ onMounted(() => {
                 </VerseSelectorButton>
             </template>
         </div>
-        <div class="flex items-center w-full max-w-300px justify-end pr-2">
-            <div v-if="downloadPercentage > 0" class="w-150px flex items-center gap-1">
-                <span class="text-size-10px">Updating</span>
-                <NProgress :percentage="downloadPercentage" type="line" />
-            </div>
-            <div>{{ selectedFaceForToday }}</div>
+        <div class="flex items-center w-full max-w-300px justify-end pr-2 gap-2">
+            <!-- Update available -->
+            <template v-if="updateStatus === 'available'">
+                <NButton size="tiny" type="primary" @click="startDownload">
+                    Update v{{ updateVersion }}
+                </NButton>
+            </template>
+
+            <!-- Downloading -->
+            <template v-else-if="updateStatus === 'downloading'">
+                <span class="text-size-10px opacity-70 whitespace-nowrap">Updating {{ downloadPercent }}%</span>
+                <div class="w-100px">
+                    <NProgress :percentage="downloadPercent" type="line" :show-indicator="false" :height="4" />
+                </div>
+            </template>
+
+            <!-- Ready to install -->
+            <template v-else-if="updateStatus === 'ready'">
+                <NButton size="tiny" type="warning" @click="installUpdate">
+                    Install &amp; Restart
+                </NButton>
+            </template>
+
+            <div v-if="updateStatus === 'idle'">{{ selectedFaceForToday }}</div>
         </div>
     </NLayoutFooter>
 </template>

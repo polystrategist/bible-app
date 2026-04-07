@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import Log from 'electron-log';
 import { saveWindowState } from './util/window';
@@ -11,7 +11,11 @@ export default (mainWindow: BrowserWindow) => {
 
         ipcMain.handle('install-update', () => {
             saveWindowState();
-                        autoUpdater.quitAndInstall(process.platform === 'win32', true);
+            autoUpdater.quitAndInstall(process.platform === 'win32', true);
+        });
+
+        ipcMain.handle('download-update', () => {
+            autoUpdater.downloadUpdate();
         });
 
         ipcMain.handle('check-for-updates', async () => {
@@ -34,20 +38,7 @@ export default (mainWindow: BrowserWindow) => {
         autoUpdater.checkForUpdates();
 
         autoUpdater.on('update-available', (info) => {
-            dialog
-                .showMessageBox({
-                    type: 'info',
-                    buttons: ['Download', 'Later'],
-                    title: 'Update Available',
-                    message: `Version ${info.version} is available.`,
-                    detail: 'Do you want to download it now?',
-                })
-                .then(({ response }) => {
-                    if (response === 0) {
-                        autoUpdater.downloadUpdate();
-                        mainWindow.webContents.send('update-available');
-                    }
-                });
+            mainWindow.webContents.send('update-available', info.version);
         });
 
         autoUpdater.on('download-progress', (progressObj) => {
@@ -57,26 +48,13 @@ export default (mainWindow: BrowserWindow) => {
 
         autoUpdater.addListener('update-downloaded', (_info: UpdateInfo) => {
             mainWindow.webContents.send('update-downloaded');
-            dialog
-                .showMessageBox({
-                    type: 'info',
-                    buttons: ['Install Now', 'Later'],
-                    title: 'Update Ready',
-                    message: 'A new update has been downloaded and is ready to install.',
-                    detail: 'The app will restart automatically after installation.',
-                })
-                .then(({ response }) => {
-                    if (response === 0) {
-                        saveWindowState();
-                        autoUpdater.quitAndInstall(process.platform === 'win32', true);
-                    }
-                });
         });
     } else {
         ipcMain.handle('check-for-updates', async () => {
             return { success: false, error: 'Updates are only available in packaged builds.' };
         });
         ipcMain.handle('install-update', async () => {});
+        ipcMain.handle('download-update', async () => {});
     }
 
     autoUpdater.on('error', (error) => {

@@ -3,7 +3,7 @@ import { NButton, NTag, NProgress } from 'naive-ui';
 import { ref, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 
-type Status = 'idle' | 'checking' | 'downloading' | 'ready' | 'up-to-date' | 'error';
+type Status = 'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'up-to-date' | 'error';
 
 const status = ref<Status>('idle');
 const errorMsg = ref('');
@@ -31,8 +31,7 @@ async function checkForUpdates() {
             errorMsg.value = result.error ?? 'Unknown error';
             status.value = 'error';
         } else if (result.updateAvailable) {
-            status.value = 'downloading';
-            downloadPercent.value = 0;
+            status.value = 'available';
         } else {
             status.value = 'up-to-date';
         }
@@ -40,6 +39,12 @@ async function checkForUpdates() {
         errorMsg.value = 'Could not reach update server.';
         status.value = 'error';
     }
+}
+
+function downloadUpdate() {
+    status.value = 'downloading';
+    downloadPercent.value = 0;
+    window.browserWindow.downloadUpdate();
 }
 
 function installUpdate() {
@@ -63,16 +68,27 @@ function installUpdate() {
             </NButton>
 
             <NButton
-                v-if="status === 'ready'"
+                v-if="status === 'available'"
                 size="small"
                 type="primary"
-                @click="installUpdate"
+                @click="downloadUpdate"
             >
                 <template #icon><Icon icon="mdi:download" /></template>
-                Install Update
+                Download Update
+            </NButton>
+
+            <NButton
+                v-if="status === 'ready'"
+                size="small"
+                type="warning"
+                @click="installUpdate"
+            >
+                <template #icon><Icon icon="mdi:restart" /></template>
+                Install &amp; Restart
             </NButton>
 
             <NTag v-if="status === 'up-to-date'" type="success" size="small">You're up to date</NTag>
+            <NTag v-else-if="status === 'available'" type="info" size="small">Update available</NTag>
             <NTag v-else-if="status === 'ready'" type="warning" size="small">Update ready to install</NTag>
             <span v-else-if="status === 'error'" class="text-xs text-red-400">{{ errorMsg }}</span>
         </div>

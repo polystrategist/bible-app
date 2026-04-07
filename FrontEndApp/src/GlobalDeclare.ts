@@ -157,7 +157,8 @@ declare global {
             // Updates
             checkForUpdates: () => Promise<{ success: boolean; updateAvailable?: boolean; error?: string }>;
             installUpdate: () => Promise<void>;
-            onUpdateAvailable: (cb: () => void) => void;
+            downloadUpdate: () => Promise<void>;
+            onUpdateAvailable: (cb: (version: string) => void) => void;
             onUpdateProgress: (cb: (percent: number) => void) => void;
             onUpdateDownloaded: (cb: () => void) => void;
 
