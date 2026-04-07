@@ -391,7 +391,10 @@
        id="page4"
        margin="0"
        bleed="0"
-       inkscape:label="Very Full Width and Hight" />
+       inkscape:label="Very Full Width and Hight"
+       inkscape:export-filename="Very Full Width and Hight.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </sodipodi:namedview>
   <g
      id="g2"

@@ -32,9 +32,8 @@ const removePrayerItem = (key: string) => {
     }
 };
 
-const editPrayerItem = (key: string, content: any): void => {
-    editPrayerModal.value?.modalTrigger(content, key);
-    editPrayerModal.value?.editor?.commands.setContent(content);
+const editPrayerItem = (element: any): void => {
+    editPrayerModal.value?.modalTrigger(element);
 };
 
 async function changeInProgress(item: any) {
@@ -59,7 +58,7 @@ const dragOptions = {
 };
 
 function selectItemFromMenuElement(key: any, element: any) {
-    if (key === 'edit') editPrayerItem(element.key, element.content);
+    if (key === 'edit') editPrayerItem(element);
     else if (key === 'remove') {
         dialog.warning({
             title: t('Confirm'),
@@ -92,9 +91,11 @@ function selectItemFromMenuElement(key: any, element: any) {
             >
                 <template #item="{ element }">
                     <div class="relative prayer-list-item group rounded-md">
-                        <div class="pb-0 duration-200">
+                        <div class="pb-0 duration-200 px-2 pt-2">
+                            <div v-if="element.title" class="font-700 text-13px mb-1 truncate">{{ element.title }}</div>
+                            <div v-if="element.group" class="inline-block text-10px font-600 px-6px py-2px rounded-full mb-6px opacity-60 border border-current">{{ element.group }}</div>
                             <div
-                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1 m-2"
+                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-0"
                                 v-html="element.content"
                             ></div>
                             <NDropdown
@@ -144,10 +145,14 @@ function selectItemFromMenuElement(key: any, element: any) {
             >
                 <template #item="{ element }">
                     <div class="group relative prayer-list-item rounded-md opacity-50">
-                        <div
-                            class="prayer-list-content cursor-move prose-mirror-render-html !pt-1 px-1"
-                            v-html="element.content"
-                        ></div>
+                        <div class="px-2 pt-2">
+                            <div v-if="element.title" class="font-700 text-13px mb-1 truncate">{{ element.title }}</div>
+                            <div v-if="element.group" class="inline-block text-10px font-600 px-6px py-2px rounded-full mb-6px opacity-60 border border-current">{{ element.group }}</div>
+                            <div
+                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-0"
+                                v-html="element.content"
+                            ></div>
+                        </div>
                         <NDropdown
                             trigger="click"
                             :options="[

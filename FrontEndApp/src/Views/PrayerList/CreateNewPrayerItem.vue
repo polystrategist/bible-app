@@ -1,30 +1,36 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { NButton, NModal, NIcon, NCard, useMessage } from 'naive-ui';
-import initialContent from './initialContent';
+import { NButton, NModal, NIcon, NCard, NInput, NCheckbox, useMessage } from 'naive-ui';
 import { Close, Add, Save } from '@vicons/carbon';
 import Editor from '../../components/Editor/Editor.vue';
 import { usePrayerListStore } from '../../store/prayerListStore';
 
 const message = useMessage();
 const showModal = ref(false);
+const prayerTitle = ref('');
+const prayerGroup = ref('');
 const prayerContent = ref('');
-const closeCreateNewModal = () => {
-    showModal.value = false;
-    let initialValue = initialContent;
-};
+const isAnswered = ref(false);
+
 const prayerListStore = usePrayerListStore();
+
+const closeModal = () => {
+    showModal.value = false;
+    prayerTitle.value = '';
+    prayerGroup.value = '';
+    prayerContent.value = '';
+    isAnswered.value = false;
+};
 
 const SaveEditorContent = () => {
     try {
         prayerListStore.savePrayerItem({
-            title: null,
+            title: prayerTitle.value.trim() || null,
             content: prayerContent.value,
-            group: null,
-            status: 'ongoing',
+            group: prayerGroup.value.trim() || null,
+            status: isAnswered.value ? 'done' : 'ongoing',
         });
-        showModal.value = false;
-        prayerContent.value = '';
+        closeModal();
     } catch (e) {
         if (e instanceof Error) message.error(e.message);
     }
@@ -32,31 +38,47 @@ const SaveEditorContent = () => {
 </script>
 
 <template>
-    <NButton @click="showModal = true" round secondary size='tiny'>
+    <NButton @click="showModal = true" round secondary size="tiny">
         <template #icon>
-            <NIcon>
-                <Add />
-            </NIcon>
+            <NIcon><Add /></NIcon>
         </template>
         <span class="capitalize">{{ $t('new') }}</span>
     </NButton>
+
     <NModal :show="showModal" class="min-w-500px max-w-600px">
         <NCard class="my-20px" size="small">
             <template #header>
                 <span class="capitalize">{{ $t('create') }}</span>
             </template>
-            <Editor v-model="prayerContent" :button-actions="['bold', 'italic', 'underline', 'strike', 'clearFormat']" />
-            <div class="p-10px flex flex-row justify-end gap-15px dark:bg-black dark:bg-opacity-10">
-                <NButton ghost @click="closeCreateNewModal()">
-                    <NIcon>
-                        <Close />
-                    </NIcon>
+
+            <div class="flex flex-col gap-12px mb-16px">
+                <div class="flex flex-col gap-4px">
+                    <label class="text-12px font-600 opacity-70">Title</label>
+                    <NInput v-model:value="prayerTitle" placeholder="Enter prayer title..." />
+                </div>
+                <div class="flex flex-col gap-4px">
+                    <label class="text-12px font-600 opacity-70">Group</label>
+                    <NInput v-model:value="prayerGroup" placeholder="Family, health, work..." />
+                </div>
+                <NCheckbox v-model:checked="isAnswered">
+                    Mark as answered
+                </NCheckbox>
+                <div class="flex flex-col gap-4px">
+                    <label class="text-12px font-600 opacity-70">Content</label>
+                    <Editor
+                        v-model="prayerContent"
+                        :button-actions="['bold', 'italic', 'underline', 'strike', 'clearFormat']"
+                    />
+                </div>
+            </div>
+
+            <div class="p-10px flex flex-row justify-end gap-15px">
+                <NButton ghost @click="closeModal()">
+                    <NIcon><Close /></NIcon>
                     <span class="capitalize">{{ $t('close') }}</span>
                 </NButton>
                 <NButton type="info" @click="SaveEditorContent()">
-                    <NIcon>
-                        <Save />
-                    </NIcon>
+                    <NIcon><Save /></NIcon>
                     <span class="capitalize">{{ $t('create new') }}</span>
                 </NButton>
             </div>
