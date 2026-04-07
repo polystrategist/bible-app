@@ -75,13 +75,25 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
             const findIndex = prayerList.value.findIndex((item) => item.key == key);
             if (findIndex > -1) prayerList.value.splice(findIndex, 1);
             const doneIndex = donePrayerList.value.findIndex((item) => item.key == key);
-            if (doneIndex > -1) donePrayerList.value.splice(findIndex, 1);
+            if (doneIndex > -1) donePrayerList.value.splice(doneIndex, 1);
 
             await deletePrayerItem(key as string);
             debouncedRunSync();
         } catch (e) {
             console.error('removePrayerItem', e);
         }
+    }
+
+    /**
+     * Reorder prayer items within a status group.
+     * Passes the new ordered keys to the Electron backend so it can update
+     * each item's `index` field and write sync log entries.
+     */
+    async function reorderPrayerList(status: 'ongoing' | 'done', orderedKeys: string[]) {
+        await window.browserWindow.reorderPrayerListItems(
+            JSON.stringify({ status, orderedKeys })
+        );
+        debouncedRunSync();
     }
 
     onBeforeMount(async () => {
@@ -92,6 +104,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         resetPrayerItemList,
         removePrayerItem,
         savePrayerItem,
+        reorderPrayerList,
         prayerList,
         donePrayerList,
         setPrayerList: (data: Array<any>) => {
