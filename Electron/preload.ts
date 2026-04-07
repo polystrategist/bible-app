@@ -52,6 +52,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     savePrayerItem: (args: any) => ipcRenderer.invoke('savePrayerItem', JSON.parse(args)),
     resetPrayerListItems: (args: any) =>
         ipcRenderer.invoke('resetPrayerListItems', JSON.parse(args)),
+    reorderPrayerListItems: (args: any) =>
+        ipcRenderer.invoke('reorderPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
     updateDownloadProgress: (progress: { percentage: Function; done: Function }) => {
         // Listen for the event from the main process

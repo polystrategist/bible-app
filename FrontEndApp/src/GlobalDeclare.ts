@@ -89,6 +89,11 @@ declare global {
             resetPrayerListItems: (args: string) => Promise<any>;
 
             /**
+             * Reorder Prayer List Items within a status group
+             */
+            reorderPrayerListItems: (args: string) => Promise<any>;
+
+            /**
              * Delete Prayer List Item
              */
             deletePrayerListItem: (key: string | number) => Promise<any>;
@@ -123,14 +128,16 @@ declare global {
 
             openDonateWindow: () => void;
 
-            // Note
-            getNote: () => Promise<{
+            // Notes
+            getNotes: () => Promise<Array<{
+                note_id: string;
+                title: string;
                 content: string;
                 created_at: null | number | string;
-                id: number;
                 updated_at: number | string | null;
-            }>;
-            saveNote: (args: { note: string }) => Promise<any>;
+            }>>;
+            upsertNote: (args: { note_id: string; title: string; content: string }) => Promise<any>;
+            deleteNote: (args: { note_id: string }) => Promise<any>;
 
             // Dictionary
             searchDictionary: (search: string) => Promise<any>;
@@ -169,11 +176,13 @@ declare global {
             getSyncSetting: (key: string) => Promise<any>;
             setSyncSetting: (key: string, value: any) => Promise<any>;
             applyPullData: (data: {
+                sync_logs?: any[];
                 bookmarks?: any[];
                 highlights?: any[];
                 clip_notes?: any[];
                 prayer_lists?: any[];
                 notes?: any[];
+                settings?: any;
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;

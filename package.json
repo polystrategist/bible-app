@@ -7,7 +7,9 @@
   "license": "GPL-3.0",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit && cd FrontEndApp && yarn vue-tsc --noEmit",
+    "typecheck": "tsc --noEmit && cd FrontEndApp && yarn typecheck",
+    "typecheck:electron": "tsc --noEmit",
+    "typecheck:frontend": "cd FrontEndApp && yarn typecheck",
     "watch": "nodemon --exec yarn serve:electron",
     "start": "yarn nightly:rename && concurrently -k \"yarn serve:front\" \"yarn watch\"",
     "front:setup": "cd FrontEndApp && yarn",

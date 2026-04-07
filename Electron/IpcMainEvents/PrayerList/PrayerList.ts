@@ -67,6 +67,41 @@ export default () => {
         }
     );
 
+    ipcMain.handle(
+        'reorderPrayerListItems',
+        async (event, args: { status: 'ongoing' | 'done'; orderedKeys: string[] }) => {
+            try {
+                await StoreDB.transaction(async (trx) => {
+                    for (let i = 0; i < args.orderedKeys.length; i++) {
+                        await trx(tableName)
+                            .where('key', args.orderedKeys[i])
+                            .where('status', args.status)
+                            .update({ index: i });
+                    }
+                });
+
+                for (let i = 0; i < args.orderedKeys.length; i++) {
+                    const item = await StoreDB(tableName).where('key', args.orderedKeys[i]).first();
+                    if (item) {
+                        try {
+                            await logSyncChange({
+                                table_name: 'prayer_lists',
+                                record_key: args.orderedKeys[i],
+                                action: 'updated',
+                                payload: item,
+                                synced: 0,
+                            });
+                        } catch (e) {
+                            Log.error('Failed to log sync change for prayer list reorder:', e);
+                        }
+                    }
+                }
+            } catch (e) {
+                Log.error(e);
+            }
+        }
+    );
+
     ipcMain.handle('deletePrayerListItem', async (event, key: string | number) => {
         try {
             const existingItem = await StoreDB(tableName).where('key', String(key)).first();
