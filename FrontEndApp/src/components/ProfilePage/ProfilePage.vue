@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NSwitch, useMessage } from 'naive-ui';
+import { NAlert, NButton, NForm, NInput, NModal, NSwitch, useMessage } from 'naive-ui';
 import { computed, ref } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
@@ -42,6 +42,34 @@ async function onSyncToggle(enabled: boolean) {
 
     await authStore.setSyncEnabled(false);
     message.success('Sync disabled.');
+}
+
+// Danger Zone
+const dangerZoneOpen = ref(false);
+const showDeleteModal = ref(false);
+const deleteEmail = ref('');
+const deleteError = ref('');
+const isDeleting = ref(false);
+
+function openDeleteModal() {
+    deleteEmail.value = '';
+    deleteError.value = '';
+    showDeleteModal.value = true;
+}
+
+async function confirmDeleteAccount() {
+    deleteError.value = '';
+    isDeleting.value = true;
+    const result = await authStore.deleteAccount(deleteEmail.value.trim());
+    isDeleting.value = false;
+
+    if (result.success) {
+        showDeleteModal.value = false;
+        message.success('Account deleted.');
+        router.push('/profile');
+    } else {
+        deleteError.value = result.message;
+    }
 }
 </script>
 
@@ -124,7 +152,78 @@ async function onSyncToggle(enabled: boolean) {
                         Logout
                     </NButton>
                 </div>
+
+                <!-- Danger Zone -->
+                <div class="danger-zone mt-8">
+                    <button class="danger-zone-header" @click="dangerZoneOpen = !dangerZoneOpen">
+                        <div class="flex items-center gap-2">
+                            <Icon icon="mdi:alert-circle-outline" class="text-red-400" />
+                            <span class="font-600 text-red-400">Danger Zone</span>
+                        </div>
+                        <Icon
+                            :icon="dangerZoneOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'"
+                            class="text-red-400"
+                        />
+                    </button>
+
+                    <div v-if="dangerZoneOpen" class="danger-zone-body">
+                        <div class="flex items-start justify-between gap-4 flex-wrap">
+                            <div>
+                                <p class="font-600 m-0 mb-1">Delete Account</p>
+                                <p class="m-0 text-sm opacity-70" style="max-width: 480px;">
+                                    Permanently deletes your account and all associated data, including bookmarks,
+                                    highlights, notes, and prayer lists. This action cannot be undone.
+                                </p>
+                            </div>
+                            <NButton type="error" size="small" @click="openDeleteModal">
+                                <template #icon>
+                                    <Icon icon="mdi:trash-can-outline" />
+                                </template>
+                                Delete My Account
+                            </NButton>
+                        </div>
+                    </div>
+                </div>
             </NForm>
+
+            <!-- Delete Account Confirmation Modal -->
+            <NModal
+                v-model:show="showDeleteModal"
+                preset="dialog"
+                type="error"
+                title="Delete Account"
+                :mask-closable="!isDeleting"
+                :close-on-esc="!isDeleting"
+            >
+                <template #icon>
+                    <Icon icon="mdi:alert-circle-outline" />
+                </template>
+                <div class="flex flex-col gap-3">
+                    <p class="m-0 text-sm">
+                        This will permanently delete your account and all data. This action <strong>cannot be undone</strong>.
+                    </p>
+                    <p class="m-0 text-sm font-600">Enter your email address to confirm:</p>
+                    <NInput
+                        v-model:value="deleteEmail"
+                        placeholder="your@email.com"
+                        type="text"
+                        :disabled="isDeleting"
+                        @keyup.enter="confirmDeleteAccount"
+                    />
+                    <p v-if="deleteError" class="m-0 text-sm text-red-400">{{ deleteError }}</p>
+                </div>
+                <template #action>
+                    <NButton :disabled="isDeleting" @click="showDeleteModal = false">Cancel</NButton>
+                    <NButton
+                        type="error"
+                        :loading="isDeleting"
+                        :disabled="isDeleting || !deleteEmail.trim()"
+                        @click="confirmDeleteAccount"
+                    >
+                        Delete Account
+                    </NButton>
+                </template>
+            </NModal>
     </div>
 </template>
 
@@ -231,5 +330,34 @@ async function onSyncToggle(enabled: boolean) {
 .sync-footer-item.is-active {
     background: rgba(74, 222, 128, 0.14);
     color: #bbf7d0;
+}
+
+.danger-zone {
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.danger-zone-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: rgba(239, 68, 68, 0.06);
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+
+.danger-zone-header:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.danger-zone-body {
+    padding: 18px;
+    border-top: 1px solid rgba(239, 68, 68, 0.2);
 }
 </style>

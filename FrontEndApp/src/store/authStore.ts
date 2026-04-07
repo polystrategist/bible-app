@@ -135,6 +135,43 @@ export const useAuthStore = defineStore('authStore', () => {
     }
 
     /**
+     * Delete the authenticated user's account.
+     * Requires email confirmation matching the current user's email.
+     */
+    async function deleteAccount(email: string): Promise<{ success: boolean; message: string }> {
+        const currentToken = token.value;
+        if (!currentToken) return { success: false, message: 'Not authenticated' };
+
+        try {
+            const response = await axios.delete(`${API_BASE_URL}/auth/account`, {
+                headers: { Authorization: `Bearer ${currentToken}` },
+                data: { email },
+            });
+
+            if (response.data.status === 'success') {
+                user.value = null;
+                token.value = null;
+                isAuthenticated.value = false;
+                syncEnabled.value = false;
+                remoteSettings.value = null;
+                pendingSettingsUpdate.value = null;
+                pendingSyncEnabled.value = null;
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('pending_theme_settings');
+                localStorage.removeItem('pending_sync_enabled');
+                return { success: true, message: response.data.message };
+            }
+
+            return { success: false, message: response.data.message || 'Failed to delete account' };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to delete account',
+            };
+        }
+    }
+
+    /**
      * Logout user
      */
     async function logout(): Promise<{ success: boolean; message: string }> {
@@ -484,6 +521,7 @@ export const useAuthStore = defineStore('authStore', () => {
         register,
         login,
         logout,
+        deleteAccount,
         getUser,
         initAuth,
         loadSyncEnabled,
