@@ -13,12 +13,26 @@ body.light {
     --scrollbar-track: rgba(30, 30, 30, 0.08);
     --scrollbar-thumb: rgba(30, 30, 30, 0.28);
     --scrollbar-thumb-hover: var(--primary-color);
+    /* Default theme variable fallbacks for light mode */
+    --theme-bg-main: #f5f5f5;
+    --theme-bg-soft: #ebebeb;
+    --theme-bg-elevated: #ffffff;
+    --theme-text: #333333;
+    --theme-text-soft: #888888;
+    --theme-border: #e0e0e0;
 }
 
 body.dark {
     --scrollbar-track: rgba(255, 255, 255, 0.1);
     --scrollbar-thumb: rgba(255, 255, 255, 0.26);
     --scrollbar-thumb-hover: var(--primary-color);
+    /* Default theme variable fallbacks for dark mode */
+    --theme-bg-main: #101014;
+    --theme-bg-soft: #18181c;
+    --theme-bg-elevated: #1c1c1e;
+    --theme-text: #e0e0e0;
+    --theme-text-soft: #aaaaaa;
+    --theme-border: #333333;
 }
 
 html {
