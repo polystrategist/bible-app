@@ -129,10 +129,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     },
 
     // Bible Import
-    importBibleSelectFile: () => ipcRenderer.invoke('import-bible:select-file'),
-    importBibleValidate: (filePath: string) => ipcRenderer.invoke('import-bible:validate', filePath),
+    importBibleSelectFile: (source: string) => ipcRenderer.invoke('import-bible:select-file', source),
+    importBibleValidate: (args: { filePath: string; source: string }) => ipcRenderer.invoke('import-bible:validate', args),
     importBibleCheckDuplicate: (title: string) => ipcRenderer.invoke('import-bible:check-duplicate', title),
-    importBible: (args: { filePath: string; title: string; description: string }) => ipcRenderer.invoke('import-bible:import', args),
+    importBible: (args: { filePath: string; title: string; description: string; source: string }) => ipcRenderer.invoke('import-bible:import', args),
 
     // Sync Operations
     logSyncChange: (entry: any) => ipcRenderer.invoke('logSyncChange', entry),

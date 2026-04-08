@@ -16,12 +16,20 @@ const selectedFilePath = ref<string | null>(null);
 const selectedFileName = ref<string | null>(null);
 const isValidating = ref(false);
 const isImporting = ref(false);
-const validationResult = ref<{ valid: boolean; error?: string; verseCount?: number } | null>(null);
+const validationResult = ref<{ valid: boolean; error?: string; verseCount?: number; warning?: string } | null>(null);
 const duplicateError = ref<string | null>(null);
 
 const sourceOptions = [
     { label: 'ebible.org SQL', value: 'ebible-sql' },
+    { label: 'MyBible (.sqlite3)', value: 'mybible-sqlite3' },
 ];
+
+// Reset file selection when source changes
+watch(importSource, () => {
+    selectedFilePath.value = null;
+    selectedFileName.value = null;
+    validationResult.value = null;
+});
 
 const canImport = computed(() => {
     return (
@@ -49,7 +57,7 @@ watch(title, (newTitle) => {
 });
 
 async function selectFile() {
-    const result = await window.browserWindow.importBibleSelectFile();
+    const result = await window.browserWindow.importBibleSelectFile(importSource.value);
     if (result.canceled || !result.filePath) return;
 
     selectedFilePath.value = result.filePath;
@@ -59,7 +67,7 @@ async function selectFile() {
     isValidating.value = true;
     validationResult.value = null;
     try {
-        validationResult.value = await window.browserWindow.importBibleValidate(result.filePath);
+        validationResult.value = await window.browserWindow.importBibleValidate({ filePath: result.filePath, source: importSource.value });
     } finally {
         isValidating.value = false;
     }
@@ -76,6 +84,7 @@ async function doImport() {
             filePath: selectedFilePath.value,
             title: title.value.trim(),
             description: description.value.trim(),
+            source: importSource.value,
         });
 
         if (result.success) {
@@ -133,7 +142,10 @@ function resetAndClose() {
 
             <!-- File Selection -->
             <div class="mb-3">
-                <label class="block text-xs font-600 mb-1 opacity-70">SQL File <span class="text-red-500">*</span></label>
+                <label class="block text-xs font-600 mb-1 opacity-70">
+                    {{ importSource === 'mybible-sqlite3' ? 'SQLite3 File' : 'SQL File' }}
+                    <span class="text-red-500">*</span>
+                </label>
                 <div class="flex gap-2 items-center">
                     <NButton size="small" @click="selectFile" :disabled="isImporting">
                         <template #icon>
@@ -151,9 +163,14 @@ function resetAndClose() {
                 Validating file...
             </div>
             <div v-else-if="validationResult" class="mb-3 text-xs">
-                <div v-if="validationResult.valid" class="flex items-center gap-1 text-green-500">
-                    <NIcon size="14"><Checkmark /></NIcon>
-                    Valid — {{ validationResult.verseCount?.toLocaleString() }} verses found
+                <div v-if="validationResult.valid" class="flex flex-col gap-1">
+                    <div class="flex items-center gap-1 text-green-500">
+                        <NIcon size="14"><Checkmark /></NIcon>
+                        Valid — {{ validationResult.verseCount?.toLocaleString() }} verses found
+                    </div>
+                    <div v-if="validationResult.warning" class="text-yellow-500 opacity-80">
+                        ⚠ {{ validationResult.warning }}
+                    </div>
                 </div>
                 <div v-else class="text-red-500">
                     <NIcon size="14"><Close /></NIcon>

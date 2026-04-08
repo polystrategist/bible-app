@@ -118,6 +118,9 @@ yarn app:build:nightly
 # Compile Electron TypeScript only
 yarn build
 
+# Type-check both Electron and FrontEndApp (no emit)
+yarn typecheck
+
 # Run Vite dev server only (frontend)
 cd FrontEndApp && yarn dev
 ```

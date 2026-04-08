@@ -163,10 +163,10 @@ declare global {
             onUpdateDownloaded: (cb: () => void) => void;
 
             // Bible Import
-            importBibleSelectFile: () => Promise<{ canceled: boolean; filePath?: string }>;
-            importBibleValidate: (filePath: string) => Promise<{ valid: boolean; error?: string; verseCount?: number }>;
+            importBibleSelectFile: (source: string) => Promise<{ canceled: boolean; filePath?: string }>;
+            importBibleValidate: (args: { filePath: string; source: string }) => Promise<{ valid: boolean; error?: string; verseCount?: number; warning?: string }>;
             importBibleCheckDuplicate: (title: string) => Promise<{ exists: boolean }>;
-            importBible: (args: { filePath: string; title: string; description: string }) => Promise<{ success: boolean; error?: string; verseCount?: number; fileName?: string }>;
+            importBible: (args: { filePath: string; title: string; description: string; source: string }) => Promise<{ success: boolean; error?: string; verseCount?: number; fileName?: string }>;
 
             // Sync
             logSyncChange: (entry: any) => Promise<any>;
