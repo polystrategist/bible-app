@@ -18,13 +18,26 @@ async function pushSync(token: string): Promise<number> {
 
     if (!unsyncedChanges.length) return 0;
 
-    // Discard legacy entries with no record_key (old single-blob note model)
-    const stale = unsyncedChanges.filter((e: any) => !e.record_key);
+    const ALLOWED_TABLES = ['bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'notes'];
+    const ALLOWED_ACTIONS = ['created', 'updated', 'deleted'];
+
+    // Discard legacy entries: no record_key, unknown table name, or unknown action.
+    // These are leftovers from old app versions and would cause the entire push to fail.
+    const stale = unsyncedChanges.filter((e: any) =>
+        !e.record_key ||
+        !ALLOWED_TABLES.includes(e.table_name) ||
+        !ALLOWED_ACTIONS.includes(e.action)
+    );
     if (stale.length) {
+        console.info(`[Sync] Discarding ${stale.length} stale/unknown sync_log entry(ies).`);
         await window.browserWindow.markAsSynced(stale.map((e: any) => e.id));
     }
 
-    const valid = unsyncedChanges.filter((e: any) => !!e.record_key);
+    const valid = unsyncedChanges.filter((e: any) =>
+        !!e.record_key &&
+        ALLOWED_TABLES.includes(e.table_name) &&
+        ALLOWED_ACTIONS.includes(e.action)
+    );
     if (!valid.length) return 0;
 
     const payload = valid.map((entry: any) => ({
