@@ -1,5 +1,5 @@
 import Log from 'electron-log';
-import { app, BrowserWindow, globalShortcut, screen } from 'electron';
+import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
@@ -73,10 +73,6 @@ async function createWindow() {
 
     mainWindow.show();
 
-    globalShortcut.register('CommandOrControl+Shift+I', () => {
-        mainWindow.webContents.toggleDevTools();
-    });
-
     if (windowState.isFullScreen) {
         mainWindow.setFullScreen(true);
     } else if (windowState.isMaximized) {
@@ -137,6 +133,5 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
     saveWindowState();
     clearBibleVersionCache();
-    globalShortcut.unregisterAll();
     Log.info('Application cleanup completed');
 });
