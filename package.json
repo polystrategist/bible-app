@@ -2,7 +2,7 @@
   "name": "believers-sword-nightly",
   "description": "Believers Sword is an application for believers community, it is used to study bible, also used for praying, social or connect with other believers.",
   "author": "JenuelDev",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "main": "./dist/main.js",
   "license": "GPL-3.0",
   "scripts": {
@@ -22,6 +22,8 @@
     "electron:builder": "electron-builder",
     "app:build": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder",
     "app:build:nightly": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=no && yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder",
+    "app:build:msix": "yarn prod:rename && yarn build:front && yarn electron:build && yarn electron:builder --win appx",
+    "app:build:msix:nightly": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=no && yarn nightly:rename && yarn build:front && yarn electron:build && yarn electron:builder --win appx",
     "nightly:rename": "json -I -f package.json -e \"this.name='believers-sword-nightly'\" && json -I -f package.json -e \"this.build.productName='Believers Sword Nightly'\" && json -I -f package.json -e \"this.build.appId='com.official-believers-sword-nightly.app'\"",
     "prod:rename": "json -I -f package.json -e \"this.name='believers-sword'\" && json -I -f package.json -e \"this.build.productName='Believers Sword'\" && json -I -f package.json -e \"this.build.appId='com.official-believers-sword.app'\"",
     "electron-rebuild": "./node_modules/.bin/electron-rebuild",
@@ -63,8 +65,15 @@
     "win": {
       "target": [
         "nsis",
-        "portable"
+        "portable",
+        "appx"
       ]
+    },
+    "appx": {
+      "applicationId": "BelieversSword",
+      "publisher": "CN=77A53CA7-0845-448E-8408-E97652135998",
+      "publisherDisplayName": "JenuelDev",
+      "identityName": "BelieversSword"
     },
     "mac": {
       "target": [
