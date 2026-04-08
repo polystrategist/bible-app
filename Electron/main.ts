@@ -1,5 +1,5 @@
 import Log from 'electron-log';
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, globalShortcut, screen } from 'electron';
 import path from 'path';
 import { isDev, isNightly } from './config';
 import { setupDefault } from './Setups/setup';
@@ -34,7 +34,7 @@ async function createWindow() {
         icon: iconPath,
         webPreferences: {
             preload: __dirname + '/preload.js',
-            devTools: isDev || isNightly,
+            devTools: true,
         },
         show: false,
         alwaysOnTop: true,
@@ -72,6 +72,10 @@ async function createWindow() {
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
 
     mainWindow.show();
+
+    globalShortcut.register('CommandOrControl+Shift+I', () => {
+        mainWindow.webContents.toggleDevTools();
+    });
 
     if (windowState.isFullScreen) {
         mainWindow.setFullScreen(true);
@@ -133,5 +137,6 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
     saveWindowState();
     clearBibleVersionCache();
+    globalShortcut.unregisterAll();
     Log.info('Application cleanup completed');
 });

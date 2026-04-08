@@ -141,24 +141,28 @@ export default defineStore('useNotesStore', () => {
         });
     }
 
-    function storeNote() {
-        for (const note of notes.value) {
-            window.browserWindow.upsertNote({
-                note_id: note.id,
-                title: note.title,
-                content: note.content,
-            });
-        }
+    function storeNote(note: NoteItem) {
+        window.browserWindow.upsertNote({
+            note_id: note.id,
+            title: note.title,
+            content: note.content,
+        });
         debouncedRunSync();
     }
 
     watch(
-        () => [notes.value, selectedNoteId.value],
-        () => {
+        () => notes.value,
+        (newNotes, oldNotes) => {
             if (isHydrating.value) return;
+            // Find notes that actually changed content or title
+            const changed = newNotes.filter((note) => {
+                const old = oldNotes?.find((n) => n.id === note.id);
+                return !old || old.title !== note.title || old.content !== note.content;
+            });
+            if (!changed.length) return;
             clearTimeout(window.takingNoteTimeOut);
             window.takingNoteTimeOut = setTimeout(() => {
-                storeNote();
+                for (const note of changed) storeNote(note);
             }, 700);
         },
         { deep: true }
