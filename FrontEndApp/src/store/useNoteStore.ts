@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { debouncedRunSync } from '../util/Sync/sync';
+import { debouncedRunSync, runPushSync } from '../util/Sync/sync';
 import SESSION from '../util/session';
 
 export type NoteItem = {
@@ -95,6 +95,10 @@ export default defineStore('useNotesStore', () => {
             notes.value = [];
             selectedNoteId.value = '';
         }
+        // Seed snapshot so loaded notes don't get re-saved immediately.
+        for (const note of notes.value) {
+            savedSnapshot.set(note.id, { title: note.title, content: note.content });
+        }
         // Wait for Vue's watcher flush before clearing the hydration guard,
         // so the watch callback sees isHydrating = true and skips storeNote().
         await nextTick();
@@ -133,31 +137,37 @@ export default defineStore('useNotesStore', () => {
 
     // ─── Persistence ─────────────────────────────────────────────
 
-    async function _persistNote(note: NoteItem) {
-        await window.browserWindow.upsertNote({
-            note_id: note.id,
-            title: note.title,
-            content: note.content,
-        });
-    }
+    // Snapshot of last-saved state per note, used to detect real changes.
+    // Vue 3 deep watchers on mutated arrays give the same reference for
+    // oldValue and newValue, so we can't diff there directly.
+    const savedSnapshot = new Map<string, { title: string; content: string }>();
+
+    // Dedicated sync timer for note edits — fires 15s after the last edit
+    // so the push doesn't interrupt active typing.
+    let notesSyncTimer: ReturnType<typeof setTimeout> | null = null;
 
     function storeNote(note: NoteItem) {
+        savedSnapshot.set(note.id, { title: note.title, content: note.content });
         window.browserWindow.upsertNote({
             note_id: note.id,
             title: note.title,
             content: note.content,
         });
-        debouncedRunSync();
+        if (notesSyncTimer) clearTimeout(notesSyncTimer);
+        notesSyncTimer = setTimeout(() => {
+            notesSyncTimer = null;
+            runPushSync();
+        }, 15_000);
     }
 
     watch(
         () => notes.value,
-        (newNotes, oldNotes) => {
+        (newNotes) => {
             if (isHydrating.value) return;
-            // Find notes that actually changed content or title
+            // Find notes that actually changed relative to last saved snapshot.
             const changed = newNotes.filter((note) => {
-                const old = oldNotes?.find((n) => n.id === note.id);
-                return !old || old.title !== note.title || old.content !== note.content;
+                const snap = savedSnapshot.get(note.id);
+                return !snap || snap.title !== note.title || snap.content !== note.content;
             });
             if (!changed.length) return;
             clearTimeout(window.takingNoteTimeOut);
