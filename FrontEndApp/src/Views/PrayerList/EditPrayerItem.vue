@@ -72,7 +72,7 @@ defineExpose({ modalTrigger });
                     <label class="text-12px font-600 opacity-70">Content</label>
                     <Editor
                         v-model="prayerItemContent"
-                        :button-actions="['bold', 'italic', 'underline', 'strike', 'clearFormat']"
+                        :button-actions="['bold', 'italic', 'underline', 'strike', 'bulletList', 'orderedList', 'clearFormat']"
                     />
                 </div>
             </div>
