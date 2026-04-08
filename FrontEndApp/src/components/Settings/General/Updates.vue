@@ -2,9 +2,11 @@
 import { NButton, NTag, NProgress } from 'naive-ui';
 import { ref, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
+import { useThemeStore } from '../../../store/theme';
 
 type Status = 'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'up-to-date' | 'error';
 
+const themeStore = useThemeStore();
 const status = ref<Status>('idle');
 const errorMsg = ref('');
 const downloadPercent = ref(0);
@@ -81,6 +83,7 @@ function installUpdate() {
                 v-if="status === 'ready'"
                 size="small"
                 type="warning"
+                :style="themeStore.isDark ? 'color: #1a1a1a;' : ''"
                 @click="installUpdate"
             >
                 <template #icon><Icon icon="mdi:restart" /></template>

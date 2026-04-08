@@ -11,9 +11,11 @@ import useNoteStore from '../../store/useNoteStore';
 import { useSettingStore } from '../../store/settingStore';
 import { useTTSStore } from '../../store/ttsStore';
 import { usePiperTTSStore } from '../../store/piperTTSStore';
+import { useThemeStore } from '../../store/theme';
 import TTSFooterPlayer from '../TTS/TTSFooterPlayer.vue';
 
 const noteStore = useNoteStore();
+const themeStore = useThemeStore();
 const bibleStore = useBibleStore();
 const ttsStore = useTTSStore();
 const piperStore = usePiperTTSStore();
@@ -129,7 +131,7 @@ function installUpdate() {
 
             <!-- Ready to install -->
             <template v-else-if="updateStatus === 'ready'">
-                <NButton size="tiny" type="warning" @click="installUpdate">
+                <NButton size="tiny" type="warning" :style="themeStore.isDark ? 'color: #1a1a1a;' : ''" @click="installUpdate">
                     Install &amp; Restart
                 </NButton>
             </template>
