@@ -67,5 +67,9 @@
         "vuedraggable",
         "vueuse",
         "wordtype"
-    ]
+    ],
+    "chat.tools.terminal.autoApprove": {
+        "Add-Type": true,
+        "ForEach-Object": true
+    }
 }
