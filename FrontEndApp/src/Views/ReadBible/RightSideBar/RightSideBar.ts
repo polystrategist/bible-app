@@ -1,9 +1,7 @@
 import {
-    NotebookSubsection24Filled,
     Bookmark24Filled,
     Highlight24Filled,
     Attach24Filled,
-    NotebookSubsection24Regular,
     Bookmark24Regular,
     Highlight24Regular,
     Attach24Regular,
@@ -20,12 +18,6 @@ type RightSideBarMenu = {
 };
 
 export const rightSideBarMenus: RightSideBarMenu[] = [
-    {
-        title: 'Bible Versions',
-        key: 'bible-lists',
-        icon: NotebookSubsection24Regular,
-        iconDark: NotebookSubsection24Filled,
-    },
     {
         title: 'Bookmarks',
         key: 'bible-bookmarks',

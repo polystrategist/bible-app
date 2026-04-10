@@ -3,227 +3,276 @@
         "title": "King James Version",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV&b=mybible&c",
         "version_short_name_and_date": "KJV1611",
-        "description": "Classic public domain English Bible",
-        "file_name": "king_james_version.sqlite3",
+        "year": 1611,
+        "description": "Commissioned by King James I and first published in 1611, produced by 47 scholars from the Church of England. A word-for-word translation from the Textus Receptus and Masoretic Text, and one of the most influential English translations in history.",
+        "file_name": "king_james_version.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "King James Version (1769 Edition)",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=KJV1769&b=mybible&c",
         "version_short_name_and_date": "KJV1769",
-        "description": "Standardized revision of the King James Version",
-        "file_name": "king_james_version_1769.sqlite3",
+        "year": 1769,
+        "description": "The 1769 Oxford edition edited by Benjamin Blayney, modernizing spelling, correcting errors, and updating punctuation. This is the version most commonly printed and read today when people refer to the King James Version.",
+        "file_name": "king_james_version_1769.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "American Standard Version",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ASV&b=mybible&c",
         "version_short_name_and_date": "ASV1901",
-        "description": "Literal public domain translation",
-        "file_name": "american_standard_version.sqlite3",
+        "year": 1901,
+        "description": "Published in 1901 as the American revision of the English Revised Version, known for its rigorous word-for-word literal accuracy. It uses 'Jehovah' instead of 'LORD' for the divine name and was widely regarded as one of the most literal English translations of its era.",
+        "file_name": "american_standard_version.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Douay-Rheims Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DRB&b=mybible&c",
         "version_short_name_and_date": "DRB1752",
-        "description": "Catholic public domain Bible",
-        "file_name": "douay_rheims_bible.sqlite3",
+        "year": 1752,
+        "description": "Originally translated by Catholic scholars at Douai and Rheims (NT 1582, OT 1609), the 1752 edition is Bishop Challoner's extensively revised version. A word-for-word translation from the Latin Vulgate that served as the standard English Bible for Roman Catholics for over two centuries.",
+        "file_name": "douay_rheims_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Darby Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=DBY&b=mybible&c",
         "version_short_name_and_date": "DBY1890",
-        "description": "Literal translation by John Nelson Darby",
-        "file_name": "darby_bible.sqlite3",
+        "year": 1890,
+        "description": "Translated by John Nelson Darby, a founder of the Plymouth Brethren movement, published in its final revised edition in 1890. An extremely literal word-for-word translation known for its precise rendering of Greek and Hebrew verb tenses.",
+        "file_name": "darby_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Young's Literal Translation",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=YLT&b=mybible&c",
         "version_short_name_and_date": "YLT1898",
-        "description": "Highly literal public domain translation",
-        "file_name": "youngs_literal_translation.sqlite3",
+        "year": 1898,
+        "description": "Translated by Robert Young, a Scottish publisher and biblical scholar, with its third and final edition published in 1898. One of the most strictly literal English translations ever produced, preserving Hebrew and Greek verb tenses with extreme precision.",
+        "file_name": "youngs_literal_translation.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Geneva Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=GNV&b=mybible&c",
         "version_short_name_and_date": "GNV1560",
-        "description": "Early English Protestant Bible",
-        "file_name": "geneva_bible.sqlite3",
+        "year": 1560,
+        "description": "Produced by English Protestant exiles in Geneva and first published in 1560, it was the first English Bible to use verse numbering throughout and included extensive Calvinist study notes. The most popular English Bible before the KJV, used by Shakespeare and the Pilgrims.",
+        "file_name": "geneva_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Bishop's Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=BB&b=mybible&c",
         "version_short_name_and_date": "BB1568",
-        "description": "Predecessor to the King James Version",
-        "file_name": "bishops_bible.sqlite3",
+        "year": 1568,
+        "description": "Commissioned by the Church of England under Archbishop Matthew Parker in 1568, intended to replace the Geneva Bible as the authorized church version. It served as the primary basis for the King James Version of 1611.",
+        "file_name": "bishops_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Tyndale Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=TRC&b=mybible&c",
         "version_short_name_and_date": "TYN1530",
-        "description": "Early English translation by William Tyndale",
-        "file_name": "tyndale_bible.sqlite3",
+        "year": 1530,
+        "description": "The first English Bible translated directly from Hebrew and Greek sources, produced by William Tyndale around 1530. A pioneering literal translation that profoundly influenced nearly every subsequent English Bible, including the King James Version.",
+        "file_name": "tyndale_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Coverdale Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=CVB&b=mybible&c",
         "version_short_name_and_date": "CVB1535",
-        "description": "First complete printed English Bible",
-        "file_name": "coverdale_bible.sqlite3",
+        "year": 1535,
+        "description": "The first complete printed English Bible, translated by Miles Coverdale in 1535 from Latin and German sources including Tyndale's and Luther's work. It introduced the arrangement of grouping the Apocrypha as a separate section between the Old and New Testaments.",
+        "file_name": "coverdale_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "World English Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEB&b=mybible&c",
         "version_short_name_and_date": "WEB2020",
-        "description": "Modern public domain English Bible",
-        "file_name": "world_english_bible.sqlite3",
+        "year": 2020,
+        "description": "A modern public-domain translation based on the ASV (1901), updated into contemporary English by volunteers led by Michael Paul Johnson. A literal translation and one of the few modern translations freely available without copyright restrictions.",
+        "file_name": "world_english_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "World English Bible (British Edition)",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WEBBE&b=mybible&c",
         "version_short_name_and_date": "WEBBE2020",
-        "description": "British spelling edition of WEB",
-        "file_name": "world_english_bible_british.sqlite3",
+        "year": 2020,
+        "description": "A variant of the World English Bible adapted to use British English spelling and vocabulary conventions. It retains the same literal translation philosophy and public-domain status as the standard WEB.",
+        "file_name": "world_english_bible_british.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "New Heart English Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=NHEB&b=mybible&c",
         "version_short_name_and_date": "NHEB2021",
-        "description": "Modern public domain update of WEB",
-        "file_name": "new_heart_english_bible.sqlite3",
+        "year": 2021,
+        "description": "A public-domain translation derived from the World English Bible, edited by Wayne A. Mitchell to remove archaic language and produce a clear, readable modern English text. Follows a modified literal approach and is freely available without copyright restrictions.",
+        "file_name": "new_heart_english_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Open English Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=OEB&b=mybible&c",
         "version_short_name_and_date": "OEB2010",
-        "description": "Open licensed modern English Bible",
-        "file_name": "open_english_bible.sqlite3",
+        "year": 2010,
+        "description": "A free, open-licensed modern English translation based on the Twentieth Century New Testament, developed collaboratively using open-source principles. It uses a thought-for-thought approach, prioritizing natural contemporary English readability.",
+        "file_name": "open_english_bible.SQLite3",
         "is_zipped": true,
         "license": "open",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Unlocked Literal Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=ULB&b=mybible&c",
         "version_short_name_and_date": "ULB2017",
-        "description": "Open translation by unfoldingWord",
-        "file_name": "unlocked_literal_bible.sqlite3",
+        "year": 2017,
+        "description": "A literal English translation published by unfoldingWord in 2017, designed as an open-licensed resource for missionaries and translators to freely use as a base text for translating the Bible into other languages.",
+        "file_name": "unlocked_literal_bible.SQLite3",
         "is_zipped": true,
         "license": "open_attribution_required",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Unlocked Dynamic Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=UDB&b=mybible&c",
         "version_short_name_and_date": "UDB2018",
-        "description": "Simplified open translation by unfoldingWord",
-        "file_name": "unlocked_dynamic_bible.sqlite3",
+        "year": 2018,
+        "description": "A thought-for-thought English translation published by unfoldingWord in 2018, intended as a companion to the ULB to help translators understand the meaning of the biblical text. Released under an open Creative Commons license.",
+        "file_name": "unlocked_dynamic_bible.SQLite3",
         "is_zipped": true,
         "license": "open_attribution_required",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "title": "Wycliffe Bible",
         "download_link": "https://www.ph4.org/_dl.php?back=bbl&a=WYC&b=mybible&c",
         "version_short_name_and_date": "WYC1395",
-        "description": "Middle English Bible translation",
-        "file_name": "wycliffe_bible.sqlite3",
+        "year": 1395,
+        "description": "One of the earliest English translations of the complete Bible, produced by John Wycliffe and his associates around 1382-1395, translated from the Latin Vulgate. A landmark in making Scripture accessible to English-speaking laity during the late medieval period, written in Middle English.",
+        "file_name": "wycliffe_bible.SQLite3",
         "is_zipped": true,
         "license": "public_domain",
         "language": "en",
-        "language_full": "english"
+        "language_full": "english",
+        "module_type": "MyBible"
     },
     {
         "file_name": "Bíblia de João Ferreira de Almeida - Edição de 1819.SQLite3",
         "language": "pt",
         "language_full": "portuguese",
         "title": "Bíblia de João Ferreira de Almeida - Edição de 1819",
-        "description": "Bíblia de João Ferreira de Almeida, Edição de 1819",
-        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Bíblia de João Ferreira de Almeida - Edição de 1819.SQLite3"
+        "version_short_name_and_date": "ALM1819",
+        "year": 1819,
+        "description": "An 1819 edition of the Portuguese Bible originally translated by João Ferreira de Almeida, a 17th-century Protestant minister who produced the first complete Portuguese translation from the original languages. One of the most widely used Portuguese Bibles, following a word-for-word approach.",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Bíblia de João Ferreira de Almeida - Edição de 1819.SQLite3",
+        "module_type": "MyBible"
     },
     {
         "file_name": "Catholic Public Domain Version 2009.SQLite3",
         "language": "en",
         "language_full": "english",
         "title": "Catholic Public Domain Version 2009",
-        "description": "Catholic Public Domain Version, 2009",
-        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Catholic Public Domain Version 2009.SQLite3"
+        "version_short_name_and_date": "CPDV2009",
+        "year": 2009,
+        "description": "An English translation of the Bible from the Latin Vulgate published in 2009 by Ronald L. Conte Jr., produced from a Catholic perspective and including the deuterocanonical books. Released in the public domain, it aims for a literal yet readable rendering.",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Catholic Public Domain Version 2009.SQLite3",
+        "module_type": "MyBible"
     },
     {
         "file_name": "King James Bible 1611 Pure Cambridge Edition 1900.SQLite3",
         "language": "en",
         "language_full": "english",
         "title": "King James Bible 1611 Pure Cambridge Edition 1900",
-        "description": "King James Bible 1611 Pure Cambridge Edition 1900",
-        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Bible 1611 Pure Cambridge Edition 1900.SQLite3"
+        "version_short_name_and_date": "KJVPCE1900",
+        "year": 1900,
+        "description": "The Pure Cambridge Edition, finalized around 1900 by Cambridge University Press, representing centuries of careful corrections to the original 1611 KJV text. Widely regarded by KJV purists as the most accurate and consistent printed form of the Authorized Version.",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Bible 1611 Pure Cambridge Edition 1900.SQLite3",
+        "module_type": "MyBible"
     },
     {
         "file_name": "King James Version - 1769.SQLite3",
         "language": "en",
         "language_full": "english",
         "title": "King James Version - 1769",
-        "description": "King James Version - 1769",
-        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version - 1769.SQLite3"
+        "version_short_name_and_date": "KJV1769",
+        "year": 1769,
+        "description": "The 1769 revision edited by Benjamin Blayney at Oxford, which modernized spelling and punctuation of the original 1611 text. This revision is effectively the standard KJV text in common use today, based on the Textus Receptus and Masoretic Text.",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version - 1769.SQLite3",
+        "module_type": "MyBible"
     },
     {
         "file_name": "King James Version of 1611 or 1769.SQLite3",
         "language": "en",
         "language_full": "english",
         "title": "King James Version of 1611 or 1769",
-        "description": "King James Version of 1611 or 1769",
-        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version of 1611 or 1769.SQLite3"
+        "version_short_name_and_date": "KJV1611",
+        "year": 1611,
+        "description": "The Authorized Version commissioned by King James I, first published in 1611 by 47 scholars, with the 1769 Oxford revision by Benjamin Blayney being the form most widely circulated today. A word-for-word translation from the Textus Receptus and Masoretic Text, renowned for its literary influence.",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version of 1611 or 1769.SQLite3",
+        "module_type": "MyBible"
     }
 ]

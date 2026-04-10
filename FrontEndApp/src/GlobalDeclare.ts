@@ -26,6 +26,7 @@ declare global {
             getAppScale: () => Promise<number>;
             setAppScale: (scale: number) => Promise<number>;
             getAvailableBibles: () => Promise<Array<any>>;
+            deleteBible: (fileName: string) => Promise<{ success: boolean; error?: string }>;
             getVerses: (args: string) => Promise<Array<any>>;
             getVersesCount: (args: string) => Promise<number>;
             getChapterHighlights: (args: string) => Promise<Array<any>>;

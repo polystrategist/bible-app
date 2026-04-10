@@ -7,6 +7,6 @@ const mainStore = useMainStore();
 </script>
 <template>
     <NModal v-model:show="mainStore.showSettings" class="my-30px">
-        <Settings class="max-w-500px" />
+        <Settings class="max-w-650px" />
     </NModal>
 </template>

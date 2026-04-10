@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('browserWindow', {
     setAppScale: (scale: number) => ipcRenderer.invoke('setAppScale', scale),
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
+    deleteBible: (fileName: string) => ipcRenderer.invoke('deleteBible', fileName),
     getVerses: (args: string) => ipcRenderer.invoke('getVerses', JSON.parse(args)),
     getVersesCount: (args: string) => ipcRenderer.invoke('getVersesCount', JSON.parse(args)),
     searchBible: (args: string) => ipcRenderer.invoke('searchBible', JSON.parse(args)),

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { NCard, NIcon, NTabs, NTabPane } from 'naive-ui';
-import { Settings, SettingsAdjust, DataBin } from '@vicons/carbon';
+import { Settings, SettingsAdjust, DataBin, Book } from '@vicons/carbon';
 import LanguageSetting from './Language/Language.vue';
 import PrimaryColor from './PrimaryColor/PrimaryColor.vue';
 import Theme from './Theme/Theme.vue';
@@ -10,6 +10,7 @@ import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
 import Scale from './Scale/Scale.vue';
 import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
 import Updates from './General/Updates.vue';
+import BibleSetting from './Bible/BibleSetting.vue';
 import { Icon } from '@iconify/vue';
 import { useMainStore } from '../../store/main';
 import { computed } from 'vue';
@@ -43,6 +44,17 @@ const name = computed({
                         <Deuterocanonical />
                         <Updates />
                     </div>
+                </NTabPane>
+                <NTabPane class="h-full overflow-y-auto overflowing-div" name="Bible">
+                    <template #tab>
+                        <span class="flex items-center gap-1">
+                            <NIcon>
+                                <Book />
+                            </NIcon>
+                            {{ $t('Bible') }}
+                        </span>
+                    </template>
+                    <BibleSetting />
                 </NTabPane>
                 <NTabPane class="flex flex-col gap-30px" name="Tab">
                     <template #tab>

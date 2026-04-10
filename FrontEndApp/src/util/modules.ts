@@ -7,6 +7,7 @@ export type MODULE_BIBLE_TYPE = {
     language_full?: string;
     title: string;
     description: string;
+    version_short_name_and_date?: string;
     download_link: string;
     is_zipped?: boolean | undefined | null;
 };

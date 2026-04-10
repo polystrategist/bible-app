@@ -2,7 +2,6 @@
 import { NButton, NIcon, NTooltip, useMessage } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 import { rightSideBarBottomMenu, rightSideBarMenus } from './RightSideBar';
-import BibleList from './Bibles/Bibles.vue';
 import Bookmarks from './Bookmarks/Bookmarks.vue';
 import Highlights from './Highlights/Highlights.vue';
 import SESSION from '../../../util/session';
@@ -14,7 +13,7 @@ import BottomContents from './BottomContents/BottomContents.vue';
 
 const themeStore = useThemeStore();
 const SavedRightSideBar = 'saved-right-side-bar-menu-key';
-const selectedButton = ref<string>('bible-search');
+const selectedButton = ref<string>('bible-bookmarks');
 const rightSideStore = useRightSideStore();
 
 function selectRightSideBarMenu(key: string) {
@@ -35,7 +34,7 @@ function selectRightSideBarBottomMenu(key: string) {
 
 onBeforeMount(() => {
     const saveMenuKey = SESSION.get(SavedRightSideBar);
-    if (saveMenuKey) selectedButton.value = saveMenuKey;
+    if (saveMenuKey && saveMenuKey !== 'bible-lists') selectedButton.value = saveMenuKey;
     else selectRightSideBarMenu('bible-bookmarks');
 
     window.message = useMessage();
@@ -59,7 +58,6 @@ onBeforeMount(() => {
                 "
             >
                 <div class="h-full p-2 read-bible-right-content">
-                    <BibleList v-show="selectedButton == 'bible-lists'" />
                     <Bookmarks v-show="selectedButton == 'bible-bookmarks'" />
                     <Highlights v-show="selectedButton == 'bible-highlights'" />
                     <ClipNotes v-show="selectedButton == 'bible-clip-notes'" />
