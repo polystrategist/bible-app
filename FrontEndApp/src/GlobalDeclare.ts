@@ -155,9 +155,21 @@ declare global {
             piperOnModelProgress: (cb: (data: { voiceId: string; percent: number }) => void) => void;
 
             // Updates
-            checkForUpdates: () => Promise<{ success: boolean; updateAvailable?: boolean; error?: string }>;
+            getUpdateConfig: () => Promise<{
+                provider: 'electron-updater' | 'microsoft-store' | 'unavailable';
+                canCheckForUpdates: boolean;
+                message: string;
+            }>;
+            checkForUpdates: () => Promise<{
+                success: boolean;
+                updateAvailable?: boolean;
+                error?: string;
+                provider?: 'electron-updater' | 'microsoft-store' | 'unavailable';
+                message?: string;
+            }>;
             installUpdate: () => Promise<void>;
             downloadUpdate: () => Promise<void>;
+            openStoreUpdates: () => Promise<{ success: boolean; error?: string }>;
             onUpdateAvailable: (cb: (version: string) => void) => void;
             onUpdateProgress: (cb: (percent: number) => void) => void;
             onUpdateDownloaded: (cb: () => void) => void;

@@ -1,39 +1,106 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import Log from 'electron-log';
 import { saveWindowState } from './util/window';
 
 let errorAlreadyShown = false;
+
+type UpdateProvider = 'electron-updater' | 'microsoft-store' | 'unavailable';
+
+type UpdateConfig = {
+    provider: UpdateProvider;
+    canCheckForUpdates: boolean;
+    message: string;
+};
+
+const registerHandler = <T extends Parameters<typeof ipcMain.handle>[1]>(channel: string, handler: T) => {
+    ipcMain.removeHandler(channel);
+    ipcMain.handle(channel, handler);
+};
+
+const getUpdateProvider = (): UpdateProvider => {
+    if (!app.isPackaged) {
+        return 'unavailable';
+    }
+
+    if (process.windowsStore) {
+        return 'microsoft-store';
+    }
+
+    if (process.platform === 'linux' && !process.env.APPIMAGE) {
+        return 'unavailable';
+    }
+
+    return 'electron-updater';
+};
+
+const getUpdateConfig = (): UpdateConfig => {
+    const provider = getUpdateProvider();
+
+    if (provider === 'microsoft-store') {
+        return {
+            provider,
+            canCheckForUpdates: false,
+            message: 'This installation is managed by Microsoft Store. Publish a new Store submission with a higher version, then users receive the update through Store.',
+        };
+    }
+
+    if (provider === 'unavailable') {
+        return {
+            provider,
+            canCheckForUpdates: false,
+            message: 'Automatic update checks are only available in packaged desktop builds.',
+        };
+    }
+
+    return {
+        provider,
+        canCheckForUpdates: true,
+        message: 'Check for updates from the configured release feed.',
+    };
+};
+
 export default (mainWindow: BrowserWindow) => {
-    if (app.isPackaged) {
+    const updateConfig = getUpdateConfig();
+
+    registerHandler('get-update-config', async () => updateConfig);
+    registerHandler('open-store-updates', async () => {
+        if (getUpdateProvider() !== 'microsoft-store') {
+            return { success: false, error: 'Microsoft Store updates are only available for Store installations.' };
+        }
+
+        await shell.openExternal('ms-windows-store://downloadsandupdates');
+        return { success: true };
+    });
+
+    if (updateConfig.provider === 'electron-updater') {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
 
-        ipcMain.handle('install-update', () => {
+        registerHandler('install-update', () => {
             saveWindowState();
             autoUpdater.quitAndInstall(process.platform === 'win32', true);
         });
 
-        ipcMain.handle('download-update', () => {
+        registerHandler('download-update', () => {
             autoUpdater.downloadUpdate();
         });
 
-        ipcMain.handle('check-for-updates', async () => {
+        registerHandler('check-for-updates', async () => {
             try {
                 const result = await autoUpdater.checkForUpdates();
                 const latestVersion = result?.updateInfo?.version;
                 const currentVersion = app.getVersion();
                 const updateAvailable = !!latestVersion && latestVersion !== currentVersion;
-                return { success: true, updateAvailable };
+                return { success: true, updateAvailable, provider: updateConfig.provider };
             } catch (err: any) {
-                return { success: false, error: err?.message ?? 'Failed to check for updates' };
+                return {
+                    success: false,
+                    error: err?.message ?? 'Failed to check for updates',
+                    provider: updateConfig.provider,
+                };
             }
         });
-
-        if (process.platform === 'linux' && !process.env.APPIMAGE) {
-            Log.warn('APPIMAGE env var not set — auto-update skipped (not running as AppImage, or AppImageLauncher did not pass the env var)');
-            return;
-        }
 
         autoUpdater.checkForUpdates();
 
@@ -50,11 +117,17 @@ export default (mainWindow: BrowserWindow) => {
             mainWindow.webContents.send('update-downloaded');
         });
     } else {
-        ipcMain.handle('check-for-updates', async () => {
-            return { success: false, error: 'Updates are only available in packaged builds.' };
+        registerHandler('check-for-updates', async () => {
+            return {
+                success: updateConfig.provider === 'microsoft-store',
+                updateAvailable: false,
+                error: updateConfig.provider === 'microsoft-store' ? undefined : updateConfig.message,
+                provider: updateConfig.provider,
+                message: updateConfig.message,
+            };
         });
-        ipcMain.handle('install-update', async () => {});
-        ipcMain.handle('download-update', async () => {});
+        registerHandler('install-update', async () => {});
+        registerHandler('download-update', async () => {});
     }
 
     autoUpdater.on('error', (error) => {

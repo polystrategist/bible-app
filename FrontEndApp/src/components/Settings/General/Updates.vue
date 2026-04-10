@@ -5,13 +5,24 @@ import { Icon } from '@iconify/vue';
 import { useThemeStore } from '../../../store/theme';
 
 type Status = 'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'up-to-date' | 'error';
+type UpdateProvider = 'electron-updater' | 'microsoft-store' | 'unavailable';
 
 const themeStore = useThemeStore();
 const status = ref<Status>('idle');
 const errorMsg = ref('');
 const downloadPercent = ref(0);
+const updateProvider = ref<UpdateProvider>('unavailable');
+const providerMessage = ref('');
 
-onMounted(() => {
+onMounted(async () => {
+    const updateConfig = await window.browserWindow.getUpdateConfig();
+    updateProvider.value = updateConfig.provider;
+    providerMessage.value = updateConfig.message;
+
+    if (updateConfig.provider !== 'electron-updater') {
+        return;
+    }
+
     window.browserWindow.onUpdateAvailable(() => {
         status.value = 'downloading';
         downloadPercent.value = 0;
@@ -52,12 +63,30 @@ function downloadUpdate() {
 function installUpdate() {
     window.browserWindow.installUpdate();
 }
+
+function openStoreUpdates() {
+    window.browserWindow.openStoreUpdates();
+}
 </script>
 
 <template>
     <div class="flex flex-col gap-2">
         <div class="text-sm font-600">Updates</div>
-        <div class="flex items-center gap-3 flex-wrap">
+        <div
+            v-if="updateProvider === 'microsoft-store'"
+            class="flex items-center gap-3 flex-wrap"
+        >
+            <NButton size="small" secondary @click="openStoreUpdates">
+                <template #icon><Icon icon="mdi:microsoft-windows" /></template>
+                Open Microsoft Store
+            </NButton>
+            <NTag type="info" size="small">Managed by Microsoft Store</NTag>
+        </div>
+
+        <div
+            v-else-if="updateProvider === 'electron-updater'"
+            class="flex items-center gap-3 flex-wrap"
+        >
             <NButton
                 size="small"
                 secondary
@@ -96,7 +125,11 @@ function installUpdate() {
             <span v-else-if="status === 'error'" class="text-xs text-red-400">{{ errorMsg }}</span>
         </div>
 
-        <div v-if="status === 'downloading'" class="flex flex-col gap-1 mt-1">
+        <div v-else class="flex items-center gap-3 flex-wrap">
+            <NTag type="default" size="small">Updates unavailable here</NTag>
+        </div>
+
+        <div v-if="status === 'downloading' && updateProvider === 'electron-updater'" class="flex flex-col gap-1 mt-1">
             <span class="text-xs opacity-60">Downloading update... {{ downloadPercent }}%</span>
             <NProgress
                 type="line"
@@ -105,6 +138,10 @@ function installUpdate() {
                 :border-radius="3"
                 :show-indicator="false"
             />
+        </div>
+
+        <div v-if="updateProvider !== 'electron-updater'" class="text-xs opacity-70 leading-5">
+            {{ providerMessage }}
         </div>
     </div>
 </template>
