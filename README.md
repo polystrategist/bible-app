@@ -1,139 +1,159 @@
-## 🛡️ Believers Sword (Official)
+# Believers Sword
 
 <div align="center">
 
-**A Beautiful, Powerful Bible Study Companion for Modern Believers**
+**A Bible study companion for reading, prayer, notes, highlights, and deeper daily devotion.**
 
-[![Version](https://img.shields.io/badge/version-0.10.1-blue.svg)]()
-[![Electron](https://img.shields.io/badge/Electron-28.2.3-4C4C4C.svg)]()
-[![Vue 3](https://img.shields.io/badge/Vue-3.4.38-42B883.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.1.8-2563eb.svg)](https://github.com/JenuelDev/Believers-Sword/releases/latest)
+[![Electron](https://img.shields.io/badge/Electron-41.0.3-47848F.svg)](https://www.electronjs.org/)
+[![Vue 3](https://img.shields.io/badge/Vue-3-42B883.svg)](https://vuejs.org/)
+[![License](https://img.shields.io/badge/license-GPL--3.0-16a34a.svg)](./LICENSE)
+
+<br />
+<br />
+
 
 </div>
 
-> *"Your word is a lamp to my feet and a light to my path."*  
-> — Psalm 119:105
-
----
-
-Believers Sword is more than just a Bible reading app—it's a **digital sanctuary** designed to help you engage deeply with God's Word. With a beautiful, modern interface and powerful study tools, this app is my way of dedicating time to the Lord and sharing that blessing with others.
+> "Your word is a lamp to my feet and a light to my path."
+>
+> Psalm 119:105
 
 <div align="center">
-  
-![App Screenshot](https://images.unsplash.com/photo-1543512214-318c77a075ea?w=800&h=400&fit=crop)
-
+  <img src="./design-assets/App%20for%20daily%20spiritual%20growth.png" alt="Believers Sword hero artwork" width="900" />
 </div>
 
-### ✨ Why Believers Sword?
+## Overview
 
-- 🎨 **Stunning Design** - Warm, modern interface with Space Grotesk + Sora typography
-- 📖 **Complete Bible Tools** - Read, study, highlight, and take notes in one place
-- 🚀 **Fast & Lightweight** - Built with Electron for desktop performance
-- 🔒 **Offline First** - Your Bible study works anywhere, anytime
-- 🎯 **Focus on Faith** - Designed by believers, for believers
+Believers Sword is a desktop Bible app built to help believers stay close to Scripture throughout the day. It combines Bible reading, study tools, notes, highlights, prayer tracking, sermons, and offline-friendly access in one focused experience.
 
-### 🎯 Core Features
+## Downloads
 
-| Feature | Description |
-|---------|-------------|
-| 📖 **Read Bible** | Access multiple Bible translations with a clean, distraction-free reading experience |
-| 📝 **Take Notes** | Write personal reflections alongside verses with our rich-text editor |
-| 🎨 **Highlight & Color** | Mark important verses with 12+ color options for quick reference |
-| 🔖 **Bookmarks** | Save your favorite verses for quick access later |
-| 📚 **Study Space** | Organize your notes, highlights, and research in one place |
-| 🎤 **Sermons** | Read or watch sermons from your library |
-| 🔍 **Search** | Find verses quickly across your Bible translations |
-| 🙏 **Prayer List** | Keep track of your prayer requests and answered prayers |
-| 🌓 **Dark Mode** | Study comfortably day or night with theme support |
-| 🎵 **Audio Bible** | **Listen to Scripture** |
-| 🔗 **Cross-References** | **Easy passage linking** |
+Desktop downloads are published through GitHub Releases. Microsoft Store installs are also available for Windows users.
 
-### 🚧 Coming Soon
+- Windows installer: `NSIS` setup package
+- Windows Portable: no-install portable executable
+- macOS: `DMG`
+- Linux: `AppImage`
+- Microsoft Store: Store-managed Windows installation and updates
 
-We're working on exciting new features to enhance your Bible study experience:
-- 🔄 **Revamped Sermons Page** - Modern, user-friendly interface
-- 📢 **User-Generated Content** - Share sermons and study notes
-- 🤖 **AI Insights** | **Ask questions about your Bible**
-- 📅 **Daily Devotionals** | **Spiritual guidance each morning**
-- 🎮 **Bible Games** | **Test your knowledge with quizzes**
+If a direct asset link changes on a future release, use the latest releases page:
 
-### 💻 System Requirements
+- https://github.com/JenuelDev/Believers-Sword/releases/latest
 
-- Windows 10/11 (64-bit)
-- 2GB RAM (4GB recommended)
-- 500MB free disk space
+## Features
 
-### 🚀 Getting Started
+- Read multiple Bible translations in a focused reader
+- Highlight verses and organize them by color
+- Create notes and clip notes while studying
+- Save bookmarks for quick return
+- Manage prayer lists and answered prayers
+- Use Study Space to keep research organized
+- Search verses quickly across installed modules
+- Listen with audio and TTS features
+- Explore commentary and verse comparison tools
+- Work offline with local resources
 
-#### Prerequisites
+## Screenshots
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [Yarn](https://yarnpkg.com/) (v1 or v2+)
+### Desktop
 
-#### Installation
+<div align="center">
+  <img src="./design-assets/screenshots/desktop/desktop-hero-01.png" alt="Believers Sword desktop hero screenshot" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-preview-01.png" alt="Believers Sword desktop preview screenshot 1" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-preview-02.png" alt="Believers Sword desktop preview screenshot 2" width="300" />
+</div>
+
+<div align="center">
+  <img src="./design-assets/screenshots/desktop/desktop-01.png" alt="Believers Sword desktop screenshot 1" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-02.png" alt="Believers Sword desktop screenshot 2" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-03.png" alt="Believers Sword desktop screenshot 3" width="300" />
+</div>
+
+<div align="center">
+  <img src="./design-assets/screenshots/desktop/desktop-04.png" alt="Believers Sword desktop screenshot 4" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-05.png" alt="Believers Sword desktop screenshot 5" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-06.png" alt="Believers Sword desktop screenshot 6" width="300" />
+</div>
+
+<div align="center">
+  <img src="./design-assets/screenshots/desktop/desktop-07.png" alt="Believers Sword desktop screenshot 7" width="300" />
+</div>
+
+### Mobile
+
+<div align="center">
+  <img src="./design-assets/screenshots/mobile/mobile-preview-01.jpg" alt="Believers Sword mobile preview screenshot 1" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-preview-02.jpg" alt="Believers Sword mobile preview screenshot 2" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-01.jpg" alt="Believers Sword mobile screenshot 1" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-02.jpg" alt="Believers Sword mobile screenshot 2" width="220" />
+</div>
+
+<div align="center">
+  <img src="./design-assets/screenshots/mobile/mobile-03.jpg" alt="Believers Sword mobile screenshot 3" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-04.jpg" alt="Believers Sword mobile screenshot 4" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-05.jpg" alt="Believers Sword mobile screenshot 5" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-06.jpg" alt="Believers Sword mobile screenshot 6" width="220" />
+</div>
+
+## System Requirements
+
+- Windows 10 or newer
+- macOS build support when release assets are published
+- Linux support through `AppImage`
+- 2 GB RAM minimum
+- Around 500 MB of free storage recommended
+
+## Development
+
+### Prerequisites
+
+- Node.js
+- Yarn
+
+### Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/Bible-Projects/believers-sword-next.git
-
-# Navigate to the project directory
-cd believers-sword-next
-
-# Install all dependencies
+git clone https://github.com/JenuelDev/Believers-Sword.git
+cd Believers-Sword
 yarn setup
 ```
 
-#### Development
+### Run locally
 
 ```bash
-# Start the app in development mode
 yarn start
 ```
 
-#### Build for Production
+### Build desktop packages
 
 ```bash
-# Build Windows installer
 yarn app:build
-
-# Build nightly version
-yarn app:build:nightly
 ```
 
-### 💖 Support the Mission
+### Build Microsoft Store package
 
-If this app blesses you, consider supporting the development:
+```bash
+yarn app:build:msix
+```
 
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/BroJenuel)
-[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-EA4AAA?logo=github-sponsors&logoColor=white)](https://github.com/sponsors/Bible-Projects)
+## Support
 
-### 🤝 Contributing
+If the app blesses you and you want to support development:
 
-We welcome contributions from the community! Check out our [Contributing Guide](https://github.com/Bible-Projects/believers-sword-next/wiki/Contributing) to get started.
+- Buy Me a Coffee: https://www.buymeacoffee.com/jenuel.dev
+- GitHub Sponsors: https://github.com/sponsors/Bible-Projects
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Contributing
 
-### 📜 License
+Contributions are welcome.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. Fork the repository.
+2. Create a branch for your change.
+3. Commit your work.
+4. Push the branch.
+5. Open a pull request.
 
-### 🙏 Acknowledgments
+## License
 
-- To the Lord Almighty for wisdom and guidance
-- The open-source community for inspiration and tools
-- Every user who provides feedback to make this app better
-
----
-
-<div align="center">
-  
-**"Study to show yourself approved unto God..."**  
-— 2 Timothy 2:15
-
-⭐ Star this repository if you find it helpful!
-
-</div>
+This project is licensed under the GPL-3.0 license. See [LICENSE](./LICENSE).
