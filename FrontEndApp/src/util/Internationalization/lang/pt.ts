@@ -190,6 +190,14 @@ const message: InternationalMessageType = {
     "added": "adicionado",
     "add": "adicionar",
     "bible": "biblia",
+    "Bible": "Bíblia",
     "bible version": "versão da biblia",
+    "Toggle left sidebar": "Alternar barra lateral esquerda",
+    "Toggle right sidebar": "Alternar barra lateral direita",
+    "Toggle notes panel": "Alternar painel de notas",
+    "Added": "Adicionado",
+    "Download": "Baixar",
+    "Import": "Importar",
+    "Search versions...": "Pesquisar versões...",
 };
 export default message;

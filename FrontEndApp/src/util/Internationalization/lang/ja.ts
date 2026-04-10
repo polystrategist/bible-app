@@ -190,7 +190,15 @@ const message: InternationalMessageType = {
     "added": "追加",
     "add": "追加",    
     "bible": "聖書",
-    "bible version": "聖書ベーション",    
+    "Bible": "聖書",
+    "bible version": "聖書ベーション",
+    "Toggle left sidebar": "左サイドバーを切り替え",
+    "Toggle right sidebar": "右サイドバーを切り替え",
+    "Toggle notes panel": "ノートパネルを切り替え",
+    "Added": "追加済み",
+    "Download": "ダウンロード",
+    "Import": "インポート",
+    "Search versions...": "バージョンを検索...",
 }
 
 export default message;

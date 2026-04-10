@@ -189,7 +189,15 @@ export interface InternationalMessageInterface {
     "added": string;
     "add": string;
     "bible": string;
+    "Bible": string;
     "bible version": string;
+    "Toggle left sidebar": string;
+    "Toggle right sidebar": string;
+    "Toggle notes panel": string;
+    "Added": string;
+    "Download": string;
+    "Import": string;
+    "Search versions...": string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
