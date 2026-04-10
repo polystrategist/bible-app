@@ -161,6 +161,35 @@ Vue Component → Pinia Store → window.ipcRenderer.invoke('channel', payload)
 - All DB access uses Knex.js helpers from `Electron/DataBase/DataBase.ts` (`StoreDB`, `DictionaryDB`, `setDB`)
 - DB tables are initialized at startup in `Electron/Setups/setup.ts`
 
+### Bible Module Management
+
+Bible modules are `.SQLite3` files stored at `{userData}/modules/bible/`. Each contains a `verses` table (book_number, chapter, verse, text) and a `books` table. Book numbering uses the MyBible 10-increment system (Genesis = 10, Exodus = 20, ..., Revelation = 730).
+
+**Module metadata** lives in `FrontEndApp/src/assets/json/MyBible.module.json` — an array of objects with `file_name`, `title`, `description`, `download_link`, `language_full`, `version_short_name_and_date`, `is_zipped`, etc. This JSON is the source of truth for the Download list and is also used to enrich installed module info (short name, language, description).
+
+**Download flow:**
+1. User picks a version in Settings > Bible > Download tab
+2. Frontend calls `window.browserWindow.downloadModule({ urls, percentage, done, cancel }, moduleData)` via preload bridge
+3. Electron handler in `Electron/IpcMainEvents/downloading/` downloads + unzips (if `is_zipped`) to `{userData}/modules/bible/`
+4. On completion, `moduleStore.getBibleLists()` refreshes the installed list
+
+**Import flow** (Settings > Bible > Import tab):
+1. User selects a source format: `ebible-sql` (ebible.org SQL dump) or `mybible-sqlite3` (MyBible .sqlite3 file)
+2. `window.browserWindow.importBibleSelectFile(source)` → native file dialog
+3. `window.browserWindow.importBibleValidate({ filePath, source })` → validates verse count
+4. `window.browserWindow.importBibleCheckDuplicate(title)` → checks for existing module with same title
+5. `window.browserWindow.importBible({ filePath, title, description, source })` → copies/converts file into `{userData}/modules/bible/`
+6. IPC handlers live in `Electron/IpcMainEvents/importing/importing.ts`
+
+**Delete flow** (Settings > Bible > Added tab):
+1. `window.browserWindow.deleteBible(fileName)` → IPC handler in `Electron/Modules/Bible/Common/DeleteBible.ts`
+2. Destroys cached knex DB connection, clears the Bible version cache, then `fs.unlinkSync()` the file
+3. Frontend removes the version from `bibleStore.selectedBibleVersions` and refreshes the module list
+
+**DB connection caching:** `Electron/Modules/Bible/Common/BibleVersionCache.ts` maintains a `Map<string, knex>` cache. `getBibleVersionDb(version)` returns a cached connection or creates one. `clearBibleVersionCache()` destroys all connections (called on app quit and before module deletion).
+
+**Adding a new module to the Download list:** Add an entry to `FrontEndApp/src/assets/json/MyBible.module.json` with at minimum `file_name`, `title`, `download_link`, and `description`. Set `is_zipped: true` if the download is a zip archive.
+
 ### Cloud Sync
 
 Sync runs via `/api/sync` (POST push) and `/api/sync/pull` (GET pull) against the Laravel backend.
