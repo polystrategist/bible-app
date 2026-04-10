@@ -12,7 +12,7 @@ const message: InternationalMessageType = {
     'Bible List': 'Lista de Bíblias',
     Bookmarks: 'Marcadores',
     Search: 'Pesquisar',
-    'Are You sure?': 'Você está certo?',
+    'Are You sure?': 'Você tem certeza?',
     Before: 'Anterior',
     Next: 'Próximo',
     'Bible Versions': 'Versões Bíblicas',
@@ -171,7 +171,7 @@ const message: InternationalMessageType = {
     Confirm: 'Confirmar',
     "Are You Sure You want to remove?": 'Tem certeza que deseja remover?',
     "Add to Bookmark": 'Adicionar ao marcador',
-    night: 'noite',
+    night: 'escuro',
     customize: 'personalizar',
     'Pick a style and color for you': 'Escolha um estilo e cor para você',
     color: 'cor do tema primário',
@@ -185,7 +185,7 @@ const message: InternationalMessageType = {
     'dictionary': 'dicionário',
     'references': 'referências',
     'answered': 'respondido',
-    "Believers\' Feed": "Feed dos Believers",
+    "Believers\' Feed": "Feed dos Fiéis",
     "Daily Devotional": "Devocional Diário",
     "added": "adicionado",
     "add": "adicionar",
@@ -199,5 +199,22 @@ const message: InternationalMessageType = {
     "Download": "Baixar",
     "Import": "Importar",
     "Search versions...": "Pesquisar versões...",
+    "Sign in to access your Believers Sword account. To sync your bookmarks, highlights, clip notes, and notes, download the Believers Sword mobile app and enable sync in it.": "Faça login para acessar sua conta Believers Sword. Para sincronizar seus favoritos, destaques, notas destacadas e anotações, baixe o aplicativo móvel Believers Sword e ative a sincronização nele."
+    "Sign In": "Fazer login"
+    "Email Address:": "Endereço de E-mail:"
+    "Email": "E-mail"
+    "Password:" "Senha:"
+    "Password": "Senha"
+    "Create Account": "Criar conta"
+    "Change Theme": "Mudar tema"
+    "About": "Sobre"
+    "Highlight Verse": "Destacar versículo"
+    "Verse Reader": "Leitor de versículo"
+    "Compare Verse": "Comparar versículo"
+    "Piper TTS - Click to change":
+    "Browser Text to Speech": 
+    "Read verse number": "Ler o número do versículo"
+    "Announce the verse number before reading each verse": "Anunciar o número do versículo antes de ler cada versículo"
+    "No Bible versions found.": "Nenhuma versão da Bíblia foi encontrada"
 };
 export default message;
