@@ -141,8 +141,15 @@ yarn app:build:msix
 
 If the app blesses you and you want to support development:
 
-- Buy Me a Coffee: https://www.buymeacoffee.com/jenuel.dev
-- GitHub Sponsors: https://github.com/sponsors/Bible-Projects
+<div align="center">
+
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=☕&slug=jenuel.dev&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://buymeacoffee.com/jenuel.dev)
+
+</div>
+
+- One-time donation: https://buymeacoffee.com/jenuel.dev
+- Membership: https://buymeacoffee.com/jenuel.dev/membership
+- GitHub Sponsors: https://github.com/sponsors/JenuelDev
 
 ## Contributing
 
