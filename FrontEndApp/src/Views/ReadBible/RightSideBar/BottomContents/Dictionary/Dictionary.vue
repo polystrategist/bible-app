@@ -91,6 +91,7 @@ onMounted(() => {
             :clear-filter-after-select="false"
             @search="handleSearch"
             :on-clear="() => (definitions = [])"
+            to="body"
         >
             <!-- <template #prefix>
                 <NIcon>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NButton, NIcon, useMessage, NInput } from 'naive-ui';
+import { NButton, NIcon, useMessage, NInput, NSelect } from 'naive-ui';
 import { useVirtualList } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { useBibleDownloadStore } from '../../../store/downloadBible';
@@ -8,6 +8,36 @@ import { bible, type MODULE_BIBLE_TYPE } from '../../../util/modules';
 import { Download } from '@vicons/carbon';
 
 const searchBible = ref<string | null>(null);
+const selectedLanguage = ref<string | null>(null);
+const selectedModuleType = ref<string | null>(null);
+
+const moduleTypeOptions = computed(() => {
+    const types = new Set<string>();
+    for (const version of bible) {
+        if (version.title.includes('commentaries')) continue;
+        const type = version.module_type?.trim();
+        if (type) types.add(type);
+    }
+    const labels: Record<string, string> = {
+        'BelieversSword': 'Believers Sword',
+        'ebible': 'eBible.org',
+    };
+    return Array.from(types)
+        .sort((a, b) => a.localeCompare(b))
+        .map((type) => ({ label: labels[type] || type, value: type }));
+});
+
+const languageOptions = computed(() => {
+    const langs = new Set<string>();
+    for (const version of bible) {
+        if (version.title.includes('commentaries')) continue;
+        const lang = version.language_full?.trim();
+        if (lang) langs.add(lang);
+    }
+    return Array.from(langs)
+        .sort((a, b) => a.localeCompare(b))
+        .map((lang) => ({ label: lang.charAt(0).toUpperCase() + lang.slice(1), value: lang }));
+});
 
 function openExternal(url: string) {
     window.browserWindow.openExternal(url);
@@ -57,6 +87,8 @@ function matchesSearch(version: MODULE_BIBLE_TYPE, query: string) {
 
 const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
     const query = searchBible.value?.trim() ?? '';
+    const langFilter = selectedLanguage.value;
+    const typeFilter = selectedModuleType.value;
     const groupedVersions = new Map<string, MODULE_BIBLE_TYPE[]>();
 
     for (const version of bible) {
@@ -64,6 +96,9 @@ const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
         if (!matchesSearch(version, query)) continue;
 
         const language = version.language_full?.trim() || 'unknown';
+        if (langFilter && language !== langFilter) continue;
+        if (typeFilter && version.module_type !== typeFilter) continue;
+
         const versions = groupedVersions.get(language) ?? [];
         versions.push(version);
         groupedVersions.set(language, versions);
@@ -137,7 +172,7 @@ function clickDownload(downloadLink: string, version: any) {
     }, {
         title: version.title,
         description: version.description,
-        is_zipped: version.is_zipped,
+        is_zipped: !!version.is_zipped,
         file_name: version.file_name,
         module_type: version.module_type,
     });
@@ -145,8 +180,29 @@ function clickDownload(downloadLink: string, version: any) {
 </script>
 <template>
     <div>
-        <div class="mb-3">
-            <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable />
+        <div class="mb-3 flex gap-2">
+            <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable class="flex-1" />
+            <NSelect
+                v-model:value="selectedModuleType"
+                :options="moduleTypeOptions"
+                placeholder="All sources"
+                size="small"
+                clearable
+                to="body"
+                style="width: 160px"
+                :virtual-scroll="false"
+            />
+            <NSelect
+                v-model:value="selectedLanguage"
+                :options="languageOptions"
+                placeholder="All languages"
+                size="small"
+                clearable
+                filterable
+                to="body"
+                style="width: 180px"
+                :virtual-scroll="false"
+            />
         </div>
         <div
             v-if="flatItems.length"
