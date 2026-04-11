@@ -161,6 +161,26 @@ Contributions are welcome.
 4. Push the branch.
 5. Open a pull request.
 
+### PR Labels
+
+When opening a pull request, please add one of the following labels so your change is categorized correctly in the release notes:
+
+| Label | Use when |
+|---|---|
+| `feature` or `enhancement` | Adding new functionality |
+| `bug` or `fix` | Fixing a bug |
+| `improvement`, `refactor`, or `performance` | Improving existing code without adding features |
+| `documentation` or `docs` | Updating documentation only |
+
+**Examples:**
+
+- Adding a new "verse of the day" feature → label: `feature`
+- Fixing a crash when opening bookmarks → label: `bug`
+- Speeding up Bible module loading → label: `performance`
+- Updating the README → label: `docs`
+
+If no label is added, your PR will appear under "Other Changes" in the release notes.
+
 ## License
 
 This project is licensed under the GPL-3.0 license. See [LICENSE](./LICENSE).

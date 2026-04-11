@@ -64,3 +64,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VITE_API_BASE_URL: https://app.believersword.com
         run: ${{ matrix.build_script }} -p always
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish release with notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          echo "Publishing release for tag: $TAG"
+          gh release edit "$TAG" --draft=false --generate-notes
