@@ -46,8 +46,13 @@ function installStepLabel(step: string, percent: number): string {
             class="flex flex-col p-3 rounded-lg border cursor-pointer transition-colors"
             :class="
                 settings.verseReaderMode === option.value
-                    ? 'border-[var(--primary-color)] bg-[var(--primary-color)] bg-opacity-5'
+                    ? 'border-[var(--primary-color)]'
                     : 'border-gray-500 border-opacity-30 hover:border-opacity-60'
+            "
+            :style="
+                settings.verseReaderMode === option.value
+                    ? 'background-color: color-mix(in srgb, var(--primary-color) 10%, transparent)'
+                    : ''
             "
             @click="settings.verseReaderMode = option.value"
         >
@@ -152,8 +157,8 @@ function installStepLabel(step: string, percent: number): string {
     <!-- Read verse number toggle -->
     <div class="flex items-center justify-between p-3 rounded-lg border border-gray-500 border-opacity-30 mt-1">
         <div>
-            <div class="font-600 text-sm">Read verse number</div>
-            <div class="text-xs opacity-50 mt-0.5">Announce the verse number before reading each verse</div>
+            <div class="font-600 text-sm">{{ $t('Read verse number') }}</div>
+            <div class="text-xs opacity-50 mt-0.5">{{ $t('announce-verse-number-desc') }}</div>
         </div>
         <NSwitch v-model:value="settings.readVerseNumber" />
     </div>

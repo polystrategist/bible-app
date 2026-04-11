@@ -71,7 +71,7 @@ function openStoreUpdates() {
 
 <template>
     <div class="flex flex-col gap-2">
-        <div class="text-sm font-600">Updates</div>
+        <div class="text-sm font-600">{{ $t('Updates') }}</div>
         <div
             v-if="updateProvider === 'microsoft-store'"
             class="flex items-center gap-3 flex-wrap"
@@ -95,7 +95,7 @@ function openStoreUpdates() {
                 @click="checkForUpdates"
             >
                 <template #icon><Icon icon="mdi:refresh" /></template>
-                Check for Updates
+                {{ $t('Check for Updates') }}
             </NButton>
 
             <NButton
@@ -119,7 +119,7 @@ function openStoreUpdates() {
                 Install &amp; Restart
             </NButton>
 
-            <NTag v-if="status === 'up-to-date'" type="success" size="small">You're up to date</NTag>
+            <NTag v-if="status === 'up-to-date'" type="success" size="small">{{ $t('up-to-date') }}</NTag>
             <NTag v-else-if="status === 'available'" type="info" size="small">Update available</NTag>
             <NTag v-else-if="status === 'ready'" type="warning" size="small">Update ready to install</NTag>
             <span v-else-if="status === 'error'" class="text-xs text-red-400">{{ errorMsg }}</span>

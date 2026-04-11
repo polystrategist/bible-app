@@ -12,7 +12,7 @@ const settings = useSettingStore();
             <Icon class="text-size-16px" icon="fluent:save-sync-20-filled" />
             {{ $t('Deuterocanonical') }}
         </div>
-        <p class="text-xs opacity-50 my-1">Show or hide Deuterocanonical books (e.g. Tobit, Judith, Maccabees) in the Bible list.</p>
+        <p class="text-xs opacity-50 my-1">{{ $t('deuterocanonical-desc') }}</p>
         <div class="flex items-center">
             <NSwitch v-model:value="settings.showDeuterocanonical">
                 <template #checked> {{ $t('Yes') }}</template>

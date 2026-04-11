@@ -41,7 +41,7 @@ function close() {
             class="title-bar flex items-center justify-between px-3 select-none shrink-0"
             style="-webkit-app-region: drag;"
         >
-            <span class="text-xs font-semibold opacity-50 tracking-wide uppercase">Compare Verse</span>
+            <span class="text-xs font-semibold opacity-50 tracking-wide uppercase">{{ $t('Compare Verse') }}</span>
             <button
                 class="close-btn flex items-center justify-center rounded-full text-lg leading-none"
                 style="-webkit-app-region: no-drag;"
@@ -73,7 +73,7 @@ function close() {
                 class="flex flex-col items-center justify-center h-full opacity-40 text-sm gap-2"
             >
                 <span style="font-size: 2rem;">📖</span>
-                <span>No Bible versions found.</span>
+                <span>{{ $t('no-bible-versions-found') }}</span>
             </div>
 
             <!-- Version cards -->

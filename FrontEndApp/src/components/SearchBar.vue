@@ -176,7 +176,7 @@ const selectedBooksForSearchString = computed(() => {
                 "
             >
                 <NButton @click="showBookSelection = true" size="small" tertiary round
-                    >Select Book</NButton
+                    >{{ $t('Select Book') }}</NButton
                 >
                 {{ selectedBooksForSearchString }}
             </div>

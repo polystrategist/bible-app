@@ -67,7 +67,7 @@ function handleBelieversSwordInfoDialog() {
             </div>
             <div class="flex gap-8px pr-8">
                 <NInput v-model:value="sermonStore.search" :disabled="sermonStore.loading" class="!w-300px"
-                    placeholder="Search Using Text" size="small" @keydown.enter="sermonStore.getSermons(true)" />
+                    :placeholder="$t('Search Using Text')" size="small" @keydown.enter="sermonStore.getSermons(true)" />
                 <NButton :disabled="sermonStore.loading" :loading="sermonStore.loading" size="small"
                     @click="sermonStore.getSermons(true)">
                     <template #icon>
@@ -106,7 +106,7 @@ function handleBelieversSwordInfoDialog() {
             class="h-[calc(100%-110px)] px-2 pt-3 pb-5 overflow-y-auto overflowing-div scroll-bar-md flex flex-col items-center justify-center">
             <div class="flex flex-col items-center gap-3 opacity-60">
                 <Icon icon="mdi:hammer-wrench" class="text-6xl" />
-                <p class="text-xl font-700">Coming Soon</p>
+                <p class="text-xl font-700">{{ $t('Coming Soon') }}</p>
                 <p class="text-sm opacity-70 text-center max-w-sm">
                     Believers' Feed is under construction. Stay tuned — something great is coming!
                 </p>

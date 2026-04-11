@@ -121,8 +121,13 @@ function qualityColor(quality: string) {
                     class="flex flex-col gap-2 p-3 rounded-lg border transition-colors"
                     :class="
                         settings.piperActiveModel === voice.id
-                            ? 'border-[var(--primary-color)] bg-[var(--primary-color)] bg-opacity-5'
+                            ? 'border-[var(--primary-color)]'
                             : 'border-gray-500 border-opacity-20'
+                    "
+                    :style="
+                        settings.piperActiveModel === voice.id
+                            ? 'background-color: color-mix(in srgb, var(--primary-color) 10%, transparent)'
+                            : ''
                     "
                 >
                     <!-- Voice info row -->

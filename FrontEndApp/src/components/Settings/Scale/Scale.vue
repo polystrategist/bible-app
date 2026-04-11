@@ -22,13 +22,13 @@ function resetScale() {
     <div>
         <div class="flex items-center gap-1 flex-wrap">
             <Icon class="text-size-16px" icon="carbon:zoom-in-area" />
-            Scale
+            {{ $t('Scale') }}
             <span class="text-xs opacity-70">({{ scalePercent }}%)</span>
             <span class="text-xs opacity-50 ml-1">
                 <kbd class="font-mono">Ctrl+Shift+-</kbd> / <kbd class="font-mono">Ctrl+Shift++</kbd>
             </span>
         </div>
-        <p class="text-xs opacity-50 mt-1">Adjust the overall zoom level of the app. Drag the slider or use the keyboard shortcuts.</p>
+        <p class="text-xs opacity-50 mt-1">{{ $t('adjust-zoom-desc') }}</p>
         <div class="mt-2 flex items-center gap-3">
             <NSlider
                 v-model:value="scalePercent"

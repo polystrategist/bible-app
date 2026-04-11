@@ -72,10 +72,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     });
 
     watch(
-        () => selectedBibleVersions.value,
+        selectedBibleVersions,
         (newData) => {
-            SESSION.set(StorageSelectedVersions, newData);
-        }
+            SESSION.set(StorageSelectedVersions, [...newData]);
+        },
+        { deep: true }
     );
 
     async function getHighlights(

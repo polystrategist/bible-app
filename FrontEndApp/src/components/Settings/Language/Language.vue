@@ -20,7 +20,7 @@ watch(locale, (lang) => {
             </NIcon>
             {{ $t('Language') }}
         </div>
-        <p class="text-xs opacity-50 mb-2">Choose the display language for the app interface.</p>
+        <p class="text-xs opacity-50 mb-2">{{ $t('choose-display-language') }}</p>
         <NSelect
             class="max-w-300px"
             size="small"

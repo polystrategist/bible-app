@@ -198,6 +198,35 @@ export interface InternationalMessageInterface {
     "Download": string;
     "Import": string;
     "Search versions...": string;
+    "sign-in-desc"?: string;
+    "Sign In"?: string;
+    "Email Address:"?: string;
+    "Email"?: string;
+    "Password:"?: string;
+    "Password"?: string;
+    "Create Account"?: string;
+    "Change Theme"?: string;
+    "Highlight Verse"?: string;
+    "Verse Reader"?: string;
+    "Compare Verse"?: string;
+    "Piper TTS - Click to change"?: string;
+    "Browser Text to Speech"?: string;
+    "Read verse number"?: string;
+    "announce-verse-number-desc"?: string;
+    "no-bible-versions-found"?: string;
+    "choose-display-language"?: string;
+    "Scale"?: string;
+    "adjust-zoom-desc"?: string;
+    "deuterocanonical-desc"?: string;
+    "Updates"?: string;
+    "Check for Updates"?: string;
+    "up-to-date"?: string;
+    "choose-visible-tabs"?: string;
+    "manage-sermons-desc"?: string;
+    "track-prayer-desc"?: string;
+    "Select Book"?: string;
+    "Search Using Text"?: string;
+    "Coming Soon"?: string;
 }
 
 type InternationalMessageTypeOptional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;

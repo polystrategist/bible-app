@@ -84,15 +84,15 @@ onMounted(async () => {
     <div class="h-full w-full">
         <div class="w-400px mx-auto mt-5 flex flex-col gap-2">
             <h5 class="text-center font-800 text-size-25px">
-                {{ isRegister ? 'Sign Up' : 'Sign In' }}
+                {{ isRegister ? 'Sign Up' : $t('Sign In') }}
             </h5>
             <p class="text-center text-sm opacity-60 mt-1 mb-2">
-                Sign in to access your Believers Sword account. To sync your bookmarks, highlights, clip notes, and notes, download the Believers Sword mobile app and enable sync in it.
+                {{ $t('sign-in-desc') }}
             </p>
-            Email Address:
-            <NInput v-model:value="form.email" placeholder="Email" />
-            Password:
-            <NInput v-model:value="form.password" placeholder="Password" type="password" />
+            {{ $t('Email Address:') }}
+            <NInput v-model:value="form.email" :placeholder="$t('Email')" />
+            {{ $t('Password:') }}
+            <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" />
             <span v-if="isRegister">Retype Password:</span>
             <NInput
                 v-if="isRegister"
@@ -114,7 +114,7 @@ onMounted(async () => {
             >
                 {{ isRegister ? 'Sign Me Up' : 'Sign In' }}
             </NButton>
-            <NButton v-show="!isRegister" @click="isRegister = true">Create Account</NButton>
+            <NButton v-show="!isRegister" @click="isRegister = true">{{ $t('Create Account') }}</NButton>
             <NButton v-show="isRegister" @click="isRegister = false"
                 >Already Have an Account?</NButton
             >

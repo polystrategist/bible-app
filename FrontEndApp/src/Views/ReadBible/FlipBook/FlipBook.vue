@@ -432,7 +432,7 @@ watch(() => flipbookStore.currentPage, () => {
 
         <!-- Book picker modal -->
         <NModal v-model:show="showBookPicker">
-            <NCard style="width: 600px; max-height: 80vh;" title="Select Book" content-style="max-height: calc(80vh - 110px); overflow-y: auto; padding: 16px;">
+            <NCard style="width: 600px; max-height: 80vh;" :title="$t('Select Book')" content-style="max-height: calc(80vh - 110px); overflow-y: auto; padding: 16px;">
                 <template #header-extra>
                     <NInput v-model:value="bookSearchQuery" placeholder="Search books..." style="width: 180px" clearable size="small" />
                 </template>
