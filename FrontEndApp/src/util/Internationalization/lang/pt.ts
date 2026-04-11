@@ -203,7 +203,7 @@ const message: InternationalMessageType = {
     "Sign In": "Fazer login",
     "Email Address:": "Endereço de E-mail:",
     "Email": "E-mail",
-    "Password:" "Senha:",
+    "Password:": "Senha:",
     "Password": "Senha",
     "Create Account": "Criar conta",
     "Change Theme": "Mudar tema",
