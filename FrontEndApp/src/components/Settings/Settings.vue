@@ -45,7 +45,7 @@ const name = computed({
                         <Updates />
                     </div>
                 </NTabPane>
-                <NTabPane class="h-full overflow-y-auto overflowing-div" name="Bible">
+                <NTabPane class="h-full" name="Bible">
                     <template #tab>
                         <span class="flex items-center gap-1">
                             <NIcon>
