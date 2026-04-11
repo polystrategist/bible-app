@@ -170,7 +170,7 @@
     },
     {
         "title": "Wycliffe Bible",
-        "download_link": "Modules/zipped/WYC.zip",
+        "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/refs/heads/main/Modules/zipped/WYC.zip",
         "version_short_name_and_date": "WYC1395",
         "year": 1395,
         "description": "One of the earliest English translations of the complete Bible, produced by John Wycliffe and his associates around 1382-1395, translated from the Latin Vulgate. A landmark in making Scripture accessible to English-speaking laity during the late medieval period, written in Middle English.",
