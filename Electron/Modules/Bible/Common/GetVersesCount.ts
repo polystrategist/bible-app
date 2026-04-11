@@ -7,6 +7,8 @@ export type GetVerseArgs = {
     selected_chapter: number;
 };
 
+const DEFAULT_BIBLE_MODULE = 'King James Version - 1769.SQLite3';
+
 export default () => {
     ipcMain.handle('getVersesCount', async (event: any, args: GetVerseArgs) => {
         let versesCount = 0;
@@ -20,8 +22,26 @@ export default () => {
                 .where('book_number', args.book_number)
                 .where('chapter', args.selected_chapter);
 
-            versesCount = rows.length;
+            if (rows.length > versesCount) {
+                versesCount = rows.length;
+            }
         }
+
+        // Fall back to the default KJV module if selected versions have no verses for this book/chapter
+        if (versesCount === 0) {
+            try {
+                const kjv = getBibleVersionDb(DEFAULT_BIBLE_MODULE);
+                const rows = await kjv
+                    .select()
+                    .from('verses')
+                    .where('book_number', args.book_number)
+                    .where('chapter', args.selected_chapter);
+                versesCount = rows.length;
+            } catch {
+                // KJV module not available, keep versesCount as 0
+            }
+        }
+
         return versesCount;
     });
 };

@@ -223,7 +223,8 @@
         "year": 1769,
         "description": "The 1769 revision edited by Benjamin Blayney at Oxford, which modernized spelling and punctuation of the original 1611 text. This revision is effectively the standard KJV text in common use today, based on the Textus Receptus and Masoretic Text.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version - 1769.SQLite3",
-        "module_type": "BelieversSword"
+        "module_type": "BelieversSword",
+        "default": true
     },
     {
         "file_name": "King James Version of 1611 or 1769.SQLite3",
