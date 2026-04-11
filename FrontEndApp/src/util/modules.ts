@@ -10,6 +10,8 @@ export type MODULE_BIBLE_TYPE = {
     version_short_name_and_date?: string;
     download_link: string;
     is_zipped?: boolean | undefined | null;
+    module_type?: string;
+    copyright?: string;
 };
 
 export const bible: MODULE_BIBLE_TYPE[] = BibleModules;

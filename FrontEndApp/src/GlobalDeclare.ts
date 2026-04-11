@@ -201,6 +201,12 @@ declare global {
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;
 
+            // Export
+            exportToPdf: (args: { html: string; filename: string }) => Promise<any>;
+            exportToDocx: (args: { html: string; filename: string }) => Promise<any>;
+
+            // Shell
+            openExternal: (url: string) => Promise<void>;
         };
     }
 }
