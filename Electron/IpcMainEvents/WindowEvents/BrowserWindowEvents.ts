@@ -1,5 +1,5 @@
 import { appConfig } from "./../../ElectronStore/Configuration";
-import { app, BrowserWindow, ipcMain, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen, shell } from "electron";
 
 const MIN_SCALE = 0.75;
 const MAX_SCALE = 1.5;
@@ -73,4 +73,5 @@ export const windowBrowserEvents = (win: BrowserWindow) => {
     });
     ipcMain.handle('getAppScale', () => getAppScale(win));
     ipcMain.handle('setAppScale', (_event, scale: number) => setAppScale(win, scale));
+    ipcMain.handle('openExternal', (_event, url: string) => shell.openExternal(url));
 };

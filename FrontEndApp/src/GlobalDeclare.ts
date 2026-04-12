@@ -41,7 +41,7 @@ declare global {
                 percentage: Function;
                 done: () => void;
                 cancel: () => void;
-            }, moduleData?: { title: string; description: string; zipped: boolean }) => void;
+            }, moduleData?: { title: string; description: string; is_zipped: boolean; file_name: string; module_type?: string }) => void;
 
             /**
              * Save A Bookmark
@@ -201,6 +201,12 @@ declare global {
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;
 
+            // Export
+            exportToPdf: (args: { html: string; filename: string }) => Promise<any>;
+            exportToDocx: (args: { html: string; filename: string }) => Promise<any>;
+
+            // Shell
+            openExternal: (url: string) => Promise<void>;
         };
     }
 }

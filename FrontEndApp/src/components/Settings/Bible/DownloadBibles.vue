@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NButton, NIcon, useMessage, NInput } from 'naive-ui';
+import { NButton, NIcon, useMessage, NInput, NSelect } from 'naive-ui';
 import { useVirtualList } from '@vueuse/core';
 import { computed, ref } from 'vue';
 import { useBibleDownloadStore } from '../../../store/downloadBible';
@@ -8,6 +8,40 @@ import { bible, type MODULE_BIBLE_TYPE } from '../../../util/modules';
 import { Download } from '@vicons/carbon';
 
 const searchBible = ref<string | null>(null);
+const selectedLanguage = ref<string | null>(null);
+const selectedModuleType = ref<string | null>(null);
+
+const moduleTypeOptions = computed(() => {
+    const types = new Set<string>();
+    for (const version of bible) {
+        if (version.title.includes('commentaries')) continue;
+        const type = version.module_type?.trim();
+        if (type) types.add(type);
+    }
+    const labels: Record<string, string> = {
+        'believers_sword': "Believer's Sword",
+        'ebible': 'eBible.org',
+    };
+    return Array.from(types)
+        .sort((a, b) => a.localeCompare(b))
+        .map((type) => ({ label: labels[type] || type, value: type }));
+});
+
+const languageOptions = computed(() => {
+    const langs = new Set<string>();
+    for (const version of bible) {
+        if (version.title.includes('commentaries')) continue;
+        const lang = version.language_full?.trim();
+        if (lang) langs.add(lang);
+    }
+    return Array.from(langs)
+        .sort((a, b) => a.localeCompare(b))
+        .map((lang) => ({ label: lang.charAt(0).toUpperCase() + lang.slice(1), value: lang }));
+});
+
+function openExternal(url: string) {
+    window.browserWindow.openExternal(url);
+}
 const message = useMessage();
 const bibleDownloadStore = useBibleDownloadStore();
 const moduleStore = useModuleStore();
@@ -53,6 +87,8 @@ function matchesSearch(version: MODULE_BIBLE_TYPE, query: string) {
 
 const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
     const query = searchBible.value?.trim() ?? '';
+    const langFilter = selectedLanguage.value;
+    const typeFilter = selectedModuleType.value;
     const groupedVersions = new Map<string, MODULE_BIBLE_TYPE[]>();
 
     for (const version of bible) {
@@ -60,6 +96,9 @@ const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
         if (!matchesSearch(version, query)) continue;
 
         const language = version.language_full?.trim() || 'unknown';
+        if (langFilter && language !== langFilter) continue;
+        if (typeFilter && version.module_type !== typeFilter) continue;
+
         const versions = groupedVersions.get(language) ?? [];
         versions.push(version);
         groupedVersions.set(language, versions);
@@ -130,13 +169,40 @@ function clickDownload(downloadLink: string, version: any) {
             bibleDownloadStore.isDownloading = false;
             message.error('Download Cancelled');
         },
-    }, version);
+    }, {
+        title: version.title,
+        description: version.description,
+        is_zipped: !!version.is_zipped,
+        file_name: version.file_name,
+        module_type: version.module_type,
+    });
 }
 </script>
 <template>
     <div>
-        <div class="mb-3">
-            <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable />
+        <div class="mb-3 flex gap-2">
+            <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable class="flex-1" />
+            <NSelect
+                v-model:value="selectedModuleType"
+                :options="moduleTypeOptions"
+                placeholder="All sources"
+                size="small"
+                clearable
+                to="body"
+                style="width: 160px"
+                :virtual-scroll="false"
+            />
+            <NSelect
+                v-model:value="selectedLanguage"
+                :options="languageOptions"
+                placeholder="All languages"
+                size="small"
+                clearable
+                filterable
+                to="body"
+                style="width: 180px"
+                :virtual-scroll="false"
+            />
         </div>
         <div
             v-if="flatItems.length"
@@ -149,12 +215,14 @@ function clickDownload(downloadLink: string, version: any) {
                     <div
                         v-if="item.type === 'header'"
                         :style="{ height: `${HEADER_HEIGHT}px` }"
-                        class="bg-gray-200 dark:bg-dark-400 py-2 rounded-1 flex items-center"
+                        class="bg-gray-100 dark:bg-dark-500 border-b border-gray-200 dark:border-dark-300 flex items-center justify-between px-3 rounded-1"
                     >
-                        <h2 class="m-0 text-sm font-700 capitalize tracking-[0.08em] px-2 opacity-80">
+                        <h2 class="m-0 text-xs font-700 uppercase tracking-[0.12em] opacity-70">
                             {{ item.language }}
-                            <span class="text-xs font-500 normal-case opacity-60">({{ item.count }})</span>
                         </h2>
+                        <span class="text-[10px] font-600 opacity-50 bg-gray-200 dark:bg-dark-300 px-1.5 py-0.5 rounded-full">
+                            {{ item.count }}
+                        </span>
                     </div>
 
                     <!-- Version card -->
@@ -162,7 +230,7 @@ function clickDownload(downloadLink: string, version: any) {
                         v-else
                         :style="{ height: `${VERSION_HEIGHT}px` }"
                         :disabled="bibleDownloadStore.isDownloading"
-                        class="flex items-start gap-3 rounded-3 p-2 hover:bg-black hover:bg-opacity-4 dark:hover:bg-white dark:hover:bg-opacity-4"
+                        class="relative rounded-3 p-2 pr-20 hover:bg-black hover:bg-opacity-4 dark:hover:bg-white dark:hover:bg-opacity-4"
                     >
                         <NButton
                             size="tiny"
@@ -172,6 +240,7 @@ function clickDownload(downloadLink: string, version: any) {
                             secondary
                             rounded
                             :loading="item.version.download_link === selectedDownloadLink && downloadLoading"
+                            class="absolute top-2 right-2"
                         >
                             <NIcon>
                                 <Download />
@@ -182,9 +251,16 @@ function clickDownload(downloadLink: string, version: any) {
                             </span>
                         </NButton>
 
-                        <div class="min-w-0 flex-1">
-                            <div class="text-base font-600 leading-tight">
-                                {{ item.version.title }}
+                        <div class="min-w-0">
+                            <div class="text-base font-600 leading-tight flex items-center gap-2">
+                                <span>{{ item.version.title }}</span>
+                                <span
+                                    v-if="item.version.module_type === 'ebible'"
+                                    class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 cursor-pointer whitespace-nowrap"
+                                    @click.stop="openExternal('https://ebible.org/')"
+                                >
+                                    eBible.org
+                                </span>
                             </div>
                             <div class="mt-1 text-xs opacity-60">
                                 <span class="font-700">Short name:</span>
@@ -192,6 +268,9 @@ function clickDownload(downloadLink: string, version: any) {
                             </div>
                             <div class="mt-1 text-sm leading-snug opacity-70 line-clamp-2">
                                 {{ formatDescription(item.version.description) }}
+                            </div>
+                            <div v-if="item.version.copyright" class="mt-1 text-xs opacity-50 line-clamp-1">
+                                {{ item.version.copyright }}
                             </div>
                         </div>
                     </div>
