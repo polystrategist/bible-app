@@ -10,7 +10,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "American Standard Version",
@@ -23,7 +23,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Darby Bible",
@@ -36,7 +36,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Young's Literal Translation",
@@ -49,7 +49,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Geneva Bible",
@@ -62,7 +62,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "The Bishop's Bible",
@@ -75,7 +75,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Tyndale Bible",
@@ -88,7 +88,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Coverdale Bible",
@@ -101,7 +101,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "World English Bible",
@@ -114,7 +114,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "World English Bible (British Edition)",
@@ -127,7 +127,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "New Heart English Bible",
@@ -140,7 +140,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Unlocked Literal Bible",
@@ -153,7 +153,7 @@
         "license": "open_attribution_required",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Unlocked Dynamic Bible",
@@ -166,7 +166,7 @@
         "license": "open_attribution_required",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "title": "Wycliffe Bible",
@@ -179,7 +179,7 @@
         "license": "public_domain",
         "language": "en",
         "language_full": "english",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "file_name": "Bíblia de João Ferreira de Almeida - Edição de 1819.SQLite3",
@@ -190,7 +190,7 @@
         "year": 1819,
         "description": "An 1819 edition of the Portuguese Bible originally translated by João Ferreira de Almeida, a 17th-century Protestant minister who produced the first complete Portuguese translation from the original languages. One of the most widely used Portuguese Bibles, following a word-for-word approach.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Bíblia de João Ferreira de Almeida - Edição de 1819.SQLite3",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "file_name": "Catholic Public Domain Version 2009.SQLite3",
@@ -201,7 +201,7 @@
         "year": 2009,
         "description": "An English translation of the Bible from the Latin Vulgate published in 2009 by Ronald L. Conte Jr., produced from a Catholic perspective and including the deuterocanonical books. Released in the public domain, it aims for a literal yet readable rendering.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/Catholic Public Domain Version 2009.SQLite3",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "file_name": "King James Bible 1611 Pure Cambridge Edition 1900.SQLite3",
@@ -212,7 +212,7 @@
         "year": 1900,
         "description": "The Pure Cambridge Edition, finalized around 1900 by Cambridge University Press, representing centuries of careful corrections to the original 1611 KJV text. Widely regarded by KJV purists as the most accurate and consistent printed form of the Authorized Version.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Bible 1611 Pure Cambridge Edition 1900.SQLite3",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     },
     {
         "file_name": "King James Version - 1769.SQLite3",
@@ -223,7 +223,7 @@
         "year": 1769,
         "description": "The 1769 revision edited by Benjamin Blayney at Oxford, which modernized spelling and punctuation of the original 1611 text. This revision is effectively the standard KJV text in common use today, based on the Textus Receptus and Masoretic Text.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version - 1769.SQLite3",
-        "module_type": "BelieversSword",
+        "module_type": "believers_sword",
         "default": true
     },
     {
@@ -235,6 +235,6 @@
         "year": 1611,
         "description": "The Authorized Version commissioned by King James I, first published in 1611 by 47 scholars, with the 1769 Oxford revision by Benjamin Blayney being the form most widely circulated today. A word-for-word translation from the Textus Receptus and Masoretic Text, renowned for its literary influence.",
         "download_link": "https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Bible/King James Version of 1611 or 1769.SQLite3",
-        "module_type": "BelieversSword"
+        "module_type": "believers_sword"
     }
 ]
