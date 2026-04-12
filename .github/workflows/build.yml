@@ -110,12 +110,15 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${TAG}"
-          NOTES=$(cat notes.md | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
-          MESSAGE=$(printf '🎉 <b>Believers Sword %s Released!</b>\n\n%s\n\n<a href="%s">Download Here</a>' "$TAG" "$NOTES" "$RELEASE_URL")
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}"
+          DESCRIPTION=$(gh release view "$TAG" --json body -q '.body' | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+          MESSAGE=$(printf '🎉 <b>Believers Sword %s Released!</b>\n\n%s\n\n📥 <a href="%s">Download</a>\n📄 <a href="%s">Release Page</a>' "$TAG" "$DESCRIPTION" "$DOWNLOAD_URL" "$RELEASE_URL")
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d parse_mode="HTML" \
+            -d disable_web_page_preview=true \
             --data-urlencode text="$MESSAGE"
