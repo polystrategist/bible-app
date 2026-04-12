@@ -19,7 +19,7 @@ const moduleTypeOptions = computed(() => {
         if (type) types.add(type);
     }
     const labels: Record<string, string> = {
-        'BelieversSword': 'Believers Sword',
+        'believers_sword': "Believer's Sword",
         'ebible': 'eBible.org',
     };
     return Array.from(types)
