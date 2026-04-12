@@ -27,6 +27,7 @@ jobs:
           fetch-depth: 0
 
       - name: Verify tag is on main
+        shell: bash
         run: |
           if ! git merge-base --is-ancestor ${{ github.sha }} origin/main; then
             echo "::error::Release tags must be on the main branch."
