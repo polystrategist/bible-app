@@ -11,6 +11,10 @@ import { setupPortableMode } from './util/portable';
 import { createWindowState, attachWindowStateManager, saveWindowState } from './util/window';
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 
+// Suppress EPIPE errors when stdout/stderr pipe is closed (e.g. terminal closed after launch)
+process.stdout.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'EPIPE') return; });
+process.stderr.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'EPIPE') return; });
+
 // Check if running in portable mode
 setupPortableMode();
 
