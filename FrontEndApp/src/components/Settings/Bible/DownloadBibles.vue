@@ -28,7 +28,7 @@ const moduleTypeOptions = computed(() => {
         'ph4_mybible': 'PH4.org MyBible',
     };
     return [
-        { label: 'All sources', value: null },
+        { label: 'All sources', value: null as unknown as string },
         ...Array.from(types)
             .sort((a, b) => a.localeCompare(b))
             .map((type) => ({ label: labels[type] || type, value: type })),
@@ -45,7 +45,7 @@ const languageOptions = computed(() => {
         if (lang) langs.add(lang);
     }
     return [
-        { label: 'All languages', value: null },
+        { label: 'All languages', value: null as unknown as string },
         ...Array.from(langs)
             .sort((a, b) => a.localeCompare(b))
             .map((lang) => ({ label: lang.charAt(0).toUpperCase() + lang.slice(1), value: lang })),
