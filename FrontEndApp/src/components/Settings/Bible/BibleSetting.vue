@@ -7,9 +7,7 @@ import ImportBible from './ImportBible.vue';
 <template>
     <NTabs type="line" size="small" default-value="Added">
         <NTabPane name="Added" :tab="$t('Added')">
-            <div class="py-2">
-                <InstalledBibles />
-            </div>
+            <InstalledBibles />
         </NTabPane>
         <NTabPane name="Download" :tab="$t('Download')">
             <div class="py-2">

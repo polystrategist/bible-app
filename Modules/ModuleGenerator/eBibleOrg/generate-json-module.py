@@ -13,6 +13,8 @@ Usage:
     python generate-json-module.py --reset
 """
 
+from __future__ import annotations
+
 import json
 import random
 import re

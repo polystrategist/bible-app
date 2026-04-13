@@ -11,6 +11,8 @@ Usage:
 The generated .SQLite3 file will be placed in ./Generated/
 """
 
+from __future__ import annotations
+
 import sys
 import re
 import io

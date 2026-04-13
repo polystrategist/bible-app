@@ -197,7 +197,8 @@ async function downloadModuleUrls(mainWindow: BrowserWindow, urls: Array<string>
                         mainWindow.webContents.send('download-module-done');
                     } else {
                         // MyBible: extract zip and rename files
-                        const isExtracted = await extractZip(downloadedFilePath, filePath, moduleData?.title);
+                        const baseName = moduleData.file_name.replace(/\.[^.]+$/, '');
+                        const isExtracted = await extractZip(downloadedFilePath, filePath, baseName);
 
                         if (!isExtracted) {
                             mainWindow.webContents.send('download-module-done');

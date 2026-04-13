@@ -16,6 +16,8 @@ export async function getDownloadedBible(): Promise<Array<any>> {
             description: meta?.description ?? '',
             short_name: meta?.version_short_name_and_date ?? '',
             language: meta?.language_full ?? '',
+            module_type: (meta as any)?.module_type ?? '',
+            year: (meta as any)?.year ?? null,
         };
     });
 }

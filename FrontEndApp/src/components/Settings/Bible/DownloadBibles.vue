@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { NButton, NIcon, useMessage, NInput, NSelect } from 'naive-ui';
+import { NButton, NIcon, useMessage, NInput, NSelect, NModal, NCard } from 'naive-ui';
 import { useVirtualList } from '@vueuse/core';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useBibleDownloadStore } from '../../../store/downloadBible';
 import { useModuleStore } from '../../../store/moduleStore';
 import { bible, type MODULE_BIBLE_TYPE } from '../../../util/modules';
@@ -10,6 +10,10 @@ import { Download } from '@vicons/carbon';
 const searchBible = ref<string | null>(null);
 const selectedLanguage = ref<string | null>(null);
 const selectedModuleType = ref<string | null>(null);
+
+watch(selectedModuleType, () => {
+    selectedLanguage.value = null;
+});
 
 const moduleTypeOptions = computed(() => {
     const types = new Set<string>();
@@ -21,22 +25,31 @@ const moduleTypeOptions = computed(() => {
     const labels: Record<string, string> = {
         'believers_sword': "Believer's Sword",
         'ebible': 'eBible.org',
+        'ph4_mybible': 'PH4.org MyBible',
     };
-    return Array.from(types)
-        .sort((a, b) => a.localeCompare(b))
-        .map((type) => ({ label: labels[type] || type, value: type }));
+    return [
+        { label: 'All sources', value: null },
+        ...Array.from(types)
+            .sort((a, b) => a.localeCompare(b))
+            .map((type) => ({ label: labels[type] || type, value: type })),
+    ];
 });
 
 const languageOptions = computed(() => {
+    const typeFilter = selectedModuleType.value;
     const langs = new Set<string>();
     for (const version of bible) {
         if (version.title.includes('commentaries')) continue;
+        if (typeFilter && version.module_type !== typeFilter) continue;
         const lang = version.language_full?.trim();
         if (lang) langs.add(lang);
     }
-    return Array.from(langs)
-        .sort((a, b) => a.localeCompare(b))
-        .map((lang) => ({ label: lang.charAt(0).toUpperCase() + lang.slice(1), value: lang }));
+    return [
+        { label: 'All languages', value: null },
+        ...Array.from(langs)
+            .sort((a, b) => a.localeCompare(b))
+            .map((lang) => ({ label: lang.charAt(0).toUpperCase() + lang.slice(1), value: lang })),
+    ];
 });
 
 function openExternal(url: string) {
@@ -149,7 +162,34 @@ function isAlreadyDownloaded(file_name: string) {
 
 const downloadLoading = ref(false);
 const selectedDownloadLink = ref<string | null>(null);
+
+// PH4.org confirmation dialog
+const showPh4Dialog = ref(false);
+const pendingPh4Version = ref<any>(null);
+
 function clickDownload(downloadLink: string, version: any) {
+    if (version.module_type === 'ph4_mybible') {
+        pendingPh4Version.value = version;
+        showPh4Dialog.value = true;
+        return;
+    }
+    startDownload(downloadLink, version);
+}
+
+function confirmPh4Download() {
+    showPh4Dialog.value = false;
+    if (pendingPh4Version.value) {
+        startDownload(pendingPh4Version.value.download_link, pendingPh4Version.value);
+        pendingPh4Version.value = null;
+    }
+}
+
+function cancelPh4Download() {
+    showPh4Dialog.value = false;
+    pendingPh4Version.value = null;
+}
+
+function startDownload(downloadLink: string, version: any) {
     selectedDownloadLink.value = downloadLink;
 
     bibleDownloadStore.isDownloading = true;
@@ -180,14 +220,57 @@ function clickDownload(downloadLink: string, version: any) {
 </script>
 <template>
     <div>
+        <!-- PH4.org confirmation dialog -->
+        <NModal v-model:show="showPh4Dialog" :mask-closable="false" preset="card" style="max-width: 420px">
+            <template #header>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-700 rounded bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                        PH4.org
+                    </span>
+                    <span class="font-600">External Module Source</span>
+                </div>
+            </template>
+
+            <div class="space-y-3 text-sm">
+                <p class="opacity-80 leading-relaxed">
+                    This module is hosted by
+                    <span
+                        class="text-green-600 dark:text-green-400 font-600 cursor-pointer hover:underline"
+                        @click="openExternal('https://www.ph4.org/')"
+                    >PH4.org</span>,
+                    a third-party website. Believers Sword does not own, control, or verify the content of externally hosted modules.
+                </p>
+                <p class="opacity-80 leading-relaxed">
+                    By continuing, you confirm that you have the right to download and use this content, and you accept full responsibility for its use.
+                </p>
+                <div v-if="pendingPh4Version" class="rounded-2 bg-gray-100 dark:bg-dark-400 px-3 py-2 text-xs opacity-70">
+                    <span class="font-700">Module:</span> {{ pendingPh4Version.title }}
+                </div>
+            </div>
+
+            <template #footer>
+                <div class="flex justify-end gap-2">
+                    <NButton size="small" @click="cancelPh4Download">Cancel</NButton>
+                    <NButton size="small" type="primary" @click="confirmPh4Download">
+                        Continue
+                    </NButton>
+                </div>
+            </template>
+        </NModal>
+
+        <div class="mb-3 rounded-2 border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-3 py-2 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+            Believer's Sword does not own or distribute Bible modules.
+            Modules are provided by third-party sources such as
+            <span class="font-600 cursor-pointer hover:underline" @click="openExternal('https://www.ph4.org/')">PH4.org</span>.
+            Users are responsible for verifying usage rights.
+        </div>
+
         <div class="mb-3 flex gap-2">
             <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable class="flex-1" />
             <NSelect
                 v-model:value="selectedModuleType"
                 :options="moduleTypeOptions"
-                placeholder="All sources"
                 size="small"
-                clearable
                 to="body"
                 style="width: 160px"
                 :virtual-scroll="false"
@@ -195,9 +278,7 @@ function clickDownload(downloadLink: string, version: any) {
             <NSelect
                 v-model:value="selectedLanguage"
                 :options="languageOptions"
-                placeholder="All languages"
                 size="small"
-                clearable
                 filterable
                 to="body"
                 style="width: 180px"
@@ -207,7 +288,7 @@ function clickDownload(downloadLink: string, version: any) {
         <div
             v-if="flatItems.length"
             v-bind="containerProps"
-            class="select-none h-[calc(70vh-180px)] overflowing-div pr-2"
+            class="select-none h-[calc(70vh-240px)] overflowing-div pr-2"
         >
             <div v-bind="wrapperProps">
                 <template v-for="{ data: item, index } in list" :key="item.key">
@@ -260,6 +341,19 @@ function clickDownload(downloadLink: string, version: any) {
                                     @click.stop="openExternal('https://ebible.org/')"
                                 >
                                     eBible.org
+                                </span>
+                                <span
+                                    v-else-if="item.version.module_type === 'ph4_mybible'"
+                                    class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 cursor-pointer whitespace-nowrap"
+                                    @click.stop="openExternal('https://www.ph4.org/')"
+                                >
+                                    PH4.org
+                                </span>
+                                <span
+                                    v-if="(item.version as any).year"
+                                    class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-gray-100 text-gray-500 dark:bg-dark-300 dark:text-gray-400 whitespace-nowrap"
+                                >
+                                    {{ (item.version as any).year }}
                                 </span>
                             </div>
                             <div class="mt-1 text-xs opacity-60">

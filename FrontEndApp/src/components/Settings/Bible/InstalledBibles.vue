@@ -46,19 +46,33 @@ async function removeBible(fileName: string, title: string) {
 }
 </script>
 <template>
-    <div class="flex flex-col gap-1">
+    <div class="flex flex-col gap-1 max-h-[calc(70vh-100px)] overflow-y-auto overflowing-div pr-2">
         <template v-for="bible in moduleStore.bibleLists">
             <div v-if="!bible.title.includes('commentaries')"
                 class="py-2 px-3 rounded-2 flex items-start justify-between gap-3 hover:bg-black hover:bg-opacity-4 dark:hover:bg-white dark:hover:bg-opacity-4">
                 <div class="min-w-0 flex-1">
-                    <div class="font-600 leading-tight">{{ bible.title }}</div>
+                    <div class="font-600 leading-tight flex items-center gap-2 flex-wrap">
+                        <span>{{ bible.title }}</span>
+                        <span
+                            v-if="bible.module_type === 'ebible'"
+                            class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 whitespace-nowrap"
+                        >eBible.org</span>
+                        <span
+                            v-else-if="bible.module_type === 'ph4_mybible'"
+                            class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 whitespace-nowrap"
+                        >PH4.org</span>
+                        <span
+                            v-if="bible.year"
+                            class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-gray-100 text-gray-500 dark:bg-dark-300 dark:text-gray-400 whitespace-nowrap"
+                        >{{ bible.year }}</span>
+                    </div>
                     <div v-if="bible.short_name || bible.language" class="mt-1 flex items-center gap-2 text-xs opacity-50">
                         <span v-if="bible.short_name">{{ bible.short_name }}</span>
                         <span v-if="bible.short_name && bible.language">·</span>
                         <span v-if="bible.language" class="capitalize">{{ bible.language }}</span>
                     </div>
-                    <div v-if="formatDescription(bible.description)" class="mt-1 text-xs opacity-40">
-                        {{ formatDescription(bible.description) }}
+                    <div class="mt-1 text-xs opacity-40">
+                        {{ formatDescription(bible.description) || 'No description.' }}
                     </div>
                 </div>
                 <NPopconfirm @positive-click="removeBible(bible.file_name, bible.title)" positive-text="Remove" negative-text="Cancel">
