@@ -122,3 +122,27 @@ jobs:
             -d parse_mode="HTML" \
             -d disable_web_page_preview=true \
             --data-urlencode text="$MESSAGE"
+
+      - name: Notify Discord
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${TAG}"
+          DESCRIPTION=$(gh release view "$TAG" --json body -q '.body' | head -c 4000)
+          curl -s -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"🗡️ Believers Sword ${TAG} Released!\",
+                \"description\": $(echo "$DESCRIPTION" | python3 -c \"import sys,json; print(json.dumps(sys.stdin.read()))\"),
+                \"url\": \"${RELEASE_URL}\",
+                \"color\": 5814783,
+                \"fields\": [
+                  { \"name\": \"Version\", \"value\": \"${TAG}\", \"inline\": true },
+                  { \"name\": \"Release Page\", \"value\": \"[View on GitHub](${RELEASE_URL})\", \"inline\": true }
+                ]
+              }]
+            }"
