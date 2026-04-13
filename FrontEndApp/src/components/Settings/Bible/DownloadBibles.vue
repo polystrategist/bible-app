@@ -167,10 +167,19 @@ const selectedDownloadLink = ref<string | null>(null);
 const showPh4Dialog = ref(false);
 const pendingPh4Version = ref<any>(null);
 
+// eBible.org confirmation dialog
+const showEbibleDialog = ref(false);
+const pendingEbibleVersion = ref<any>(null);
+
 function clickDownload(downloadLink: string, version: any) {
     if (version.module_type === 'ph4_mybible') {
         pendingPh4Version.value = version;
         showPh4Dialog.value = true;
+        return;
+    }
+    if (version.module_type === 'ebible') {
+        pendingEbibleVersion.value = version;
+        showEbibleDialog.value = true;
         return;
     }
     startDownload(downloadLink, version);
@@ -187,6 +196,19 @@ function confirmPh4Download() {
 function cancelPh4Download() {
     showPh4Dialog.value = false;
     pendingPh4Version.value = null;
+}
+
+function confirmEbibleDownload() {
+    showEbibleDialog.value = false;
+    if (pendingEbibleVersion.value) {
+        startDownload(pendingEbibleVersion.value.download_link, pendingEbibleVersion.value);
+        pendingEbibleVersion.value = null;
+    }
+}
+
+function cancelEbibleDownload() {
+    showEbibleDialog.value = false;
+    pendingEbibleVersion.value = null;
 }
 
 function startDownload(downloadLink: string, version: any) {
@@ -252,6 +274,44 @@ function startDownload(downloadLink: string, version: any) {
                 <div class="flex justify-end gap-2">
                     <NButton size="small" @click="cancelPh4Download">Cancel</NButton>
                     <NButton size="small" type="primary" @click="confirmPh4Download">
+                        Continue
+                    </NButton>
+                </div>
+            </template>
+        </NModal>
+
+        <!-- eBible.org confirmation dialog -->
+        <NModal v-model:show="showEbibleDialog" :mask-closable="false" preset="card" style="max-width: 420px">
+            <template #header>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-700 rounded bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                        eBible.org
+                    </span>
+                    <span class="font-600">External Module Source</span>
+                </div>
+            </template>
+
+            <div class="space-y-3 text-sm">
+                <p class="opacity-80 leading-relaxed">
+                    This module is hosted by
+                    <span
+                        class="text-blue-600 dark:text-blue-400 font-600 cursor-pointer hover:underline"
+                        @click="openExternal('https://ebible.org/')"
+                    >eBible.org</span>,
+                    a third-party website. Believers Sword does not own, control, or verify the content of externally hosted modules.
+                </p>
+                <p class="opacity-80 leading-relaxed">
+                    By continuing, you confirm that you have the right to download and use this content, and you accept full responsibility for its use.
+                </p>
+                <div v-if="pendingEbibleVersion" class="rounded-2 bg-gray-100 dark:bg-dark-400 px-3 py-2 text-xs opacity-70">
+                    <span class="font-700">Module:</span> {{ pendingEbibleVersion.title }}
+                </div>
+            </div>
+
+            <template #footer>
+                <div class="flex justify-end gap-2">
+                    <NButton size="small" @click="cancelEbibleDownload">Cancel</NButton>
+                    <NButton size="small" type="primary" @click="confirmEbibleDownload">
                         Continue
                     </NButton>
                 </div>

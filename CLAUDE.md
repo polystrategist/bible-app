@@ -229,6 +229,22 @@ A separate Nuxt 3 app with SSR enabled. Uses:
 
 ---
 
+## Known Issues & Fixes
+
+### EPIPE: broken pipe (Electron main process error dialog)
+
+**Symptom:** An error dialog appears: *"A JavaScript error occurred in the main process — Error: EPIPE: broken pipe, write"*. Stack trace points to `electron-log` console transport or `process.onWarning`.
+
+**Cause:** When the app is launched from a terminal (e.g. `yarn start`, VS Code debugger), stdout/stderr are connected to that terminal via a pipe. If the terminal or parent process closes while Electron is still running and tries to log something, the OS returns `EPIPE` — Node.js then surfaces it as an uncaught exception.
+
+**Fix (already applied):** Two EPIPE error handlers at the top of `Electron/main.ts`, before anything else:
+```ts
+process.stdout.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'EPIPE') return; });
+process.stderr.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'EPIPE') return; });
+```
+
+---
+
 ## Coding Conventions
 
 - All Vue components use `<script setup lang="ts">` (Composition API)
