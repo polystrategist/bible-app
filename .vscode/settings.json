@@ -70,6 +70,7 @@
     ],
     "chat.tools.terminal.autoApprove": {
         "Add-Type": true,
-        "ForEach-Object": true
+        "ForEach-Object": true,
+        "yarn add": true
     }
 }
