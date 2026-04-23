@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { Splitpanes, Pane } from 'splitpanes';
-import { NButton, NCard, NDropdown, NEmpty, NIcon, NInput, NModal, useDialog } from 'naive-ui';
+import { NButton, NCard, NDropdown, NEmpty, NIcon, NInput, NModal, NTabs, NTabPane, useDialog } from 'naive-ui';
 import { Add, TrashCan } from '@vicons/carbon';
 import Editor from '../../../components/Editor/Editor.vue';
+import CrossReferences from './CrossReferences.vue';
 import useNoteStore from '../../../store/useNoteStore';
 import SESSION from '../../../util/session';
 
@@ -23,6 +24,7 @@ const noteContextY = ref(0);
 const contextNoteId = ref('');
 const contextNoteTitle = ref('');
 const takeNotePaneStorageKey = 'take-note-pane-sizes';
+const activeTab = ref(SESSION.get('take-note-active-tab') ?? 'notes');
 const paneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 15, max: 45, size: 28 },
     { min: 55, max: 85, size: 72 },
@@ -45,6 +47,10 @@ watch(
         EditorRef.value?.setContent(noteStore.currentNoteContent);
     },
 );
+
+watch(activeTab, (tab) => {
+    SESSION.set('take-note-active-tab', tab);
+});
 
 onMounted(async () => {
     await noteStore.loadNote();
@@ -161,96 +167,109 @@ function changePaneSizes(sizes: Array<any>) {
 }
 </script>
 <template>
-    <div class="h-[calc(100%-1px)] relative bg-opacity-0 take-note-root">
-        <Splitpanes
-            vertical
-            :dbl-click-splitter="false"
-            class="h-full w-full take-note-split"
-            @resized="changePaneSizes"
+    <div class="h-[calc(100%-1px)] relative bg-opacity-0 take-note-root flex flex-col">
+        <NTabs
+            v-model:value="activeTab"
+            type="card"
+            size="small"
+            class="take-note-tabs flex flex-col flex-1 min-h-0"
         >
-            <Pane
-                :size="paneSizes[0].size"
-                :min-size="paneSizes[0].min"
-                :max-size="paneSizes[0].max"
-                class="rounded-md"
-            >
-                <div
-                    class="h-[calc(100%-20px)] border border-gray-200 dark:bg-dark-400 bg-gray-200/55 dark:bg-dark-400 p-10px flex flex-col gap-2 take-note-list-panel"
+            <NTabPane name="notes" tab="Notes" display-directive="show" class="flex-1 min-h-0">
+                <Splitpanes
+                    vertical
+                    :dbl-click-splitter="false"
+                    class="h-[calc(100%-10px)] w-full take-note-split"
+                    @resized="changePaneSizes"
                 >
-                    <NButton size="small" type="primary" secondary @click="openCreateNoteDialog()">
-                        <template #icon>
-                            <NIcon><Add /></NIcon>
-                        </template>
-                        New Note
-                    </NButton>
-
-                    <div
-                        class="overflow-y-auto overflowing-div hide-note-list-scrollbar h-full flex flex-col gap-1 pr-1"
+                    <Pane
+                        :size="paneSizes[0].size"
+                        :min-size="paneSizes[0].min"
+                        :max-size="paneSizes[0].max"
+                        class="rounded-md"
                     >
-                        <NEmpty
-                            v-if="!noteStore.notes.length"
-                            description="No notes yet"
-                            size="small"
-                        />
-
                         <div
-                            v-for="(noteItem, index) in noteStore.notes"
-                            :key="noteItem.id"
-                            class="group note-item rounded-md border p-2 cursor-pointer transition-all duration-200 ease-out"
-                            :class="{
-                                'note-item-selected bg-[var(--primary-color)]/20 border-[var(--primary-color)] shadow-md':
-                                    noteStore.selectedNoteId === noteItem.id,
-                                'note-item-unselected':
-                                    noteStore.selectedNoteId !== noteItem.id,
-                            }"
-                            @click="noteStore.selectNote(noteItem.id)"
-                            @contextmenu="
-                                openNoteContextMenu(
-                                    $event,
-                                    noteItem.id,
-                                    noteItem.title || `Note ${index + 1}`,
-                                )
-                            "
+                            class="h-[calc(100%-10px)] pt-5px pl-5px pb-5px flex flex-col gap-2 take-note-list-panel"
                         >
-                            <div class="flex items-start justify-between gap-1">
-                                <div class="text-xs font-700 truncate select-none">
-                                    {{ noteItem.title || `Note ${index + 1}` }}
-                                </div>
-                                <NButton
-                                    quaternary
-                                    size="tiny"
-                                    title="Delete note"
-                                    class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                                    @click.stop="
-                                        confirmDeleteNote(
+                            <NButton size="small" type="primary" secondary @click="openCreateNoteDialog()">
+                                <template #icon>
+                                    <NIcon><Add /></NIcon>
+                                </template>
+                                New Note
+                            </NButton>
+
+                            <div
+                                class="overflow-y-auto overflowing-div hide-note-list-scrollbar h-full flex flex-col gap-1 pr-1"
+                            >
+                                <NEmpty
+                                    v-if="!noteStore.notes.length"
+                                    description="No notes yet"
+                                    size="small"
+                                />
+
+                                <div
+                                    v-for="(noteItem, index) in noteStore.notes"
+                                    :key="noteItem.id"
+                                    class="group note-item rounded-md border p-2 cursor-pointer transition-all duration-200 ease-out"
+                                    :class="{
+                                        'note-item-selected bg-[var(--primary-color)]/20 border-[var(--primary-color)] shadow-md':
+                                            noteStore.selectedNoteId === noteItem.id,
+                                        'note-item-unselected':
+                                            noteStore.selectedNoteId !== noteItem.id,
+                                    }"
+                                    @click="noteStore.selectNote(noteItem.id)"
+                                    @contextmenu="
+                                        openNoteContextMenu(
+                                            $event,
                                             noteItem.id,
                                             noteItem.title || `Note ${index + 1}`,
                                         )
                                     "
                                 >
-                                    <template #icon>
-                                        <NIcon><TrashCan /></NIcon>
-                                    </template>
-                                </NButton>
+                                    <div class="flex items-start justify-between gap-1">
+                                        <div class="text-xs font-700 truncate select-none">
+                                            {{ noteItem.title || `Note ${index + 1}` }}
+                                        </div>
+                                        <NButton
+                                            quaternary
+                                            size="tiny"
+                                            title="Delete note"
+                                            class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                                            @click.stop="
+                                                confirmDeleteNote(
+                                                    noteItem.id,
+                                                    noteItem.title || `Note ${index + 1}`,
+                                                )
+                                            "
+                                        >
+                                            <template #icon>
+                                                <NIcon><TrashCan /></NIcon>
+                                            </template>
+                                        </NButton>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </Pane>
+                    </Pane>
 
-            <Pane
-                :size="paneSizes[1].size"
-                :min-size="paneSizes[1].min"
-                :max-size="paneSizes[1].max"
-                class="rounded-md"
-            >
-                <div
-                    class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 take-note-editor-panel"
-                >
-                    <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow />
-                </div>
-            </Pane>
-        </Splitpanes>
+                    <Pane
+                        :size="paneSizes[1].size"
+                        :min-size="paneSizes[1].min"
+                        :max-size="paneSizes[1].max"
+                        class="rounded-md pt-5px pb-5px" 
+                    >
+                        <div
+                            class="h-full min-w-0 rounded-r-md border border-gray-200 dark:border-dark-200 bg-gray-200/55 dark:bg-dark-400 take-note-editor-panel"
+                        >
+                            <Editor ref="EditorRef" v-model="noteStore.currentNoteContent" overflow />
+                        </div>
+                    </Pane>
+                </Splitpanes>
+            </NTabPane>
+
+            <NTabPane name="cross-references" tab="Cross References" display-directive="show:lazy" class="flex-1 min-h-0">
+                <CrossReferences />
+            </NTabPane>
+        </NTabs>
 
         <NDropdown
             trigger="manual"
@@ -297,50 +316,20 @@ function changePaneSizes(sizes: Array<any>) {
     position: relative;
 }
 
-:deep(.take-note-split .splitpanes__splitter::before) {
-    content: '';
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    background: rgba(120, 120, 120, 0.45);
+:deep(.take-note-tabs) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-:deep(.take-note-split .splitpanes__splitter:hover::before) {
-    width: 2px;
-    background: var(--primary-color);
+:deep(.take-note-tabs .n-tabs-pane-wrapper) {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
-.hide-note-list-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.hide-note-list-scrollbar::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
-}
-
-.note-item {
-    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.05));
-    border-color: var(--theme-border, rgba(255, 255, 255, 0.1));
-    color: var(--theme-text, #ffffff);
-    transform: translateY(0);
-}
-
-.note-item-unselected:hover {
-    background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.1));
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transform: translateY(-2px);
-}
-
-.note-item-selected {
-    background-color: var(--primary-color) !important;
-    color: #ffffff;
-    transform: translateY(0);
+:deep(.take-note-tabs .n-tab-pane) {
+    height: 100%;
+    padding: 0;
 }
 </style>

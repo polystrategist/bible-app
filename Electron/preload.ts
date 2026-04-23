@@ -155,4 +155,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
 
     // Shell
     openExternal: (url: string) => ipcRenderer.invoke('openExternal', url),
+
+    // Cross References
+    getCrossReferences: (args: { book_number: number; chapter: number; verse: number }) =>
+        ipcRenderer.invoke('getCrossReferences', args),
+    getVerseText: (args: { bible_versions: string[]; book_number: number; chapter: number; verse: number }) =>
+        ipcRenderer.invoke('getVerseText', args),
 });

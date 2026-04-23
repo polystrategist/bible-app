@@ -23,6 +23,14 @@ export const DictionaryDB = knex({
     },
 });
 
+export const CrossReferencesDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\StoreDB\\cross_references.db`,
+    },
+});
+
 export const setDB = (pathOfDb: string) => {
     return knex({
         client: 'sqlite3',

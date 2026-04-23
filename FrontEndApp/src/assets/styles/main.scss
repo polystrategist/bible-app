@@ -719,7 +719,6 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-toolbar,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-verses-toolbar,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-version-sticky,
-body[class*='theme-bg-']:not(.theme-bg-default) .take-note-list-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .take-note-editor-panel {
     background-color: var(--theme-bg-elevated) !important;
     color: var(--theme-text) !important;
@@ -742,7 +741,6 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-ro
     background-color: var(--theme-bg-main) !important;
 }
 
-body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-list-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-editor-panel {
     background-color: var(--theme-bg-soft) !important;
     border-color: var(--theme-border) !important;

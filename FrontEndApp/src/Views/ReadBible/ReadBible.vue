@@ -5,8 +5,7 @@ import SESSION from '../../util/session';
 import LeftSideBar from './LeftSideBar/LeftSideBar.vue';
 import RightSideBar from './RightSideBar/RightSideBar.vue';
 import ViewVerses from './ViewVerses/ViewVerses.vue';
-import Editor from '../../components/Editor/Editor.vue';
-import TakeNote from './TakeNote/TakeNote.vue';
+import BottomPanel from './BottomPanel/BottomPanel.vue';
 import useNoteStore from '../../store/useNoteStore';
 import { useSettingStore } from '../../store/settingStore';
 
@@ -72,7 +71,7 @@ onBeforeMount(() => {
             <Splitpanes
                 horizontal
                 :dbl-click-splitter="false"
-                class="h-full w-full"
+                class="h-full w-full splitpanes_show_bar "
                 :class="{ 'splitter-hidden': !noteStore.showNote}"
                 @resized="changeViewVerseSize"
             >
@@ -90,8 +89,8 @@ onBeforeMount(() => {
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"
                 >
-                    <div class="p-5px h-[calc(100%-10px)] take-note-fade" :class="{ 'take-note-show': noteStore.showNote }">
-                        <TakeNote />
+                    <div class="h-full take-note-fade" :class="{ 'take-note-show': noteStore.showNote }">
+                        <BottomPanel />
                     </div>
                 </Pane>
             </Splitpanes>

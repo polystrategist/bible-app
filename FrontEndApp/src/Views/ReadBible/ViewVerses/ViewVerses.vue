@@ -435,6 +435,10 @@ const copyText = () => {
 
 function checkHere(this: HTMLElement): void {
     const el = this;
+    const verse = parseInt(el.dataset.verse || '0');
+    if (verse) {
+        bibleStore.setActiveVerse(verse);
+    }
     el.addEventListener('keydown', function (event: KeyboardEvent) {
         const key = event.key;
         const ctrl = event.ctrlKey;
@@ -721,16 +725,17 @@ onMounted(() => {
                                             'rounded-t-md': clipNoteRender(
                                                 `${verse.book_number}_${verse.chapter}_${verse.verse}`,
                                             ),
+                                            'dark:bg-light-50 dark:bg-opacity-10 bg-gray-600 bg-opacity-10':
+                                                bibleStore.selectedVerse === verse.verse,
                                         }"
                                         :data-book="verse.book_number"
                                         :data-chapter="verse.chapter"
                                         :data-verse="verse.verse"
-                                        :style="`border: 1px solid ${
-                                            clipNoteRender(
-                                                `${verse.book_number}_${verse.chapter}_${verse.verse}`,
-                                            ).color
-                                        }`"
-                                        class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative"
+                                        :style="[
+                                            `border: 1px solid ${clipNoteRender(`${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`,
+                                            bibleStore.selectedVerse === verse.verse ? 'border-left: 1px solid var(--primary-color)' : '',
+                                        ]"
+                                        class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative transition-colors duration-150"
                                     >
                                         <div
                                             v-if="verse.version[paneIndex]"
