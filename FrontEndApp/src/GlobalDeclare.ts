@@ -207,6 +207,25 @@ declare global {
 
             // Shell
             openExternal: (url: string) => Promise<void>;
+
+            // Cross References
+            getCrossReferences: (args: {
+                book_number: number;
+                chapter: number;
+                verse: number;
+            }) => Promise<Array<{
+                to_book: number;
+                to_chapter: number;
+                to_verse_start: number;
+                to_verse_end: number;
+                votes: number;
+            }>>;
+            getVerseText: (args: {
+                bible_versions: string[];
+                book_number: number;
+                chapter: number;
+                verse: number;
+            }) => Promise<Array<{ version: string; text: string }>>;
         };
     }
 }
