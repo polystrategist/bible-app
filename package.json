@@ -4,7 +4,7 @@
   "author": "JenuelDev",
   "version": "1.3.0",
   "main": "./dist/main.js",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit && cd FrontEndApp && yarn typecheck",
