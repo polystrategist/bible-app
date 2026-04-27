@@ -66,9 +66,8 @@ export const routes: Array<RouteRecordRaw> = [
         component: DailyDevotional,
     },
 ];
-const mode = import.meta.env.MODE == 'web' ? '/app/' : undefined;
 const router = createRouter({
-    history: createWebHashHistory(mode),
+    history: createWebHashHistory(),
     routes,
 });
 

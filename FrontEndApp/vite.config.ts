@@ -4,10 +4,12 @@ import UnoCSS from 'unocss/vite';
 
 export default defineConfig(({ mode }) => ({
     build: {
-        outDir: mode == 'web' ? './../web/public/app' : './../dist',
+        outDir: mode == 'web' ? './../dist-web' : './../dist',
         chunkSizeWarningLimit: 2000,
     },
-    base: mode == 'web' ? '/app/' : mode == 'development' ? '' : './',
+    // Electron loads via file:// so it needs './' relative paths.
+    // Web is served from the site root, so '/'.
+    base: mode == 'web' ? '/' : mode == 'development' ? '' : './',
     plugins: [vue(), UnoCSS()],
     server: {
         port: 3000,
