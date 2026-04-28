@@ -121,3 +121,81 @@ onMounted(async () => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.login-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: var(--theme-bg-main);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 36px;
+    border-radius: 12px;
+    border: 1px solid var(--theme-border);
+    background: var(--theme-bg-elevated);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    color: var(--theme-text);
+}
+
+.login-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.login-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.login-app-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--theme-text);
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 8px;
+    color: var(--theme-text);
+}
+
+.login-desc {
+    text-align: center;
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    margin: 0 0 28px;
+    line-height: 1.5;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.login-label {
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    margin-bottom: -4px;
+}
+
+.login-submit {
+    margin-top: 6px;
+}
+</style>

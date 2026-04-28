@@ -27,7 +27,8 @@ export const routes: Array<RouteRecordRaw> = [
             {
                 path: '',
                 name: 'ProfilePage',
-                component: LoginPage,
+                redirect: () =>
+                    localStorage.getItem('auth_token') ? '/profile/profile' : '/login',
             },
             {
                 path: 'profile',
