@@ -87,15 +87,21 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
-          PREV_TAG=$(gh release list --limit 1 --exclude-drafts --json tagName -q '.[0].tagName' || echo "")
-          if [ -n "$PREV_TAG" ]; then
-            gh api repos/${{ github.repository }}/releases/generate-notes \
-              -f tag_name="$TAG" -f previous_tag_name="$PREV_TAG" \
-              --jq '.body' > notes.md
+          if [ -s release_note.md ]; then
+            echo "Using release_note.md from repository."
+            cp release_note.md notes.md
           else
-            gh api repos/${{ github.repository }}/releases/generate-notes \
-              -f tag_name="$TAG" \
-              --jq '.body' > notes.md
+            echo "release_note.md missing or empty — falling back to auto-generated notes."
+            PREV_TAG=$(gh release list --limit 1 --exclude-drafts --json tagName -q '.[0].tagName' || echo "")
+            if [ -n "$PREV_TAG" ]; then
+              gh api repos/${{ github.repository }}/releases/generate-notes \
+                -f tag_name="$TAG" -f previous_tag_name="$PREV_TAG" \
+                --jq '.body' > notes.md
+            else
+              gh api repos/${{ github.repository }}/releases/generate-notes \
+                -f tag_name="$TAG" \
+                --jq '.body' > notes.md
+            fi
           fi
 
       - name: Publish release
