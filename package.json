@@ -16,6 +16,7 @@
     "electron:setup": "yarn",
     "setup": "yarn electron:setup && yarn front:setup",
     "serve:front": "cd FrontEndApp && yarn dev",
+    "serve:web": "cd FrontEndApp && yarn dev",
     "serve:electron": "set APP_IS_NIGHTLY=yes && set APP_IS_DEV=yes && yarn build && wait-on tcp:3000 && electron .",
     "build:front": "cd FrontEndApp && yarn build",
     "electron:build": "yarn build",

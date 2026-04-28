@@ -10,6 +10,9 @@ export default defineConfig(({ mode }) => ({
     // Electron loads via file:// so it needs './' relative paths.
     // Web is served from the site root, so '/'.
     base: mode == 'web' ? '/' : mode == 'development' ? '' : './',
+    define: {
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    },
     plugins: [vue(), UnoCSS()],
     server: {
         port: 3000,
