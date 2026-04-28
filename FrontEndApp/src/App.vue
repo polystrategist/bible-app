@@ -30,7 +30,7 @@ import { computed } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
-const isPopupWindow = computed(() => route.name === 'CompareVerse' || route.name === 'Login');
+const isPopupWindow = computed(() => route.name === 'CompareVerse' || (!window.isElectron && route.name === 'Login'));
 
 const isMounted = ref(false);
 const authStore = useAuthStore();
