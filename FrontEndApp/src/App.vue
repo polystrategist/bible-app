@@ -12,7 +12,7 @@ import {
 } from 'naive-ui';
 import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
-import { onBeforeMount, onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref, watch } from 'vue';
 import { useThemeStore } from './store/theme';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
@@ -25,14 +25,22 @@ import SettingsModal from './components/Settings/SettingsModal.vue';
 import { useAuthStore } from './store/authStore';
 import FlipBook from './Views/ReadBible/FlipBook/FlipBook.vue';
 import VersionSelectModal from './Views/ReadBible/FlipBook/VersionSelectModal.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { computed } from 'vue';
 
 const route = useRoute();
-const isPopupWindow = computed(() => route.name === 'CompareVerse');
+const router = useRouter();
+const isPopupWindow = computed(() => route.name === 'CompareVerse' || route.name === 'Login');
 
 const isMounted = ref(false);
 const authStore = useAuthStore();
+
+// On web: redirect to /login when the token is invalidated (e.g. 401 response)
+watch(() => authStore.isAuthenticated, (authenticated) => {
+    if (!authenticated && !window.isElectron) {
+        router.push('/login');
+    }
+});
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();

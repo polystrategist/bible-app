@@ -37,7 +37,7 @@ async function login() {
     }
 
     message.success('Logged In! Successfully.');
-    await router.push('/profile/profile');
+    await router.push(window.isElectron ? '/profile/profile' : '/');
 }
 
 async function register() {
@@ -66,7 +66,7 @@ async function register() {
     }
 
     message.success('Registered! Successfully.');
-    await router.push('/profile/profile');
+    await router.push(window.isElectron ? '/profile/profile' : '/');
 }
 
 async function submit() {
@@ -76,7 +76,7 @@ async function submit() {
 
 onMounted(async () => {
     if (authStore.isAuthenticated) {
-        await router.push('/profile/profile');
+        await router.push(window.isElectron ? '/profile/profile' : '/');
     }
 });
 </script>
