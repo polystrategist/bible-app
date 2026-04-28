@@ -3,19 +3,26 @@
  *
  * In Electron, `window.browserWindow` is exposed via contextBridge from
  * `Electron/preload.ts` and routes to IPC handlers. In the browser there is
- * no IPC, so this file installs a stub object with the same shape.
- *
- * Every method here returns a SAFE DEFAULT (empty list, no-op, or a shaped
- * "unavailable" response) instead of throwing — the goal of Phase 1 is to
- * load the UI on the web without crashes, not to provide real data. As the
- * web backend grows, replace stubs with real `fetch` calls one by one.
+ * no IPC, so this file routes calls to the REST API backend instead.
  *
  * Convention:
- *   - reads      -> return empty list / object / sensible default
- *   - writes     -> log a warning, resolve with a no-op success shape
- *   - listeners  -> no-op (callback never fires)
- *   - window/OS  -> no-op
+ *   - Bible reads  -> real fetch calls to /api/bible/*
+ *   - writes       -> log a warning, resolve with a no-op success shape
+ *   - listeners    -> no-op (callback never fires)
+ *   - window/OS    -> no-op
  */
+
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL ?? ''}/api`;
+
+async function apiFetch<T>(path: string, fallback: T): Promise<T> {
+    try {
+        const r = await fetch(`${API_BASE}${path}`);
+        if (!r.ok) return fallback;
+        return r.json() as Promise<T>;
+    } catch {
+        return fallback;
+    }
+}
 
 let warned = new Set<string>();
 function warnOnce(method: string) {
@@ -38,11 +45,36 @@ const stub: Window['browserWindow'] = {
     setAppScale: async (scale: number) => scale,
 
     // ---------- Bible reads ----------
-    getAvailableBibles: async () => [],
+    getAvailableBibles: async () => apiFetch('/bible/versions', [] as string[]),
     deleteBible: async () => { warnOnce('deleteBible'); return { success: false, error: 'Not available on web' }; },
-    getVerses: async () => [],
-    getVersesCount: async () => 0,
-    searchBible: async () => ({ result: [], totalCount: 0 } as any),
+    getVerses: async (args: string) => {
+        const { bible_versions, book_number, selected_chapter } = JSON.parse(args);
+        const params = new URLSearchParams();
+        (bible_versions as string[]).forEach((v) => params.append('versions[]', v));
+        params.set('book_number', String(book_number));
+        params.set('chapter', String(selected_chapter));
+        return apiFetch(`/bible/verses?${params}`, []);
+    },
+    getVersesCount: async (args: string) => {
+        const { bible_versions, book_number, selected_chapter } = JSON.parse(args);
+        const params = new URLSearchParams();
+        (bible_versions as string[]).forEach((v) => params.append('versions[]', v));
+        params.set('book_number', String(book_number));
+        params.set('chapter', String(selected_chapter));
+        const res = await apiFetch<{ count: number }>(`/bible/verses/count?${params}`, { count: 0 });
+        return res.count;
+    },
+    searchBible: async (args: string) => {
+        const { search, bible_versions, book_number, book_numbers, page, limit } = JSON.parse(args);
+        const params = new URLSearchParams({ q: search, page: String(page), limit: String(limit) });
+        (bible_versions as string[]).forEach((v) => params.append('versions[]', v));
+        if (Array.isArray(book_numbers) && book_numbers.length) {
+            (book_numbers as number[]).forEach((b) => params.append('book_numbers[]', String(b)));
+        } else if (book_number) {
+            params.set('book_number', String(book_number));
+        }
+        return apiFetch(`/bible/search?${params}`, []);
+    },
 
     // ---------- Highlights ----------
     getChapterHighlights: async () => [],
@@ -143,7 +175,15 @@ const stub: Window['browserWindow'] = {
 
     // ---------- Cross References ----------
     getCrossReferences: async () => [],
-    getVerseText: async () => [],
+    getVerseText: async (args) => {
+        const { bible_versions, book_number, chapter, verse } = args;
+        const params = new URLSearchParams();
+        (bible_versions as string[]).forEach((v) => params.append('versions[]', v));
+        params.set('book_number', String(book_number));
+        params.set('chapter', String(chapter));
+        params.set('verse', String(verse));
+        return apiFetch(`/bible/verse-text?${params}`, []);
+    },
 };
 
 export function installWebBridge() {
