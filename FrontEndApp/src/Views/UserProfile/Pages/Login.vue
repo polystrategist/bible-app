@@ -81,43 +81,151 @@ onMounted(async () => {
 });
 </script>
 <template>
-    <div class="h-full w-full">
-        <div class="w-400px mx-auto mt-5 flex flex-col gap-2">
-            <h5 class="text-center font-800 text-size-25px">
-                {{ isRegister ? 'Sign Up' : $t('Sign In') }}
-            </h5>
-            <p class="text-center text-sm opacity-60 mt-1 mb-2">
-                {{ $t('sign-in-desc') }}
-            </p>
-            {{ $t('Email Address:') }}
-            <NInput v-model:value="form.email" :placeholder="$t('Email')" />
-            {{ $t('Password:') }}
-            <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" />
-            <span v-if="isRegister">Retype Password:</span>
-            <NInput
-                v-if="isRegister"
-                v-model:value="form.retypePassword"
-                placeholder="Retype Password"
-                type="password"
-            />
+    <div class="login-page">
+        <div class="login-card">
+            <!-- Branding -->
+            <div class="login-brand">
+                <img src="/logo.svg" alt="Believers Sword" class="login-logo" />
+                <span class="login-app-name">Believers Sword</span>
+            </div>
 
-            <template v-if="isRegister">
-                <span>Full Name:</span>
-                <NInput v-model:value="form.name" placeholder="Your name" type="text" />
-            </template>
-            <NButton
-                :disabled="loading"
-                :loading="loading"
-                type="primary"
-                @click="submit"
-                @keydown.enter="submit"
-            >
-                {{ isRegister ? 'Sign Me Up' : 'Sign In' }}
-            </NButton>
-            <NButton v-show="!isRegister" @click="isRegister = true">{{ $t('Create Account') }}</NButton>
-            <NButton v-show="isRegister" @click="isRegister = false"
-                >Already Have an Account?</NButton
-            >
+            <h2 class="login-title">{{ isRegister ? 'Create Account' : 'Sign In' }}</h2>
+            <p class="login-desc">{{ $t('sign-in-desc') }}</p>
+
+            <div class="login-form">
+                <template v-if="isRegister">
+                    <label class="login-label">Full Name</label>
+                    <NInput v-model:value="form.name" placeholder="Your name" size="large" @keydown.enter="submit" />
+                </template>
+
+                <label class="login-label">{{ $t('Email Address:') }}</label>
+                <NInput v-model:value="form.email" :placeholder="$t('Email')" size="large" @keydown.enter="submit" />
+
+                <label class="login-label">{{ $t('Password:') }}</label>
+                <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" size="large" @keydown.enter="submit" />
+
+                <template v-if="isRegister">
+                    <label class="login-label">Retype Password</label>
+                    <NInput v-model:value="form.retypePassword" placeholder="Retype Password" type="password" size="large" @keydown.enter="submit" />
+                </template>
+
+                <NButton
+                    class="login-submit"
+                    :disabled="loading"
+                    :loading="loading"
+                    type="primary"
+                    size="large"
+                    block
+                    @click="submit"
+                >
+                    {{ isRegister ? 'Sign Me Up' : 'Sign In' }}
+                </NButton>
+
+                <NButton size="large" block @click="isRegister = !isRegister">
+                    {{ isRegister ? 'Already have an account? Sign In' : $t('Create Account') }}
+                </NButton>
+            </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+/* ── dark (default) ────────────────────────────────── */
+.login-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: #111;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 36px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+}
+
+.login-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.login-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.login-app-name {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 8px;
+    color: #ffffff;
+}
+
+.login-desc {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 28px;
+    line-height: 1.5;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.login-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: -4px;
+}
+
+.login-submit {
+    margin-top: 6px;
+}
+
+/* ── light theme overrides ─────────────────────────── */
+:global(body.light) .login-page {
+    background: #f0f0f0;
+}
+
+:global(body.light) .login-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    color: #111111;
+}
+
+:global(body.light) .login-logo {
+    filter: brightness(0);
+}
+
+:global(body.light) .login-app-name { color: rgba(0, 0, 0, 0.85); }
+:global(body.light) .login-title    { color: #111111; }
+:global(body.light) .login-desc     { color: rgba(0, 0, 0, 0.5); }
+:global(body.light) .login-label    { color: rgba(0, 0, 0, 0.65); }
+</style>

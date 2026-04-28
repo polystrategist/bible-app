@@ -17,6 +17,8 @@ const API_BASE = `${import.meta.env.VITE_API_BASE_URL ?? ''}/api`;
 async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {}): Promise<T> {
     try {
         const token = localStorage.getItem('auth_token');
+        const isPublic = path.startsWith('/bible/');
+        if (!isPublic && !token) return fallback;
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -87,7 +89,7 @@ const stub: Window['browserWindow'] = {
     getChapterHighlights: async (args: string) => {
         const { book_number, chapter } = JSON.parse(args);
         const params = new URLSearchParams({ book_number: String(book_number), chapter: String(chapter) });
-        return apiFetch(`/highlights/chapter?${params}`, {});
+        return apiFetch(`/highlights/chapter?${params}`, []);
     },
     getHighlights: async (args: string) => {
         const { page, search, limit } = JSON.parse(args);
