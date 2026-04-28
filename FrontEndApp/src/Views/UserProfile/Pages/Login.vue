@@ -37,7 +37,7 @@ async function login() {
     }
 
     message.success('Logged In! Successfully.');
-    await router.push('/profile/profile');
+    await router.push(window.isElectron ? '/profile/profile' : '/');
 }
 
 async function register() {
@@ -66,7 +66,7 @@ async function register() {
     }
 
     message.success('Registered! Successfully.');
-    await router.push('/profile/profile');
+    await router.push(window.isElectron ? '/profile/profile' : '/');
 }
 
 async function submit() {
@@ -76,53 +76,61 @@ async function submit() {
 
 onMounted(async () => {
     if (authStore.isAuthenticated) {
-        await router.push('/profile/profile');
+        await router.push(window.isElectron ? '/profile/profile' : '/');
     }
 });
 </script>
 <template>
-    <div class="h-full w-full">
-        <div class="w-400px mx-auto mt-5 flex flex-col gap-2">
-            <h5 class="text-center font-800 text-size-25px">
-                {{ isRegister ? 'Sign Up' : $t('Sign In') }}
-            </h5>
-            <p class="text-center text-sm opacity-60 mt-1 mb-2">
-                {{ $t('sign-in-desc') }}
-            </p>
-            {{ $t('Email Address:') }}
-            <NInput v-model:value="form.email" :placeholder="$t('Email')" />
-            {{ $t('Password:') }}
-            <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" />
-            <span v-if="isRegister">Retype Password:</span>
-            <NInput
-                v-if="isRegister"
-                v-model:value="form.retypePassword"
-                placeholder="Retype Password"
-                type="password"
-            />
+    <div class="login-page">
+        <div class="login-card">
+            <!-- Branding -->
+            <div class="login-brand">
+                <img src="/logo.svg" alt="Believers Sword" class="login-logo" />
+                <span class="login-app-name">Believers Sword</span>
+            </div>
 
-            <template v-if="isRegister">
-                <span>Full Name:</span>
-                <NInput v-model:value="form.name" placeholder="Your name" type="text" />
-            </template>
-            <NButton
-                :disabled="loading"
-                :loading="loading"
-                type="primary"
-                @click="submit"
-                @keydown.enter="submit"
-            >
-                {{ isRegister ? 'Sign Me Up' : 'Sign In' }}
-            </NButton>
-            <NButton v-show="!isRegister" @click="isRegister = true">{{ $t('Create Account') }}</NButton>
-            <NButton v-show="isRegister" @click="isRegister = false"
-                >Already Have an Account?</NButton
-            >
+            <h2 class="login-title">{{ isRegister ? 'Create Account' : 'Sign In' }}</h2>
+            <p class="login-desc">{{ $t('sign-in-desc') }}</p>
+
+            <div class="login-form">
+                <template v-if="isRegister">
+                    <label class="login-label">Full Name</label>
+                    <NInput v-model:value="form.name" placeholder="Your name" size="large" @keydown.enter="submit" />
+                </template>
+
+                <label class="login-label">{{ $t('Email Address:') }}</label>
+                <NInput v-model:value="form.email" :placeholder="$t('Email')" size="large" @keydown.enter="submit" />
+
+                <label class="login-label">{{ $t('Password:') }}</label>
+                <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" size="large" @keydown.enter="submit" />
+
+                <template v-if="isRegister">
+                    <label class="login-label">Retype Password</label>
+                    <NInput v-model:value="form.retypePassword" placeholder="Retype Password" type="password" size="large" @keydown.enter="submit" />
+                </template>
+
+                <NButton
+                    class="login-submit"
+                    :disabled="loading"
+                    :loading="loading"
+                    type="primary"
+                    size="large"
+                    block
+                    @click="submit"
+                >
+                    {{ isRegister ? 'Sign Me Up' : 'Sign In' }}
+                </NButton>
+
+                <NButton size="large" block @click="isRegister = !isRegister">
+                    {{ isRegister ? 'Already have an account? Sign In' : $t('Create Account') }}
+                </NButton>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+/* ── dark (default) ────────────────────────────────── */
 .login-page {
     min-height: 100vh;
     width: 100%;

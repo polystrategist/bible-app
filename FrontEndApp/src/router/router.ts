@@ -16,6 +16,12 @@ export const routes: Array<RouteRecordRaw> = [
         redirect: 'prayer-list',
     },
     {
+        name: 'Login',
+        path: '/login',
+        component: LoginPage,
+        meta: { public: true },
+    },
+    {
         name: 'PrayerList',
         path: '/prayer-list',
         component: PrayerList,
@@ -70,6 +76,13 @@ export const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
     history: createWebHashHistory(),
     routes,
+});
+
+router.beforeEach((to) => {
+    if (window.isElectron) return true;
+    if (to.meta?.public) return true;
+    if (!localStorage.getItem('auth_token')) return { name: 'Login' };
+    return true;
 });
 
 export default router;
