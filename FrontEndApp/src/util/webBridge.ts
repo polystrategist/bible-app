@@ -14,9 +14,16 @@
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL ?? ''}/api`;
 
-async function apiFetch<T>(path: string, fallback: T): Promise<T> {
+async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {}): Promise<T> {
     try {
-        const r = await fetch(`${API_BASE}${path}`);
+        const token = localStorage.getItem('auth_token');
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...(options.headers as Record<string, string> ?? {}),
+        };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const r = await fetch(`${API_BASE}${path}`, { ...options, headers });
         if (!r.ok) return fallback;
         return r.json() as Promise<T>;
     } catch {
@@ -77,40 +84,92 @@ const stub: Window['browserWindow'] = {
     },
 
     // ---------- Highlights ----------
-    getChapterHighlights: async () => [],
-    getHighlights: async () => [],
-    saveHighlight: async () => { warnOnce('saveHighlight'); return null; },
-    deleteHighlight: async () => { warnOnce('deleteHighlight'); return null; },
+    getChapterHighlights: async (args: string) => {
+        const { book_number, chapter } = JSON.parse(args);
+        const params = new URLSearchParams({ book_number: String(book_number), chapter: String(chapter) });
+        return apiFetch(`/highlights/chapter?${params}`, {});
+    },
+    getHighlights: async (args: string) => {
+        const { page, search, limit } = JSON.parse(args);
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search) params.set('search', search);
+        return apiFetch(`/highlights?${params}`, []);
+    },
+    saveHighlight: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/highlights', 0, { method: 'POST', body: JSON.stringify(body) });
+    },
+    deleteHighlight: async (args: { key: string }) => {
+        return apiFetch(`/highlights/${encodeURIComponent(args.key)}`, null, { method: 'DELETE' });
+    },
 
     // ---------- Downloads ----------
     downloadModule: () => { warnOnce('downloadModule'); },
 
     // ---------- Bookmarks ----------
-    saveBookMark: async () => { warnOnce('saveBookMark'); return null; },
-    getBookMarks: async () => ({}),
-    deleteBookmark: async () => { warnOnce('deleteBookmark'); return null; },
+    getBookMarks: async () => apiFetch('/bookmarks', {}),
+    saveBookMark: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/bookmarks', {}, { method: 'POST', body: JSON.stringify(body) });
+    },
+    deleteBookmark: async (args: string) => {
+        const { book_number, chapter, verse } = JSON.parse(args);
+        const key = `${book_number}_${chapter}_${verse}`;
+        return apiFetch(`/bookmarks/${encodeURIComponent(key)}`, null, { method: 'DELETE' });
+    },
 
     // ---------- Clip Notes ----------
-    getClipNotes: async () => [],
-    getChapterClipNotes: async () => ({} as any),
-    storeClipNote: async () => { warnOnce('storeClipNote'); return null; },
-    deleteChapterClipNotes: async () => { warnOnce('deleteChapterClipNotes'); return null; },
+    getClipNotes: async (args: string) => {
+        const { page, search, limit } = JSON.parse(args);
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search) params.set('search', search);
+        return apiFetch(`/clip-notes?${params}`, []);
+    },
+    getChapterClipNotes: async (args: string) => {
+        const { book_number, chapter } = JSON.parse(args);
+        const params = new URLSearchParams({ book_number: String(book_number), chapter: String(chapter) });
+        return apiFetch(`/clip-notes/chapter?${params}`, {} as any);
+    },
+    storeClipNote: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/clip-notes', null, { method: 'POST', body: JSON.stringify(body) });
+    },
+    deleteChapterClipNotes: async (args: string) => {
+        const { book_number, chapter, verse } = JSON.parse(args);
+        const key = `${book_number}_${chapter}_${verse}`;
+        return apiFetch(`/clip-notes/${encodeURIComponent(key)}`, null, { method: 'DELETE' });
+    },
 
     // ---------- Prayer List ----------
-    getPrayerLists: async () => [],
-    savePrayerItem: async () => { warnOnce('savePrayerItem'); return null; },
-    resetPrayerListItems: async () => { warnOnce('resetPrayerListItems'); return null; },
-    reorderPrayerListItems: async () => { warnOnce('reorderPrayerListItems'); return null; },
-    deletePrayerListItem: async () => { warnOnce('deletePrayerListItem'); return null; },
+    getPrayerLists: async () => apiFetch('/prayer-list', []),
+    savePrayerItem: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/prayer-list', null, { method: 'POST', body: JSON.stringify(body) });
+    },
+    resetPrayerListItems: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/prayer-list/reset', null, { method: 'POST', body: JSON.stringify(body) });
+    },
+    reorderPrayerListItems: async (args: string) => {
+        const body = JSON.parse(args);
+        return apiFetch('/prayer-list/reorder', null, { method: 'POST', body: JSON.stringify(body) });
+    },
+    deletePrayerListItem: async (key: string | number) => {
+        return apiFetch(`/prayer-list/${encodeURIComponent(String(key))}`, null, { method: 'DELETE' });
+    },
 
     // ---------- Misc ----------
     updateDownloadProgress: () => { /* no-op listener */ },
     openDonateWindow: () => { warnOnce('openDonateWindow'); },
 
     // ---------- Notes ----------
-    getNotes: async () => [],
-    upsertNote: async () => { warnOnce('upsertNote'); return null; },
-    deleteNote: async () => { warnOnce('deleteNote'); return null; },
+    getNotes: async () => apiFetch('/notes', []),
+    upsertNote: async (args: { note_id: string; title: string; content: string }) => {
+        return apiFetch('/notes', null, { method: 'POST', body: JSON.stringify(args) });
+    },
+    deleteNote: async (args: { note_id: string }) => {
+        return apiFetch(`/notes/${encodeURIComponent(args.note_id)}`, null, { method: 'DELETE' });
+    },
 
     // ---------- Dictionary ----------
     searchDictionary: async () => [],
