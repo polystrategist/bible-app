@@ -50,6 +50,7 @@ const stub: Window['browserWindow'] = {
     closeWindow: async () => { warnOnce('closeWindow'); },
     maximizeWindow: async () => { warnOnce('maximizeWindow'); },
     minimizeWindow: async () => { warnOnce('minimizeWindow'); },
+    onWindowMaximized: () => { warnOnce('onWindowMaximized'); },
     getAppScale: async () => 1,
     setAppScale: async (scale: number) => scale,
 
