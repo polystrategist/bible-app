@@ -88,8 +88,8 @@ async function logout() {
         style="padding: 0; border-radius: 12px; overflow: hidden; min-width: 220px"
     >
         <template #trigger>
-            <NButton size="tiny" quaternary style="gap: 6px">
-                <div style="display: flex; align-items: center; gap: 6px">
+            <NButton size="small" round quaternary>
+                <template #icon>
                     <div
                         style="
                             width: 18px;
@@ -108,8 +108,8 @@ async function logout() {
                     >
                         {{ initials }}
                     </div>
-                    {{ firstName }}
-                </div>
+                </template>
+                {{ firstName }}
             </NButton>
         </template>
 
@@ -179,7 +179,7 @@ async function logout() {
         </div>
     </NPopover>
 
-    <NButton v-else round size="tiny" quaternary @click="menuStore.setMenu('/profile')">
+    <NButton v-else round size="small" quaternary @click="menuStore.setMenu('/profile')">
         <template #icon>
             <NIcon>
                 <Login />

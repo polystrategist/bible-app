@@ -65,6 +65,9 @@ const setAppScale = (win: BrowserWindow, scale: number): number => {
 };
 
 export const windowBrowserEvents = (win: BrowserWindow) => {
+    win.on('maximize', () => win.webContents.send('window:maximized', true));
+    win.on('unmaximize', () => win.webContents.send('window:maximized', false));
+
     ipcMain.handle("minimizeWindow", () => minimizeWindow(win));
     ipcMain.handle("maximizeWindow", () => maximizeWindow(win));
     ipcMain.handle("closeWindow", () => closeWindow(win));

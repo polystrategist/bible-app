@@ -123,10 +123,10 @@ onMounted(() => {
                     {{ definition.definition }}
                 </div>
             </div>
-            <div class="h-full flex flex-col items-center justify-center">
-                <div class="text-3xl">🔎</div>
-                <div>Empty</div>
-                <small>Search for a word</small>
+            <div class="h-full flex flex-col items-center justify-center gap-1 opacity-60">
+                <div class="text-4xl">📖</div>
+                <div class="font-semibold text-lg">Dictionary</div>
+                <small class="text-center px-4">Type a word above to see its definition</small>
             </div>
         </div>
     </div>

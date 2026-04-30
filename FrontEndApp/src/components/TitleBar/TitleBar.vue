@@ -11,10 +11,10 @@ import {
     SquareMultiple20Regular,
     Subtract20Regular,
 } from '@vicons/fluent';
-import { Close, Information } from '@vicons/carbon';
+import { Close } from '@vicons/carbon';
+import HelpMenu from '../Footer/HelpMenu.vue';
 import { onBeforeMount, ref } from 'vue';
 import { useThemeStore } from '../../store/theme';
-import { useMainStore } from '../../store/main';
 import SearchBar from '../SearchBar.vue';
 import LogoComponent from './../LogoComponent.vue';
 // import ProfileDropdown from './Partials/ProfileDropdown.vue';
@@ -26,7 +26,6 @@ import ProfileDropdown from './Partials/ProfileDropdown.vue';
 
 const isMaximized = ref(false);
 const themeStore = useThemeStore();
-const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const isElectron = window.isElectron;
 const settingStore = useSettingStore();
@@ -38,7 +37,6 @@ async function minimizeWindow() {
 
 async function maximizeWindow() {
     await window.browserWindow.maximizeWindow();
-    isMaximized.value = !isMaximized.value;
 }
 
 async function closeWindow() {
@@ -46,8 +44,12 @@ async function closeWindow() {
 }
 
 onBeforeMount(async () => {
-    if (window.isElectron)
+    if (window.isElectron) {
         isMaximized.value = await window.browserWindow.isWindowBrowserMaximized();
+        window.browserWindow.onWindowMaximized((value) => {
+            isMaximized.value = value;
+        });
+    }
 });
 </script>
 <template>
@@ -109,16 +111,12 @@ onBeforeMount(async () => {
             </div>
         </div>
         <div class="flex items-center w-full h-full z-50 justify-between">
-            <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>
+            <div class="draggable-region flex-grow opacity-0">draggable region</div>
             <SearchBar />
-            <div class="draggable-region flex-grow cursor-move opacity-0">draggable region</div>
+            <div class="draggable-region flex-grow opacity-0">draggable region</div>
         </div>
-        <div class="flex items-center h-full justify-end pr-6px">
-            <NButton round size="small" quaternary @click="mainStore.showAbout = true" title="About">
-                <NIcon size="20">
-                    <Information />
-                </NIcon>
-            </NButton>
+        <div class="flex items-center h-full justify-end pr-6px gap-5px">
+            <HelpMenu />
             <ThemeChangerDrawer />
             <ProfileDropdown />
             <NButton
@@ -127,7 +125,6 @@ onBeforeMount(async () => {
                 quaternary
                 :title="$t('minimize')"
                 @click="minimizeWindow()"
-                class="ml-5"
             >
                 <NIcon size="20">
                     <Subtract20Regular />
@@ -163,6 +160,5 @@ onBeforeMount(async () => {
 <style lang="scss">
 .draggable-region {
     -webkit-app-region: drag;
-    cursor: move;
 }
 </style>
