@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw } from 'vue-router';
 import PrayerList from './../Views/PrayerList/PrayerList.vue';
 import AboutPage from './../Views/About/About.vue';
+import HelpPortal from './../Views/HelpPortal/HelpPortal.vue';
 import CreateSermon from './../Views/CreateSermon/CreateSermon.vue';
 import LoginPage from './../Views/UserProfile/Pages/Login.vue';
 import ProfileAccountPage from './../Views/UserProfile/Pages/Profile/Profile.vue';
@@ -46,6 +47,11 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'AboutPage',
         path: '/about-page',
         component: AboutPage,
+    },
+    {
+        name: 'HelpPortal',
+        path: '/help-portal',
+        component: HelpPortal,
     },
     {
         name: 'CreateSermon',

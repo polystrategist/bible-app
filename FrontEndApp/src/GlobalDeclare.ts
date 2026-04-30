@@ -171,6 +171,7 @@ declare global {
             installUpdate: () => Promise<void>;
             downloadUpdate: () => Promise<void>;
             openStoreUpdates: () => Promise<{ success: boolean; error?: string }>;
+            onWindowMaximized: (cb: (isMaximized: boolean) => void) => void;
             onUpdateAvailable: (cb: (version: string) => void) => void;
             onUpdateProgress: (cb: (percent: number) => void) => void;
             onUpdateDownloaded: (cb: () => void) => void;

@@ -118,6 +118,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     installUpdate: () => ipcRenderer.invoke('install-update'),
     downloadUpdate: () => ipcRenderer.invoke('download-update'),
     openStoreUpdates: () => ipcRenderer.invoke('open-store-updates'),
+    onWindowMaximized: (cb: (isMaximized: boolean) => void) => {
+        ipcRenderer.removeAllListeners('window:maximized');
+        ipcRenderer.on('window:maximized', (_e, value) => cb(value));
+    },
     onUpdateAvailable: (cb: (version: string) => void) => {
         ipcRenderer.removeAllListeners('update-available');
         ipcRenderer.on('update-available', (_e, version) => cb(version));
