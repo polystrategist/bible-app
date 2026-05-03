@@ -108,7 +108,7 @@ const stub: Window['browserWindow'] = {
     setAppScale: async (scale: number) => scale,
 
     // ---------- Bible reads ----------
-    getAvailableBibles: async () => apiFetch('/bible/versions', [] as string[]),
+    getAvailableBibles: async () => apiFetch('/bible/version-details', [] as string[]),
     deleteBible: async () => { warnOnce('deleteBible'); return { success: false, error: 'Not available on web' }; },
     getVerses: async (args: string) => {
         const { bible_versions, book_number, selected_chapter } = JSON.parse(args);

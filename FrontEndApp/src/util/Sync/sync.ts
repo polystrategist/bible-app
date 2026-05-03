@@ -93,6 +93,7 @@ async function pullSync(token: string): Promise<void> {
         if (response.data.status !== 'success') return;
 
         const { sync_logs, bookmarks, highlights, clip_notes, prayer_lists, notes, settings, has_more, next_cursor, last_sync_timestamp } = response.data;
+        const authStore = useAuthStore();
 
         await window.browserWindow.applyPullData({
             sync_logs,
@@ -103,6 +104,10 @@ async function pullSync(token: string): Promise<void> {
             notes,
             settings,
         });
+
+        if (settings && !authStore.pendingSettingsUpdate) {
+            authStore.remoteSettings = settings;
+        }
 
         if (has_more && next_cursor) {
             since = next_cursor;
