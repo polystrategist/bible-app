@@ -13,6 +13,7 @@
  */
 
 const API_BASE = `${import.meta.env.VITE_API_BASE_URL ?? ''}/api`;
+const bibleVersesCache = new Map<string, Promise<any[]>>();
 
 async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {}): Promise<T> {
     try {
@@ -40,6 +41,16 @@ function buildBibleVersesPath(version: string, bookNumber: number, chapter: numb
     params.set('chapter', String(chapter));
 
     return `/bible/verses?${params}`;
+}
+
+function getBibleVersesRows(version: string, bookNumber: number, chapter: number) {
+    const path = buildBibleVersesPath(version, bookNumber, chapter);
+    const cached = bibleVersesCache.get(path);
+    if (cached) return cached;
+
+    const request = apiFetch<any[]>(path, []);
+    bibleVersesCache.set(path, request);
+    return request;
 }
 
 function mergeVerseRows(target: any[], rows: any[], fallbackVersion: string) {
@@ -104,10 +115,7 @@ const stub: Window['browserWindow'] = {
         const selectedVersions = bible_versions as string[];
         const responses = await Promise.all(
             selectedVersions.map((version) =>
-                apiFetch<any[]>(
-                    buildBibleVersesPath(version, book_number, selected_chapter),
-                    [],
-                ),
+                getBibleVersesRows(version, book_number, selected_chapter),
             ),
         );
 
@@ -289,7 +297,14 @@ const stub: Window['browserWindow'] = {
     openExternal: async (url: string) => { window.open(url, '_blank', 'noopener,noreferrer'); },
 
     // ---------- Cross References ----------
-    getCrossReferences: async () => [],
+    getCrossReferences: async (args) => {
+        const params = new URLSearchParams({
+            book_number: String(args.book_number),
+            chapter: String(args.chapter),
+            verse: String(args.verse),
+        });
+        return apiFetch(`/cross-references?${params}`, []);
+    },
     getVerseText: async (args) => {
         const { bible_versions, book_number, chapter, verse } = args;
         const params = new URLSearchParams();

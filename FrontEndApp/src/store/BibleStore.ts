@@ -35,6 +35,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedVerse = ref<number>(1);
     const verses = ref<Array<any>>([]);
     const isLoadingVerses = ref(false);
+    const loadingVerseVersions = ref<Array<string>>([]);
     const chapterHighlights = ref<Array<any>>([]);
     const allHighlights = ref<Array<any>>([]);
     const highlightPage = ref(1);
@@ -116,11 +117,25 @@ export const useBibleStore = defineStore('useBibleStore', () => {
 
     let getVersesRequestId = 0;
 
+    function hasLoadedCurrentChapterVersion(versionFile: string) {
+        return verses.value.some(
+            (verse) =>
+                verse.book_number === selectedBookNumber.value &&
+                verse.chapter === selectedChapter.value &&
+                verse.version?.some((version: any) => version.version === versionFile),
+        );
+    }
+
     async function getVerses() {
         const requestId = ++getVersesRequestId;
+        const requestedVersions = [...selectedBibleVersions.value];
+        const missingVersions = requestedVersions.filter(
+            (version) => !hasLoadedCurrentChapterVersion(version),
+        );
         isLoadingVerses.value = true;
+        loadingVerseVersions.value = missingVersions.length ? missingVersions : requestedVersions;
         const arg = {
-            bible_versions: selectedBibleVersions.value,
+            bible_versions: requestedVersions,
             book_number: selectedBookNumber.value,
             selected_chapter: selectedChapter.value,
         };
@@ -133,6 +148,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         } finally {
             if (requestId === getVersesRequestId) {
                 isLoadingVerses.value = false;
+                loadingVerseVersions.value = [];
             }
         }
     }
@@ -192,6 +208,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         AutoScrollSavedPosition,
         verses,
         isLoadingVerses,
+        loadingVerseVersions,
         DefaultSelectedVersion,
         selectedBibleVersions,
         selectedBook,

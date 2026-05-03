@@ -125,6 +125,10 @@
     min-height: 34px;
 }
 
+.read-bible-verse-scroll-pane {
+    scroll-behavior: auto;
+}
+
 .verse-loading-skeleton {
     display: flex;
     gap: 16px;

@@ -5,7 +5,7 @@ import { Icon } from '@iconify/vue';
 import { useSettingStore } from '../../../store/settingStore';
 import { usePiperTTSStore } from '../../../store/piperTTSStore';
 import { useDialog } from 'naive-ui';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import PiperModelsModal from './PiperModelsModal.vue';
 
 const dialog = useDialog();
@@ -13,21 +13,35 @@ const dialog = useDialog();
 const settings = useSettingStore();
 const piperStore = usePiperTTSStore();
 const showModelsModal = ref(false);
+const canUsePiperTts = window.isElectron;
 
-onMounted(() => piperStore.checkInstalled());
+onMounted(() => {
+    if (!canUsePiperTts && settings.verseReaderMode === 'piper-tts') {
+        settings.verseReaderMode = 'browser-tts';
+    }
 
-const options = [
+    if (canUsePiperTts) {
+        piperStore.checkInstalled();
+    }
+});
+
+const options = computed(() => [
     {
         value: 'browser-tts',
         title: 'Browser Text to Speech',
         description: "Uses your device's built-in speech engine to read Bible verses aloud. Works fully offline — no internet or external service required.",
     },
-    {
-        value: 'piper-tts',
-        title: 'Piper Neural TTS',
-        description: 'High-quality AI voice that runs fully offline using a neural network model. Sounds significantly more natural than browser speech. Requires a one-time download (~67 MB).',
-    },
-];
+    ...(canUsePiperTts
+        ? [
+              {
+                  value: 'piper-tts',
+                  title: 'Piper Neural TTS',
+                  description:
+                      'High-quality AI voice that runs fully offline using a neural network model. Sounds significantly more natural than browser speech. Requires a one-time download (~67 MB).',
+              },
+          ]
+        : []),
+]);
 
 function installStepLabel(step: string, percent: number): string {
     if (step === 'binary') return `Downloading Piper engine… ${percent}%`;
@@ -163,5 +177,5 @@ function installStepLabel(step: string, percent: number): string {
         <NSwitch v-model:value="settings.readVerseNumber" />
     </div>
 
-    <PiperModelsModal v-model:show="showModelsModal" />
+    <PiperModelsModal v-if="canUsePiperTts" v-model:show="showModelsModal" />
 </template>

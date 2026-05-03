@@ -61,6 +61,8 @@ const scrollPaneRefs = ref<(HTMLElement | null)[]>([]);
 const verseSkeletonRows = [0, 1, 2, 3, 4];
 let activePaneIndex: number | null = null;
 let saveScrollTimeout: ReturnType<typeof setTimeout> | null = null;
+let scrollSyncAnimationFrame: number | null = null;
+let pendingScrollSourcePaneIndex: number | null = null;
 
 function versionOptionsForPane(paneIndex: number) {
     const usedByOtherPanes = bibleStore.selectedBibleVersions.filter(
@@ -122,7 +124,14 @@ function paneHasVisibleVerses(paneIndex: number) {
     return bibleStore.renderVerses.some((verse) => verse.version[paneIndex]?.text);
 }
 
-const showVerseSkeletons = computed(() => !window.isElectron && bibleStore.isLoadingVerses);
+function showVerseSkeletons(paneIndex: number) {
+    const versionFile = bibleStore.selectedBibleVersions[paneIndex];
+    return (
+        !window.isElectron &&
+        bibleStore.isLoadingVerses &&
+        bibleStore.loadingVerseVersions.includes(versionFile)
+    );
+}
 
 function removeSplit(paneIndex: number) {
     if (bibleStore.selectedBibleVersions.length <= 1) return;
@@ -131,7 +140,6 @@ function removeSplit(paneIndex: number) {
     const count = bibleStore.selectedBibleVersions.length;
     splitPaneSizes.value = Array(count).fill(100 / count);
     SESSION.set(storageSplitPaneSizesKey, splitPaneSizes.value);
-    bibleStore.getVerses();
 }
 
 function onSplitResized(sizes: Array<{ size: number }>) {
@@ -172,6 +180,18 @@ function scrollPaneToVerse(scrollEl: HTMLElement, verse: number, proportion: num
     scrollEl.scrollTop = targetVerseEl.offsetTop - scrollEl.offsetTop + proportion * targetVerseEl.offsetHeight;
 }
 
+function getScrollRatio(scrollEl: HTMLElement) {
+    const maxScrollTop = scrollEl.scrollHeight - scrollEl.clientHeight;
+    if (maxScrollTop <= 0) return 0;
+
+    return scrollEl.scrollTop / maxScrollTop;
+}
+
+function scrollPaneToRatio(scrollEl: HTMLElement, ratio: number) {
+    const maxScrollTop = scrollEl.scrollHeight - scrollEl.clientHeight;
+    scrollEl.scrollTop = maxScrollTop * ratio;
+}
+
 function saveScrollPosition(scrollEl: HTMLElement) {
     if (saveScrollTimeout) clearTimeout(saveScrollTimeout);
     saveScrollTimeout = setTimeout(() => {
@@ -206,16 +226,30 @@ function onPaneMouseEnter(paneIndex: number) {
 
 function syncScroll(sourcePaneIndex: number) {
     if (activePaneIndex !== sourcePaneIndex) return;
+    pendingScrollSourcePaneIndex = sourcePaneIndex;
+
+    if (scrollSyncAnimationFrame !== null) return;
+
+    scrollSyncAnimationFrame = requestAnimationFrame(() => {
+        scrollSyncAnimationFrame = null;
+        const sourcePaneIndex = pendingScrollSourcePaneIndex;
+        pendingScrollSourcePaneIndex = null;
+
+        if (sourcePaneIndex === null || activePaneIndex !== sourcePaneIndex) return;
+        syncScrollToPanes(sourcePaneIndex);
+    });
+}
+
+function syncScrollToPanes(sourcePaneIndex: number) {
     const source = scrollPaneRefs.value[sourcePaneIndex];
     if (!source) return;
 
-    const pos = getTopVisibleVerse(source as HTMLElement);
-    if (!pos) return;
+    const ratio = getScrollRatio(source as HTMLElement);
 
     const panes = scrollPaneRefs.value;
     for (let i = 0; i < panes.length; i++) {
         if (i === sourcePaneIndex || !panes[i]) continue;
-        scrollPaneToVerse(panes[i] as HTMLElement, pos.verse, pos.proportion);
+        scrollPaneToRatio(panes[i] as HTMLElement, ratio);
     }
 
     saveScrollPosition(source as HTMLElement);
@@ -668,6 +702,9 @@ onUnmounted(() => {
     if (verseCopyListener) {
         document.removeEventListener('copy', verseCopyListener);
     }
+    if (scrollSyncAnimationFrame !== null) {
+        cancelAnimationFrame(scrollSyncAnimationFrame);
+    }
 });
 </script>
 <template>
@@ -838,11 +875,12 @@ onUnmounted(() => {
                         <!-- Scrollable verse list for this pane -->
                         <div
                             :ref="(el) => setScrollPaneRef(paneIndex, el)"
-                            class="flex-1 min-h-0 scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div pb-20px"
+                            class="flex-1 min-h-0 scroll-bar-md flex flex-col gap-5px overflow-y-auto overflowing-div pb-20px read-bible-verse-scroll-pane"
                             @mouseenter="onPaneMouseEnter(paneIndex)"
+                            @pointerdown="onPaneMouseEnter(paneIndex)"
                             @scroll="syncScroll(paneIndex)"
                         >
-                            <template v-if="showVerseSkeletons">
+                            <template v-if="showVerseSkeletons(paneIndex)">
                                 <div
                                     v-for="row in verseSkeletonRows"
                                     :key="`verse-skeleton-${paneIndex}-${row}`"
