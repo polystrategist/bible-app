@@ -58,6 +58,7 @@ const storageSplitPaneSizesKey = 'verse-split-pane-sizes';
 const storageScrollPositionKey = 'verse-scroll-position';
 const splitPaneSizes = ref<number[]>([100]);
 const scrollPaneRefs = ref<(HTMLElement | null)[]>([]);
+const verseSkeletonRows = [0, 1, 2, 3, 4];
 let activePaneIndex: number | null = null;
 let saveScrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -81,13 +82,34 @@ function changeVersion(paneIndex: number, newVersion: string) {
     bibleStore.getVerses();
 }
 
-function addSplit() {
+async function versionHasCurrentChapter(versionFile: string) {
+    const verseCount = await window.browserWindow.getVersesCount(
+        JSON.stringify({
+            bible_versions: [versionFile],
+            book_number: bibleStore.selectedBookNumber,
+            selected_chapter: bibleStore.selectedChapter,
+        }),
+    );
+
+    return verseCount > 0;
+}
+
+async function addSplit() {
     if (bibleStore.selectedBibleVersions.length >= 6) return;
-    // Pick first version not already selected
-    const available = moduleStore.bibleLists
-        .filter((b: any) => !b.title.includes('commentaries'))
-        .find((b: any) => !bibleStore.selectedBibleVersions.includes(b.file_name));
-    const newVersion = available ? available.file_name : bibleStore.DefaultSelectedVersion;
+    const available = moduleStore.bibleLists.filter(
+        (b: any) =>
+            !b.title.includes('commentaries') &&
+            !bibleStore.selectedBibleVersions.includes(b.file_name),
+    );
+
+    let newVersion = available[0]?.file_name ?? bibleStore.DefaultSelectedVersion;
+    for (const candidate of available) {
+        if (await versionHasCurrentChapter(candidate.file_name)) {
+            newVersion = candidate.file_name;
+            break;
+        }
+    }
+
     bibleStore.selectedBibleVersions.push(newVersion);
     // Distribute pane sizes evenly
     const count = bibleStore.selectedBibleVersions.length;
@@ -95,6 +117,12 @@ function addSplit() {
     SESSION.set(storageSplitPaneSizesKey, splitPaneSizes.value);
     bibleStore.getVerses();
 }
+
+function paneHasVisibleVerses(paneIndex: number) {
+    return bibleStore.renderVerses.some((verse) => verse.version[paneIndex]?.text);
+}
+
+const showVerseSkeletons = computed(() => !window.isElectron && bibleStore.isLoadingVerses);
 
 function removeSplit(paneIndex: number) {
     if (bibleStore.selectedBibleVersions.length <= 1) return;
@@ -814,11 +842,36 @@ onUnmounted(() => {
                             @mouseenter="onPaneMouseEnter(paneIndex)"
                             @scroll="syncScroll(paneIndex)"
                         >
-                            <div
-                                v-for="(verse, verseIndex) in bibleStore.renderVerses"
-                                :key="verse.verse"
-                                class="flex flex-col w-full mx-auto"
-                            >
+                            <template v-if="showVerseSkeletons">
+                                <div
+                                    v-for="row in verseSkeletonRows"
+                                    :key="`verse-skeleton-${paneIndex}-${row}`"
+                                    class="mx-10px verse-loading-skeleton"
+                                    aria-hidden="true"
+                                >
+                                    <div class="verse-loading-number"></div>
+                                    <div class="verse-loading-content">
+                                        <div class="verse-loading-line w-92"></div>
+                                        <div class="verse-loading-line w-76"></div>
+                                        <div class="verse-loading-line w-58"></div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-else-if="!paneHasVisibleVerses(paneIndex)">
+                                <div
+                                    class="mx-10px mt-16px rounded border px-12px py-10px text-size-13px"
+                                    style="border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.12); color: #f59e0b;"
+                                >
+                                    This Bible version does not contain
+                                    {{ bibleStore.selectedBook.title }} {{ bibleStore.selectedChapter }}.
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div
+                                    v-for="(verse, verseIndex) in bibleStore.renderVerses"
+                                    :key="verse.verse"
+                                    class="flex flex-col w-full mx-auto"
+                                >
                                 <div class="mx-10px">
                                     <div
                                         :class="{
@@ -827,10 +880,17 @@ onUnmounted(() => {
                                             ),
                                             'dark:bg-light-50 dark:bg-opacity-10 bg-gray-600 bg-opacity-10':
                                                 bibleStore.selectedVerse === verse.verse,
+                                            'the-selected-verse':
+                                                bibleStore.selectedVerse === verse.verse,
                                         }"
                                         :data-book="verse.book_number"
                                         :data-chapter="verse.chapter"
                                         :data-verse="verse.verse"
+                                        :id="
+                                            paneIndex === 0 && bibleStore.selectedVerse === verse.verse
+                                                ? 'the-selected-verse'
+                                                : undefined
+                                        "
                                         :style="[
                                             `border: 1px solid ${clipNoteRender(`${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`,
                                             bibleStore.selectedVerse === verse.verse ? 'border-left: 1px solid var(--primary-color)' : '',
@@ -838,7 +898,7 @@ onUnmounted(() => {
                                         class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative transition-colors duration-150"
                                     >
                                         <div
-                                            v-if="verse.version[paneIndex]"
+                                            v-if="!verse.version[paneIndex].missing"
                                             class="w-full"
                                             :class="{
                                                 'context-menu-active-verse':
@@ -982,7 +1042,8 @@ onUnmounted(() => {
                                         ></div>
                                     </div>
                                 </div>
-                            </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </Pane>

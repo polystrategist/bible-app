@@ -33,6 +33,48 @@ async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {})
     }
 }
 
+function buildBibleVersesPath(version: string, bookNumber: number, chapter: number) {
+    const params = new URLSearchParams();
+    params.append('versions[]', version);
+    params.set('book_number', String(bookNumber));
+    params.set('chapter', String(chapter));
+
+    return `/bible/verses?${params}`;
+}
+
+function mergeVerseRows(target: any[], rows: any[], fallbackVersion: string) {
+    rows.forEach((row: any) => {
+        if (!row) return;
+
+        const verseNumber = Number(row.verse);
+        if (!verseNumber) return;
+
+        if (!target[verseNumber - 1]) {
+            target[verseNumber - 1] = {
+                book_number: row.book_number,
+                chapter: row.chapter,
+                verse: verseNumber,
+                version: [],
+            };
+        }
+
+        const versionRows = Array.isArray(row.version)
+            ? row.version
+            : [{ version: row.version ?? fallbackVersion, text: row.text }];
+
+        versionRows.forEach((versionRow: any) => {
+            const version = versionRow?.version ?? fallbackVersion;
+            const text = versionRow?.text ?? '';
+
+            if (!version || target[verseNumber - 1].version.some((item: any) => item.version === version)) {
+                return;
+            }
+
+            target[verseNumber - 1].version.push({ version, text });
+        });
+    });
+}
+
 let warned = new Set<string>();
 function warnOnce(method: string) {
     if (warned.has(method)) return;
@@ -59,11 +101,22 @@ const stub: Window['browserWindow'] = {
     deleteBible: async () => { warnOnce('deleteBible'); return { success: false, error: 'Not available on web' }; },
     getVerses: async (args: string) => {
         const { bible_versions, book_number, selected_chapter } = JSON.parse(args);
-        const params = new URLSearchParams();
-        (bible_versions as string[]).forEach((v) => params.append('versions[]', v));
-        params.set('book_number', String(book_number));
-        params.set('chapter', String(selected_chapter));
-        return apiFetch(`/bible/verses?${params}`, []);
+        const selectedVersions = bible_versions as string[];
+        const responses = await Promise.all(
+            selectedVersions.map((version) =>
+                apiFetch<any[]>(
+                    buildBibleVersesPath(version, book_number, selected_chapter),
+                    [],
+                ),
+            ),
+        );
+
+        const mergedRows: any[] = [];
+        responses.forEach((rows, index) => {
+            mergeVerseRows(mergedRows, rows, selectedVersions[index]);
+        });
+
+        return mergedRows.filter(Boolean);
     },
     getVersesCount: async (args: string) => {
         const { bible_versions, book_number, selected_chapter } = JSON.parse(args);

@@ -34,6 +34,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
     const verses = ref<Array<any>>([]);
+    const isLoadingVerses = ref(false);
     const chapterHighlights = ref<Array<any>>([]);
     const allHighlights = ref<Array<any>>([]);
     const highlightPage = ref(1);
@@ -47,7 +48,21 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             // Content is now just the hex color (e.g., "#FFD26A")
             const highlightColor = highlight?.content ?? null;
 
-            const theVersions = v.version.map((ver: any) => {
+            const verseVersionsByFileName = new Map(
+                v.version.map((ver: any) => [ver.version, ver]),
+            );
+
+            const theVersions = selectedBibleVersions.value.map((versionFile) => {
+                const ver: any = verseVersionsByFileName.get(versionFile);
+                if (!ver) {
+                    return {
+                        text: '',
+                        version: versionFile,
+                        key: '',
+                        missing: true,
+                    };
+                }
+
                 const key = `${ver.version.replace('.SQLite3', '')}_${v.book_number}_${v.chapter}_${
                     v.verse
                 }`;
@@ -59,6 +74,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
                     text,
                     version: ver.version,
                     key,
+                    missing: false,
                 };
             });
 
@@ -98,17 +114,27 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         chapterHighlights.value = await bibleService.getChapterHighlights(args);
     }
 
+    let getVersesRequestId = 0;
+
     async function getVerses() {
+        const requestId = ++getVersesRequestId;
+        isLoadingVerses.value = true;
         const arg = {
             bible_versions: selectedBibleVersions.value,
             book_number: selectedBookNumber.value,
             selected_chapter: selectedChapter.value,
         };
-        await getChapterHighlights();
-        await clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
-        selectedBook.value = getBook(selectedBookNumber.value);
-        const bibleService = getBibleService();
-        verses.value = await bibleService.getVerses(arg);
+        try {
+            await getChapterHighlights();
+            await clipNoteStore.getChapterClipNotes(selectedBookNumber.value, selectedChapter.value);
+            selectedBook.value = getBook(selectedBookNumber.value);
+            const bibleService = getBibleService();
+            verses.value = await bibleService.getVerses(arg);
+        } finally {
+            if (requestId === getVersesRequestId) {
+                isLoadingVerses.value = false;
+            }
+        }
     }
 
     function saveVersesToStorage() {
@@ -165,6 +191,7 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         allHighlights,
         AutoScrollSavedPosition,
         verses,
+        isLoadingVerses,
         DefaultSelectedVersion,
         selectedBibleVersions,
         selectedBook,

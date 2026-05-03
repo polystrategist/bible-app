@@ -17,7 +17,14 @@ function selectBookVerse(
     { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number },
 ) {
     selectedHighlight.value = key;
-    bibleStore.selectVerse(book_number, chapter, verse);
+    if (
+        bibleStore.selectedBookNumber === book_number &&
+        bibleStore.selectedChapter === chapter
+    ) {
+        bibleStore.setActiveVerse(verse);
+    } else {
+        bibleStore.selectVerse(book_number, chapter, verse);
+    }
     bibleStore.AutoScrollSavedPosition(100);
 }
 

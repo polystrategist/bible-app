@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NLayoutFooter, NProgress, NButton, NIcon } from 'naive-ui';
+import { NLayoutFooter, NProgress, NButton, NIcon, NTag } from 'naive-ui';
 import { onBeforeMount, onMounted, ref } from 'vue';
 import { useMainStore } from '../../store/main';
 import { useNetwork } from '@vueuse/core';
@@ -23,6 +23,7 @@ const network = useNetwork();
 const mainStore = useMainStore();
 const menuStore = useMenuStore();
 const settingStore = useSettingStore();
+const showBetaTag = !window.isElectron;
 
 type UpdateStatus = 'idle' | 'available' | 'downloading' | 'ready';
 
@@ -95,6 +96,9 @@ function installUpdate() {
     >
         <div class="whitespace-nowrap flex items-center gap-1 w-full max-w-300px">
             <span class="text-size-12px"> {{ $t('version') }} {{ mainStore.version }} </span>
+            <NTag v-if="showBetaTag" size="small" type="warning" round :bordered="false">
+                Beta Version
+            </NTag>
         </div>
         <div
             class="w-full text-center z-50 font-700 flex items-center justify-center flex items-center gap-2"
