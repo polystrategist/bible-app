@@ -22,6 +22,8 @@
 
 .verse-select-text {
     caret-color: transparent;
+    cursor: text;
+    user-select: text;
 
     &, * {
         font-family: var(--bible-font-family) !important;
@@ -88,10 +90,6 @@
         j {
             font-weight: 700 !important;
         }
-    }
-
-    [contenteditable]:focus {
-        outline: 0 solid transparent;
     }
 }
 

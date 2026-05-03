@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, onMounted, ref, watch, h, computed, nextTick } from 'vue';
+import { onBeforeMount, onMounted, onUnmounted, ref, watch, h, computed, nextTick } from 'vue';
 import { useBibleStore } from '../../../store/BibleStore';
 import { NButton, NIcon, NPopover, NSelect, NSlider, useDialog, useMessage } from 'naive-ui';
 import { Attachment, BookmarkFilled, Copy, Delete, Edit, Add, Close } from '@vicons/carbon';
@@ -281,7 +281,10 @@ const contextMenuData = ref({});
 const contextMenuVerseKey = ref<string>('');
 const bookmarkStore = useBookmarkStore();
 const showPopOver = ref(false);
+const selectedPassageTextForCopy = ref<string | null>(null);
 const { x, y } = useMouse();
+let verseCopyListener: ((event: ClipboardEvent) => void) | null = null;
+let forcedPassageCopyText: string | null = null;
 
 const footnotePopover = ref({
     show: false,
@@ -424,34 +427,120 @@ watch(showContextMenu, (val) => {
     if (!val) contextMenuVerseKey.value = '';
 });
 
-const copyText = () => {
+function getCleanVerseTextForCopy(element: HTMLElement) {
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll('a, s, f').forEach((hiddenElement) => hiddenElement.remove());
+
+    return (clone.textContent ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function getSelectedVerseElements(selection: Selection) {
+    if (!selection.rangeCount || !selection.toString().trim()) return [];
+
+    const container = document.getElementById('view-verses-container');
+    if (!container) return [];
+
+    const range = selection.getRangeAt(0);
+
+    return Array.from(container.querySelectorAll<HTMLElement>('.verse-select-text')).filter(
+        (element) => {
+            try {
+                return range.intersectsNode(element);
+            } catch {
+                return false;
+            }
+        },
+    );
+}
+
+function getSelectedPassageTextForCopy(includeRawFallback = true) {
     const selected = window.getSelection();
-    const text: string | undefined = selected?.toString();
-    if (text) {
-        navigator.clipboard.writeText(text);
-        message.success('Copied to clipboard');
+    if (!selected) return null;
+
+    const selectedVerseElements = getSelectedVerseElements(selected);
+    if (!selectedVerseElements.length) {
+        return includeRawFallback ? selected.toString().trim() || null : null;
     }
+
+    const selectedVerses = selectedVerseElements
+        .map((element) => ({
+            bookNumber: Number(element.dataset.book),
+            chapter: Number(element.dataset.chapter),
+            verse: Number(element.dataset.verse),
+            text: getCleanVerseTextForCopy(element),
+        }))
+        .filter((verse) => verse.bookNumber && verse.chapter && verse.verse && verse.text);
+
+    if (!selectedVerses.length) {
+        return includeRawFallback ? selected.toString().trim() || null : null;
+    }
+
+    const firstVerse = selectedVerses[0];
+    const lastVerse = selectedVerses[selectedVerses.length - 1];
+    const bookName = bibleStore.getBook(firstVerse.bookNumber).title;
+    const reference =
+        firstVerse.verse === lastVerse.verse
+            ? `${bookName} ${firstVerse.chapter}:${firstVerse.verse}`
+            : `${bookName} ${firstVerse.chapter}:${firstVerse.verse}-${lastVerse.verse}`;
+
+    return `"${selectedVerses.map((verse) => verse.text).join('\n')}"\n${reference}`;
+}
+
+function copyTextThroughCopyEvent(text: string) {
+    forcedPassageCopyText = text;
+
+    const copyTarget = document.createElement('textarea');
+    copyTarget.value = text;
+    copyTarget.setAttribute('readonly', 'true');
+    copyTarget.style.position = 'fixed';
+    copyTarget.style.opacity = '0';
+    copyTarget.style.pointerEvents = 'none';
+    copyTarget.style.top = '-9999px';
+
+    document.body.appendChild(copyTarget);
+    copyTarget.focus();
+    copyTarget.select();
+
+    let copied = false;
+    try {
+        copied = document.execCommand('copy');
+    } finally {
+        document.body.removeChild(copyTarget);
+        forcedPassageCopyText = null;
+    }
+
+    return copied;
+}
+
+const copyText = () => {
+    const text = selectedPassageTextForCopy.value ?? getSelectedPassageTextForCopy();
+    if (!text) return;
+
+    if (copyTextThroughCopyEvent(text)) {
+        message.success('Copied to clipboard');
+        showPopOver.value = false;
+        return;
+    }
+
+    message.error('Unable to copy selected verses');
 };
 
-function checkHere(this: HTMLElement): void {
-    const el = this;
+function copySelectedPassageWithReference(event: ClipboardEvent) {
+    const text = forcedPassageCopyText ?? getSelectedPassageTextForCopy(false);
+    if (!text || !event.clipboardData) return;
+
+    event.clipboardData.setData('text/plain', text);
+    event.preventDefault();
+}
+
+function setActiveVerseFromElement(event: Event): void {
+    const el = (event.currentTarget as HTMLElement | null)?.closest<HTMLElement>('[data-verse]');
+    if (!el) return;
+
     const verse = parseInt(el.dataset.verse || '0');
     if (verse) {
         bibleStore.setActiveVerse(verse);
     }
-    el.addEventListener('keydown', function (event: KeyboardEvent) {
-        const key = event.key;
-        const ctrl = event.ctrlKey;
-        if (key.toUpperCase() == 'C' && ctrl) {
-            const selected = window.getSelection();
-            const text: string | undefined = selected?.toString();
-            if (text) {
-                message.info('Copied to Clipboard!');
-            }
-        } else {
-            event.preventDefault();
-        }
-    });
 }
 
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
@@ -516,8 +605,10 @@ onMounted(() => {
         }
 
         if (!selectedText) {
+            selectedPassageTextForCopy.value = null;
             showPopOver.value = false;
         } else {
+            selectedPassageTextForCopy.value = getSelectedPassageTextForCopy(false);
             contextMenuPositionX.value = e.pageX;
             contextMenuPositionY.value = e.pageY - 20;
             showPopOver.value = true;
@@ -527,6 +618,9 @@ onMounted(() => {
     container?.addEventListener('dragstart', (event) => {
         event.preventDefault();
     });
+
+    verseCopyListener = copySelectedPassageWithReference;
+    document.addEventListener('copy', verseCopyListener);
 
     // Ctrl+scroll to change font size (works across all panes)
     container?.addEventListener('wheel', (event) => {
@@ -540,6 +634,12 @@ onMounted(() => {
             event.preventDefault();
         }
     });
+});
+
+onUnmounted(() => {
+    if (verseCopyListener) {
+        document.removeEventListener('copy', verseCopyListener);
+    }
 });
 </script>
 <template>
@@ -788,11 +888,9 @@ onMounted(() => {
                                                     :data-chapter="verse.chapter"
                                                     :data-key="verse.version[paneIndex].key"
                                                     :data-verse="verse.verse"
-                                                    :onfocus="checkHere"
                                                     class="verse-select-text input-text-search"
-                                                    contenteditable="true"
-                                                    spellcheck="false"
                                                     v-html="verse.version[paneIndex].text"
+                                                    @mousedown="setActiveVerseFromElement"
                                                     @mouseover="handleFootnoteHover($event, verse.version[paneIndex], verse)"
                                                     @mouseleave="footnotePopover.show = false"
                                                 ></span>
@@ -907,7 +1005,14 @@ onMounted(() => {
             trigger="click"
         >
             <div id="buttons" class="flex items-center gap-10px">
-                <NButton round size="small" secondary title="Copy" @click="copyText">
+                <NButton
+                    round
+                    size="small"
+                    secondary
+                    title="Copy"
+                    @mousedown.prevent
+                    @click="copyText"
+                >
                     <template #icon>
                         <NIcon>
                             <Copy />
