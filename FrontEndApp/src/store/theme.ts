@@ -57,6 +57,27 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         },
     });
 
+    function resolveSelectedTheme(value: unknown): typeNameInterface {
+        return typeof value === 'string' && value in themesOptions
+            ? value as typeNameInterface
+            : 'default';
+    }
+
+    function resolveBackgroundTheme(value: unknown): backgroundThemeType {
+        return typeof value === 'string' && appearanceThemeOptions.some((theme) => theme.backgroundTheme === value)
+            ? value as backgroundThemeType
+            : 'default';
+    }
+
+    function resolveIsDark(value: unknown): boolean {
+        return typeof value === 'boolean' ? value : true;
+    }
+
+    function applyPrimaryTheme() {
+        const theme = getTheme(selectedTheme.value) ?? getTheme('default');
+        themeOverrides.value.common = theme[isDark.value ? 'dark' : 'light'];
+    }
+
     function applyBodyThemeClass() {
         document.body.classList.remove('dark', 'light');
         document.body.classList.add(isDark.value ? 'dark' : 'light');
@@ -68,8 +89,10 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     }
 
     function saveThemeSelected(itsDark = isDark.value) {
-        if (themeOverrides.value.common)
-            themeOverrides.value.common = itsDark ? getTheme(selectedTheme.value).dark : getTheme(selectedTheme.value).light;
+        isDark.value = resolveIsDark(itsDark);
+        selectedTheme.value = resolveSelectedTheme(selectedTheme.value);
+        backgroundTheme.value = resolveBackgroundTheme(backgroundTheme.value);
+        applyPrimaryTheme();
 
         applyBodyThemeClass();
         SESSION.set(saveThemeStorageKey, {
@@ -112,10 +135,10 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     onBeforeMount(() => {
         const savedTheme = SESSION.get(saveThemeStorageKey);
         if (savedTheme) {
-            selectedTheme.value = savedTheme.selectedTheme;
-            isDark.value = savedTheme.isDark;
-            backgroundTheme.value = savedTheme.backgroundTheme || 'default';
-            themeOverrides.value.common = (themesOptions as any)[selectedTheme.value][isDark.value ? 'dark' : 'light'];
+            selectedTheme.value = resolveSelectedTheme(savedTheme.selectedTheme);
+            isDark.value = resolveIsDark(savedTheme.isDark);
+            backgroundTheme.value = resolveBackgroundTheme(savedTheme.backgroundTheme);
+            applyPrimaryTheme();
         }
 
         applyBodyThemeClass();
@@ -127,10 +150,10 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         watch(() => authStore.remoteSettings, (settings) => {
             if (!settings) return;
             if (authStore.pendingSettingsUpdate) return;
-            selectedTheme.value = settings.selected_theme as typeNameInterface;
-            isDark.value = settings.is_dark;
-            backgroundTheme.value = settings.background_theme as backgroundThemeType;
-            themeOverrides.value.common = (themesOptions as any)[selectedTheme.value][isDark.value ? 'dark' : 'light'];
+            selectedTheme.value = resolveSelectedTheme(settings.selected_theme);
+            isDark.value = resolveIsDark(settings.is_dark);
+            backgroundTheme.value = resolveBackgroundTheme(settings.background_theme);
+            applyPrimaryTheme();
             applyBodyThemeClass();
             changeTheRootProperty();
             // Keep localStorage in sync
@@ -148,19 +171,19 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     }
 
     function changePrimaryColor(key: typeNameInterface) {
-        selectedTheme.value = key;
-        themeOverrides.value.common = (themesOptions as any)[key][isDark.value ? 'dark' : 'light'];
+        selectedTheme.value = resolveSelectedTheme(key);
+        applyPrimaryTheme();
         saveThemeSelected();
         changeTheRootProperty();
     }
 
     function setBackgroundTheme(theme: backgroundThemeType) {
-        backgroundTheme.value = theme;
+        backgroundTheme.value = resolveBackgroundTheme(theme);
     }
 
     function applyAppearanceTheme(theme: { isDark: boolean; backgroundTheme: backgroundThemeType }) {
-        isDark.value = theme.isDark;
-        backgroundTheme.value = theme.backgroundTheme;
+        isDark.value = resolveIsDark(theme.isDark);
+        backgroundTheme.value = resolveBackgroundTheme(theme.backgroundTheme);
         saveThemeSelected(theme.isDark);
         changeTheRootProperty();
     }
