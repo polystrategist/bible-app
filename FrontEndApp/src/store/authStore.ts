@@ -508,6 +508,46 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     });
 
+    async function forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
+            return {
+                success: response.data.status === 'success',
+                message: response.data.message ?? 'Failed to send reset link',
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to send reset link',
+            };
+        }
+    }
+
+    async function resetPassword(
+        token: string,
+        email: string,
+        password: string,
+        passwordConfirmation: string,
+    ): Promise<{ success: boolean; message: string }> {
+        try {
+            const response = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
+                token,
+                email,
+                password,
+                password_confirmation: passwordConfirmation,
+            });
+            return {
+                success: response.data.status === 'success',
+                message: response.data.message ?? 'Failed to reset password',
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to reset password',
+            };
+        }
+    }
+
     return {
         user,
         token,
@@ -529,5 +569,7 @@ export const useAuthStore = defineStore('authStore', () => {
         loadSettings,
         updateSettings,
         flushPendingSettings,
+        forgotPassword,
+        resetPassword,
     };
 });

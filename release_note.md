@@ -1,2 +1,2 @@
 ## Update
-- Fix Status Failed Wrong End point
+- Implemented Forgot password.
