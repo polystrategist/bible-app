@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 import useNoteStore from '../../store/useNoteStore';
+import { useBookmarkStore } from '../../store/bookmark';
+import { usePrayerListStore } from '../../store/prayerListStore';
+import { useBibleStore } from '../../store/BibleStore';
+import { useClipNoteStore } from '../../store/ClipNotes';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -121,10 +125,28 @@ async function pullSync(token: string): Promise<void> {
 }
 
 /**
+ * Reload all Pinia stores that mirror pulled data so the UI reflects what was
+ * just written to SQLite by applyPullData.
+ */
+function reloadStoresAfterPull() {
+    useNoteStore().loadNote();
+    useBookmarkStore().getBookmarks();
+    usePrayerListStore().loadPrayerLists();
+    useBibleStore().getChapterHighlights();
+    useClipNoteStore().getClipNotes();
+}
+
+/**
  * Debounced sync — resets a 3-second timer on each call, fires once after
  * the user stops making changes. Pushes local changes only — no pull,
  * no loadNote, so active editing is never interrupted.
  */
+/** Clear exponential backoff so the next sync attempt runs immediately. */
+export function resetSyncBackoff(): void {
+    consecutiveFailures = 0;
+    backoffUntil = 0;
+}
+
 export function debouncedRunSync(): void {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -186,7 +208,7 @@ export async function runPullSync(): Promise<void> {
         consecutiveFailures = 0;
         backoffUntil = 0;
         authStore.loadLastSyncAt();
-        useNoteStore().loadNote();
+        reloadStoresAfterPull();
     } catch (error: any) {
         const status = error?.response?.status;
         if (status === 401) {
@@ -228,7 +250,7 @@ export async function runSync(): Promise<void> {
         consecutiveFailures = 0;
         backoffUntil = 0;
         authStore.loadLastSyncAt();
-        useNoteStore().loadNote();
+        reloadStoresAfterPull();
     } catch (error: any) {
         const status = error?.response?.status;
         if (status === 401) {

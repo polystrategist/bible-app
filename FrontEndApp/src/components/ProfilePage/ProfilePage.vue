@@ -35,13 +35,8 @@ async function logout() {
 }
 
 async function onSyncToggle(enabled: boolean) {
-    if (enabled) {
-        message.info('To enable sync, download the Believers Sword mobile app and enable sync there.');
-        return;
-    }
-
-    await authStore.setSyncEnabled(false);
-    message.success('Sync disabled.');
+    await authStore.setSyncEnabled(enabled);
+    message.success(enabled ? 'Sync enabled.' : 'Sync disabled.');
 }
 
 // Danger Zone

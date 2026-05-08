@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 import axios from 'axios';
-import { runSync, runPullSync } from '../util/Sync/sync';
+import { runSync, runPullSync, resetSyncBackoff } from '../util/Sync/sync';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -370,6 +370,9 @@ export const useAuthStore = defineStore('authStore', () => {
         if (savedToken) {
             token.value = savedToken;
             isAuthenticated.value = true;
+            // Load sync preference from local IPC store so syncEnabled is correct
+            // even if the network is down and getUser() fails.
+            loadSyncEnabled();
             getUser().then((u) => {
                 if (u) loadSettings();
             });
@@ -394,10 +397,19 @@ export const useAuthStore = defineStore('authStore', () => {
 
     async function onOnline() {
         if (!isAuthenticated.value) return;
+        // If we were offline at startup, user may be null and syncEnabled may be stale.
+        if (!user.value) {
+            const u = await getUser();
+            if (u) loadSettings();
+        }
         await flushPendingSettings();
         if (!pendingSettingsUpdate.value) loadSettings();
-        // Push all accumulated offline changes and pull any remote changes.
-        if (syncEnabled.value) runSync();
+        // Clear backoff so reconnect triggers an immediate sync rather than waiting
+        // out a cooldown that was set during the offline period.
+        if (syncEnabled.value) {
+            resetSyncBackoff();
+            runSync();
+        }
     }
 
     /**
@@ -457,10 +469,6 @@ export const useAuthStore = defineStore('authStore', () => {
      * Queues the preference locally so it's not lost if offline.
      */
     async function setSyncEnabled(enabled: boolean) {
-        if (enabled) {
-            return;
-        }
-
         syncEnabled.value = enabled;
 
         try {

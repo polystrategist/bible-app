@@ -17,6 +17,13 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         }
     }
 
+    /** Clear and re-fetch all prayer lists. Safe to call multiple times. */
+    async function loadPrayerLists() {
+        prayerList.value = [];
+        donePrayerList.value = [];
+        await getPrayerLists();
+    }
+
     /**
      * Use This to Reset Data
      * @param status
@@ -97,7 +104,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
     }
 
     onBeforeMount(async () => {
-        await getPrayerLists();
+        await loadPrayerLists();
     });
 
     return {
@@ -105,6 +112,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         removePrayerItem,
         savePrayerItem,
         reorderPrayerList,
+        loadPrayerLists,
         prayerList,
         donePrayerList,
         setPrayerList: (data: Array<any>) => {
