@@ -75,7 +75,7 @@ async function removeBible(fileName: string, title: string) {
                         {{ formatDescription(bible.description) || 'No description.' }}
                     </div>
                 </div>
-                <NPopconfirm @positive-click="removeBible(bible.file_name, bible.title)" positive-text="Remove" negative-text="Cancel">
+                <NPopconfirm v-if="window.isElectron" @positive-click="removeBible(bible.file_name, bible.title)" positive-text="Remove" negative-text="Cancel">
                     <template #trigger>
                         <NButton quaternary size="tiny" type="error" :loading="deletingFile === bible.file_name" class="mt-0.5">
                             <template #icon>
