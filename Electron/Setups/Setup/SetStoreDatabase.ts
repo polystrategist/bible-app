@@ -4,7 +4,6 @@ import bookmarksMigration from './StoreDB/bookmarks.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
 import notesMigration from './StoreDB/notes.migration';
 import syncLogsMigration from './StoreDB/sync_logs.migration';
-import dailyDevotionalsMigration from './StoreDB/daily_devotionals.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -26,9 +25,6 @@ export default async () => {
 
         // setup sync_logs
         await syncLogsMigration();
-
-        // setup daily devotionals
-        await dailyDevotionalsMigration();
     } catch (e) {
         try {
             Log.error(e);

@@ -1,10 +1,20 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { NSpin, NModal, NSteps, NStep } from 'naive-ui';
 import { Icon } from '@iconify/vue';
+import { useI18n } from 'vue-i18n';
 import { useBibleStore } from '../../store/BibleStore';
 import { bibleBooks } from '../../util/books';
 import { getBibleService } from '../../services/BibleService';
+
+// Maps i18n locale names to ISO codes used in devotionals.db.
+// Falls back to 'en' for any locale not in the DB.
+const localeToLangCode: Record<string, string> = {
+    English: 'en',
+    Korean: 'ko',
+    Portuguese: 'pt',
+    Filipino: 'tl',
+};
 
 interface Devotional {
     id: number;
@@ -26,10 +36,15 @@ const steps = [
     { key: 'go', label: 'Go', icon: 'mdi:arrow-right-circle-outline' },
 ] as const;
 
+const { locale } = useI18n();
 const devotional = ref<Devotional | null>(null);
 const loading = ref(true);
 const activeStep = ref(0);
 const bibleStore = useBibleStore();
+
+function langCode(): string {
+    return localeToLangCode[locale.value] ?? 'en';
+}
 
 function hasVisibleText(html: string): boolean {
     return html.replace(/<[^>]*>/g, '').trim().length > 0;
@@ -126,13 +141,18 @@ async function openVersePreview(verseRef: string) {
     }
 }
 
-onMounted(async () => {
+async function loadTodayDevotional() {
+    loading.value = true;
     try {
-        devotional.value = await (window as any).browserWindow.getTodayDevotional();
+        devotional.value = await (window as any).browserWindow.getTodayDevotional(langCode());
     } finally {
         loading.value = false;
     }
-});
+}
+
+onMounted(loadTodayDevotional);
+
+watch(locale, loadTodayDevotional);
 </script>
 
 <template>

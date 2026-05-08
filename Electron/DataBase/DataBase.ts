@@ -31,6 +31,14 @@ export const CrossReferencesDB = knex({
     },
 });
 
+export const DevotionalsDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\StoreDB\\devotionals.db`,
+    },
+});
+
 export const setDB = (pathOfDb: string) => {
     return knex({
         client: 'sqlite3',

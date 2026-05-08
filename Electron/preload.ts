@@ -104,8 +104,8 @@ contextBridge.exposeInMainWorld('browserWindow', {
     closeCurrentWindow: () => ipcRenderer.invoke('closeCurrentWindow'),
 
     // Daily Devotional
-    getTodayDevotional: () => ipcRenderer.invoke('getTodayDevotional'),
-    getDevotionalByDay: (day: number) => ipcRenderer.invoke('getDevotionalByDay', day),
+    getTodayDevotional: (languageCode: string = 'en') => ipcRenderer.invoke('getTodayDevotional', languageCode),
+    getDevotionalByDay: (day: number, languageCode: string = 'en') => ipcRenderer.invoke('getDevotionalByDay', day, languageCode),
 
     // Commentaries
     getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
