@@ -482,7 +482,9 @@ watch(locale, loadTodayDevotional);
     opacity: 0.9;
 }
 
-.verse-preview-text :deep(f) {
+.verse-preview-text :deep(f),
+.verse-preview-text :deep(s),
+.verse-preview-text :deep(n) {
     display: none;
 }
 
