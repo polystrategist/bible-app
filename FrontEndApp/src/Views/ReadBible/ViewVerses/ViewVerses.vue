@@ -244,12 +244,16 @@ function syncScrollToPanes(sourcePaneIndex: number) {
     const source = scrollPaneRefs.value[sourcePaneIndex];
     if (!source) return;
 
-    const ratio = getScrollRatio(source as HTMLElement);
+    const pos = getTopVisibleVerse(source as HTMLElement);
 
     const panes = scrollPaneRefs.value;
     for (let i = 0; i < panes.length; i++) {
         if (i === sourcePaneIndex || !panes[i]) continue;
-        scrollPaneToRatio(panes[i] as HTMLElement, ratio);
+        if (pos) {
+            scrollPaneToVerse(panes[i] as HTMLElement, pos.verse, pos.proportion);
+        } else {
+            scrollPaneToRatio(panes[i] as HTMLElement, getScrollRatio(source as HTMLElement));
+        }
     }
 
     saveScrollPosition(source as HTMLElement);
