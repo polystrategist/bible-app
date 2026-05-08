@@ -144,7 +144,7 @@ async function openVersePreview(verseRef: string) {
 async function loadTodayDevotional() {
     loading.value = true;
     try {
-        devotional.value = await (window as any).browserWindow.getTodayDevotional(langCode());
+        devotional.value = await window.browserWindow.getTodayDevotional(langCode());
     } finally {
         loading.value = false;
     }

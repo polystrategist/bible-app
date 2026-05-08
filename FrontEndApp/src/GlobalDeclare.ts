@@ -227,6 +227,30 @@ declare global {
                 chapter: number;
                 verse: number;
             }) => Promise<Array<{ version: string; text: string }>>;
+
+            // Devotional
+            getTodayDevotional: (languageCode?: string) => Promise<{
+                id: number;
+                day_number: number;
+                title: string;
+                pause: string;
+                listen: string;
+                think: string;
+                pray: string;
+                go_action: string;
+                verses: string[];
+            } | null>;
+            getDevotionalByDay: (day: number, languageCode?: string) => Promise<{
+                id: number;
+                day_number: number;
+                title: string;
+                pause: string;
+                listen: string;
+                think: string;
+                pray: string;
+                go_action: string;
+                verses: string[];
+            } | null>;
         };
     }
 }

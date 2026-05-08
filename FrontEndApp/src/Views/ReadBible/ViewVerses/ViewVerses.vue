@@ -942,7 +942,7 @@ onUnmounted(() => {
                                                 'context-menu-active-verse':
                                                     contextMenuVerseKey === verse.version[paneIndex].key,
                                             }"
-                                            @contextmenu="clickContextMenu({ ...verse, key: verse.version[paneIndex].key })"
+                                            @contextmenu.prevent="clickContextMenu({ ...verse, key: verse.version[paneIndex].key })"
                                         >
                                             <div :style="`font-size:${fontSize}px`">
                                                 <span

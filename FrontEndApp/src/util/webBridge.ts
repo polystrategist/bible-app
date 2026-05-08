@@ -18,7 +18,7 @@ const bibleVersesCache = new Map<string, Promise<any[]>>();
 async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {}): Promise<T> {
     try {
         const token = localStorage.getItem('auth_token');
-        const isPublic = path.startsWith('/bible/');
+        const isPublic = path.startsWith('/bible/') || path.startsWith('/devotional/');
         if (!isPublic && !token) return fallback;
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
@@ -297,6 +297,16 @@ const stub: Window['browserWindow'] = {
     openExternal: async (url: string) => { window.open(url, '_blank', 'noopener,noreferrer'); },
 
     // ---------- Cross References ----------
+    // ---------- Devotional ----------
+    getTodayDevotional: async (languageCode: string = 'en') => {
+        const params = new URLSearchParams({ lang: languageCode });
+        return apiFetch(`/devotional/today?${params}`, null);
+    },
+    getDevotionalByDay: async (day: number, languageCode: string = 'en') => {
+        const params = new URLSearchParams({ lang: languageCode });
+        return apiFetch(`/devotional/${day}?${params}`, null);
+    },
+
     getCrossReferences: async (args) => {
         const params = new URLSearchParams({
             book_number: String(args.book_number),
