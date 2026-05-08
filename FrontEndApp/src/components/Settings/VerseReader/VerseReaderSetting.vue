@@ -6,8 +6,10 @@ import { useSettingStore } from '../../../store/settingStore';
 import { usePiperTTSStore } from '../../../store/piperTTSStore';
 import { useDialog } from 'naive-ui';
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import PiperModelsModal from './PiperModelsModal.vue';
 
+const { t } = useI18n();
 const dialog = useDialog();
 
 const settings = useSettingStore();
@@ -28,27 +30,26 @@ onMounted(() => {
 const options = computed(() => [
     {
         value: 'browser-tts',
-        title: 'Browser Text to Speech',
-        description: "Uses your device's built-in speech engine to read Bible verses aloud. Works fully offline — no internet or external service required.",
+        title: t('Browser Text to Speech'),
+        description: t('browser-tts-desc'),
     },
     ...(canUsePiperTts
         ? [
               {
                   value: 'piper-tts',
                   title: 'Piper Neural TTS',
-                  description:
-                      'High-quality AI voice that runs fully offline using a neural network model. Sounds significantly more natural than browser speech. Requires a one-time download (~67 MB).',
+                  description: t('piper-tts-desc'),
               },
           ]
         : []),
 ]);
 
 function installStepLabel(step: string, percent: number): string {
-    if (step === 'binary') return `Downloading Piper engine… ${percent}%`;
-    if (step === 'model') return `Downloading voice model… ${percent}%`;
-    if (step === 'config') return 'Downloading model config…';
-    if (step === 'done') return 'Installation complete!';
-    return 'Installing…';
+    if (step === 'binary') return `${t('Downloading Piper engine')}… ${percent}%`;
+    if (step === 'model') return `${t('Downloading voice model')}… ${percent}%`;
+    if (step === 'config') return `${t('Downloading model config')}…`;
+    if (step === 'done') return t('Installation complete!');
+    return `${t('Installing')}…`;
 }
 </script>
 
@@ -84,7 +85,7 @@ function installStepLabel(step: string, percent: number): string {
                         <span
                             v-if="option.value === 'piper-tts' && piperStore.isInstalled"
                             class="text-xs px-1.5 py-0.5 rounded-full bg-green-500 bg-opacity-20 text-green-400"
-                        >Installed</span>
+                        >{{ $t('Installed') }}</span>
                     </div>
                     <div class="text-xs opacity-50 mt-0.5">{{ option.description }}</div>
                 </div>
@@ -105,7 +106,7 @@ function installStepLabel(step: string, percent: number): string {
             >
                 <NButton size="small" secondary @click="showModelsModal = true">
                     <template #icon><Icon icon="mdi:account-voice" /></template>
-                    Voice Models
+                    {{ $t('Voice Models') }}
                 </NButton>
                 <div class="flex-1" />
                 <NTooltip trigger="hover">
@@ -114,17 +115,17 @@ function installStepLabel(step: string, percent: number): string {
                             size="small"
                             type="error"
                             @click="dialog.warning({
-                                title: 'Uninstall Piper?',
-                                content: 'This will delete the Piper engine and all voice models. You can re-download anytime.',
-                                positiveText: 'Uninstall',
-                                negativeText: 'Cancel',
+                                title: t('Uninstall Piper?'),
+                                content: t('uninstall-piper-content'),
+                                positiveText: t('Uninstall'),
+                                negativeText: t('Cancel'),
                                 onPositiveClick: () => piperStore.uninstall(),
                             })"
                         >
                             <template #icon><Icon icon="mdi:delete-outline" /></template>
                         </NButton>
                     </template>
-                    Uninstall Piper
+                    {{ $t('Uninstall Piper') }}
                 </NTooltip>
             </div>
 
@@ -152,7 +153,7 @@ function installStepLabel(step: string, percent: number): string {
                     <span class="text-xs text-red-400">{{ piperStore.installError }}</span>
                     <NButton size="small" type="error" secondary @click="piperStore.install()">
                         <template #icon><Icon icon="mdi:refresh" /></template>
-                        Retry
+                        {{ $t('Retry') }}
                     </NButton>
                 </div>
 
@@ -160,9 +161,9 @@ function installStepLabel(step: string, percent: number): string {
                 <div v-else class="flex items-center gap-3">
                     <NButton size="small" type="primary" @click="piperStore.install()">
                         <template #icon><Icon icon="mdi:download" /></template>
-                        Download & Install (~67 MB)
+                        {{ $t('Download & Install (~67 MB)') }}
                     </NButton>
-                    <span class="text-xs opacity-40">One-time download</span>
+                    <span class="text-xs opacity-40">{{ $t('One-time download') }}</span>
                 </div>
             </div>
         </div>

@@ -36,7 +36,7 @@ const steps = [
     { key: 'go', label: 'Go', icon: 'mdi:arrow-right-circle-outline' },
 ] as const;
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const devotional = ref<Devotional | null>(null);
 const loading = ref(true);
 const activeStep = ref(0);
@@ -173,7 +173,7 @@ watch(locale, loadTodayDevotional);
                 <!-- Header -->
                 <div class="devo-header">
                     <p class="devo-date">{{ dateLabel }}</p>
-                    <span class="devo-day-badge">Day {{ devotional.day_number }}</span>
+                    <span class="devo-day-badge">{{ $t('Day') }} {{ devotional.day_number }}</span>
                     <h1 class="devo-title">{{ devotional.title }}</h1>
 
                     <!-- Verse chips -->
@@ -182,7 +182,7 @@ watch(locale, loadTodayDevotional);
                             v-for="verse in devotional.verses"
                             :key="verse"
                             class="verse-chip"
-                            :title="`Read ${verse.replace(/:/g, ' ')}`"
+                            :title="`${verse.replace(/:/g, ' ')}`"
                             @click="openVersePreview(verse)"
                         >
                             <Icon icon="mdi:book-open-variant" class="text-xs" />
@@ -196,7 +196,7 @@ watch(locale, loadTodayDevotional);
                     <NStep
                         v-for="(step, i) in steps"
                         :key="step.key"
-                        :title="step.label"
+                        :title="t(step.label)"
                         @click="activeStep = i"
                         style="cursor: pointer"
                     />
@@ -206,7 +206,7 @@ watch(locale, loadTodayDevotional);
                 <div class="devo-content-area">
                     <div class="devo-content-accent" />
                     <div class="devo-content-inner">
-                        <h3 class="devo-step-label">{{ steps[activeStep].label }}</h3>
+                        <h3 class="devo-step-label">{{ $t(steps[activeStep].label) }}</h3>
                         <div class="devo-step-body" v-html="stepContent"></div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@ watch(locale, loadTodayDevotional);
                         @click="prevStep"
                     >
                         <Icon icon="mdi:arrow-left" class="text-sm" />
-                        Back
+                        {{ $t('Back') }}
                     </button>
                     <span v-else />
                     <button
@@ -227,12 +227,12 @@ watch(locale, loadTodayDevotional);
                         class="devo-nav-btn devo-nav-btn-primary"
                         @click="nextStep"
                     >
-                        Next
+                        {{ $t('Next') }}
                         <Icon icon="mdi:arrow-right" class="text-sm" />
                     </button>
                     <span v-else class="devo-finished">
                         <Icon icon="mdi:check-circle" class="text-[var(--primary-color)]" />
-                        Completed
+                        {{ $t('Completed') }}
                     </span>
                 </div>
             </template>

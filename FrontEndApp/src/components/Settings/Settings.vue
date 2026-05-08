@@ -71,11 +71,11 @@ const name = computed({
                     <template #tab>
                         <span class="flex items-center gap-1">
                             <Icon icon="mdi:account-voice" style="font-size: 16px;" />
-                            Verse Reader
+                            {{ $t('Verse Reader') }}
                         </span>
                     </template>
                     <div class="py-3">
-                        <p class="text-xs opacity-50 mb-4">Choose how Bible verses are read aloud. More options will be available in future updates.</p>
+                        <p class="text-xs opacity-50 mb-4">{{ $t('verse-reader-desc') }}</p>
                         <VerseReaderSetting />
                     </div>
                 </NTabPane>

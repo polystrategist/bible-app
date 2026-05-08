@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { NSelect, NTag } from 'naive-ui';
 import { onMounted, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const displayFont = ref(false);
 const fontSize = ref(14);
@@ -78,7 +81,7 @@ onMounted(() => {
     <div class="flex flex-col h-full">
         <NSelect
             v-model:value="selected"
-            placeholder="Search..."
+            :placeholder="t('Search') + '...'"
             clearable
             filterable
             :loading="loading"
@@ -125,8 +128,8 @@ onMounted(() => {
             </div>
             <div class="h-full flex flex-col items-center justify-center gap-1 opacity-60">
                 <div class="text-4xl">📖</div>
-                <div class="font-semibold text-lg">Dictionary</div>
-                <small class="text-center px-4">Type a word above to see its definition</small>
+                <div class="font-semibold text-lg">{{ $t('dictionary') }}</div>
+                <small class="text-center px-4">{{ $t('Type a word above to see its definition') }}</small>
             </div>
         </div>
     </div>

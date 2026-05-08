@@ -15,23 +15,25 @@ import { useMenuStore } from '../../../store/menu';
 import { useAuthStore } from '../../../store/authStore';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
-
-function formatLastSync(ts: string | null): string {
-    if (!ts) return 'Never';
-    const date = new Date(ts);
-    if (isNaN(date.getTime())) return 'Never';
-    return new Intl.DateTimeFormat(undefined, {
-        month: 'short', day: 'numeric',
-        hour: 'numeric', minute: '2-digit',
-    }).format(date);
-}
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const dialog = useDialog();
 const authStore = useAuthStore();
 const message = useMessage();
 const menuStore = useMenuStore();
+const { t } = useI18n();
 let loadingReactive: MessageReactive | null = null;
+
+function formatLastSync(ts: string | null): string {
+    if (!ts) return t('Never');
+    const date = new Date(ts);
+    if (isNaN(date.getTime())) return t('Never');
+    return new Intl.DateTimeFormat(undefined, {
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+    }).format(date);
+}
 
 const showDropdown = ref(false);
 
@@ -47,7 +49,7 @@ const initials = computed(() => {
         .toUpperCase();
 });
 
-const firstName = computed(() => authStore.user?.name?.split(' ')[0] ?? 'Account');
+const firstName = computed(() => authStore.user?.name?.split(' ')[0] ?? t('Account'));
 
 function goToProfile() {
     showDropdown.value = false;
@@ -57,20 +59,20 @@ function goToProfile() {
 async function logout() {
     showDropdown.value = false;
     dialog.warning({
-        title: 'Confirm',
-        content: 'Are you sure you want to logout?',
-        positiveText: 'Yes',
-        negativeText: 'No',
+        title: t('Confirm'),
+        content: t('Are you sure you want to logout?'),
+        positiveText: t('Yes'),
+        negativeText: t('No'),
         onPositiveClick: async () => {
             if (!loadingReactive) {
-                loadingReactive = message.loading('Signing Out...', { duration: 0 });
+                loadingReactive = message.loading(t('Signing Out'), { duration: 0 });
             }
             await authStore.logout();
             if (loadingReactive) {
                 loadingReactive.destroy();
                 loadingReactive = null;
             }
-            message.success('Logged Out!');
+            message.success(t('Logged Out'));
             await menuStore.setMenu('/profile');
             router.push('/profile');
         },
@@ -138,11 +140,11 @@ async function logout() {
                     class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit"
                 >
                     <Icon icon="mdi:cloud-check" />
-                    <span>Sync Enabled</span>
+                    <span>{{ $t('Sync Enabled') }}</span>
                 </div>
                 <div class="flex items-center gap-1 text-xs opacity-40 px-1">
                     <Icon icon="mdi:clock-outline" style="font-size: 12px" />
-                    <span>Last sync: {{ formatLastSync(authStore.lastSyncAt) }}</span>
+                    <span>{{ $t('Last sync') }}: {{ formatLastSync(authStore.lastSyncAt) }}</span>
                 </div>
             </div>
 
@@ -159,7 +161,7 @@ async function logout() {
                     <template #icon>
                         <NIcon><UserIcon /></NIcon>
                     </template>
-                    Profile
+                    {{ $t('Profile') }}
                 </NButton>
             </div>
             <NDivider style="margin: 0" />
@@ -173,7 +175,7 @@ async function logout() {
                     <template #icon>
                         <NIcon><LogoutIcon /></NIcon>
                     </template>
-                    Log Out
+                    {{ $t('Log Out') }}
                 </NButton>
             </div>
         </div>
@@ -185,6 +187,6 @@ async function logout() {
                 <Login />
             </NIcon>
         </template>
-        Sign In
+        {{ $t('Sign In') }}
     </NButton>
 </template>

@@ -2,8 +2,10 @@
 import { NPopover, NButton, NIcon, NDivider } from 'naive-ui';
 import { QuestionCircle24Regular } from '@vicons/fluent';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useMenuStore } from '../../store/menu';
 
+const { t } = useI18n();
 const menuStore = useMenuStore();
 const show = ref(false);
 
@@ -32,16 +34,16 @@ function open(url: string) {
                         <QuestionCircle24Regular />
                     </NIcon>
                 </template>
-                Help
+                {{ t('Help') }}
             </NButton>
         </template>
 
         <div class="flex flex-col p-2">
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="navigate('/help-portal')">
-                📖&nbsp; Help Portal
+                📖&nbsp; {{ t('Help Portal') }}
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://believersword.com')">
-                🌐&nbsp; Visit Website
+                🌐&nbsp; {{ t('Visit Website') }}
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://discord.gg/BVqhNEYZ')">
                 💬&nbsp; Join Discord
@@ -62,10 +64,10 @@ function open(url: string) {
         <NDivider style="margin: 0" />
         <div class="flex flex-col p-2">
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://github.com/JenuelDev/Believers-Sword/releases')">
-                📋&nbsp; Release Notes
+                📋&nbsp; {{ t('Release Notes') }}
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="navigate('/about-page')">
-                ℹ️&nbsp; About
+                ℹ️&nbsp; {{ $t('About') }}
             </NButton>
         </div>
     </NPopover>
