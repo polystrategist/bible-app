@@ -1,3 +1,3 @@
 ## Update
-- Added Translation for Daily Devotion. Refactored devotion schema.
-- Fixed untranslated words in the app
+- Improved Web View for devotional https://app.believersword.com
+- Fix Bugs on Web View
