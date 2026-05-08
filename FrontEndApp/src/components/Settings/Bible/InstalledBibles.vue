@@ -8,6 +8,7 @@ import { TrashCan } from '@vicons/carbon';
 const message = useMessage();
 const moduleStore = useModuleStore();
 const bibleStore = useBibleStore();
+const isElectron = window.isElectron;
 const deletingFile = ref<string | null>(null);
 
 function formatDescription(description?: string) {
@@ -75,7 +76,7 @@ async function removeBible(fileName: string, title: string) {
                         {{ formatDescription(bible.description) || 'No description.' }}
                     </div>
                 </div>
-                <NPopconfirm v-if="window.isElectron" @positive-click="removeBible(bible.file_name, bible.title)" positive-text="Remove" negative-text="Cancel">
+                <NPopconfirm v-if="isElectron" @positive-click="removeBible(bible.file_name, bible.title)" positive-text="Remove" negative-text="Cancel">
                     <template #trigger>
                         <NButton quaternary size="tiny" type="error" :loading="deletingFile === bible.file_name" class="mt-0.5">
                             <template #icon>
