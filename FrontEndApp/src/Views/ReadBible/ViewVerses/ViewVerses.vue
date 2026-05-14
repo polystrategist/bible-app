@@ -461,6 +461,7 @@ watch(
     () => {
         const s = activeStore();
         if (s.isActive && !s.autoAdvancing) s.stop();
+        clearVerseSelection();
     },
 );
 
@@ -475,9 +476,24 @@ async function navigateChapter(action: 'next' | 'before') {
     bibleStore.AutoScrollSavedPosition();
 }
 
-function clickContextMenu(verse: Object) {
+function clickContextMenu(verse: Object, paneIndex: number) {
+    const verseNum = (verse as any).verse;
     contextMenuData.value = verse;
     contextMenuVerseKey.value = (verse as any).key;
+
+    if (selectedVersesSet.value.has(verseNum) && selectedVerseNumbers.value.length > 1) {
+        contextMenuSelectedVerses.value = bibleStore.renderVerses
+            .filter((v: any) => selectedVersesSet.value.has(v.verse))
+            .map((v: any) => ({
+                book_number: v.book_number,
+                chapter: v.chapter,
+                verse: v.verse,
+                key: v.version[paneIndex]?.key ?? `${v.book_number}_${v.chapter}_${v.verse}`,
+            }));
+    } else {
+        if (!selectedVersesSet.value.has(verseNum)) clearVerseSelection();
+        contextMenuSelectedVerses.value = [];
+    }
 
     if (showContextMenu.value) {
         showContextMenu.value = false;
@@ -599,14 +615,50 @@ function copySelectedPassageWithReference(event: ClipboardEvent) {
     event.preventDefault();
 }
 
-function setActiveVerseFromElement(event: Event): void {
-    const el = (event.currentTarget as HTMLElement | null)?.closest<HTMLElement>('[data-verse]');
-    if (!el) return;
+const selectedVerseNumbers = ref<number[]>([]);
+const lastMultiSelectVerse = ref<number | null>(null);
+const contextMenuSelectedVerses = ref<any[]>([]);
+const selectedVersesSet = computed(() => new Set(selectedVerseNumbers.value));
 
-    const verse = parseInt(el.dataset.verse || '0');
-    if (verse) {
-        bibleStore.setActiveVerse(verse);
+function clearVerseSelection() {
+    selectedVerseNumbers.value = [];
+    lastMultiSelectVerse.value = null;
+}
+
+function handleVerseMouseDown(event: MouseEvent, verseNum: number) {
+    if (event.button !== 0) return;
+    if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+        const idx = selectedVerseNumbers.value.indexOf(verseNum);
+        if (idx >= 0) {
+            selectedVerseNumbers.value.splice(idx, 1);
+        } else {
+            selectedVerseNumbers.value.push(verseNum);
+            lastMultiSelectVerse.value = verseNum;
+        }
+        return;
     }
+    if (event.shiftKey && lastMultiSelectVerse.value !== null) {
+        event.preventDefault();
+        const verses = bibleStore.renderVerses.map((v: any) => v.verse);
+        const fromIdx = verses.indexOf(lastMultiSelectVerse.value);
+        const toIdx = verses.indexOf(verseNum);
+        if (fromIdx !== -1 && toIdx !== -1) {
+            const [start, end] = fromIdx < toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+            for (let i = start; i <= end; i++) {
+                const vNum = verses[i];
+                if (!selectedVersesSet.value.has(vNum)) {
+                    selectedVerseNumbers.value.push(vNum);
+                }
+            }
+        }
+        return;
+    }
+    bibleStore.setActiveVerse(verseNum);
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') clearVerseSelection();
 }
 
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
@@ -687,6 +739,7 @@ onMounted(() => {
 
     verseCopyListener = copySelectedPassageWithReference;
     document.addEventListener('copy', verseCopyListener);
+    document.addEventListener('keydown', handleKeyDown);
 
     // Ctrl+scroll to change font size (works across all panes)
     container?.addEventListener('wheel', (event) => {
@@ -706,6 +759,7 @@ onUnmounted(() => {
     if (verseCopyListener) {
         document.removeEventListener('copy', verseCopyListener);
     }
+    document.removeEventListener('keydown', handleKeyDown);
     if (scrollSyncAnimationFrame !== null) {
         cancelAnimationFrame(scrollSyncAnimationFrame);
     }
@@ -924,6 +978,7 @@ onUnmounted(() => {
                                                 bibleStore.selectedVerse === verse.verse,
                                             'the-selected-verse':
                                                 bibleStore.selectedVerse === verse.verse,
+                                            'verse-multi-selected': selectedVersesSet.has(verse.verse),
                                         }"
                                         :data-book="verse.book_number"
                                         :data-chapter="verse.chapter"
@@ -937,7 +992,8 @@ onUnmounted(() => {
                                             `border: 1px solid ${clipNoteRender(`${verse.book_number}_${verse.chapter}_${verse.verse}`).color}`,
                                             bibleStore.selectedVerse === verse.verse ? 'border-left: 1px solid var(--primary-color)' : '',
                                         ]"
-                                        class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative transition-colors duration-150"
+                                        class="group flex items-start dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-600 hover:bg-opacity-10 px-8px py-2 relative transition-colors duration-150 cursor-pointer"
+                                        @mousedown="handleVerseMouseDown($event, verse.verse)"
                                     >
                                         <div
                                             v-if="!verse.version[paneIndex].missing"
@@ -946,7 +1002,7 @@ onUnmounted(() => {
                                                 'context-menu-active-verse':
                                                     contextMenuVerseKey === verse.version[paneIndex].key,
                                             }"
-                                            @contextmenu.prevent="clickContextMenu({ ...verse, key: verse.version[paneIndex].key })"
+                                            @contextmenu.prevent="clickContextMenu({ ...verse, key: verse.version[paneIndex].key }, paneIndex)"
                                         >
                                             <div :style="`font-size:${fontSize}px`">
                                                 <span
@@ -992,7 +1048,6 @@ onUnmounted(() => {
                                                     :data-verse="verse.verse"
                                                     class="verse-select-text input-text-search"
                                                     v-html="verse.version[paneIndex].text"
-                                                    @mousedown="setActiveVerseFromElement"
                                                     @mouseover="handleFootnoteHover($event, verse.version[paneIndex], verse)"
                                                     @mouseleave="footnotePopover.show = false"
                                                 ></span>
@@ -1091,11 +1146,29 @@ onUnmounted(() => {
                 </Pane>
             </Splitpanes>
         </div>
+        <Transition name="verse-sel-badge">
+            <div
+                v-if="selectedVerseNumbers.length > 0"
+                class="fixed bottom-24px left-50% z-50 flex items-center gap-8px px-14px py-6px rounded-full shadow-lg select-none"
+                style="transform: translateX(-50%); background: var(--primary-color); color: #fff;"
+            >
+                <span class="text-sm font-medium">
+                    {{ selectedVerseNumbers.length }} verse{{ selectedVerseNumbers.length > 1 ? 's' : '' }} selected
+                </span>
+                <button
+                    class="opacity-75 hover:opacity-100 ml-4px text-white leading-none"
+                    title="Clear selection (Esc)"
+                    @mousedown.stop
+                    @click="clearVerseSelection"
+                >✕</button>
+            </div>
+        </Transition>
         <ContextMenu
             :data="contextMenuData"
             :show-context-menu="showContextMenu"
             :x="contextMenuPositionX"
             :y="contextMenuPositionY"
+            :selected-verses-data="contextMenuSelectedVerses"
             @close="showContextMenu = false"
             @create-clip-note="
                 (data) => (createClipNoteRef ? createClipNoteRef.toggleClipNoteModal(data) : false)

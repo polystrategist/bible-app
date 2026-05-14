@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NIcon, NPopover } from 'naive-ui';
 import { onClickOutside } from '@vueuse/core';
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
 import { ContextMenuOptions } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
@@ -31,16 +31,21 @@ const props = defineProps({
         type: Object,
         default: {},
     },
+    selectedVersesData: {
+        type: Array as PropType<any[]>,
+        default: () => [],
+    },
 });
 
 async function highlightVerse(color: string) {
-    const { book_number, chapter, verse } = props.data;
-    // Version-independent key (matches mobile app format)
-    const key = `${book_number}_${chapter}_${verse}`;
-
-    await window.browserWindow.saveHighlight(
-        JSON.stringify({ key, book_number, chapter, verse, content: color }),
-    );
+    const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+    for (const verseData of verses) {
+        const { book_number, chapter, verse } = verseData;
+        const key = `${book_number}_${chapter}_${verse}`;
+        await window.browserWindow.saveHighlight(
+            JSON.stringify({ key, book_number, chapter, verse, content: color }),
+        );
+    }
     await bibleStore.getChapterHighlights();
     debouncedRunSync();
     showColorPicker.value = false;
@@ -49,9 +54,12 @@ async function highlightVerse(color: string) {
 
 async function clickContextMenu(key: string) {
     if (key == 'add-to-bookmark') {
-        bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
-            JSON.stringify(props.data),
-        );
+        const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+        for (const verseData of verses) {
+            bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
+                JSON.stringify(verseData),
+            );
+        }
         debouncedRunSync();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
@@ -66,11 +74,12 @@ async function clickContextMenu(key: string) {
             book_name: bibleStore.selectedBook.title,
         });
     } else if (key == 'clear-highlight') {
-        // Try version-independent key first, then legacy version-specific key
-        const verseKey = `${props.data.book_number}_${props.data.chapter}_${props.data.verse}`;
-        await bibleStore.removeHighlightInDb(verseKey);
-        // Also clear legacy version-specific highlight if exists
-        await bibleStore.removeHighlightInDb(props.data.key);
+        const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+        for (const verseData of verses) {
+            const verseKey = `${verseData.book_number}_${verseData.chapter}_${verseData.verse}`;
+            await bibleStore.removeHighlightInDb(verseKey);
+            await bibleStore.removeHighlightInDb(verseData.key);
+        }
     }
     showColorPicker.value = false;
     emits('close');

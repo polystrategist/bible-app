@@ -195,3 +195,23 @@
         transform: translateX(100%);
     }
 }
+
+.verse-multi-selected {
+    border-left: 3px solid var(--primary-color) !important;
+    background: rgba(128, 90, 213, 0.1) !important;
+}
+
+.dark .verse-multi-selected {
+    background: rgba(128, 90, 213, 0.15) !important;
+}
+
+.verse-sel-badge-enter-active,
+.verse-sel-badge-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.verse-sel-badge-enter-from,
+.verse-sel-badge-leave-to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+}
