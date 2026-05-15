@@ -3,16 +3,21 @@ import {
     NButton, NInput, NSelect, NTag, NModal, NSpin, useDialog, useMessage,
 } from 'naive-ui';
 import { useSermonStore, SermonType } from '../../store/Sermons';
+import { useBibleStore } from '../../store/BibleStore';
+import { useModuleStore } from '../../store/moduleStore';
 import { ref, onBeforeUnmount, onMounted, watch } from 'vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import { DAYJS } from '../../util/dayjs';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useMenuStore } from '../../store/menu';
+import { bible } from '../../util/modules';
 
 const menuStore = useMenuStore();
 const authStore = useAuthStore();
 const sermonStore = useSermonStore();
+const bibleStore = useBibleStore();
+const moduleStore = useModuleStore();
 const dialog = useDialog();
 const message = useMessage();
 
@@ -23,6 +28,20 @@ const selectedSermon = ref<SermonType | null>(null);
 const showDetailModal = ref(false);
 const viewDelayMs = 7000;
 const viewTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+const scriptureLoading = ref(false);
+type ScriptureVerseVersion = {
+    version: string;
+    versionCode: string;
+    text: string;
+};
+type ScriptureVerseGroup = {
+    key: string;
+    refLabel: string;
+    versions: ScriptureVerseVersion[];
+};
+const scriptureVerseGroups = ref<ScriptureVerseGroup[]>([]);
+const scriptureVersionIndexes = ref<Record<string, number>>({});
+let scriptureLoadToken = 0;
 
 useInfiniteScroll(browseEl as any, () => {
     if (sermonStore.hasMoreFeed && !sermonStore.loading) sermonStore.page++;
@@ -55,6 +74,7 @@ function openDetail(sermon: SermonType) {
     selectedSermon.value = sermon;
     showDetailModal.value = true;
     scheduleSermonView(sermon);
+    loadSermonScripture(sermon);
 }
 
 function clearSermonViewTimer() {
@@ -143,12 +163,129 @@ const BOOK_NAMES: Record<number, string> = {
 };
 function bookName(n: number) { return BOOK_NAMES[n] ?? `Book ${n}`; }
 
+function scriptureRefLabel(book: number, chapter: number, verse: number) {
+    return `${bookName(book)} ${chapter}:${verse}`;
+}
+
+function hasVisibleText(html: string) {
+    return html.replace(/<[^>]*>/g, '').trim().length > 0;
+}
+
+function versionShortCode(fileName: string) {
+    const installed = moduleStore.bibleLists.find((item: any) => item.file_name === fileName);
+    const meta = bible.find((item) => item.file_name === fileName);
+    const shortCode = installed?.short_name || meta?.version_short_name_and_date;
+
+    if (shortCode) return shortCode;
+
+    return fileName
+        .replace(/\.(SQLite3|sqlite3|db)$/i, '')
+        .replace(/^ph4_mybible_/i, '')
+        .replace(/^ebible-/i, '')
+        .split(/[\s_-]+/)
+        .map((part) => part[0])
+        .join('')
+        .slice(0, 10)
+        .toUpperCase();
+}
+
+async function loadSermonScripture(sermon: SermonType) {
+    const refs = sermon.main_scripture ?? [];
+    const versions = [...bibleStore.selectedBibleVersions];
+    const token = ++scriptureLoadToken;
+    scriptureVerseGroups.value = [];
+    scriptureVersionIndexes.value = {};
+
+    if (!refs.length || !versions.length) return;
+
+    scriptureLoading.value = true;
+    try {
+        const verseRequests = refs.flatMap((ref) =>
+            (ref.verse ?? []).map((verse) => ({
+                book: ref.book,
+                chapter: ref.chapter,
+                verse,
+                refLabel: scriptureRefLabel(ref.book, ref.chapter, verse),
+            }))
+        );
+
+        const rows = await Promise.all(
+            verseRequests.map(async (request) => {
+                try {
+                    const results = await window.browserWindow.getVerseText({
+                        bible_versions: versions,
+                        book_number: request.book,
+                        chapter: request.chapter,
+                        verse: request.verse,
+                    });
+
+                    const versionRows = results
+                        .filter((item) => item.text && hasVisibleText(item.text))
+                        .map((item) => ({
+                            version: item.version,
+                            versionCode: versionShortCode(item.version),
+                            text: item.text,
+                        }));
+
+                    return {
+                        key: `${request.book}-${request.chapter}-${request.verse}`,
+                        refLabel: request.refLabel,
+                        versions: versionRows,
+                    };
+                } catch (error) {
+                    console.error('getVerseText failed:', error);
+                    return null;
+                }
+            })
+        );
+
+        if (token === scriptureLoadToken) {
+            scriptureVerseGroups.value = rows.filter(
+                (row): row is ScriptureVerseGroup => !!row && row.versions.length > 0
+            );
+        }
+    } finally {
+        if (token === scriptureLoadToken) scriptureLoading.value = false;
+    }
+}
+
+function scriptureVersionIndex(group: ScriptureVerseGroup) {
+    const index = scriptureVersionIndexes.value[group.key] ?? 0;
+    return Math.min(index, Math.max(group.versions.length - 1, 0));
+}
+
+function activeScriptureVersion(group: ScriptureVerseGroup) {
+    return group.versions[scriptureVersionIndex(group)];
+}
+
+function shiftScriptureVersion(group: ScriptureVerseGroup, direction: -1 | 1) {
+    if (group.versions.length < 2) return;
+
+    const current = scriptureVersionIndex(group);
+    const next = (current + direction + group.versions.length) % group.versions.length;
+    scriptureVersionIndexes.value = {
+        ...scriptureVersionIndexes.value,
+        [group.key]: next,
+    };
+}
+
 function viewLabel(count: number) {
     return `${count.toLocaleString()} ${count === 1 ? 'view' : 'views'}`;
 }
 
 watch(showDetailModal, (showing) => {
-    if (!showing) clearSermonViewTimer();
+    if (showing) return;
+    clearSermonViewTimer();
+    scriptureLoadToken++;
+    scriptureLoading.value = false;
+    scriptureVerseGroups.value = [];
+    scriptureVersionIndexes.value = {};
+});
+
+watch(() => [...bibleStore.selectedBibleVersions], () => {
+    if (showDetailModal.value && selectedSermon.value) {
+        loadSermonScripture(selectedSermon.value);
+    }
 });
 
 onBeforeUnmount(() => {
@@ -410,7 +547,7 @@ onBeforeUnmount(() => {
             v-model:show="showDetailModal"
             preset="card"
             :title="selectedSermon?.title ?? ''"
-            class="sermon-detail-modal !max-w-760px !w-[92vw]"
+            class="sermon-detail-modal !max-w-1120px !w-[94vw]"
             :bordered="false"
         >
             <div v-if="selectedSermon" class="detail-body">
@@ -421,63 +558,108 @@ onBeforeUnmount(() => {
                     class="detail-hero"
                 />
 
-                <div class="detail-header">
-                    <div class="detail-meta">
-                        <span v-if="selectedSermon.preacher_name || selectedSermon.creator" class="detail-meta-item">
-                            <Icon icon="mdi:account-tie" />
-                            {{ selectedSermon.preacher_name || selectedSermon.creator?.name }}
-                        </span>
-                        <span v-if="selectedSermon.sermon_date" class="detail-meta-item">
-                            <Icon icon="mdi:calendar-blank-outline" />
-                            {{ formatDate(selectedSermon.sermon_date) }}
-                        </span>
-                        <span class="detail-meta-item detail-view-count">
-                            <Icon icon="mdi:eye-outline" />
-                            {{ viewLabel(selectedSermon.view_count) }}
-                        </span>
+                <div class="detail-layout">
+                    <div class="detail-main">
+                        <div v-if="selectedSermon.video_url || selectedSermon.audio_url" class="detail-actions">
+                            <a v-if="selectedSermon.video_url" :href="selectedSermon.video_url" target="_blank" rel="noopener">
+                                <NButton size="small" type="info">
+                                    <template #icon><Icon icon="mdi:play-circle-outline" /></template>
+                                    Watch Video
+                                </NButton>
+                            </a>
+                            <a v-if="selectedSermon.audio_url" :href="selectedSermon.audio_url" target="_blank" rel="noopener">
+                                <NButton size="small">
+                                    <template #icon><Icon icon="mdi:headphones" /></template>
+                                    Listen
+                                </NButton>
+                            </a>
+                        </div>
+
+                        <div class="detail-content" v-html="selectedSermon.content" />
+
+                        <div v-if="selectedSermon.tags?.length" class="detail-tags">
+                            <span v-for="tag in selectedSermon.tags" :key="tag" class="detail-tag">#{{ tag }}</span>
+                        </div>
                     </div>
 
-                    <div class="detail-badges">
-                        <NTag v-if="selectedSermon.category" size="small" :bordered="false" type="info">
-                            {{ selectedSermon.category.name }}
-                        </NTag>
-                        <NTag v-if="selectedSermon.series" size="small" :bordered="false">
-                            <template #icon><Icon icon="mdi:playlist-play" /></template>
-                            {{ selectedSermon.series.title }}
-                        </NTag>
-                    </div>
+                    <aside class="detail-sidebar">
+                        <div class="detail-header">
+                            <div class="detail-meta">
+                                <span v-if="selectedSermon.preacher_name || selectedSermon.creator" class="detail-meta-item">
+                                    <Icon icon="mdi:account-tie" />
+                                    {{ selectedSermon.preacher_name || selectedSermon.creator?.name }}
+                                </span>
+                                <span v-if="selectedSermon.sermon_date" class="detail-meta-item">
+                                    <Icon icon="mdi:calendar-blank-outline" />
+                                    {{ formatDate(selectedSermon.sermon_date) }}
+                                </span>
+                                <span class="detail-meta-item detail-view-count">
+                                    <Icon icon="mdi:eye-outline" />
+                                    {{ viewLabel(selectedSermon.view_count) }}
+                                </span>
+                            </div>
 
-                    <p class="detail-summary">{{ selectedSermon.short_summary }}</p>
+                            <div class="detail-badges">
+                                <NTag v-if="selectedSermon.category" size="small" :bordered="false" type="info">
+                                    {{ selectedSermon.category.name }}
+                                </NTag>
+                                <NTag v-if="selectedSermon.series" size="small" :bordered="false">
+                                    <template #icon><Icon icon="mdi:playlist-play" /></template>
+                                    {{ selectedSermon.series.title }}
+                                </NTag>
+                            </div>
 
-                    <div v-if="selectedSermon.main_scripture?.length" class="detail-scripture">
-                        <Icon icon="mdi:book-open-variant" class="detail-scripture-icon" />
-                        <span class="detail-scripture-label">Scripture</span>
-                        <span v-for="(s, i) in selectedSermon.main_scripture" :key="i">
-                            {{ bookName(s.book) }} {{ s.chapter }}<span v-if="s.verse.length">:{{ s.verse.join(', ') }}</span>
-                            <span v-if="i < selectedSermon.main_scripture!.length - 1"> · </span>
-                        </span>
-                    </div>
-                </div>
+                            <p class="detail-summary">{{ selectedSermon.short_summary }}</p>
 
-                <div v-if="selectedSermon.video_url || selectedSermon.audio_url" class="detail-actions">
-                    <a v-if="selectedSermon.video_url" :href="selectedSermon.video_url" target="_blank" rel="noopener">
-                        <NButton size="small" type="info">
-                            <template #icon><Icon icon="mdi:play-circle-outline" /></template>
-                            Watch Video
-                        </NButton>
-                    </a>
-                    <a v-if="selectedSermon.audio_url" :href="selectedSermon.audio_url" target="_blank" rel="noopener">
-                        <NButton size="small">
-                            <template #icon><Icon icon="mdi:headphones" /></template>
-                            Listen
-                        </NButton>
-                    </a>
-                </div>
+                            <div v-if="selectedSermon.main_scripture?.length" class="detail-scripture">
+                                <Icon icon="mdi:book-open-variant" class="detail-scripture-icon" />
+                                <span class="detail-scripture-label">Scripture</span>
+                                <span v-for="(s, i) in selectedSermon.main_scripture" :key="i">
+                                    {{ bookName(s.book) }} {{ s.chapter }}<span v-if="s.verse.length">:{{ s.verse.join(', ') }}</span>
+                                    <span v-if="i < selectedSermon.main_scripture!.length - 1"> · </span>
+                                </span>
+                            </div>
 
-                <div class="detail-content" v-html="selectedSermon.content" />
+                            <div v-if="selectedSermon.main_scripture?.length" class="detail-verse-preview">
+                                <div v-if="scriptureLoading" class="detail-verse-loading">
+                                    <NSpin size="small" />
+                                </div>
 
-                <div v-if="selectedSermon.tags?.length" class="detail-tags">
-                    <span v-for="tag in selectedSermon.tags" :key="tag" class="detail-tag">#{{ tag }}</span>
+                                <div v-else-if="scriptureVerseGroups.length" class="detail-verse-list">
+                                    <div
+                                        v-for="group in scriptureVerseGroups"
+                                        :key="group.key"
+                                        class="detail-verse-row"
+                                    >
+                                        <div class="detail-verse-line">
+                                            <span class="detail-version-code">{{ activeScriptureVersion(group).versionCode }}</span>
+                                            <span class="detail-verse-ref">{{ group.refLabel }}</span>
+                                            <div v-if="group.versions.length > 1" class="detail-verse-pager">
+                                                <button
+                                                    type="button"
+                                                    class="detail-verse-pager-btn"
+                                                    @click="shiftScriptureVersion(group, -1)"
+                                                >
+                                                    <Icon icon="mdi:chevron-left" />
+                                                </button>
+                                                <span class="detail-verse-pager-count">
+                                                    {{ scriptureVersionIndex(group) + 1 }}/{{ group.versions.length }}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    class="detail-verse-pager-btn"
+                                                    @click="shiftScriptureVersion(group, 1)"
+                                                >
+                                                    <Icon icon="mdi:chevron-right" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="detail-verse-text" v-html="activeScriptureVersion(group).text" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
                 </div>
             </div>
         </NModal>
@@ -818,8 +1000,9 @@ onBeforeUnmount(() => {
 .detail-body {
     display: flex;
     flex-direction: column;
-    max-height: min(74vh, 720px);
+    max-height: min(78vh, 760px);
     color: var(--theme-text, inherit);
+    overflow: hidden;
 }
 .detail-hero {
     width: 100%;
@@ -827,10 +1010,29 @@ onBeforeUnmount(() => {
     object-fit: cover;
     border-bottom: 1px solid var(--theme-border, rgba(255,255,255,0.08));
 }
+.detail-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+.detail-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+.detail-sidebar {
+    width: min(380px, 38%);
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-left: 1px solid var(--theme-border, rgba(255,255,255,0.08));
+    background: color-mix(in srgb, var(--theme-bg-soft, #282846) 42%, transparent);
+}
+.detail-sidebar::-webkit-scrollbar { width: 4px; }
+.detail-sidebar::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb, rgba(255,255,255,0.16)); border-radius: 4px; }
 .detail-header {
-    padding: 18px 24px 14px;
-    border-bottom: 1px solid var(--theme-border, rgba(255,255,255,0.08));
-    background: color-mix(in srgb, var(--theme-bg-soft, #282846) 55%, transparent);
+    padding: 18px;
 }
 .detail-meta {
     display: flex;
@@ -887,6 +1089,94 @@ onBeforeUnmount(() => {
 .detail-scripture-label {
     font-weight: 800;
 }
+.detail-verse-preview {
+    margin-top: 8px;
+}
+.detail-verse-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 58px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--theme-bg-elevated, #30304f) 56%, transparent);
+    border: 1px solid var(--theme-border, rgba(255,255,255,0.08));
+}
+.detail-verse-list {
+    display: grid;
+    gap: 8px;
+}
+.detail-verse-row {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--theme-bg-elevated, #30304f) 64%, transparent);
+    border: 1px solid var(--theme-border, rgba(255,255,255,0.08));
+}
+.detail-verse-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    min-width: 0;
+}
+.detail-version-code {
+    flex-shrink: 0;
+    padding: 2px 6px;
+    border-radius: 5px;
+    color: var(--primary-color, #6f84ff);
+    background: color-mix(in srgb, var(--primary-color, #6f84ff) 17%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary-color, #6f84ff) 35%, transparent);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.detail-verse-ref {
+    color: var(--theme-text-soft, rgba(255,255,255,0.62));
+    font-size: 11px;
+    font-weight: 700;
+}
+.detail-verse-pager {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--theme-text-soft, rgba(255,255,255,0.62));
+    font-size: 11px;
+    font-weight: 800;
+}
+.detail-verse-pager-btn {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 17px;
+    line-height: 1;
+}
+.detail-verse-pager-btn:hover {
+    color: var(--theme-text, inherit);
+    background: rgba(255,255,255,0.07);
+}
+.detail-verse-pager-count {
+    min-width: 28px;
+    text-align: center;
+}
+.detail-verse-text {
+    color: var(--theme-text, inherit);
+    font-size: 13px;
+    line-height: 1.55;
+}
+.detail-verse-text :deep(a) {
+    display: none;
+}
+.detail-verse-text :deep(s) {
+    color: var(--theme-text-soft, rgba(255,255,255,0.62));
+    text-decoration: none;
+}
 .detail-actions {
     display: flex;
     flex-wrap: wrap;
@@ -898,6 +1188,7 @@ onBeforeUnmount(() => {
     line-height: 1.78;
     margin: 16px 24px 0;
     padding: 0 16px 18px 0;
+    flex: 1;
     min-height: 220px;
     overflow-y: auto;
     color: var(--theme-text, inherit);
@@ -935,6 +1226,19 @@ onBeforeUnmount(() => {
     }
     .detail-view-count {
         margin-left: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .detail-layout {
+        flex-direction: column;
+    }
+    .detail-sidebar {
+        order: -1;
+        width: auto;
+        max-height: 44vh;
+        border-left: 0;
+        border-bottom: 1px solid var(--theme-border, rgba(255,255,255,0.08));
     }
 }
 </style>

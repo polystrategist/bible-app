@@ -714,6 +714,45 @@ body[class*='theme-bg-']:not(.theme-bg-default) {
     --scrollbar-thumb-hover: var(--primary-color);
 }
 
+body .n-date-panel {
+    --n-panel-color: var(--theme-bg-elevated) !important;
+    --n-panel-text-color: var(--theme-text) !important;
+    --n-panel-box-shadow: 0 14px 36px rgba(0, 0, 0, 0.34), 0 0 0 1px var(--theme-border) !important;
+    --n-panel-header-divider-color: var(--theme-border) !important;
+    --n-panel-action-divider-color: var(--theme-border) !important;
+    --n-calendar-title-color-hover: var(--theme-bg-soft) !important;
+    --n-calendar-title-text-color: var(--theme-text) !important;
+    --n-calendar-days-text-color: var(--theme-text-soft) !important;
+    --n-calendar-days-divider-color: var(--theme-border) !important;
+    --n-calendar-divider-color: var(--theme-border) !important;
+    --n-item-text-color: var(--theme-text) !important;
+    --n-item-text-color-disabled: color-mix(in srgb, var(--theme-text-soft) 58%, transparent) !important;
+    --n-item-text-color-active: var(--theme-bg-main) !important;
+    --n-item-color-hover: var(--theme-bg-soft) !important;
+    --n-item-color-disabled: color-mix(in srgb, var(--theme-bg-soft) 45%, transparent) !important;
+    --n-item-color-active: var(--primary-color) !important;
+    --n-item-color-included: color-mix(in srgb, var(--primary-color) 16%, transparent) !important;
+    --n-arrow-color: var(--theme-text-soft) !important;
+
+    background-color: var(--theme-bg-elevated) !important;
+    color: var(--theme-text) !important;
+    border: 1px solid var(--theme-border) !important;
+}
+
+body .n-date-panel .n-date-panel-actions {
+    background-color: var(--theme-bg-elevated) !important;
+    border-top-color: var(--theme-border) !important;
+}
+
+body .n-date-panel .n-button:not(.n-button--primary-type) {
+    --n-color: var(--theme-bg-soft) !important;
+    --n-color-hover: color-mix(in srgb, var(--theme-bg-soft) 80%, var(--primary-color)) !important;
+    --n-text-color: var(--theme-text) !important;
+    --n-text-color-hover: var(--theme-text) !important;
+    --n-border: 1px solid var(--theme-border) !important;
+    --n-border-hover: 1px solid var(--primary-color) !important;
+}
+
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-left-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-toolbar,
