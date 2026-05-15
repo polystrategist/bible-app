@@ -5,6 +5,12 @@ import { runSync, runPullSync, resetSyncBackoff } from '../util/Sync/sync';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
+export interface UserInfo {
+    id?: number;
+    user_id?: number;
+    denomination: string | null;
+}
+
 export interface User {
     id: number;
     name: string;
@@ -13,6 +19,7 @@ export interface User {
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
+    info?: UserInfo | null;
 }
 
 export interface AuthTokens {
@@ -531,6 +538,29 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
+    async function updateUserInfo(
+        data: { denomination?: string | null }
+    ): Promise<{ success: boolean; message?: string }> {
+        if (!token.value) return { success: false, message: 'Not authenticated' };
+        try {
+            const response = await axios.patch(`${API_BASE_URL}/user-info`, data, {
+                headers: { Authorization: `Bearer ${token.value}` },
+            });
+            if (response.data.status === 'success') {
+                if (user.value) {
+                    user.value = { ...user.value, info: response.data.info };
+                }
+                return { success: true };
+            }
+            return { success: false, message: 'Failed to update info' };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to update info',
+            };
+        }
+    }
+
     async function resetPassword(
         token: string,
         email: string,
@@ -579,5 +609,6 @@ export const useAuthStore = defineStore('authStore', () => {
         flushPendingSettings,
         forgotPassword,
         resetPassword,
+        updateUserInfo,
     };
 });

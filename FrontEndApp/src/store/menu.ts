@@ -37,7 +37,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             iconDark: renderNIcon(Book24Filled),
         },
         {
-            label: "Believers\' Feed",
+            label: 'Sermons',
             key: 'sermons',
             icon: renderNIcon(DocumentQueueMultiple24Regular),
             iconDark: renderNIcon(DocumentQueueMultiple24Filled),
@@ -128,7 +128,10 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             return;
         }
 
-        if (menu == menuSelected.value) return;
+        // Skip only when both the key and the router-mode are already correct.
+        // If isRouter is true but we're navigating to a v-show key, we still need
+        // setMenuWithNoRoute to flip isRouter back to false.
+        if (menu == menuSelected.value && !isRouter.value) return;
         else if (menu.includes('/')) await setMenuWithRoute(menu as any);
         else if (!menu.includes('/')) setMenuWithNoRoute(menu as any);
     }
@@ -157,6 +160,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         menuSelected,
         isRouter,
         setMenu,
+        setMenuWithNoRoute,
         menuUpperTabs,
         bottomMenuTabs,
         enableTab,

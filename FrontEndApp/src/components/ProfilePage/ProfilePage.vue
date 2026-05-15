@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NInput, NModal, NSwitch, useMessage } from 'naive-ui';
-import { computed, ref } from 'vue';
+import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSwitch, useMessage } from 'naive-ui';
+import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
@@ -9,6 +9,36 @@ const loading = ref(false);
 const authStore = useAuthStore();
 const message = useMessage();
 const router = useRouter();
+
+// Denomination
+const DENOMINATION_OPTIONS = [
+    'Adventist','Anglican','Apostolic','Assembly of God','Baptist',
+    'Bible Church','Brethren','Calvary Chapel','Catholic','Charismatic',
+    'Christian Missionary Alliance','Christian/Church of Christ','Church of God',
+    'Congregational','Disciples of Christ','Episcopal','Evangelical Free',
+    'Evangelical/Non-denominational','Foursquare','Free Methodist','Friends',
+    'Grace Brethren','Holiness','Independent/Bible','Lutheran','Mennonite',
+    'Methodist','Nazarene','Orthodox','Pentecostal','Presbyterian/Reformed',
+    'Salvation Army','Seventh-Day Adventist','United Methodist','Vineyard',
+    'Wesleyan','Others',
+].map((d) => ({ label: d, value: d }));
+
+const denomination = ref<string | null>(null);
+const denominationSaving = ref(false);
+const denominationDirty = ref(false);
+
+onMounted(() => {
+    denomination.value = authStore.user?.info?.denomination ?? null;
+});
+
+async function saveDenomination() {
+    denominationSaving.value = true;
+    const result = await authStore.updateUserInfo({ denomination: denomination.value });
+    denominationSaving.value = false;
+    denominationDirty.value = false;
+    if (result.success) message.success('Denomination saved.');
+    else message.error(result.message ?? 'Failed to save.');
+}
 
 const initials = computed(() => {
     const name = authStore.user?.name ?? '';
@@ -136,6 +166,40 @@ async function confirmDeleteAccount() {
                             <Icon icon="mdi:check-circle-outline" />
                             <span>Sync is currently enabled for this account</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Denomination -->
+                <div class="denomination-panel mt-4">
+                    <div class="flex items-center gap-2 font-700 mb-1">
+                        <Icon icon="mdi:church" />
+                        <span>Denomination</span>
+                        <span class="required-badge">Required</span>
+                    </div>
+                    <p class="m-0 text-sm opacity-70 mb-3">
+                        Select your church denomination. This helps connect you with your community.
+                    </p>
+                    <NAlert v-if="!denomination" type="warning" :show-icon="false" class="mb-3 text-sm">
+                        Please set your denomination to participate in the Believers' Feed.
+                    </NAlert>
+                    <div class="flex gap-2 items-end">
+                        <NSelect
+                            v-model:value="denomination"
+                            :options="DENOMINATION_OPTIONS"
+                            placeholder="Select your denomination..."
+                            filterable
+                            clearable
+                            class="flex-1"
+                            @update:value="denominationDirty = true"
+                        />
+                        <NButton
+                            type="primary"
+                            :loading="denominationSaving"
+                            :disabled="denominationSaving || !denominationDirty"
+                            @click="saveDenomination"
+                        >
+                            Save
+                        </NButton>
                     </div>
                 </div>
 
@@ -354,5 +418,24 @@ async function confirmDeleteAccount() {
 .danger-zone-body {
     padding: 18px;
     border-top: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.denomination-panel {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(111, 132, 255, 0.08);
+    border: 1px solid rgba(111, 132, 255, 0.2);
+}
+
+.required-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(251, 146, 60, 0.2);
+    color: #fb923c;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 </style>
