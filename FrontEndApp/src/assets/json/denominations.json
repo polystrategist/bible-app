@@ -1,92 +1,402 @@
-{
-  "catholic": "Catholic",
-  "roman_catholic": "Roman Catholic",
-  "eastern_catholic": "Eastern Catholic",
-  "orthodox": "Orthodox",
-  "eastern_orthodox": "Eastern Orthodox",
-  "oriental_orthodox": "Oriental Orthodox",
-  "assyrian_church_of_the_east": "Assyrian Church of the East",
-  "ancient_church_of_the_east": "Ancient Church of the East",
-
-  "protestant": "Protestant",
-  "anglican": "Anglican",
-  "episcopal": "Episcopal",
-  "lutheran": "Lutheran",
-  "reformed": "Reformed",
-  "presbyterian": "Presbyterian",
-  "congregationalist": "Congregationalist",
-  "methodist": "Methodist",
-  "wesleyan": "Wesleyan",
-  "baptist": "Baptist",
-  "anabaptist": "Anabaptist",
-  "mennonite": "Mennonite",
-  "amish": "Amish",
-  "hutterite": "Hutterite",
-  "brethren": "Brethren",
-  "plymouth_brethren": "Plymouth Brethren",
-  "moravian": "Moravian",
-  "quaker": "Quaker",
-  "society_of_friends": "Society of Friends",
-
-  "pentecostal": "Pentecostal",
-  "assemblies_of_god": "Assemblies of God",
-  "church_of_god": "Church of God",
-  "church_of_god_in_christ": "Church of God in Christ",
-  "foursquare": "Foursquare Church",
-  "apostolic": "Apostolic",
-  "oneness_pentecostal": "Oneness Pentecostal",
-
-  "charismatic": "Charismatic",
-  "neo_charismatic": "Neo-Charismatic",
-  "full_gospel": "Full Gospel",
-  "word_of_faith": "Word of Faith",
-
-  "evangelical": "Evangelical",
-  "non_denominational": "Non-denominational",
-  "independent_christian": "Independent Christian",
-  "community_church": "Community Church",
-  "bible_church": "Bible Church",
-  "free_church": "Free Church",
-
-  "restorationist": "Restorationist",
-  "churches_of_christ": "Churches of Christ",
-  "christian_church": "Christian Church",
-  "disciples_of_christ": "Disciples of Christ",
-  "seventh_day_adventist": "Seventh-day Adventist",
-  "adventist": "Adventist",
-
-  "holiness": "Holiness",
-  "nazarene": "Church of the Nazarene",
-  "salvation_army": "Salvation Army",
-  "free_methodist": "Free Methodist",
-  "christian_and_missionary_alliance": "Christian and Missionary Alliance",
-
-  "messianic_jewish": "Messianic Jewish",
-  "hebrew_roots": "Hebrew Roots",
-
-  "african_initiated_church": "African Initiated Church",
-  "zionist_church": "Zionist Church",
-  "ethiopian_orthodox": "Ethiopian Orthodox",
-  "coptic_orthodox": "Coptic Orthodox",
-  "armenian_apostolic": "Armenian Apostolic",
-  "syriac_orthodox": "Syriac Orthodox",
-  "malankara_orthodox": "Malankara Orthodox",
-  "mar_thoma": "Mar Thoma Syrian Church",
-
-  "old_catholic": "Old Catholic",
-  "independent_catholic": "Independent Catholic",
-  "liberal_catholic": "Liberal Catholic",
-
-  "united_church": "United Church",
-  "united_church_of_christ": "United Church of Christ",
-  "uniting_church": "Uniting Church",
-  "church_of_south_india": "Church of South India",
-  "church_of_north_india": "Church of North India",
-
-  "christian_science": "Christian Science",
-  "jehovahs_witnesses": "Jehovah's Witnesses",
-  "latter_day_saints": "Latter-day Saints",
-  "church_of_jesus_christ_of_latter_day_saints": "The Church of Jesus Christ of Latter-day Saints",
-
-  "other": "Other"
-}
+[
+  {
+    "name": "Catholic Church",
+    "code": "catholic_church"
+  },
+  {
+    "name": "Roman Catholic",
+    "code": "roman_catholic"
+  },
+  {
+    "name": "Eastern Catholic",
+    "code": "eastern_catholic"
+  },
+  {
+    "name": "Eastern Orthodox",
+    "code": "eastern_orthodox"
+  },
+  {
+    "name": "Oriental Orthodox",
+    "code": "oriental_orthodox"
+  },
+  {
+    "name": "Assyrian Church of the East",
+    "code": "assyrian_church_of_the_east"
+  },
+  {
+    "name": "Anglican",
+    "code": "anglican"
+  },
+  {
+    "name": "Episcopal",
+    "code": "episcopal"
+  },
+  {
+    "name": "Lutheran",
+    "code": "lutheran"
+  },
+  {
+    "name": "Reformed",
+    "code": "reformed"
+  },
+  {
+    "name": "Presbyterian",
+    "code": "presbyterian"
+  },
+  {
+    "name": "Congregationalist",
+    "code": "congregationalist"
+  },
+  {
+    "name": "Methodist",
+    "code": "methodist"
+  },
+  {
+    "name": "Wesleyan",
+    "code": "wesleyan"
+  },
+  {
+    "name": "Holiness",
+    "code": "holiness"
+  },
+  {
+    "name": "Baptist",
+    "code": "baptist"
+  },
+  {
+    "name": "Southern Baptist",
+    "code": "southern_baptist"
+  },
+  {
+    "name": "Independent Baptist",
+    "code": "independent_baptist"
+  },
+  {
+    "name": "Missionary Baptist",
+    "code": "missionary_baptist"
+  },
+  {
+    "name": "Free Will Baptist",
+    "code": "free_will_baptist"
+  },
+  {
+    "name": "Anabaptist",
+    "code": "anabaptist"
+  },
+  {
+    "name": "Mennonite",
+    "code": "mennonite"
+  },
+  {
+    "name": "Amish",
+    "code": "amish"
+  },
+  {
+    "name": "Hutterite",
+    "code": "hutterite"
+  },
+  {
+    "name": "Brethren",
+    "code": "brethren"
+  },
+  {
+    "name": "Plymouth Brethren",
+    "code": "plymouth_brethren"
+  },
+  {
+    "name": "Quaker",
+    "code": "quaker"
+  },
+  {
+    "name": "Restorationist",
+    "code": "restorationist"
+  },
+  {
+    "name": "Churches of Christ",
+    "code": "churches_of_christ"
+  },
+  {
+    "name": "Christian Church",
+    "code": "christian_church"
+  },
+  {
+    "name": "Disciples of Christ",
+    "code": "disciples_of_christ"
+  },
+  {
+    "name": "Adventist",
+    "code": "adventist"
+  },
+  {
+    "name": "Seventh-day Adventist",
+    "code": "seventh_day_adventist"
+  },
+  {
+    "name": "Pentecostal",
+    "code": "pentecostal"
+  },
+  {
+    "name": "Assemblies of God",
+    "code": "assemblies_of_god"
+  },
+  {
+    "name": "Church of God",
+    "code": "church_of_god"
+  },
+  {
+    "name": "Church of God in Christ",
+    "code": "church_of_god_in_christ"
+  },
+  {
+    "name": "Foursquare Gospel",
+    "code": "foursquare_gospel"
+  },
+  {
+    "name": "Apostolic Pentecostal",
+    "code": "apostolic_pentecostal"
+  },
+  {
+    "name": "Oneness Pentecostal",
+    "code": "oneness_pentecostal"
+  },
+  {
+    "name": "Charismatic",
+    "code": "charismatic"
+  },
+  {
+    "name": "Evangelical",
+    "code": "evangelical"
+  },
+  {
+    "name": "Non-Denominational",
+    "code": "non_denominational"
+  },
+  {
+    "name": "Independent Christian",
+    "code": "independent_christian"
+  },
+  {
+    "name": "Bible Church",
+    "code": "bible_church"
+  },
+  {
+    "name": "Calvary Chapel",
+    "code": "calvary_chapel"
+  },
+  {
+    "name": "Vineyard Churches",
+    "code": "vineyard_churches"
+  },
+  {
+    "name": "Christian and Missionary Alliance",
+    "code": "christian_and_missionary_alliance"
+  },
+  {
+    "name": "Salvation Army",
+    "code": "salvation_army"
+  },
+  {
+    "name": "Nazarene",
+    "code": "nazarene"
+  },
+  {
+    "name": "Church of the Nazarene",
+    "code": "church_of_the_nazarene"
+  },
+  {
+    "name": "Moravian Church",
+    "code": "moravian_church"
+  },
+  {
+    "name": "United Church",
+    "code": "united_church"
+  },
+  {
+    "name": "United Church of Christ",
+    "code": "united_church_of_christ"
+  },
+  {
+    "name": "United Methodist Church",
+    "code": "united_methodist_church"
+  },
+  {
+    "name": "African Methodist Episcopal",
+    "code": "african_methodist_episcopal"
+  },
+  {
+    "name": "African Methodist Episcopal Zion",
+    "code": "african_methodist_episcopal_zion"
+  },
+  {
+    "name": "Christian Methodist Episcopal",
+    "code": "christian_methodist_episcopal"
+  },
+  {
+    "name": "Messianic Jewish",
+    "code": "messianic_jewish"
+  },
+  {
+    "name": "Coptic Orthodox",
+    "code": "coptic_orthodox"
+  },
+  {
+    "name": "Armenian Apostolic",
+    "code": "armenian_apostolic"
+  },
+  {
+    "name": "Syriac Orthodox",
+    "code": "syriac_orthodox"
+  },
+  {
+    "name": "Ethiopian Orthodox",
+    "code": "ethiopian_orthodox"
+  },
+  {
+    "name": "Eritrean Orthodox",
+    "code": "eritrean_orthodox"
+  },
+  {
+    "name": "Greek Orthodox",
+    "code": "greek_orthodox"
+  },
+  {
+    "name": "Russian Orthodox",
+    "code": "russian_orthodox"
+  },
+  {
+    "name": "Serbian Orthodox",
+    "code": "serbian_orthodox"
+  },
+  {
+    "name": "Romanian Orthodox",
+    "code": "romanian_orthodox"
+  },
+  {
+    "name": "Ukrainian Orthodox",
+    "code": "ukrainian_orthodox"
+  },
+  {
+    "name": "Maronite Catholic",
+    "code": "maronite_catholic"
+  },
+  {
+    "name": "Melkite Greek Catholic",
+    "code": "melkite_greek_catholic"
+  },
+  {
+    "name": "Ukrainian Greek Catholic",
+    "code": "ukrainian_greek_catholic"
+  },
+  {
+    "name": "Chaldean Catholic",
+    "code": "chaldean_catholic"
+  },
+  {
+    "name": "Syro-Malabar Catholic",
+    "code": "syro_malabar_catholic"
+  },
+  {
+    "name": "Syro-Malankara Catholic",
+    "code": "syro_malankara_catholic"
+  },
+  {
+    "name": "Old Catholic",
+    "code": "old_catholic"
+  },
+  {
+    "name": "Latter Rain Movement",
+    "code": "latter_rain_movement"
+  },
+  {
+    "name": "House Church",
+    "code": "house_church"
+  },
+  {
+    "name": "Emerging Church",
+    "code": "emerging_church"
+  },
+  {
+    "name": "Progressive Christian",
+    "code": "progressive_christian"
+  },
+  {
+    "name": "Fundamentalist Christian",
+    "code": "fundamentalist_christian"
+  },
+  {
+    "name": "Reformed Baptist",
+    "code": "reformed_baptist"
+  },
+  {
+    "name": "Primitive Baptist",
+    "code": "primitive_baptist"
+  },
+  {
+    "name": "General Baptist",
+    "code": "general_baptist"
+  },
+  {
+    "name": "Particular Baptist",
+    "code": "particular_baptist"
+  },
+  {
+    "name": "American Baptist",
+    "code": "american_baptist"
+  },
+  {
+    "name": "National Baptist",
+    "code": "national_baptist"
+  },
+  {
+    "name": "Reformed Episcopal",
+    "code": "reformed_episcopal"
+  },
+  {
+    "name": "Continuing Anglican",
+    "code": "continuing_anglican"
+  },
+  {
+    "name": "Evangelical Free Church",
+    "code": "evangelical_free_church"
+  },
+  {
+    "name": "Grace Brethren",
+    "code": "grace_brethren"
+  },
+  {
+    "name": "Open Brethren",
+    "code": "open_brethren"
+  },
+  {
+    "name": "Exclusive Brethren",
+    "code": "exclusive_brethren"
+  },
+  {
+    "name": "Apostolic Christian Church",
+    "code": "apostolic_christian_church"
+  },
+  {
+    "name": "New Apostolic Church",
+    "code": "new_apostolic_church"
+  },
+  {
+    "name": "Christadelphian",
+    "code": "christadelphian"
+  },
+  {
+    "name": "Christian Science",
+    "code": "christian_science"
+  },
+  {
+    "name": "Unitarian Christian",
+    "code": "unitarian_christian"
+  },
+  {
+    "name": "Universalist Christian",
+    "code": "universalist_christian"
+  },
+  {
+    "name": "Other",
+    "code": "other"
+  }
+]

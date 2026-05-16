@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { NButton, NInput, useMessage } from 'naive-ui';
+import { NButton, NInput, NSelect, useMessage } from 'naive-ui';
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../../store/authStore';
+import { DENOMINATION_OPTIONS } from '../../../util/denominations';
 
 type View = 'login' | 'register' | 'forgot' | 'reset';
 
@@ -13,11 +14,14 @@ const authStore = useAuthStore();
 const router = useRouter();
 const message = useMessage();
 
+const selectScrollbarProps = { trigger: 'none' as const };
+
 const form = reactive({
     email: null as string | null,
     password: null as string | null,
     retypePassword: null as string | null,
     name: null as string | null,
+    denomination: null as string | null,
     resetToken: null as string | null,
     newPassword: null as string | null,
     newPasswordConfirm: null as string | null,
@@ -45,8 +49,12 @@ async function register() {
         message.error('Password and retype password should be the same.');
         return;
     }
+    if (!form.denomination) {
+        message.error('Please select your denomination.');
+        return;
+    }
     loading.value = true;
-    const result = await authStore.register(form.name, form.email, form.password, form.retypePassword!);
+    const result = await authStore.register(form.name, form.email, form.password, form.retypePassword!, form.denomination);
     loading.value = false;
     if (!result.success) { message.error(result.message); return; }
     message.success('Registered! Successfully.');
@@ -149,13 +157,23 @@ onMounted(async () => {
                 <!-- Login / Register: password -->
                 <template v-if="view === 'login' || view === 'register'">
                     <label class="login-label">{{ $t('Password:') }}</label>
-                    <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" size="large" @keydown.enter="submit" />
+                    <NInput v-model:value="form.password" :placeholder="$t('Password')" type="password" show-password-on="click" size="large" @keydown.enter="submit" />
                 </template>
 
-                <!-- Register: confirm password -->
+                <!-- Register: confirm password + denomination -->
                 <template v-if="view === 'register'">
                     <label class="login-label">Retype Password</label>
-                    <NInput v-model:value="form.retypePassword" placeholder="Retype Password" type="password" size="large" @keydown.enter="submit" />
+                    <NInput v-model:value="form.retypePassword" placeholder="Retype Password" type="password" show-password-on="click" size="large" @keydown.enter="submit" />
+                    <label class="login-label">Denomination <span style="color: #fb923c; font-size: 11px; margin-left: 4px;">Required</span></label>
+                    <NSelect
+                        v-model:value="form.denomination"
+                        :options="DENOMINATION_OPTIONS"
+                        placeholder="Select your denomination..."
+                        filterable
+                        :virtual-scroll="false"
+                        :scrollbar-props="selectScrollbarProps"
+                        size="large"
+                    />
                 </template>
 
                 <!-- Reset: token + new password -->
@@ -163,9 +181,9 @@ onMounted(async () => {
                     <label class="login-label">Reset Token</label>
                     <NInput v-model:value="form.resetToken" placeholder="Paste token from the reset email" size="large" @keydown.enter="submit" />
                     <label class="login-label">New Password</label>
-                    <NInput v-model:value="form.newPassword" placeholder="New Password" type="password" size="large" @keydown.enter="submit" />
+                    <NInput v-model:value="form.newPassword" placeholder="New Password" type="password" show-password-on="click" size="large" @keydown.enter="submit" />
                     <label class="login-label">Confirm New Password</label>
-                    <NInput v-model:value="form.newPasswordConfirm" placeholder="Confirm New Password" type="password" size="large" @keydown.enter="submit" />
+                    <NInput v-model:value="form.newPasswordConfirm" placeholder="Confirm New Password" type="password" show-password-on="click" size="large" @keydown.enter="submit" />
                 </template>
 
                 <!-- Submit button -->
@@ -210,16 +228,18 @@ onMounted(async () => {
     min-height: 100vh;
     width: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 24px;
     box-sizing: border-box;
     background: var(--theme-bg-main);
+    overflow-y: auto;
 }
 
 .login-card {
     width: 100%;
     max-width: 420px;
+    margin: auto 0;
     padding: 40px 36px;
     border-radius: 12px;
     border: 1px solid var(--theme-border);

@@ -64,7 +64,8 @@ export const useAuthStore = defineStore('authStore', () => {
         name: string,
         email: string,
         password: string,
-        passwordConfirmation: string
+        passwordConfirmation: string,
+        denomination?: string | null
     ): Promise<{ success: boolean; message: string; user?: User; token?: string }> {
         try {
             const response = await axios.post(`${API_BASE_URL}/auth/register`, {
@@ -72,6 +73,7 @@ export const useAuthStore = defineStore('authStore', () => {
                 email,
                 password,
                 password_confirmation: passwordConfirmation,
+                ...(denomination ? { denomination } : {}),
             });
 
             if (response.data.status === 'success') {

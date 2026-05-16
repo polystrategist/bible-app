@@ -4,36 +4,28 @@ import { computed, ref, onMounted } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
+import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
 
 const loading = ref(false);
 const authStore = useAuthStore();
 const message = useMessage();
 const router = useRouter();
 
-// Denomination
-const DENOMINATION_OPTIONS = [
-    'Adventist','Anglican','Apostolic','Assembly of God','Baptist',
-    'Bible Church','Brethren','Calvary Chapel','Catholic','Charismatic',
-    'Christian Missionary Alliance','Christian/Church of Christ','Church of God',
-    'Congregational','Disciples of Christ','Episcopal','Evangelical Free',
-    'Evangelical/Non-denominational','Foursquare','Free Methodist','Friends',
-    'Grace Brethren','Holiness','Independent/Bible','Lutheran','Mennonite',
-    'Methodist','Nazarene','Orthodox','Pentecostal','Presbyterian/Reformed',
-    'Salvation Army','Seventh-Day Adventist','United Methodist','Vineyard',
-    'Wesleyan','Others',
-].map((d) => ({ label: d, value: d }));
+const selectScrollbarProps = { trigger: 'none' as const };
 
 const denomination = ref<string | null>(null);
 const denominationSaving = ref(false);
 const denominationDirty = ref(false);
 
 onMounted(() => {
-    denomination.value = authStore.user?.info?.denomination ?? null;
+    denomination.value = normalizeDenominationCode(authStore.user?.info?.denomination);
 });
 
 async function saveDenomination() {
     denominationSaving.value = true;
-    const result = await authStore.updateUserInfo({ denomination: denomination.value });
+    const result = await authStore.updateUserInfo({
+        denomination: normalizeDenominationCode(denomination.value),
+    });
     denominationSaving.value = false;
     denominationDirty.value = false;
     if (result.success) message.success('Denomination saved.');
@@ -147,19 +139,14 @@ async function confirmDeleteAccount() {
                                 <span>Sync</span>
                             </div>
                             <p class="m-0 text-sm opacity-70">
-                                Sync can be managed from the Believers Sword mobile app.
+                                Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
                             </p>
                         </div>
                         <NSwitch
                             :value="authStore.syncEnabled"
-                            :disabled="true"
                             @update:value="onSyncToggle"
                         />
                     </div>
-
-                    <NAlert type="info" :show-icon="false" class="mt-4">
-                        To sync your data, download the Believers Sword mobile app and enable sync in it.
-                    </NAlert>
 
                     <div class="sync-footer">
                         <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
@@ -189,6 +176,8 @@ async function confirmDeleteAccount() {
                             placeholder="Select your denomination..."
                             filterable
                             clearable
+                            :virtual-scroll="false"
+                            :scrollbar-props="selectScrollbarProps"
                             class="flex-1"
                             @update:value="denominationDirty = true"
                         />
