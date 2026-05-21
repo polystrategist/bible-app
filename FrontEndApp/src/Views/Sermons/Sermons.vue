@@ -192,6 +192,18 @@ function hasVisibleText(html: string) {
     return html.replace(/<[^>]*>/g, '').trim().length > 0;
 }
 
+// Strip MyBible code-style markup (Strong's numbers, morphology, footnotes,
+// annotations) so the sermon dialog shows clean prose. Keeps formatting tags
+// like <J>, <i>, <e>, <br/>.
+function cleanScriptureHtml(html: string) {
+    return html
+        .replace(/<(S|m|n|f)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+        .replace(/<(S|m|n|f)\b[^>]*\/>/gi, '')
+        .replace(/\s+([,.;:!?])/g, '$1')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+}
+
 function versionShortCode(fileName: string) {
     const installed = moduleStore.bibleLists.find((item: any) => item.file_name === fileName);
     const meta = bible.find((item) => item.file_name === fileName);
@@ -241,12 +253,12 @@ async function loadSermonScripture(sermon: SermonType) {
                     });
 
                     const versionRows = results
-                        .filter((item) => item.text && hasVisibleText(item.text))
                         .map((item) => ({
                             version: item.version,
                             versionCode: versionShortCode(item.version),
-                            text: item.text,
-                        }));
+                            text: cleanScriptureHtml(item.text ?? ''),
+                        }))
+                        .filter((row) => hasVisibleText(row.text));
 
                     return {
                         key: `${request.book}-${request.chapter}-${request.verse}`,
