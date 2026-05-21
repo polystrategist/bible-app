@@ -27,6 +27,8 @@ export type SermonSeries = {
 export type SermonCreator = {
     id: number;
     name: string;
+    username?: string | null;
+    info?: { profile_picture?: string | null } | null;
 };
 
 export type SermonType = {
@@ -87,6 +89,7 @@ export const useSermonStore = defineStore('useSermonStore', () => {
     const lastPage = ref(1);
     const search = ref('');
     const categoryFilter = ref<number | null>(null);
+    const sort = ref<'recent' | 'popular' | 'oldest'>('recent');
 
     // My sermons (authenticated)
     const mySermons = ref<SermonType[]>([]);
@@ -124,6 +127,7 @@ export const useSermonStore = defineStore('useSermonStore', () => {
             const params: Record<string, any> = { page: page.value };
             if (search.value) params.search = search.value;
             if (categoryFilter.value) params.category_id = categoryFilter.value;
+            if (sort.value !== 'recent') params.sort = sort.value;
 
             const res = await axios.get(`${API_BASE_URL}/sermons`, { params });
             if (res.data.status === 'success') {
@@ -304,6 +308,7 @@ export const useSermonStore = defineStore('useSermonStore', () => {
         lastPage,
         search,
         categoryFilter,
+        sort,
         getSermons,
         // My sermons
         mySermons,

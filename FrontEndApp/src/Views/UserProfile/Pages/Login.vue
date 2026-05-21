@@ -21,6 +21,7 @@ const form = reactive({
     password: null as string | null,
     retypePassword: null as string | null,
     name: null as string | null,
+    username: null as string | null,
     denomination: null as string | null,
     resetToken: null as string | null,
     newPassword: null as string | null,
@@ -41,8 +42,12 @@ async function login() {
 }
 
 async function register() {
-    if (!form.email || !form.password || !form.name) {
+    if (!form.email || !form.password || !form.name || !form.username) {
         message.error('Cant Continue, some fields does not exist.');
+        return;
+    }
+    if (!/^[a-z0-9_]{3,30}$/.test(form.username)) {
+        message.error('Username must be 3–30 characters: lowercase letters, numbers, and underscores only.');
         return;
     }
     if (form.password !== form.retypePassword) {
@@ -54,7 +59,7 @@ async function register() {
         return;
     }
     loading.value = true;
-    const result = await authStore.register(form.name, form.email, form.password, form.retypePassword!, form.denomination);
+    const result = await authStore.register(form.name, form.username, form.email, form.password, form.retypePassword!, form.denomination);
     loading.value = false;
     if (!result.success) { message.error(result.message); return; }
     message.success('Registered! Successfully.');
@@ -144,10 +149,21 @@ onMounted(async () => {
                     {{ successMessage }}
                 </div>
 
-                <!-- Register: name field -->
+                <!-- Register: name + username fields -->
                 <template v-if="view === 'register'">
                     <label class="login-label">Full Name</label>
                     <NInput v-model:value="form.name" placeholder="Your name" size="large" @keydown.enter="submit" />
+                    <label class="login-label">Username</label>
+                    <NInput
+                        v-model:value="form.username"
+                        placeholder="e.g. john_doe"
+                        size="large"
+                        @keydown.enter="submit"
+                        @input="form.username = (form.username ?? '').toLowerCase().replace(/[^a-z0-9_]/g, '')"
+                    >
+                        <template #prefix><span class="username-at">@</span></template>
+                    </NInput>
+                    <p class="login-hint">3–30 chars · lowercase letters, numbers, underscores only</p>
                 </template>
 
                 <!-- Email (all views) -->
@@ -305,6 +321,19 @@ onMounted(async () => {
 .login-forgot {
     align-self: center;
     opacity: 0.7;
+}
+
+.username-at {
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0.6;
+    margin-right: 2px;
+}
+
+.login-hint {
+    margin: -4px 0 0;
+    font-size: 11px;
+    opacity: 0.45;
 }
 
 .login-success {

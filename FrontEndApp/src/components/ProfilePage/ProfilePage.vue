@@ -1,15 +1,89 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSwitch, useMessage } from 'naive-ui';
-import { computed, ref, onMounted } from 'vue';
+import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSwitch, NSpin, useMessage } from 'naive-ui';
+import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
 import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
+import { DEFAULT_PROFILE_NAMES, getDefaultProfileUrl, useAvatarUrl } from '../../util/avatar';
 
 const loading = ref(false);
 const authStore = useAuthStore();
 const message = useMessage();
 const router = useRouter();
+
+// ─── Name / Username / Email editing ─────────────────────────────────────────
+const profileName     = ref(authStore.user?.name ?? '');
+const profileUsername = ref(authStore.user?.username ?? '');
+const profileEmail    = ref(authStore.user?.email ?? '');
+const profileSaving   = ref(false);
+const usernameError   = ref('');
+
+function validateUsername(val: string): string {
+    if (!val) return 'Username is required';
+    if (!/^[a-z0-9_]{3,30}$/.test(val)) return '3–30 chars: lowercase letters, numbers, underscores only';
+    return '';
+}
+
+const profileDirty = computed(() =>
+    profileName.value.trim()     !== (authStore.user?.name ?? '') ||
+    profileUsername.value.trim() !== (authStore.user?.username ?? '') ||
+    profileEmail.value.trim()    !== (authStore.user?.email ?? ''),
+);
+
+function resetProfile() {
+    profileName.value     = authStore.user?.name ?? '';
+    profileUsername.value = authStore.user?.username ?? '';
+    profileEmail.value    = authStore.user?.email ?? '';
+    usernameError.value   = '';
+}
+
+const profileRefreshing = ref(false);
+
+async function refreshProfile() {
+    profileRefreshing.value = true;
+    await authStore.getUser(true);
+    profileRefreshing.value = false;
+    profileName.value     = authStore.user?.name     ?? profileName.value;
+    profileUsername.value = authStore.user?.username ?? profileUsername.value;
+    profileEmail.value    = authStore.user?.email    ?? profileEmail.value;
+}
+
+async function saveProfile() {
+    const name     = profileName.value.trim();
+    const username = profileUsername.value.trim();
+    const email    = profileEmail.value.trim();
+    if (!name || !email) return;
+
+    const err = validateUsername(username);
+    if (err) { usernameError.value = err; return; }
+    usernameError.value = '';
+
+    const payload: { name?: string; username?: string; email?: string } = {};
+    if (name     !== authStore.user?.name)               payload.name     = name;
+    if (username !== (authStore.user?.username ?? ''))   payload.username = username;
+    if (email    !== authStore.user?.email)              payload.email    = email;
+    if (!Object.keys(payload).length) return;
+
+    profileSaving.value = true;
+    const result = await authStore.updateProfile(payload);
+    profileSaving.value = false;
+
+    if (result.success) {
+        profileName.value     = authStore.user?.name     ?? name;
+        profileUsername.value = authStore.user?.username ?? username;
+        profileEmail.value    = authStore.user?.email    ?? email;
+        if (result.emailVerificationSent) {
+            message.info(`Verification email sent to ${payload.email}. Check your inbox to confirm the change.`, { duration: 6000 });
+        } else {
+            message.success('Profile updated.');
+        }
+    } else {
+        message.error(result.message ?? 'Failed to update profile.');
+    }
+}
 
 const selectScrollbarProps = { trigger: 'none' as const };
 
@@ -47,7 +121,6 @@ async function logout() {
     loading.value = true;
     const result = await authStore.logout();
     loading.value = false;
-
     if (result.success) {
         message.success('Logged out successfully.');
     } else {
@@ -79,7 +152,6 @@ async function confirmDeleteAccount() {
     isDeleting.value = true;
     const result = await authStore.deleteAccount(deleteEmail.value.trim());
     isDeleting.value = false;
-
     if (result.success) {
         showDeleteModal.value = false;
         message.success('Account deleted.');
@@ -88,190 +160,500 @@ async function confirmDeleteAccount() {
         deleteError.value = result.message;
     }
 }
+
+// ─── Profile Picture ─────────────────────────────────────────────────────────
+
+// Build picker list from the shared utility (one entry per default-profile folder).
+// 100px version is used for the grid thumbnails.
+const pickerProfiles = DEFAULT_PROFILE_NAMES.map((name) => ({
+    name,
+    previewUrl: getDefaultProfileUrl(name, 100) ?? '',
+}));
+
+// Full-size avatar for the header (400px, with offline cache fallback).
+const avatarUrl = useAvatarUrl(400);
+
+// ── Picker modal ──────────────────────────────────────────────────────────────
+const showPicturePicker = ref(false);
+const pictureLoading = ref(false);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+function openPicturePicker() {
+    showPicturePicker.value = true;
+}
+
+async function selectDefaultPicture(name: string) {
+    pictureLoading.value = true;
+    const result = await authStore.updateProfilePicture({ type: 'default', name });
+    pictureLoading.value = false;
+    if (result.success) {
+        showPicturePicker.value = false;
+        message.success('Profile picture updated.');
+    } else {
+        message.error(result.message ?? 'Failed to update picture.');
+    }
+}
+
+function triggerFileInput() {
+    fileInputRef.value?.click();
+}
+
+function handleFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    input.value = '';
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        cropSrc.value = e.target!.result as string;
+        showPicturePicker.value = false;
+        showCropModal.value = true;
+    };
+    reader.readAsDataURL(file);
+}
+
+// ── Crop modal ────────────────────────────────────────────────────────────────
+const showCropModal = ref(false);
+const cropSrc = ref('');
+const cropImageRef = ref<HTMLImageElement | null>(null);
+const cropUploading = ref(false);
+let cropperInstance: Cropper | null = null;
+
+watch(showCropModal, async (open) => {
+    if (open) {
+        await nextTick();
+        if (cropImageRef.value) {
+            cropperInstance = new Cropper(cropImageRef.value as HTMLImageElement, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 0.85,
+                restore: false,
+                guides: false,
+                center: false,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        }
+    } else {
+        destroyCropper();
+    }
+});
+
+function destroyCropper() {
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+}
+
+function cancelCrop() {
+    showCropModal.value = false;
+    cropSrc.value = '';
+    showPicturePicker.value = true;
+}
+
+// Sizes generated on every upload: [dimension, maxKb]
+const AVATAR_SIZES: [number, number][] = [
+    [400, 50],
+    [300, 30],
+    [100, 10],
+    [50,   5],
+    [25,   3],
+];
+
+async function confirmCrop() {
+    if (!cropperInstance) return;
+    cropUploading.value = true;
+
+    try {
+        // Crop at the largest size; all smaller sizes are downscaled from this canvas.
+        const source = cropperInstance.getCroppedCanvas({ width: 400, height: 400 });
+        const files = await generateAvatarSizes(source);
+
+        const result = await authStore.updateProfilePicture({ type: 'upload', files });
+        if (result.success) {
+            showCropModal.value = false;
+            cropSrc.value = '';
+            message.success('Profile picture updated.');
+        } else {
+            message.error(result.message ?? 'Failed to upload picture.');
+        }
+    } catch {
+        message.error('Failed to process image.');
+    } finally {
+        cropUploading.value = false;
+    }
+}
+
+async function generateAvatarSizes(source: HTMLCanvasElement): Promise<Record<number, File>> {
+    const files: Record<number, File> = {};
+    for (const [size, maxKb] of AVATAR_SIZES) {
+        const canvas = document.createElement('canvas');
+        canvas.width  = size;
+        canvas.height = size;
+        canvas.getContext('2d')!.drawImage(source, 0, 0, size, size);
+        const blob = await compressCanvasToTarget(canvas, maxKb);
+        files[size] = new File([blob], `${size}.jpg`, { type: 'image/jpeg' });
+    }
+    return files;
+}
+
+async function compressCanvasToTarget(canvas: HTMLCanvasElement, maxKb: number): Promise<Blob> {
+    for (let q = 0.9; q >= 0.1; q = Math.round((q - 0.05) * 100) / 100) {
+        const blob = await canvasToJpegBlob(canvas, q);
+        if (blob.size <= maxKb * 1024) return blob;
+    }
+    return canvasToJpegBlob(canvas, 0.1);
+}
+
+function canvasToJpegBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(
+            (b) => (b ? resolve(b) : reject(new Error('toBlob failed'))),
+            'image/jpeg',
+            quality,
+        );
+    });
+}
+
+onBeforeUnmount(destroyCropper);
 </script>
 
 <template>
     <div class="profile-shell">
-            <NForm v-if="authStore.user">
-                <div class="flex items-start justify-between gap-4 mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="profile-avatar">
+        <NForm v-if="authStore.user">
+            <div class="flex items-start justify-between gap-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <!-- Avatar with edit overlay -->
+                    <button class="avatar-wrapper" @click="openPicturePicker" title="Change profile picture">
+                        <img
+                            v-if="avatarUrl"
+                            :src="avatarUrl"
+                            class="profile-avatar is-image"
+                            alt="Profile"
+                        />
+                        <div v-else class="profile-avatar">
                             {{ initials }}
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <h3 class="text-lg flex gap-2 items-center font-700 m-0">
-                                <Icon icon="mdi:account-circle" />
-                                <span>Profile</span>
-                            </h3>
-                            <span class="text-sm opacity-65">
-                                Your account information and sync status.
-                            </span>
+                        <div class="avatar-edit-overlay">
+                            <Icon icon="mdi:camera" />
                         </div>
-                    </div>
-                    <div class="profile-status-chip" :class="authStore.syncEnabled ? 'is-enabled' : 'is-disabled'">
-                        <Icon :icon="authStore.syncEnabled ? 'mdi:cloud-check' : 'mdi:cloud-off-outline'" />
-                        <span>{{ authStore.syncEnabled ? 'Sync On' : 'Desktop Only' }}</span>
+                    </button>
+                    <div class="flex flex-col gap-1">
+                        <h3 class="text-lg flex gap-2 items-center font-700 m-0">
+                            <Icon icon="mdi:account-circle" />
+                            <span>Profile</span>
+                        </h3>
+                        <span class="text-sm opacity-65">
+                            Your account information and sync status.
+                        </span>
                     </div>
                 </div>
+                <div class="profile-status-chip" :class="authStore.syncEnabled ? 'is-enabled' : 'is-disabled'">
+                    <Icon :icon="authStore.syncEnabled ? 'mdi:cloud-check' : 'mdi:cloud-off-outline'" />
+                    <span>{{ authStore.syncEnabled ? 'Sync On' : 'Desktop Only' }}</span>
+                </div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="profile-info-block">
-                        <span class="profile-label">Name</span>
-                        <div class="profile-value-row">
-                            <Icon icon="mdi:account-outline" class="opacity-60" />
-                            <span class="profile-value">{{ authStore.user.name }}</span>
-                        </div>
-                    </div>
-                    <div class="profile-info-block">
+            <!-- Row 1: Name | Username -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                <div class="profile-info-block">
+                    <span class="profile-label">Name</span>
+                    <NInput v-model:value="profileName" size="large" placeholder="Your name">
+                        <template #prefix>
+                            <Icon icon="mdi:account-outline" class="opacity-50 mr-1" />
+                        </template>
+                    </NInput>
+                </div>
+                <div class="profile-info-block">
+                    <span class="profile-label">Username</span>
+                    <NInput
+                        v-model:value="profileUsername"
+                        size="large"
+                        placeholder="your_handle"
+                        :status="usernameError ? 'error' : undefined"
+                        @input="profileUsername = profileUsername.toLowerCase().replace(/[^a-z0-9_]/g, '')"
+                    >
+                        <template #prefix><span class="username-at-prefix">@</span></template>
+                    </NInput>
+                    <p v-if="usernameError" class="field-error">{{ usernameError }}</p>
+                    <p v-else class="field-hint">Public handle · used in profile URLs</p>
+                </div>
+            </div>
+
+            <!-- Row 2: Email (full width) -->
+            <div class="mb-3">
+                <div class="profile-info-block">
+                    <div class="profile-label-row">
                         <span class="profile-label">Email</span>
-                        <div class="profile-value-row">
-                            <Icon icon="mdi:email-outline" class="opacity-60" />
-                            <span class="profile-value">{{ authStore.user.email }}</span>
+                        <NButton size="tiny" quaternary :loading="profileRefreshing" title="Refresh profile" @click="refreshProfile">
+                            <template #icon><Icon icon="mdi:refresh" /></template>
+                        </NButton>
+                    </div>
+                    <NInput v-model:value="profileEmail" size="large" type="text" placeholder="your@email.com">
+                        <template #prefix>
+                            <Icon icon="mdi:email-outline" class="opacity-50 mr-1" />
+                        </template>
+                    </NInput>
+                    <p v-if="authStore.user.pending_email" class="pending-email-hint">
+                        <Icon icon="mdi:clock-outline" class="inline mr-1" />
+                        Pending: <strong>{{ authStore.user.pending_email }}</strong> — check your inbox to confirm.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-6 justify-end">
+                <NButton
+                    v-if="profileDirty"
+                    size="small"
+                    @click="resetProfile"
+                    :disabled="profileSaving"
+                >
+                    Cancel
+                </NButton>
+                <NButton
+                    type="primary"
+                    size="small"
+                    :loading="profileSaving"
+                    :disabled="profileSaving || !profileDirty"
+                    @click="saveProfile"
+                >
+                    <template #icon><Icon icon="mdi:content-save-outline" /></template>
+                    Save Changes
+                </NButton>
+            </div>
+
+            <div class="sync-panel">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 font-700 mb-1">
+                            <Icon icon="mdi:sync" />
+                            <span>Sync</span>
                         </div>
+                        <p class="m-0 text-sm opacity-70">
+                            Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
+                        </p>
+                    </div>
+                    <NSwitch
+                        :value="authStore.syncEnabled"
+                        @update:value="onSyncToggle"
+                    />
+                </div>
+                <div class="sync-footer">
+                    <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
+                        <Icon icon="mdi:check-circle-outline" />
+                        <span>Sync is currently enabled for this account</span>
                     </div>
                 </div>
+            </div>
 
-                <div class="sync-panel">
-                    <div class="flex items-start justify-between gap-4">
+            <!-- Denomination -->
+            <div class="denomination-panel mt-4">
+                <div class="flex items-center gap-2 font-700 mb-1">
+                    <Icon icon="mdi:church" />
+                    <span>Denomination</span>
+                    <span class="required-badge">Required</span>
+                </div>
+                <p class="m-0 text-sm opacity-70 mb-3">
+                    Select your church denomination. This helps connect you with your community.
+                </p>
+                <NAlert v-if="!denomination" type="warning" :show-icon="false" class="mb-3 text-sm">
+                    Please set your denomination to participate in the Believers' Feed.
+                </NAlert>
+                <div class="flex gap-2 items-end">
+                    <NSelect
+                        v-model:value="denomination"
+                        :options="DENOMINATION_OPTIONS"
+                        placeholder="Select your denomination..."
+                        filterable
+                        clearable
+                        :virtual-scroll="false"
+                        :scrollbar-props="selectScrollbarProps"
+                        class="flex-1"
+                        @update:value="denominationDirty = true"
+                    />
+                    <NButton
+                        type="primary"
+                        :loading="denominationSaving"
+                        :disabled="denominationSaving || !denominationDirty"
+                        @click="saveDenomination"
+                    >
+                        Save
+                    </NButton>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <NButton type="error" secondary @click="logout" :disabled="loading" :loading="loading">
+                    <template #icon>
+                        <Icon icon="mdi:logout" />
+                    </template>
+                    Logout
+                </NButton>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="danger-zone mt-8">
+                <button class="danger-zone-header" @click="dangerZoneOpen = !dangerZoneOpen">
+                    <div class="flex items-center gap-2">
+                        <Icon icon="mdi:alert-circle-outline" class="text-red-400" />
+                        <span class="font-600 text-red-400">Danger Zone</span>
+                    </div>
+                    <Icon
+                        :icon="dangerZoneOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'"
+                        class="text-red-400"
+                    />
+                </button>
+                <div v-if="dangerZoneOpen" class="danger-zone-body">
+                    <div class="flex items-start justify-between gap-4 flex-wrap">
                         <div>
-                            <div class="flex items-center gap-2 font-700 mb-1">
-                                <Icon icon="mdi:sync" />
-                                <span>Sync</span>
-                            </div>
-                            <p class="m-0 text-sm opacity-70">
-                                Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
+                            <p class="font-600 m-0 mb-1">Delete Account</p>
+                            <p class="m-0 text-sm opacity-70" style="max-width: 480px;">
+                                Permanently deletes your account and all associated data, including bookmarks,
+                                highlights, notes, and prayer lists. This action cannot be undone.
                             </p>
                         </div>
-                        <NSwitch
-                            :value="authStore.syncEnabled"
-                            @update:value="onSyncToggle"
-                        />
-                    </div>
-
-                    <div class="sync-footer">
-                        <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
-                            <Icon icon="mdi:check-circle-outline" />
-                            <span>Sync is currently enabled for this account</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Denomination -->
-                <div class="denomination-panel mt-4">
-                    <div class="flex items-center gap-2 font-700 mb-1">
-                        <Icon icon="mdi:church" />
-                        <span>Denomination</span>
-                        <span class="required-badge">Required</span>
-                    </div>
-                    <p class="m-0 text-sm opacity-70 mb-3">
-                        Select your church denomination. This helps connect you with your community.
-                    </p>
-                    <NAlert v-if="!denomination" type="warning" :show-icon="false" class="mb-3 text-sm">
-                        Please set your denomination to participate in the Believers' Feed.
-                    </NAlert>
-                    <div class="flex gap-2 items-end">
-                        <NSelect
-                            v-model:value="denomination"
-                            :options="DENOMINATION_OPTIONS"
-                            placeholder="Select your denomination..."
-                            filterable
-                            clearable
-                            :virtual-scroll="false"
-                            :scrollbar-props="selectScrollbarProps"
-                            class="flex-1"
-                            @update:value="denominationDirty = true"
-                        />
-                        <NButton
-                            type="primary"
-                            :loading="denominationSaving"
-                            :disabled="denominationSaving || !denominationDirty"
-                            @click="saveDenomination"
-                        >
-                            Save
+                        <NButton type="error" size="small" @click="openDeleteModal">
+                            <template #icon>
+                                <Icon icon="mdi:trash-can-outline" />
+                            </template>
+                            Delete My Account
                         </NButton>
                     </div>
                 </div>
+            </div>
+        </NForm>
 
-                <div class="mt-6 flex justify-end">
-                    <NButton type="error" secondary @click="logout" :disabled="loading" :loading="loading">
-                        <template #icon>
-                            <Icon icon="mdi:logout" />
-                        </template>
-                        Logout
-                    </NButton>
-                </div>
+        <!-- Delete Account Confirmation Modal -->
+        <NModal
+            v-model:show="showDeleteModal"
+            preset="dialog"
+            type="error"
+            title="Delete Account"
+            :mask-closable="!isDeleting"
+            :close-on-esc="!isDeleting"
+        >
+            <template #icon>
+                <Icon icon="mdi:alert-circle-outline" />
+            </template>
+            <div class="flex flex-col gap-3">
+                <p class="m-0 text-sm">
+                    This will permanently delete your account and all data. This action <strong>cannot be undone</strong>.
+                </p>
+                <p class="m-0 text-sm font-600">Enter your email address to confirm:</p>
+                <NInput
+                    v-model:value="deleteEmail"
+                    placeholder="your@email.com"
+                    type="text"
+                    :disabled="isDeleting"
+                    @keyup.enter="confirmDeleteAccount"
+                />
+                <p v-if="deleteError" class="m-0 text-sm text-red-400">{{ deleteError }}</p>
+            </div>
+            <template #action>
+                <NButton :disabled="isDeleting" @click="showDeleteModal = false">Cancel</NButton>
+                <NButton
+                    type="error"
+                    :loading="isDeleting"
+                    :disabled="isDeleting || !deleteEmail.trim()"
+                    @click="confirmDeleteAccount"
+                >
+                    Delete Account
+                </NButton>
+            </template>
+        </NModal>
 
-                <!-- Danger Zone -->
-                <div class="danger-zone mt-8">
-                    <button class="danger-zone-header" @click="dangerZoneOpen = !dangerZoneOpen">
-                        <div class="flex items-center gap-2">
-                            <Icon icon="mdi:alert-circle-outline" class="text-red-400" />
-                            <span class="font-600 text-red-400">Danger Zone</span>
-                        </div>
+        <!-- Profile Picture Picker Modal -->
+        <NModal
+            v-model:show="showPicturePicker"
+            preset="card"
+            title="Change Profile Picture"
+            style="max-width: 480px;"
+            :mask-closable="!pictureLoading"
+            :close-on-esc="!pictureLoading"
+        >
+            <div v-if="pictureLoading" class="flex items-center justify-center py-8">
+                <NSpin size="large" />
+            </div>
+            <template v-else>
+                <p class="m-0 text-sm opacity-70 mb-4">Choose one of the app avatars or upload your own photo.</p>
+
+                <!-- Default app avatars -->
+                <div class="picker-section-label">App Avatars</div>
+                <div class="default-avatars-grid">
+                    <button
+                        v-for="pic in pickerProfiles"
+                        :key="pic.name"
+                        class="default-avatar-btn"
+                        :class="{ 'is-selected': authStore.user?.info?.profile_picture === `default:${pic.name}` }"
+                        @click="selectDefaultPicture(pic.name)"
+                    >
+                        <img :src="pic.previewUrl" :alt="pic.name" />
                         <Icon
-                            :icon="dangerZoneOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'"
-                            class="text-red-400"
+                            v-if="authStore.user?.info?.profile_picture === `default:${pic.name}`"
+                            icon="mdi:check-circle"
+                            class="avatar-check-icon"
                         />
                     </button>
-
-                    <div v-if="dangerZoneOpen" class="danger-zone-body">
-                        <div class="flex items-start justify-between gap-4 flex-wrap">
-                            <div>
-                                <p class="font-600 m-0 mb-1">Delete Account</p>
-                                <p class="m-0 text-sm opacity-70" style="max-width: 480px;">
-                                    Permanently deletes your account and all associated data, including bookmarks,
-                                    highlights, notes, and prayer lists. This action cannot be undone.
-                                </p>
-                            </div>
-                            <NButton type="error" size="small" @click="openDeleteModal">
-                                <template #icon>
-                                    <Icon icon="mdi:trash-can-outline" />
-                                </template>
-                                Delete My Account
-                            </NButton>
-                        </div>
-                    </div>
                 </div>
-            </NForm>
 
-            <!-- Delete Account Confirmation Modal -->
-            <NModal
-                v-model:show="showDeleteModal"
-                preset="dialog"
-                type="error"
-                title="Delete Account"
-                :mask-closable="!isDeleting"
-                :close-on-esc="!isDeleting"
-            >
-                <template #icon>
-                    <Icon icon="mdi:alert-circle-outline" />
-                </template>
-                <div class="flex flex-col gap-3">
-                    <p class="m-0 text-sm">
-                        This will permanently delete your account and all data. This action <strong>cannot be undone</strong>.
-                    </p>
-                    <p class="m-0 text-sm font-600">Enter your email address to confirm:</p>
-                    <NInput
-                        v-model:value="deleteEmail"
-                        placeholder="your@email.com"
-                        type="text"
-                        :disabled="isDeleting"
-                        @keyup.enter="confirmDeleteAccount"
-                    />
-                    <p v-if="deleteError" class="m-0 text-sm text-red-400">{{ deleteError }}</p>
-                </div>
-                <template #action>
-                    <NButton :disabled="isDeleting" @click="showDeleteModal = false">Cancel</NButton>
-                    <NButton
-                        type="error"
-                        :loading="isDeleting"
-                        :disabled="isDeleting || !deleteEmail.trim()"
-                        @click="confirmDeleteAccount"
-                    >
-                        Delete Account
+                <!-- Custom upload -->
+                <div class="picker-section-label mt-4">Custom Photo</div>
+                <p class="m-0 text-sm opacity-60 mb-3">
+                    You'll be able to crop your photo before it's uploaded.
+                </p>
+                <NButton @click="triggerFileInput" secondary>
+                    <template #icon>
+                        <Icon icon="mdi:upload" />
+                    </template>
+                    Upload Photo
+                </NButton>
+                <input
+                    ref="fileInputRef"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    style="display: none;"
+                    @change="handleFileSelected"
+                />
+            </template>
+        </NModal>
+
+        <!-- Crop Modal -->
+        <NModal
+            v-model:show="showCropModal"
+            preset="card"
+            title="Crop Photo"
+            style="max-width: 560px;"
+            :mask-closable="false"
+            :close-on-esc="!cropUploading"
+            @after-leave="destroyCropper"
+        >
+            <div class="crop-container">
+                <img ref="cropImageRef" :src="cropSrc" class="crop-source-img" alt="Crop preview" />
+            </div>
+            <template #footer>
+                <div class="flex justify-end gap-2 mt-2">
+                    <NButton :disabled="cropUploading" @click="cancelCrop">
+                        Back
                     </NButton>
-                </template>
-            </NModal>
+                    <NButton
+                        type="primary"
+                        :loading="cropUploading"
+                        :disabled="cropUploading"
+                        @click="confirmCrop"
+                    >
+                        <template #icon>
+                            <Icon icon="mdi:crop" />
+                        </template>
+                        Crop &amp; Upload
+                    </NButton>
+                </div>
+            </template>
+        </NModal>
     </div>
 </template>
 
@@ -286,6 +668,22 @@ async function confirmDeleteAccount() {
     border-radius: 24px;
 }
 
+/* Avatar with camera overlay */
+.avatar-wrapper {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 18px;
+    flex-shrink: 0;
+}
+
+.avatar-wrapper:focus-visible {
+    outline: 2px solid rgba(111, 132, 255, 0.7);
+    outline-offset: 2px;
+}
+
 .profile-avatar {
     width: 56px;
     height: 56px;
@@ -298,6 +696,29 @@ async function confirmDeleteAccount() {
     color: #fff;
     background: linear-gradient(135deg, #6f84ff 0%, #5fb0ff 100%);
     box-shadow: 0 10px 30px rgba(95, 176, 255, 0.25);
+}
+
+.profile-avatar.is-image {
+    object-fit: cover;
+    background: transparent;
+}
+
+.avatar-edit-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.avatar-wrapper:hover .avatar-edit-overlay {
+    opacity: 1;
 }
 
 .profile-status-chip {
@@ -326,28 +747,48 @@ async function confirmDeleteAccount() {
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .profile-label {
-    display: block;
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     opacity: 0.55;
-    margin-bottom: 10px;
 }
 
-.profile-value-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.pending-email-hint {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+    color: #fbbf24;
 }
 
-.profile-value {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.4;
-    word-break: break-word;
+.username-at-prefix {
+    font-size: 15px;
+    font-weight: 700;
+    opacity: 0.55;
+    margin-right: 2px;
+}
+
+.field-hint {
+    margin: 0;
+    font-size: 11px;
+    opacity: 0.45;
+}
+
+.field-error {
+    margin: 0;
+    font-size: 12px;
+    color: #f87171;
 }
 
 .sync-panel {
@@ -426,5 +867,76 @@ async function confirmDeleteAccount() {
     color: #fb923c;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+/* Picture picker */
+.picker-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 10px;
+}
+
+.default-avatars-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.default-avatar-btn {
+    position: relative;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.15s, transform 0.1s;
+    aspect-ratio: 1;
+}
+
+.default-avatar-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+
+.default-avatar-btn:hover {
+    border-color: rgba(111, 132, 255, 0.6);
+    transform: scale(1.04);
+}
+
+.default-avatar-btn.is-selected {
+    border-color: #6f84ff;
+}
+
+.avatar-check-icon {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 18px;
+    color: #6f84ff;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 999px;
+    padding: 1px;
+}
+
+/* Crop modal */
+.crop-container {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+}
+
+.crop-source-img {
+    display: block;
+    max-width: 100%;
 }
 </style>

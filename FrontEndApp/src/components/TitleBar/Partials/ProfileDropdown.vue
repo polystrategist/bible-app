@@ -13,6 +13,7 @@ import {
 import { Login, Logout as LogoutIcon, UserProfile as UserIcon } from '@vicons/carbon';
 import { useMenuStore } from '../../../store/menu';
 import { useAuthStore } from '../../../store/authStore';
+import { useAvatarUrl } from '../../../util/avatar';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import { useI18n } from 'vue-i18n';
@@ -49,7 +50,14 @@ const initials = computed(() => {
         .toUpperCase();
 });
 
-const firstName = computed(() => authStore.user?.name?.split(' ')[0] ?? t('Account'));
+const firstName = computed(() => {
+    if (authStore.user?.username) return '@' + authStore.user.username;
+    return authStore.user?.name?.split(' ')[0] ?? t('Account');
+});
+
+// 25px for the compact trigger chip; 50px for the dropdown header
+const avatarSmall  = useAvatarUrl(25);
+const avatarMedium = useAvatarUrl(50);
 
 function goToProfile() {
     showDropdown.value = false;
@@ -108,7 +116,8 @@ async function logout() {
                             overflow: hidden;
                         "
                     >
-                        {{ initials }}
+                        <img v-if="avatarSmall" :src="avatarSmall" style="width:100%;height:100%;object-fit:cover;display:block;" />
+                        <span v-else>{{ initials }}</span>
                     </div>
                 </template>
                 {{ firstName }}
@@ -120,6 +129,15 @@ async function logout() {
             <!-- User info header -->
             <div class="flex items-center gap-3 px-4 py-3">
                 <NAvatar
+                    v-if="avatarMedium"
+                    round
+                    :size="40"
+                    :src="avatarMedium"
+                    object-fit="cover"
+                    style="flex-shrink: 0"
+                />
+                <NAvatar
+                    v-else
                     round
                     :size="40"
                     color="#7c6af7"

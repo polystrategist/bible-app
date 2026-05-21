@@ -12,6 +12,7 @@ import { useAuthStore } from '../../store/authStore';
 import { Icon } from '@iconify/vue';
 import { useMenuStore } from '../../store/menu';
 import { bible } from '../../util/modules';
+import { resolveAvatarUrl } from '../../util/avatar';
 
 const menuStore = useMenuStore();
 const authStore = useAuthStore();
@@ -123,10 +124,30 @@ function handleDelete(sermon: SermonType) {
     });
 }
 
+function handlePublish(sermon: SermonType) {
+    dialog.warning({
+        title: 'Publish Sermon',
+        content: `Publish "${sermon.title}"? It will be visible to everyone.`,
+        positiveText: 'Publish',
+        negativeText: 'Cancel',
+        onPositiveClick: async () => {
+            const result = await sermonStore.updateSermon(sermon.id, { status: 'published' });
+            if (result.success) message.success('Sermon published!');
+            else message.error(result.message ?? 'Failed to publish.');
+        },
+    });
+}
+
 function selectCategory(id: number | null) {
     sermonStore.categoryFilter = id;
     sermonStore.getSermons(true);
 }
+
+const sortOptions = [
+    { label: 'Most Recent', value: 'recent' },
+    { label: 'Most Popular', value: 'popular' },
+    { label: 'Oldest', value: 'oldest' },
+];
 
 const myStatusOptions = [
     { label: 'All Statuses', value: '' },
@@ -269,8 +290,18 @@ function shiftScriptureVersion(group: ScriptureVerseGroup, direction: -1 | 1) {
     };
 }
 
-function viewLabel(count: number) {
-    return `${count.toLocaleString()} ${count === 1 ? 'view' : 'views'}`;
+function creatorAvatarUrl(creator?: SermonType['creator']): string | null {
+    return resolveAvatarUrl(creator?.info?.profile_picture ?? null, 25);
+}
+
+function creatorInitials(creator?: SermonType['creator']): string {
+    if (!creator?.name) return '?';
+    return creator.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function viewLabel(count: number | null | undefined) {
+    const n = count ?? 0;
+    return `${n.toLocaleString()} ${n === 1 ? 'view' : 'views'}`;
 }
 
 watch(showDetailModal, (showing) => {
@@ -356,6 +387,21 @@ onBeforeUnmount(() => {
                 <NButton size="small" type="primary" ghost @click="sermonStore.getSermons(true)" :loading="sermonStore.loading">
                     Search
                 </NButton>
+                <NSelect
+                    v-model:value="sermonStore.sort"
+                    :options="sortOptions"
+                    size="small"
+                    class="!w-150px"
+                    @update:value="sermonStore.getSermons(true)"
+                />
+                <NButton
+                    size="small"
+                    secondary
+                    :loading="sermonStore.loading"
+                    @click="sermonStore.getSermons(true)"
+                >
+                    <template #icon><Icon icon="mdi:refresh" /></template>
+                </NButton>
             </div>
 
             <!-- Category pills -->
@@ -420,9 +466,13 @@ onBeforeUnmount(() => {
                             <h3 class="card-title">{{ sermon.title }}</h3>
                             <p class="card-summary">{{ sermon.short_summary }}</p>
                             <div class="card-meta">
-                                <span v-if="sermon.preacher_name || sermon.creator">
-                                    <Icon icon="mdi:account" class="inline mr-0.5" />
-                                    {{ sermon.preacher_name || sermon.creator?.name }}
+                                <span v-if="sermon.preacher_name || sermon.creator" class="creator-meta">
+                                    <span class="creator-avatar">
+                                        <img v-if="creatorAvatarUrl(sermon.creator)" :src="creatorAvatarUrl(sermon.creator)" />
+                                        <span v-else>{{ creatorInitials(sermon.creator) }}</span>
+                                    </span>
+                                    <span v-if="sermon.creator?.username">@{{ sermon.creator.username }}</span>
+                                    <span v-else>{{ sermon.preacher_name || sermon.creator?.name }}</span>
                                 </span>
                                 <span v-if="sermon.sermon_date">
                                     <Icon icon="mdi:calendar-blank-outline" class="inline mr-0.5" />
@@ -495,38 +545,61 @@ onBeforeUnmount(() => {
                         </NButton>
                     </div>
 
-                    <div v-else class="my-sermon-list">
-                        <div v-for="sermon in sermonStore.mySermons" :key="sermon.id" class="my-sermon-row">
-                            <!-- Thumb -->
-                            <div class="my-thumb">
+                    <div v-else class="sermon-grid">
+                        <div
+                            v-for="sermon in sermonStore.mySermons"
+                            :key="sermon.id"
+                            class="sermon-card"
+                            @click="openDetail(sermon)"
+                        >
+                            <!-- Thumbnail -->
+                            <div class="card-thumb">
                                 <img v-if="sermon.thumbnail_url" :src="sermon.thumbnail_url" :alt="sermon.title" />
-                                <div v-else class="my-thumb-placeholder">
-                                    <Icon icon="mdi:book-cross" class="opacity-30 text-xl" />
+                                <div v-else class="card-thumb-placeholder">
+                                    <Icon icon="mdi:book-cross" class="text-4xl opacity-30" />
                                 </div>
+                                <NTag
+                                    class="card-cat-badge"
+                                    size="tiny"
+                                    :bordered="false"
+                                    :type="sermon.status === 'published' ? 'success' : sermon.status === 'draft' ? 'warning' : 'default'"
+                                >
+                                    {{ sermon.status }}
+                                </NTag>
+                                <NTag v-if="sermon.category" class="card-cat-badge-right" size="tiny" :bordered="false" type="info">
+                                    {{ sermon.category.name }}
+                                </NTag>
                             </div>
-                            <!-- Info -->
-                            <div class="my-info">
-                                <h3 class="my-title" @click="openDetail(sermon)">{{ sermon.title }}</h3>
-                                <p class="my-summary">{{ sermon.short_summary }}</p>
-                                <div class="my-meta">
+                            <!-- Body -->
+                            <div class="card-body">
+                                <h3 class="card-title">{{ sermon.title }}</h3>
+                                <p class="card-summary">{{ sermon.short_summary }}</p>
+                                <div class="card-meta">
                                     <span v-if="sermon.sermon_date">
                                         <Icon icon="mdi:calendar-blank-outline" class="inline mr-0.5" />
                                         {{ formatDate(sermon.sermon_date) }}
                                     </span>
-                                    <span><Icon icon="mdi:eye-outline" class="inline mr-0.5" />{{ sermon.view_count }}</span>
-                                    <NTag size="tiny" :bordered="false"
-                                        :type="sermon.status === 'published' ? 'success' : sermon.status === 'draft' ? 'warning' : 'default'">
-                                        {{ sermon.status }}
-                                    </NTag>
-                                    <NTag size="tiny" :bordered="false" type="info">{{ sermon.visibility }}</NTag>
-                                    <NTag v-if="sermon.category" size="tiny" :bordered="false">{{ sermon.category.name }}</NTag>
+                                    <span>
+                                        <Icon icon="mdi:eye-outline" class="inline mr-0.5" />
+                                        {{ sermon.view_count }}
+                                    </span>
                                 </div>
                             </div>
                             <!-- Actions -->
-                            <div class="my-actions">
+                            <div class="my-card-actions" @click.stop>
                                 <NButton size="tiny" secondary @click="editSermon(sermon)">
                                     <template #icon><Icon icon="mdi:pencil-outline" /></template>
                                     Edit
+                                </NButton>
+                                <NButton
+                                    v-if="sermon.status === 'draft'"
+                                    size="tiny"
+                                    type="success"
+                                    secondary
+                                    @click="handlePublish(sermon)"
+                                >
+                                    <template #icon><Icon icon="mdi:publish" /></template>
+                                    Publish
                                 </NButton>
                                 <NButton size="tiny" type="error" secondary @click="handleDelete(sermon)">
                                     <template #icon><Icon icon="mdi:trash-can-outline" /></template>
@@ -534,7 +607,7 @@ onBeforeUnmount(() => {
                                 </NButton>
                             </div>
                         </div>
-                        <div v-if="sermonStore.myLoading" class="flex justify-center py-4">
+                        <div v-if="sermonStore.myLoading" class="col-span-full flex justify-center py-4">
                             <NSpin size="small" />
                         </div>
                     </div>
@@ -673,6 +746,7 @@ onBeforeUnmount(() => {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    padding-left: 15px;
 }
 
 /* ── Header ── */
@@ -898,69 +972,43 @@ onBeforeUnmount(() => {
     font-size: 11px;
     opacity: 0.55;
 }
-
-/* ── My Sermons list ── */
-.my-sermon-list { display: flex; flex-direction: column; gap: 8px; }
-.my-sermon-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 12px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    transition: background 0.15s;
+.creator-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
-.my-sermon-row:hover { background: rgba(255,255,255,0.07); }
-.my-thumb {
-    width: 72px;
-    height: 54px;
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-    background: rgba(255,255,255,0.06);
-}
-.my-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.my-thumb-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
+.creator-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #7c6af7;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-}
-.my-info { flex: 1; min-width: 0; }
-.my-title {
-    font-size: 14px;
+    font-size: 9px;
     font-weight: 700;
-    margin: 0 0 4px;
-    cursor: pointer;
-    white-space: nowrap;
+    color: white;
     overflow: hidden;
-    text-overflow: ellipsis;
-}
-.my-title:hover { text-decoration: underline; }
-.my-summary {
-    font-size: 12px;
-    opacity: 0.6;
-    margin: 0 0 6px;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.my-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    opacity: 0.6;
-}
-.my-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     flex-shrink: 0;
+}
+.creator-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── My Sermons card actions ── */
+.my-card-actions {
+    display: flex;
+    gap: 6px;
+    padding: 0 10px 10px;
+    flex-wrap: wrap;
+}
+.card-cat-badge-right {
+    position: absolute;
+    top: 8px;
+    right: 8px;
 }
 
 /* ── Empty state ── */

@@ -40,6 +40,7 @@
         "@unocss/reset": "^0.61.0",
         "@vueuse/core": "^10.3.0",
         "axios": "^1.14.0",
+        "cropperjs": "^1.6.2",
         "dayjs": "^1.11.13",
         "intro.js": "^7.2.0",
         "notiflix": "^3.2.6",

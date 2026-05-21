@@ -9,12 +9,15 @@ export interface UserInfo {
     id?: number;
     user_id?: number;
     denomination: string | null;
+    profile_picture?: string | null;
 }
 
 export interface User {
     id: number;
     name: string;
+    username?: string | null;
     email: string;
+    pending_email?: string | null;
     sync_enabled: boolean;
     email_verified_at?: string;
     created_at?: string;
@@ -40,6 +43,11 @@ export const useAuthStore = defineStore('authStore', () => {
     const isAuthenticated = ref(false);
     const remoteSettings = ref<UserSettings | null>(null);
 
+    // Local avatar cache — base64 data URL of the last uploaded custom picture.
+    // Keyed by the profile_picture value so it auto-invalidates if the picture changes.
+    const localAvatarKey  = ref<string | null>(localStorage.getItem('profile_avatar_key'));
+    const localAvatarCache = ref<string | null>(localStorage.getItem('profile_avatar_data'));
+
     // Pending settings that failed to reach the server (e.g. offline).
     // Stored in localStorage so they survive app restarts.
     const pendingSettingsUpdate = ref<Partial<UserSettings> | null>(
@@ -57,11 +65,29 @@ export const useAuthStore = defineStore('authStore', () => {
         })()
     );
 
+    // Restore cached user from previous session so profile shows immediately offline.
+    (() => {
+        const savedUser = localStorage.getItem('cached_user');
+        if (savedUser) {
+            try { user.value = JSON.parse(savedUser); } catch {}
+        }
+    })();
+
+    // Auto-persist user on every change so it's available offline on next launch.
+    watch(user, (u) => {
+        if (u) {
+            localStorage.setItem('cached_user', JSON.stringify(u));
+        } else {
+            localStorage.removeItem('cached_user');
+        }
+    }, { deep: true });
+
     /**
      * Register a new user
      */
     async function register(
         name: string,
+        username: string,
         email: string,
         password: string,
         passwordConfirmation: string,
@@ -70,6 +96,7 @@ export const useAuthStore = defineStore('authStore', () => {
         try {
             const response = await axios.post(`${API_BASE_URL}/auth/register`, {
                 name,
+                username,
                 email,
                 password,
                 password_confirmation: passwordConfirmation,
@@ -165,9 +192,14 @@ export const useAuthStore = defineStore('authStore', () => {
                 remoteSettings.value = null;
                 pendingSettingsUpdate.value = null;
                 pendingSyncEnabled.value = null;
+                localAvatarKey.value   = null;
+                localAvatarCache.value = null;
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('pending_theme_settings');
                 localStorage.removeItem('pending_sync_enabled');
+                localStorage.removeItem('cached_user');
+                localStorage.removeItem('profile_avatar_key');
+                localStorage.removeItem('profile_avatar_data');
                 return { success: true, message: response.data.message };
             }
 
@@ -194,9 +226,14 @@ export const useAuthStore = defineStore('authStore', () => {
         remoteSettings.value = null;
         pendingSettingsUpdate.value = null;
         pendingSyncEnabled.value = null;
+        localAvatarKey.value   = null;
+        localAvatarCache.value = null;
         localStorage.removeItem('auth_token');
         localStorage.removeItem('pending_theme_settings');
         localStorage.removeItem('pending_sync_enabled');
+        localStorage.removeItem('cached_user');
+        localStorage.removeItem('profile_avatar_key');
+        localStorage.removeItem('profile_avatar_data');
 
         if (!currentToken) {
             return { success: false, message: 'No token to logout' };
@@ -223,8 +260,8 @@ export const useAuthStore = defineStore('authStore', () => {
      * Only clears auth state on 401/403 — network errors keep existing state
      * so the user is not logged out when offline.
      */
-    function getUser(): Promise<User | null> {
-        if (user.value) return Promise.resolve(user.value);
+    function getUser(forceRefresh = false): Promise<User | null> {
+        if (!forceRefresh && user.value) return Promise.resolve(user.value);
         if (!token.value) return Promise.resolve(null);
 
         if (getUserPromise) return getUserPromise;
@@ -382,7 +419,7 @@ export const useAuthStore = defineStore('authStore', () => {
             // Load sync preference from local IPC store so syncEnabled is correct
             // even if the network is down and getUser() fails.
             loadSyncEnabled();
-            getUser().then((u) => {
+            getUser(true).then((u) => {
                 if (u) loadSettings();
             });
         }
@@ -540,6 +577,31 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
+    async function updateProfile(
+        data: { name?: string; username?: string; email?: string }
+    ): Promise<{ success: boolean; message?: string; emailVerificationSent?: boolean }> {
+        if (!token.value) return { success: false, message: 'Not authenticated' };
+        try {
+            const response = await axios.patch(`${API_BASE_URL}/auth/profile`, data, {
+                headers: { Authorization: `Bearer ${token.value}` },
+            });
+            if (response.data.status === 'success') {
+                user.value = response.data.user;
+                return { success: true, emailVerificationSent: response.data.email_verification_sent === true };
+            }
+            return { success: false, message: 'Failed to update profile' };
+        } catch (error: any) {
+            const validationErrors = error.response?.data?.errors;
+            const firstError = validationErrors
+                ? Object.values(validationErrors).flat()[0] as string
+                : null;
+            return {
+                success: false,
+                message: firstError || error.response?.data?.message || error.message || 'Failed to update profile',
+            };
+        }
+    }
+
     async function updateUserInfo(
         data: { denomination?: string | null }
     ): Promise<{ success: boolean; message?: string }> {
@@ -559,6 +621,80 @@ export const useAuthStore = defineStore('authStore', () => {
             return {
                 success: false,
                 message: error.response?.data?.message || error.message || 'Failed to update info',
+            };
+        }
+    }
+
+    function fileToDataUrl(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload  = (e) => resolve(e.target!.result as string);
+            reader.onerror = () => reject(new Error('FileReader failed'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /**
+     * Set profile picture.
+     * For default app pictures pass `{ type: 'default', name: 'app_profile1.png' }`.
+     * For custom uploads pass `{ type: 'upload', file: File }` — the file must
+     * already be compressed to < 60 KB by the caller.
+     */
+    async function updateProfilePicture(
+        payload: { type: 'default'; name: string } | { type: 'upload'; files: Record<number, File> }
+    ): Promise<{ success: boolean; message?: string; profile_picture?: string }> {
+        if (!token.value) return { success: false, message: 'Not authenticated' };
+
+        try {
+            const form = new FormData();
+            form.append('type', payload.type);
+            if (payload.type === 'default') {
+                form.append('name', payload.name);
+            } else {
+                for (const [size, file] of Object.entries(payload.files)) {
+                    form.append(`image_${size}`, file);
+                }
+            }
+
+            const response = await axios.post(`${API_BASE_URL}/user-info/profile-picture`, form, {
+                headers: {
+                    Authorization: `Bearer ${token.value}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.status === 'success') {
+                if (user.value) {
+                    user.value = { ...user.value, info: response.data.info };
+                }
+
+                if (payload.type === 'upload') {
+                    // Cache the 400px version locally so it shows offline next launch.
+                    try {
+                        const file400 = payload.files[400];
+                        if (file400) {
+                            const dataUrl = await fileToDataUrl(file400);
+                            localAvatarKey.value   = response.data.profile_picture;
+                            localAvatarCache.value = dataUrl;
+                            localStorage.setItem('profile_avatar_key',  response.data.profile_picture);
+                            localStorage.setItem('profile_avatar_data', dataUrl);
+                        }
+                    } catch { /* non-critical */ }
+                } else {
+                    // Switched to a default avatar — clear any old custom cache.
+                    localAvatarKey.value   = null;
+                    localAvatarCache.value = null;
+                    localStorage.removeItem('profile_avatar_key');
+                    localStorage.removeItem('profile_avatar_data');
+                }
+
+                return { success: true, profile_picture: response.data.profile_picture };
+            }
+            return { success: false, message: 'Failed to update profile picture' };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to update profile picture',
             };
         }
     }
@@ -609,8 +745,12 @@ export const useAuthStore = defineStore('authStore', () => {
         loadSettings,
         updateSettings,
         flushPendingSettings,
+        localAvatarKey,
+        localAvatarCache,
         forgotPassword,
         resetPassword,
+        updateProfile,
         updateUserInfo,
+        updateProfilePicture,
     };
 });
