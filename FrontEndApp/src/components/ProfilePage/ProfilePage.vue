@@ -734,19 +734,23 @@ onBeforeUnmount(destroyCropper);
 
 .profile-status-chip.is-enabled {
     background: rgba(74, 222, 128, 0.14);
-    color: #86efac;
+    color: #16a34a;
 }
 
 .profile-status-chip.is-disabled {
     background: rgba(148, 163, 184, 0.14);
-    color: rgba(255, 255, 255, 0.72);
+    color: var(--theme-text-soft);
+}
+
+body.dark .profile-status-chip.is-enabled {
+    color: #86efac;
 }
 
 .profile-info-block {
     padding: 16px;
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--theme-bg-elevated);
+    border: 1px solid var(--theme-border);
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -811,13 +815,17 @@ onBeforeUnmount(destroyCropper);
     gap: 8px;
     padding: 8px 12px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--theme-bg-soft);
     font-size: 12px;
     opacity: 0.82;
 }
 
 .sync-footer-item.is-active {
     background: rgba(74, 222, 128, 0.14);
+    color: #15803d;
+}
+
+body.dark .sync-footer-item.is-active {
     color: #bbf7d0;
 }
 
