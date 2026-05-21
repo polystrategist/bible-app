@@ -468,7 +468,7 @@ onBeforeUnmount(() => {
                             <div class="card-meta">
                                 <span v-if="sermon.preacher_name || sermon.creator" class="creator-meta">
                                     <span class="creator-avatar">
-                                        <img v-if="creatorAvatarUrl(sermon.creator)" :src="creatorAvatarUrl(sermon.creator)" />
+                                        <img v-if="creatorAvatarUrl(sermon.creator)" :src="creatorAvatarUrl(sermon.creator) ?? undefined" />
                                         <span v-else>{{ creatorInitials(sermon.creator) }}</span>
                                     </span>
                                     <span v-if="sermon.creator?.username">@{{ sermon.creator.username }}</span>
