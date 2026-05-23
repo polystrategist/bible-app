@@ -289,6 +289,14 @@ const stub: Window['browserWindow'] = {
     onSyncBeforeQuit: () => { /* no-op */ },
     notifySyncBeforeQuitDone: () => { /* no-op */ },
 
+    // ---------- Sermons offline cache + favorites (no-op on web — backend is source of truth) ----------
+    replaceCachedSermons: async () => ({ success: false, error: 'Not available on web' }),
+    getCachedSermons: async () => [],
+    getSermonFavorites: async () => [],
+    getSermonFavoriteIds: async () => [],
+    addSermonFavorite: async () => ({ success: false, error: 'Not available on web' }),
+    removeSermonFavorite: async () => ({ success: false, error: 'Not available on web' }),
+
     // ---------- Export (TODO: replace with client-side jsPDF/docx libs) ----------
     exportToPdf: async () => { warnOnce('exportToPdf'); return { success: false, error: 'Not yet on web' }; },
     exportToDocx: async () => { warnOnce('exportToDocx'); return { success: false, error: 'Not yet on web' }; },
