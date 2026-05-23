@@ -4,6 +4,8 @@ import bookmarksMigration from './StoreDB/bookmarks.migration';
 import highlightsMigration from './StoreDB/highlights.migration';
 import notesMigration from './StoreDB/notes.migration';
 import syncLogsMigration from './StoreDB/sync_logs.migration';
+import cachedSermonsMigration from './StoreDB/cached_sermons.migration';
+import sermonFavoritesMigration from './StoreDB/sermon_favorites.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -25,6 +27,10 @@ export default async () => {
 
         // setup sync_logs
         await syncLogsMigration();
+
+        // setup sermons offline cache + favorites
+        await cachedSermonsMigration();
+        await sermonFavoritesMigration();
     } catch (e) {
         try {
             Log.error(e);

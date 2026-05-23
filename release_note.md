@@ -1,6 +1,8 @@
 ## v1.6.0
 
 ### New Features
+- **Favorite Sermons**: Star sermons to save them. A dedicated Favorites tab lists everything you've starred, with full content available offline. Favorites sync across devices (mobile and desktop) once you're signed in.
+- **Offline Sermons**: The 10 most recent sermons are now cached locally. If the server is unreachable or you're offline, the Sermons feed falls back to the saved copies with a banner so you know what you're seeing isn't fresh.
 - **Username**: Users now have a unique `@username`. Displayed throughout the app (profile dropdown, sermon cards, profile page). Editable from the profile page.
 - **Profile Editing**: Name and username can now be updated directly from the profile page.
 - **Email Change with Verification**: Changing your email sends a verification link to the new address before it takes effect.

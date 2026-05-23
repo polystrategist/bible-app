@@ -11,6 +11,7 @@ import { CompareVerseIpcEvents } from '../Windows/CompareVerseWindow';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
 import { SyncHandlers } from './Sync/SyncHandlers';
+import { SermonHandlers } from './Sermons/SermonHandlers';
 import { PiperTTSHandlers } from './Piper/PiperTTS';
 import Commentaries from '../Modules/Commentaries/Commentaries';
 import DailyDevotional from './DailyDevotional/DailyDevotional';
@@ -54,6 +55,9 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // sync handlers
     SyncHandlers(BrowserWindow);
+
+    // sermon offline cache + favorites
+    SermonHandlers();
 
     // piper tts handlers
     PiperTTSHandlers(BrowserWindow);

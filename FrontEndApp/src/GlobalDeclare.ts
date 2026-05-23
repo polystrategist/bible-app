@@ -197,10 +197,19 @@ declare global {
                 clip_notes?: any[];
                 prayer_lists?: any[];
                 notes?: any[];
+                sermon_favorites?: any[];
                 settings?: any;
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;
+
+            // Sermons offline cache + favorites
+            replaceCachedSermons: (sermons: any[]) => Promise<{ success: boolean; error?: string }>;
+            getCachedSermons: () => Promise<any[]>;
+            getSermonFavorites: () => Promise<any[]>;
+            getSermonFavoriteIds: () => Promise<number[]>;
+            addSermonFavorite: (sermon: any) => Promise<{ success: boolean; error?: string }>;
+            removeSermonFavorite: (sermonId: number) => Promise<{ success: boolean; error?: string }>;
 
             // Export
             exportToPdf: (args: { html: string; filename: string }) => Promise<any>;

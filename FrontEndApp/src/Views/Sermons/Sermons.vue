@@ -24,7 +24,7 @@ const message = useMessage();
 
 const browseEl = ref<HTMLElement | null>(null);
 const myListEl = ref<HTMLElement | null>(null);
-const activeTab = ref<'browse' | 'mine'>('browse');
+const activeTab = ref<'browse' | 'mine' | 'favorites'>('browse');
 const selectedSermon = ref<SermonType | null>(null);
 const showDetailModal = ref(false);
 const viewDelayMs = 7000;
@@ -379,6 +379,27 @@ onBeforeUnmount(() => {
                 <span v-if="authStore.isAuthenticated && sermonStore.mySermons.length"
                       class="tab-count">{{ sermonStore.mySermons.length }}</span>
             </button>
+            <button
+                class="tab-btn"
+                :class="{ active: activeTab === 'favorites' }"
+                @click="activeTab = 'favorites'"
+            >
+                <Icon icon="mdi:star" class="mr-1" />Favorites
+                <span v-if="sermonStore.favorites.length" class="tab-count">{{ sermonStore.favorites.length }}</span>
+            </button>
+        </div>
+
+        <!-- Offline / stale banner — visible above all tabs when feed is stale. -->
+        <div
+            v-if="activeTab === 'browse' && (sermonStore.feedStatus === 'staleOffline' || sermonStore.feedStatus === 'staleError')"
+            class="stale-banner"
+        >
+            <Icon :icon="sermonStore.feedStatus === 'staleOffline' ? 'mdi:wifi-off' : 'mdi:cloud-off-outline'" />
+            <span>
+                {{ sermonStore.feedStatus === 'staleOffline'
+                    ? "You're offline — showing saved sermons."
+                    : "Couldn't reach the server — showing saved sermons." }}
+            </span>
         </div>
 
         <!-- ═══════════════ BROWSE TAB ═══════════════ -->
@@ -471,6 +492,15 @@ onBeforeUnmount(() => {
                             <div v-if="sermon.video_url" class="card-media-badge">
                                 <Icon icon="mdi:play-circle" />
                             </div>
+                            <button
+                                type="button"
+                                class="card-fav-btn"
+                                :class="{ active: sermonStore.isFavorite(sermon.id) }"
+                                :title="sermonStore.isFavorite(sermon.id) ? 'Remove from favorites' : 'Add to favorites'"
+                                @click.stop="sermonStore.toggleFavorite(sermon)"
+                            >
+                                <Icon :icon="sermonStore.isFavorite(sermon.id) ? 'mdi:star' : 'mdi:star-outline'" />
+                            </button>
                         </div>
 
                         <!-- Body -->
@@ -625,6 +655,44 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
             </template>
+        </div>
+
+        <!-- ═══════════════ FAVORITES TAB ═══════════════ -->
+        <div v-show="activeTab === 'favorites'" class="tab-content">
+            <div v-if="!sermonStore.favorites.length" class="empty-state">
+                <Icon icon="mdi:star-outline" class="empty-icon" />
+                <p class="empty-title">No favorites yet</p>
+                <p class="empty-sub">Tap the star on a sermon to save it here for offline reading.</p>
+            </div>
+            <div v-else class="sermon-grid-scroll">
+                <div class="sermon-grid">
+                    <div
+                        v-for="sermon in sermonStore.favorites"
+                        :key="sermon.id"
+                        class="sermon-card"
+                        @click="openDetail(sermon)"
+                    >
+                        <div class="card-thumb">
+                            <img v-if="sermon.thumbnail_url" :src="sermon.thumbnail_url" :alt="sermon.title" />
+                            <div v-else class="card-thumb-placeholder">
+                                <Icon icon="mdi:book-cross" class="text-4xl opacity-30" />
+                            </div>
+                            <button
+                                type="button"
+                                class="absolute top-1 right-1 w-32px h-32px rounded-full bg-black/55 flex items-center justify-center text-yellow-400 hover:bg-black/75"
+                                title="Remove from favorites"
+                                @click.stop="sermonStore.toggleFavorite(sermon)"
+                            >
+                                <Icon icon="mdi:star" width="20" />
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">{{ sermon.title }}</h3>
+                            <p class="card-summary">{{ sermon.short_summary }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- ═══════════════ DETAIL MODAL ═══════════════ -->
@@ -1300,5 +1368,44 @@ onBeforeUnmount(() => {
         border-left: 0;
         border-bottom: 1px solid var(--theme-border, rgba(255,255,255,0.08));
     }
+}
+
+.stale-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 16px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.08));
+    background: rgba(120, 120, 120, 0.12);
+    font-size: 12px;
+    color: var(--theme-muted-foreground, #9ca3af);
+}
+
+.card-fav-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    border: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s ease, transform 0.15s ease;
+    z-index: 2;
+}
+.card-fav-btn:hover {
+    background: rgba(0, 0, 0, 0.78);
+    transform: scale(1.05);
+}
+.card-fav-btn.active {
+    color: #fbbf24;
 }
 </style>

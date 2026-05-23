@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from './authStore';
+import { debouncedRunSync } from '../util/Sync/sync';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -102,6 +103,15 @@ export const useSermonStore = defineStore('useSermonStore', () => {
     // Categories
     const categories = ref<SermonCategory[]>([]);
 
+    // Offline / favorites
+    const favoriteIds = ref<Set<number>>(new Set());
+    const favorites = ref<SermonType[]>([]);
+    /**
+     * Status of the most recent feed fetch — drives offline banner / empty
+     * messaging in the Sermons view.
+     */
+    const feedStatus = ref<'loading' | 'fresh' | 'staleOffline' | 'staleError' | 'emptyOffline' | 'emptyError'>('loading');
+
     // Tab routing signal — set by CreateSermon to switch Sermons.vue to a specific tab
     const requestedTab = ref<'browse' | 'mine' | null>(null);
 
@@ -123,6 +133,9 @@ export const useSermonStore = defineStore('useSermonStore', () => {
         }
         if (loading.value || page.value > lastPage.value) return;
         loading.value = true;
+
+        const isFirstUnfiltered = fresh && !search.value && !categoryFilter.value && sort.value === 'recent';
+
         try {
             const params: Record<string, any> = { page: page.value };
             if (search.value) params.search = search.value;
@@ -134,11 +147,81 @@ export const useSermonStore = defineStore('useSermonStore', () => {
                 const paged = res.data.data;
                 sermons.value = fresh ? paged.data : [...sermons.value, ...paged.data];
                 lastPage.value = paged.last_page ?? 1;
+                if (isFirstUnfiltered) {
+                    feedStatus.value = 'fresh';
+                    // Replace offline cache with the top 10 we just received.
+                    // Strip Vue reactive wrappers before crossing IPC.
+                    if (window.isElectron && Array.isArray(paged.data)) {
+                        try {
+                            const plain = JSON.parse(JSON.stringify(paged.data.slice(0, 10)));
+                            await window.browserWindow.replaceCachedSermons(plain);
+                        } catch (e) {
+                            console.warn('replaceCachedSermons failed', e);
+                        }
+                    }
+                }
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error('getSermons error', e);
+            if (isFirstUnfiltered) {
+                const offline = !navigator.onLine || !e?.response;
+                const cached = await loadCachedSermons();
+                if (cached.length) {
+                    sermons.value = cached;
+                    feedStatus.value = offline ? 'staleOffline' : 'staleError';
+                } else {
+                    feedStatus.value = offline ? 'emptyOffline' : 'emptyError';
+                }
+            }
         } finally {
             loading.value = false;
+        }
+    }
+
+    async function loadCachedSermons(): Promise<SermonType[]> {
+        if (!window.isElectron) return [];
+        try {
+            return (await window.browserWindow.getCachedSermons()) as SermonType[];
+        } catch (e) {
+            console.warn('getCachedSermons failed', e);
+            return [];
+        }
+    }
+
+    async function loadFavorites() {
+        if (!window.isElectron) return;
+        try {
+            const [ids, items] = await Promise.all([
+                window.browserWindow.getSermonFavoriteIds(),
+                window.browserWindow.getSermonFavorites(),
+            ]);
+            favoriteIds.value = new Set(ids);
+            favorites.value = items as SermonType[];
+        } catch (e) {
+            console.warn('loadFavorites failed', e);
+        }
+    }
+
+    async function toggleFavorite(sermon: SermonType) {
+        if (!window.isElectron) return;
+        const isFav = favoriteIds.value.has(sermon.id);
+        try {
+            if (isFav) {
+                await window.browserWindow.removeSermonFavorite(sermon.id);
+                favoriteIds.value.delete(sermon.id);
+                favorites.value = favorites.value.filter((s) => s.id !== sermon.id);
+            } else {
+                // Strip Vue's reactive Proxy before crossing the IPC boundary —
+                // structured clone can't serialise reactive wrappers.
+                const plain = JSON.parse(JSON.stringify(sermon));
+                await window.browserWindow.addSermonFavorite(plain);
+                favoriteIds.value.add(sermon.id);
+                favorites.value = [sermon, ...favorites.value.filter((s) => s.id !== sermon.id)];
+            }
+            favoriteIds.value = new Set(favoriteIds.value);
+            debouncedRunSync();
+        } catch (e) {
+            console.warn('toggleFavorite failed', e);
         }
     }
 
@@ -297,7 +380,7 @@ export const useSermonStore = defineStore('useSermonStore', () => {
     watch(() => myPage.value, () => getMySermons());
 
     onBeforeMount(async () => {
-        await Promise.all([getSermons(), fetchCategories()]);
+        await Promise.all([getSermons(true), fetchCategories(), loadFavorites()]);
     });
 
     return {
@@ -329,6 +412,13 @@ export const useSermonStore = defineStore('useSermonStore', () => {
         // Tab routing
         requestedTab,
         editingSermon,
+        // Offline + favorites
+        feedStatus,
+        favoriteIds,
+        favorites,
+        loadFavorites,
+        toggleFavorite,
+        isFavorite: (id: number) => favoriteIds.value.has(id),
         // Computed
         hasMoreFeed: computed(() => page.value < lastPage.value),
         hasMoreMine: computed(() => myPage.value < myLastPage.value),

@@ -4,9 +4,10 @@ import { useAuthStore } from '../../store/authStore';
 import { DAYJS } from '../../util/dayjs';
 import { Delete, TextAlignJustify } from '@vicons/carbon';
 import { Icon } from '@iconify/vue';
-import { SermonType } from '../../store/Sermons';
+import { SermonType, useSermonStore } from '../../store/Sermons';
 
 const authStore = useAuthStore();
+const sermonStore = useSermonStore();
 const props = defineProps<{
     sermon: SermonType
 }>();
@@ -28,6 +29,18 @@ const emit = defineEmits(['showContent', 'publishSermon', 'deleteSermon']);
                  class="font-800 text-size-25px flex items-center justify-center h-full bg-gray-300 dark:bg-gray-300 dark:text-gray-900 p-10px">
                 {{ sermon.title }}
             </div>
+            <button
+                type="button"
+                class="absolute top-1 right-1 w-32px h-32px rounded-full bg-black/55 flex items-center justify-center text-white hover:bg-black/75"
+                :title="sermonStore.isFavorite(sermon.id) ? 'Remove from favorites' : 'Add to favorites'"
+                @click.stop="sermonStore.toggleFavorite(sermon)"
+            >
+                <Icon
+                    :icon="sermonStore.isFavorite(sermon.id) ? 'mdi:star' : 'mdi:star-outline'"
+                    :class="sermonStore.isFavorite(sermon.id) ? 'text-yellow-400' : ''"
+                    width="20"
+                />
+            </button>
             <div v-if="authStore.user?.id === sermon.created_by" class="absolute top-1 left-1 flex flex-col gap-1">
                 <div v-if="sermon.status !== 'published'" class="bg-orange-700 px-2 rounded-md select-none text-white"
                      @click.stop="emit('publishSermon', sermon)">

@@ -22,7 +22,7 @@ async function pushSync(token: string): Promise<number> {
 
     if (!unsyncedChanges.length) return 0;
 
-    const ALLOWED_TABLES = ['bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'notes'];
+    const ALLOWED_TABLES = ['bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'notes', 'sermon_favorites'];
     const ALLOWED_ACTIONS = ['created', 'updated', 'deleted'];
 
     // Discard legacy entries: no record_key, unknown table name, or unknown action.
@@ -96,7 +96,7 @@ async function pullSync(token: string): Promise<void> {
 
         if (response.data.status !== 'success') return;
 
-        const { sync_logs, bookmarks, highlights, clip_notes, prayer_lists, notes, settings, has_more, next_cursor, last_sync_timestamp } = response.data;
+        const { sync_logs, bookmarks, highlights, clip_notes, prayer_lists, notes, sermon_favorites, settings, has_more, next_cursor, last_sync_timestamp } = response.data;
         const authStore = useAuthStore();
 
         await window.browserWindow.applyPullData({
@@ -106,6 +106,7 @@ async function pullSync(token: string): Promise<void> {
             clip_notes,
             prayer_lists,
             notes,
+            sermon_favorites,
             settings,
         });
 

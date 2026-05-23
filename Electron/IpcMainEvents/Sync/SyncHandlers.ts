@@ -126,6 +126,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
         clip_notes?: any[];
         prayer_lists?: any[];
         notes?: any[];
+        sermon_favorites?: any[];
     }) => {
         const now = new Date();
 
@@ -151,6 +152,13 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     case 'notes':
                         await StoreDB('notes').where('note_id', key).delete();
                         break;
+                    case 'sermon_favorites': {
+                        const id = Number(key);
+                        if (!Number.isNaN(id)) {
+                            await StoreDB('sermon_favorites').where({ sermon_id: id }).delete();
+                        }
+                        break;
+                    }
                 }
             }
 
@@ -232,6 +240,24 @@ export const SyncHandlers = (win: BrowserWindow) => {
                         updated_at: now,
                     });
                 }
+            }
+
+            // 6. Sermon favorites — backend only stores sermon_id, so preserve
+            //    any local payload. If we've never cached the sermon, insert a
+            //    placeholder JSON that will be filled in next time the sermon
+            //    is opened or appears in a fetched list.
+            for (const fav of pullData.sermon_favorites ?? []) {
+                const sermonId = fav?.sermon_id;
+                if (typeof sermonId !== 'number') continue;
+                const existing = await StoreDB('sermon_favorites').where({ sermon_id: sermonId }).first();
+                if (existing) continue;
+                const nowIso = now.toISOString();
+                await StoreDB('sermon_favorites').insert({
+                    sermon_id: sermonId,
+                    payload: JSON.stringify({ id: sermonId }),
+                    created_at: nowIso,
+                    updated_at: nowIso,
+                });
             }
 
             return { success: true };
