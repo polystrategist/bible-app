@@ -18,6 +18,7 @@ import DailyDevotional from './DailyDevotional/DailyDevotional';
 import importing from './importing/importing';
 import exporting from './exporting/exporting';
 import CrossReferences from './CrossReferences/CrossReferences';
+import DailyBelievers from './DailyBelievers/DailyBelievers';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -76,4 +77,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // cross references
     CrossReferences();
+
+    // daily believers metadata extractor (CORS bypass)
+    DailyBelievers();
 };

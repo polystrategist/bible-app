@@ -107,6 +107,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
     getTodayDevotional: (languageCode: string = 'en') => ipcRenderer.invoke('getTodayDevotional', languageCode),
     getDevotionalByDay: (day: number, languageCode: string = 'en') => ipcRenderer.invoke('getDevotionalByDay', day, languageCode),
 
+    // Daily Believers — link metadata extraction (CORS bypass via main process)
+    dailyBelieversExtractMetadata: (url: string) => ipcRenderer.invoke('dailyBelievers:extractMetadata', url),
+
     // Commentaries
     getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
     hasCommentary: (version: string) => ipcRenderer.invoke('hasCommentary', version),

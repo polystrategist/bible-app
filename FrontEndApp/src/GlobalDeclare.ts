@@ -260,6 +260,16 @@ declare global {
                 go_action: string;
                 verses: string[];
             } | null>;
+
+            // Daily Believers — extract OG/oEmbed metadata for a shared link
+            dailyBelieversExtractMetadata: (url: string) => Promise<{
+                url: string;
+                sourceType: 'website' | 'youtube';
+                sourceDomain: string;
+                title: string;
+                description: string | null;
+                thumbnailUrl: string | null;
+            }>;
         };
     }
 }

@@ -315,6 +315,30 @@ const stub: Window['browserWindow'] = {
         return apiFetch(`/devotional/${day}?${params}`, null);
     },
 
+    // ---------- Daily Believers ----------
+    dailyBelieversExtractMetadata: async (url: string) => {
+        // Web build cannot bypass CORS — best-effort YouTube oEmbed only;
+        // other URLs throw so the caller can show a helpful error.
+        const normalized = url.startsWith('http') ? url : `https://${url}`;
+        const host = new URL(normalized).host.toLowerCase().replace(/^www\./, '');
+        if (host.includes('youtube.com') || host === 'youtu.be') {
+            const res = await fetch(
+                `https://www.youtube.com/oembed?url=${encodeURIComponent(normalized)}&format=json`
+            );
+            if (!res.ok) throw new Error(`Could not load YouTube metadata (${res.status}).`);
+            const data = await res.json();
+            return {
+                url: normalized,
+                sourceType: 'youtube' as const,
+                sourceDomain: 'youtube.com',
+                title: data.title ?? 'YouTube video',
+                description: data.author_name ? `By ${data.author_name}` : null,
+                thumbnailUrl: data.thumbnail_url ?? null,
+            };
+        }
+        throw new Error('Link previews for non-YouTube URLs require the desktop app.');
+    },
+
     getCrossReferences: async (args) => {
         const params = new URLSearchParams({
             book_number: String(args.book_number),
