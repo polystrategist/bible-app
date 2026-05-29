@@ -62,8 +62,13 @@ async function register() {
     const result = await authStore.register(form.name, form.username, form.email, form.password, form.retypePassword!, form.denomination);
     loading.value = false;
     if (!result.success) { message.error(result.message); return; }
-    message.success('Registered! Successfully.');
-    await router.push(window.isElectron ? '/profile/profile' : '/');
+    successMessage.value = 'Email verification sent to your email. Please check your inbox to verify your account before signing in.';
+    view.value = 'login';
+    form.password = null;
+    form.retypePassword = null;
+    form.name = null;
+    form.username = null;
+    form.denomination = null;
 }
 
 async function sendResetLink() {

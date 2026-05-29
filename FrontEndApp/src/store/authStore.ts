@@ -104,17 +104,9 @@ export const useAuthStore = defineStore('authStore', () => {
             });
 
             if (response.data.status === 'success') {
-                user.value = response.data.user;
-                token.value = response.data.token;
-                isAuthenticated.value = true;
-
-                localStorage.setItem('auth_token', response.data.token);
-
                 return {
                     success: true,
                     message: response.data.message,
-                    user: response.data.user,
-                    token: response.data.token,
                 };
             }
 
@@ -699,6 +691,25 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
+    async function resendVerification(): Promise<{ success: boolean; message: string; alreadyVerified?: boolean }> {
+        if (!token.value) return { success: false, message: 'Not authenticated' };
+        try {
+            const response = await axios.post(`${API_BASE_URL}/auth/resend-verification`, {}, {
+                headers: { Authorization: `Bearer ${token.value}` },
+            });
+            return {
+                success: response.data.status === 'success',
+                message: response.data.message ?? 'Verification email sent.',
+                alreadyVerified: response.data.already_verified === true,
+            };
+        } catch (error: any) {
+            return {
+                success: false,
+                message: error.response?.data?.message || error.message || 'Failed to send verification email',
+            };
+        }
+    }
+
     async function resetPassword(
         token: string,
         email: string,
@@ -752,5 +763,6 @@ export const useAuthStore = defineStore('authStore', () => {
         updateProfile,
         updateUserInfo,
         updateProfilePicture,
+        resendVerification,
     };
 });

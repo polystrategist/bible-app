@@ -42,6 +42,26 @@ function resetProfile() {
 
 const profileRefreshing = ref(false);
 
+// ─── Email Verification ──────────────────────────────────────────────────────
+const isEmailVerified = computed(() => !!authStore.user?.email_verified_at);
+const resendingVerification = ref(false);
+
+async function resendVerification() {
+    resendingVerification.value = true;
+    const result = await authStore.resendVerification();
+    resendingVerification.value = false;
+    if (result.success) {
+        if (result.alreadyVerified) {
+            message.success('Your email is already verified.');
+            await authStore.getUser(true);
+        } else {
+            message.success(result.message);
+        }
+    } else {
+        message.error(result.message);
+    }
+}
+
 async function refreshProfile() {
     profileRefreshing.value = true;
     await authStore.getUser(true);
@@ -357,6 +377,28 @@ onBeforeUnmount(destroyCropper);
                     <Icon :icon="authStore.syncEnabled ? 'mdi:cloud-check' : 'mdi:cloud-off-outline'" />
                     <span>{{ authStore.syncEnabled ? 'Sync On' : 'Desktop Only' }}</span>
                 </div>
+            </div>
+
+            <!-- Unverified email warning -->
+            <div v-if="!isEmailVerified" class="verify-warning mb-6">
+                <Icon icon="mdi:email-alert-outline" class="verify-warning-icon" />
+                <div class="flex-1">
+                    <p class="verify-warning-title">Verify your email address</p>
+                    <p class="verify-warning-text">
+                        Your email is not yet verified. Please verify it before
+                        <strong>June 30, 2026</strong>, or your account will stop working.
+                    </p>
+                </div>
+                <NButton
+                    size="small"
+                    type="warning"
+                    :loading="resendingVerification"
+                    :disabled="resendingVerification"
+                    @click="resendVerification"
+                >
+                    <template #icon><Icon icon="mdi:email-fast-outline" /></template>
+                    Resend Email
+                </NButton>
             </div>
 
             <!-- Row 1: Name | Username -->
@@ -774,6 +816,37 @@ body.dark .profile-status-chip.is-enabled {
     font-size: 12px;
     opacity: 0.7;
     color: #fbbf24;
+}
+
+.verify-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(251, 146, 60, 0.1);
+    border: 1px solid rgba(251, 146, 60, 0.32);
+}
+
+.verify-warning-icon {
+    font-size: 22px;
+    color: #fb923c;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.verify-warning-title {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fb923c;
+}
+
+.verify-warning-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: 0.85;
 }
 
 .username-at-prefix {
