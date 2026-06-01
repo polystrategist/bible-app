@@ -44,41 +44,51 @@ async function pushSync(token: string): Promise<number> {
     );
     if (!valid.length) return 0;
 
-    const payload = valid.map((entry: any) => ({
-        table_name: entry.table_name,
-        record_key: entry.record_key,
-        action: entry.action,
-        payload: typeof entry.payload === 'string' ? JSON.parse(entry.payload) : entry.payload,
-        timestamp: entry.created_at,
-    }));
+    // The backend rejects batches larger than 500, so push in small chunks.
+    // Each batch is marked synced as it succeeds, so a large offline backlog
+    // drains incrementally and progress survives a mid-way failure.
+    const BATCH_SIZE = 150;
+    let totalSynced = 0;
 
-    const response = await axios.post(
-        `${API_BASE_URL}/sync`,
-        { sync_logs: payload },
-        { headers: { Authorization: `Bearer ${token}` } }
-    );
+    for (let i = 0; i < valid.length; i += BATCH_SIZE) {
+        const batch = valid.slice(i, i + BATCH_SIZE);
+        const payload = batch.map((entry: any) => ({
+            table_name: entry.table_name,
+            record_key: entry.record_key,
+            action: entry.action,
+            payload: typeof entry.payload === 'string' ? JSON.parse(entry.payload) : entry.payload,
+            timestamp: entry.created_at,
+        }));
 
-    if (response.data.status === 'success') {
+        const response = await axios.post(
+            `${API_BASE_URL}/sync`,
+            { sync_logs: payload },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data.status !== 'success') {
+            console.warn('[Sync] Push rejected by backend:', response.data);
+            return totalSynced > 0 ? totalSynced : -1;
+        }
+
         const failedKeys: string[] = response.data.failed_keys ?? [];
         const syncedEntries = failedKeys.length
-            ? valid.filter((e: any) => !failedKeys.includes(e.record_key))
-            : valid;
+            ? batch.filter((e: any) => !failedKeys.includes(e.record_key))
+            : batch;
 
         if (syncedEntries.length) {
             const ids = syncedEntries.map((e: any) => e.id);
             await window.browserWindow.markAsSynced(ids);
+            totalSynced += syncedEntries.length;
         }
 
         if (failedKeys.length) {
             console.warn(`[Sync] ${failedKeys.length} key(s) failed:`, failedKeys);
         }
-
-        console.info(`[Sync] Pushed ${syncedEntries.length} change(s) to backend.`);
-        return syncedEntries.length;
     }
 
-    console.warn('[Sync] Push rejected by backend:', response.data);
-    return -1;
+    console.info(`[Sync] Pushed ${totalSynced} change(s) to backend.`);
+    return totalSynced;
 }
 
 /**
