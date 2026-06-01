@@ -7,8 +7,8 @@ export type SyncLogEntry = {
     action: 'created' | 'updated' | 'deleted';
     payload: any;
     synced: 0 | 1;
-    created_at?: Date;
-    updated_at?: Date;
+    created_at?: Date | string;
+    updated_at?: Date | string;
 };
 
 export type SyncSetting = {
@@ -23,7 +23,12 @@ export type SyncSetting = {
  * Log a data change for sync tracking
  */
 export async function logSyncChange(entry: SyncLogEntry): Promise<{ action: string; id: number }> {
-    const now = new Date();
+    // Store as explicit UTC ISO8601 (e.g. 2026-06-01T10:00:00.000Z) rather than
+    // a raw Date, so the `timestamp` we later push is unambiguously UTC and
+    // matches the mobile client. The backend uses this for last-write-wins
+    // conflict resolution, so a naive/local-time string here would corrupt the
+    // comparison on non-UTC machines.
+    const now = new Date().toISOString();
     const data = {
         table_name: entry.table_name,
         record_key: entry.record_key,
@@ -54,7 +59,7 @@ export async function getUnsyncedChanges(): Promise<SyncLogEntry[]> {
 export async function markAsSynced(ids: number[]): Promise<void> {
     await StoreDB('sync_logs')
         .whereIn('id', ids)
-        .update({ synced: 1, updated_at: new Date() });
+        .update({ synced: 1, updated_at: new Date().toISOString() });
 }
 
 /**
@@ -98,13 +103,14 @@ export async function setSyncSetting(key: string, value: any): Promise<void> {
     if (existing) {
         await StoreDB('sync_settings')
             .where('key', key)
-            .update({ value, updated_at: new Date() });
+            .update({ value, updated_at: new Date().toISOString() });
     } else {
+        const now = new Date().toISOString();
         await StoreDB('sync_settings').insert({
             key,
             value,
-            created_at: new Date(),
-            updated_at: new Date(),
+            created_at: now,
+            updated_at: now,
         });
     }
 }

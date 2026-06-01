@@ -53,6 +53,7 @@ export default () => {
                     .where({ key })
                     .first();
 
+                const now = new Date().toISOString();
                 const result = await updateOrCreate(
                     'clip_notes',
                     { key },
@@ -62,8 +63,8 @@ export default () => {
                         verse,
                         content,
                         color,
-                        updated_at: new Date(),
-                        created_at: new Date(),
+                        updated_at: now,
+                        created_at: now,
                     }
                 );
 

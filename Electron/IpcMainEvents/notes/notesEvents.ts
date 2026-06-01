@@ -15,7 +15,7 @@ export default () => {
         async (event, { note_id, title, content }: { note_id: string; title: string; content: string }) => {
             try {
                 const existing = await StoreDB('notes').where('note_id', note_id).first();
-                const now = new Date();
+                const now = new Date().toISOString();
 
                 if (existing) {
                     await StoreDB('notes').where('note_id', note_id).update({

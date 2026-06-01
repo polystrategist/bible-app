@@ -491,6 +491,13 @@ onBeforeUnmount(destroyCropper);
                         <span>Sync is currently enabled for this account</span>
                     </div>
                 </div>
+                <div class="sync-free-notice">
+                    <Icon icon="mdi:information-outline" />
+                    <span>
+                        Sync is free while in preview. It may become a paid feature in the
+                        future — we'll let you know before that happens.
+                    </span>
+                </div>
             </div>
 
             <!-- Denomination -->
@@ -900,6 +907,31 @@ body.dark .profile-status-chip.is-enabled {
 
 body.dark .sync-footer-item.is-active {
     color: #bbf7d0;
+}
+
+.sync-free-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(216, 162, 58, 0.10);
+    border: 1px solid rgba(216, 162, 58, 0.35);
+    font-size: 12px;
+    line-height: 1.4;
+    color: #8a6314;
+}
+
+.sync-free-notice .iconify {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 15px;
+}
+
+body.dark .sync-free-notice {
+    color: #e6b45a;
+    background: rgba(216, 162, 58, 0.14);
 }
 
 .danger-zone {

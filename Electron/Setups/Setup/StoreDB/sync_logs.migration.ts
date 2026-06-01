@@ -32,11 +32,12 @@ export default async () => {
     // Initialize default sync settings if not exists
     const existingSetting = await StoreDB('sync_settings').where('key', 'last_sync_timestamp').first();
     if (!existingSetting) {
+        const now = new Date().toISOString();
         await StoreDB('sync_settings').insert({
             key: 'last_sync_timestamp',
             value: '0',
-            created_at: new Date(),
-            updated_at: new Date(),
+            created_at: now,
+            updated_at: now,
         });
     }
 };

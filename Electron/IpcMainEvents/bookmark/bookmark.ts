@@ -22,13 +22,14 @@ const saveVersesInBookmark = async ({
             .first();
 
         if (!existingBookmark) {
+            const now = new Date().toISOString();
             await StoreDB('bookmarks').insert({
                 key,
                 book_number,
                 chapter,
                 verse,
-                updated_at: new Date(),
-                created_at: new Date(),
+                updated_at: now,
+                created_at: now,
             });
 
             // Log sync change for new bookmark

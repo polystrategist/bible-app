@@ -128,7 +128,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
         notes?: any[];
         sermon_favorites?: any[];
     }) => {
-        const now = new Date();
+        const now = new Date().toISOString();
 
         try {
             // 0. Process deletions from sync_logs
@@ -251,12 +251,11 @@ export const SyncHandlers = (win: BrowserWindow) => {
                 if (typeof sermonId !== 'number') continue;
                 const existing = await StoreDB('sermon_favorites').where({ sermon_id: sermonId }).first();
                 if (existing) continue;
-                const nowIso = now.toISOString();
                 await StoreDB('sermon_favorites').insert({
                     sermon_id: sermonId,
                     payload: JSON.stringify({ id: sermonId }),
-                    created_at: nowIso,
-                    updated_at: nowIso,
+                    created_at: now,
+                    updated_at: now,
                 });
             }
 
