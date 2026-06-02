@@ -112,8 +112,8 @@ yarn start
 # Build for production (Windows NSIS + portable)
 yarn app:build
 
-# Build nightly version
-yarn app:build:nightly
+# Build beta version (from the development branch)
+yarn app:build:beta
 
 # Compile Electron TypeScript only
 yarn build
@@ -214,10 +214,16 @@ Sync runs via `/api/sync` (POST push) and `/api/sync/pull` (GET pull) against th
 
 ### Build Variants
 
-- **Production**: `app-id = com.official-believers-sword.app`, `productName = Believers Sword`
-- **Nightly**: `app-id = com.official-believers-sword-nightly.app`, `productName = Believers Sword Nightly`
-- Controlled by `APP_IS_DEV` and `APP_IS_NIGHTLY` environment variables (see `Electron/config.ts`)
-- `yarn nightly:rename` / `yarn prod:rename` mutate `package.json` fields before building
+Three identities, each with its own `appId`/`productName` so they install side-by-side and keep separate `userData` directories. The `*:rename` yarn scripts mutate `package.json` (`name`/`productName`/`appId`) before each build:
+
+| Variant | `appId` / `productName` | Backend (`VITE_API_BASE_URL`) | How it's built |
+|---|---|---|---|
+| **Local dev** | `com.official-believers-sword-local-dev.app` / `Believers Sword Local Dev` | `http://localhost:8888` (from `FrontEndApp/.env.development`) | `yarn start` → `dev:rename`, `APP_IS_DEV=yes` |
+| **Beta** | `com.official-believers-sword-beta.app` / `Believers Sword Beta` | `https://service-dev.believersword.com` | `v*-beta*` tag on `development` → CI; or `yarn app:build:beta` |
+| **Production** | `com.official-believers-sword.app` / `Believers Sword` | `https://service.believersword.com` (from `FrontEndApp/.env.production`) | `v*` tag on `main` → CI; or `yarn app:build` |
+
+- Build flags `APP_IS_DEV` / `APP_IS_BETA` (see `Electron/config.ts`) only affect dev-tools and icon path; the variant *identity* comes from the `*:rename` script, not these flags.
+- CI: `.github/workflows/build.yml` (prod) and `.github/workflows/build-beta.yml` (beta). The beta workflow stamps the package version from the tag (`v1.6.0-beta.1` → `1.6.0-beta.1`); the `-beta` prerelease suffix makes electron-builder emit a separate `beta.yml` update channel, so the prod auto-updater (`latest.yml`) never sees beta builds.
 
 ### Web App (`web/`)
 

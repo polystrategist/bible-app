@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import axios from 'axios';
 import { runSync, runPullSync, resetSyncBackoff } from '../util/Sync/sync';
 
@@ -19,6 +19,8 @@ export interface User {
     email: string;
     pending_email?: string | null;
     sync_enabled: boolean;
+    /** Server-verified subscription tier (RevenueCat webhook source of truth). */
+    tier?: 'free' | 'sync' | 'pro';
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
@@ -42,6 +44,11 @@ export const useAuthStore = defineStore('authStore', () => {
     const token = ref<string | null>(null);
     const isAuthenticated = ref(false);
     const remoteSettings = ref<UserSettings | null>(null);
+
+    // Server-verified subscription tier (authoritative; the backend also gates
+    // every AI request). Drives entitlement gating in the AI views.
+    const tier = computed<'free' | 'sync' | 'pro'>(() => user.value?.tier ?? 'free');
+    const isAiEnabled = computed(() => tier.value !== 'free');
 
     // Local avatar cache — base64 data URL of the last uploaded custom picture.
     // Keyed by the profile_picture value so it auto-invalidates if the picture changes.
@@ -738,6 +745,8 @@ export const useAuthStore = defineStore('authStore', () => {
     return {
         user,
         token,
+        tier,
+        isAiEnabled,
         isAuthenticated,
         syncEnabled,
         lastSyncAt,

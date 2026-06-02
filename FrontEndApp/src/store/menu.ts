@@ -21,6 +21,8 @@ import {
     BookStar24Filled,
     PeopleCommunity24Regular,
     PeopleCommunity24Filled,
+    Sparkle24Regular,
+    Sparkle24Filled,
 } from '@vicons/fluent';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
@@ -62,6 +64,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             icon: renderNIcon(PeopleCommunity24Regular),
             iconDark: renderNIcon(PeopleCommunity24Filled),
         },
+        {
+            label: 'AI Assistant',
+            key: '/ai-assistant',
+            icon: renderNIcon(Sparkle24Regular),
+            iconDark: renderNIcon(Sparkle24Filled),
+        },
     ]);
 
     const bottomMenuTabs = ref([
@@ -92,6 +100,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         '/prayer-list',
         '/daily-devotional',
         '/daily-believers',
+        '/ai-assistant',
         // '/profile',
         '/settings-page',
         '/create-sermon',

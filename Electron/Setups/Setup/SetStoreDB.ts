@@ -2,7 +2,6 @@ import { app } from 'electron';
 import fs from 'fs';
 import UPath from 'upath';
 import Log from 'electron-log';
-import { isNightly } from '../../config';
 import { setupPortableMode } from '../../util/portable';
 
 setupPortableMode();

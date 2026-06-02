@@ -11,6 +11,7 @@ import UserProfileLayout from './../Views/UserProfile/Profile.vue';
 import CompareVerse from '../Views/CompareVerse/CompareVerse.vue';
 import DailyDevotional from '../Views/DailyDevotional/DailyDevotional.vue';
 import DailyBelievers from '../Views/DailyBelievers/DailyBelievers.vue';
+import AiAssistant from '../Views/AiAssistant/AiAssistant.vue';
 
 export const routes: Array<RouteRecordRaw> = [
     {
@@ -83,6 +84,11 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'DailyBelievers',
         path: '/daily-believers',
         component: DailyBelievers,
+    },
+    {
+        name: 'AiAssistant',
+        path: '/ai-assistant',
+        component: AiAssistant,
     },
 ];
 const router = createRouter({
