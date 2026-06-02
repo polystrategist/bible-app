@@ -47,8 +47,10 @@ jobs:
         run: cd FrontEndApp && yarn install --frozen-lockfile
 
       # Stamp the package version from the tag (e.g. v1.6.0-beta.1 -> 1.6.0-beta.1).
-      # The -beta prerelease suffix makes electron-builder publish a separate `beta.yml`
-      # channel, so the production auto-updater (which reads `latest.yml`) ignores it.
+      # The separate `beta.yml` update channel comes from `channel: 'beta'` in the
+      # publish config (set by the `beta:rename` script), NOT from the -beta version
+      # suffix — electron-builder does not auto-derive the channel file here. That
+      # keeps the production auto-updater (which reads `latest.yml`) from seeing betas.
       - name: Set beta version from tag
         shell: bash
         run: |
