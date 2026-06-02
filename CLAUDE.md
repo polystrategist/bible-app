@@ -223,7 +223,9 @@ Three identities, each with its own `appId`/`productName` so they install side-b
 | **Production** | `com.official-believers-sword.app` / `Believers Sword` | `https://service.believersword.com` (from `FrontEndApp/.env.production`) | `v*` tag on `main` → CI; or `yarn app:build` |
 
 - Build flags `APP_IS_DEV` / `APP_IS_BETA` (see `Electron/config.ts`) only affect dev-tools and icon path; the variant *identity* comes from the `*:rename` script, not these flags.
-- CI: `.github/workflows/build.yml` (prod) and `.github/workflows/build-beta.yml` (beta). The beta workflow stamps the package version from the tag (`v1.6.0-beta.1` → `1.6.0-beta.1`); the `-beta` prerelease suffix makes electron-builder emit a separate `beta.yml` update channel, so the prod auto-updater (`latest.yml`) never sees beta builds.
+- CI: `.github/workflows/build.yml` (prod) and `.github/workflows/build-beta.yml` (beta). The beta workflow stamps the package version from the tag (`v1.6.0-beta.1` → `1.6.0-beta.1`); the `-beta` prerelease suffix makes electron-builder emit a separate `beta.yml` update channel.
+- Auto-update channel isolation (`Electron/AutoUpdate.ts`): beta builds pin `autoUpdater.channel = 'beta'` (+ `allowPrerelease = true`) so they only ever read `beta.yml` and never offer a stable build; prod stays on the default `latest` channel with prereleases disallowed, so it never sees a beta. Both publish to the same GitHub repo.
+- Beta releases: `yarn release:beta` (auto-increments `-beta.N` by scanning remote tags) or `yarn release:beta <n>`; `yarn untag:beta <n>` / `yarn rerelease:beta <n>` require an explicit number. See `scripts/release-beta.js`.
 
 ### Web App (`web/`)
 

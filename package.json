@@ -34,7 +34,7 @@
     "untag": "node -e \"const v='v'+require('./package.json').version,e=require('child_process').execSync;e('git tag -d '+v,{stdio:'inherit'});e('git push origin :refs/tags/'+v,{stdio:'inherit'})\"",
     "release": "node -e \"const v='v'+require('./package.json').version,e=require('child_process').execSync;e('git tag '+v,{stdio:'inherit'});e('git push origin '+v,{stdio:'inherit'})\"",
     "rerelease": "yarn untag && yarn release",
-    "release:beta": "node -e \"const n=process.argv[1];if(!n){console.error('Usage: yarn release:beta <number>  (e.g. yarn release:beta 1)');process.exit(1)}const v='v'+require('./package.json').version+'-beta.'+n,e=require('child_process').execSync;e('git tag '+v,{stdio:'inherit'});e('git push origin '+v,{stdio:'inherit'})\"",
+    "release:beta": "node scripts/release-beta.js",
     "untag:beta": "node -e \"const n=process.argv[1];if(!n){console.error('Usage: yarn untag:beta <number>  (e.g. yarn untag:beta 1)');process.exit(1)}const v='v'+require('./package.json').version+'-beta.'+n,e=require('child_process').execSync;e('git tag -d '+v,{stdio:'inherit'});e('git push origin :refs/tags/'+v,{stdio:'inherit'})\"",
     "rerelease:beta": "node -e \"const n=process.argv[1];if(!n){console.error('Usage: yarn rerelease:beta <number>  (e.g. yarn rerelease:beta 1)');process.exit(1)}const e=require('child_process').execSync;e('yarn untag:beta '+n,{stdio:'inherit'});e('yarn release:beta '+n,{stdio:'inherit'})\""
   },
