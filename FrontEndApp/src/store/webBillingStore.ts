@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import {
     Purchases,
     PurchasesError,
@@ -16,6 +16,16 @@ export interface PlanOption {
     price: string;
     pkg: Package;
 }
+
+/** Outcome of trying to open subscription management. */
+export type ManageResult =
+    /** A web (Paddle) management page was opened in the browser. */
+    | { status: 'opened' }
+    /** The active subscription lives on another store (Play/App Store), which
+     *  has no web management URL — the caller should tell the user where to go. */
+    | { status: 'managed-elsewhere'; store: string }
+    /** Nothing to manage / couldn't read customer info. */
+    | { status: 'none' };
 
 /**
  * RevenueCat Web Billing (Paddle) purchasing for the desktop/web app.
@@ -37,6 +47,21 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
     const loading = ref(false);
     const purchasingId = ref<string | null>(null);
     const error = ref<string | null>(null);
+
+    /** The store backing the active entitlement ('play_store', 'app_store',
+     *  'rc_billing'/'paddle', 'test_store', …), or null if none / not yet read. */
+    const activeStore = ref<string | null>(null);
+
+    /** Stores whose subscriptions are billed through the web (Paddle) and can
+     *  therefore be managed here in the desktop/web app. Anything else (a mobile
+     *  store) must be managed on the device where it was purchased. */
+    const WEB_STORES = new Set(['rc_billing', 'paddle', 'stripe']);
+
+    /** True when the user has an active subscription that was purchased on a
+     *  mobile store, so the web app can't manage/upgrade it. */
+    const managedOnMobile = computed(
+        () => activeStore.value !== null && !WEB_STORES.has(activeStore.value),
+    );
 
     let configuredFor: string | null = null;
 
@@ -84,10 +109,31 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         }
     }
 
+    /** Whether the account already has any active entitlement (from ANY store —
+     *  RevenueCat merges mobile + web under the same app user id). */
+    async function hasActiveSubscription(): Promise<boolean> {
+        try {
+            const info = await Purchases.getSharedInstance().getCustomerInfo();
+            return Object.keys(info.entitlements.active ?? {}).length > 0;
+        } catch {
+            return false; // can't verify — don't hard-block
+        }
+    }
+
     /** Run the hosted checkout for a package, then refresh the verified tier. */
     async function purchase(plan: PlanOption): Promise<boolean> {
         if (!ensureConfigured()) return false;
         error.value = null;
+
+        // Prevent duplicate/stacked subscriptions: if the account already has an
+        // active entitlement (web OR mobile), don't create a second paid
+        // subscription. Direct the user to "Manage subscription" to change it.
+        if (await hasActiveSubscription()) {
+            error.value =
+                'You already have an active subscription. Use "Manage subscription" to change or cancel your plan.';
+            return false;
+        }
+
         purchasingId.value = plan.id;
         try {
             await Purchases.getSharedInstance().purchase({
@@ -96,6 +142,7 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
             });
             // The RevenueCat webhook updates our backend; pull the new tier.
             await authStore.getUser(true);
+            void refreshActiveStore();
             return true;
         } catch (e) {
             if (e instanceof PurchasesError && e.errorCode === ErrorCode.UserCancelledError) {
@@ -108,5 +155,65 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         }
     }
 
-    return { supported, plans, loading, purchasingId, error, loadPlans, purchase };
+    /** The store backing the currently active entitlement (e.g. 'play_store',
+     *  'app_store', 'paddle'/'rc_billing'), or null if none. */
+    function readActiveStore(info: {
+        entitlements: { active?: Record<string, { store?: string }> };
+    }): string | null {
+        const active = Object.values(info.entitlements.active ?? {});
+        return active.length ? (active[0].store ?? null) : null;
+    }
+
+    /** Pull CustomerInfo and cache which store the active subscription lives on,
+     *  so the UI can disable web-only management for mobile-bought plans. */
+    async function refreshActiveStore(): Promise<void> {
+        if (!ensureConfigured()) {
+            activeStore.value = null;
+            return;
+        }
+        try {
+            const info = await Purchases.getSharedInstance().getCustomerInfo();
+            activeStore.value = readActiveStore(info);
+        } catch {
+            // leave the last known value
+        }
+    }
+
+    /** Open the subscription management page so the user can cancel/upgrade.
+     *
+     *  Web Billing only exposes a `managementURL` for subscriptions purchased
+     *  through the web (Paddle). A subscription bought on mobile (Google Play /
+     *  App Store) has no web management URL — it must be managed on that store —
+     *  so we report it back as 'managed-elsewhere' instead of silently no-op'ing.
+     *  Uses the OS default browser (Electron shell.openExternal). */
+    async function manageSubscription(): Promise<ManageResult> {
+        if (!ensureConfigured()) return { status: 'none' };
+        try {
+            const info = await Purchases.getSharedInstance().getCustomerInfo();
+            const url = (info as { managementURL?: string | null }).managementURL;
+            if (url) {
+                void window.browserWindow.openExternal(url);
+                return { status: 'opened' };
+            }
+            const store = readActiveStore(info);
+            if (store) return { status: 'managed-elsewhere', store };
+            return { status: 'none' };
+        } catch {
+            return { status: 'none' };
+        }
+    }
+
+    return {
+        supported,
+        plans,
+        loading,
+        purchasingId,
+        error,
+        activeStore,
+        managedOnMobile,
+        loadPlans,
+        refreshActiveStore,
+        purchase,
+        manageSubscription,
+    };
 });

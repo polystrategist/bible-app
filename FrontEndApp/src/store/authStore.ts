@@ -21,6 +21,8 @@ export interface User {
     sync_enabled: boolean;
     /** Server-verified subscription tier (RevenueCat webhook source of truth). */
     tier?: 'free' | 'sync' | 'pro';
+    /** ISO-8601 renewal/expiry date of the active subscription, or null. */
+    subscription_renews_at?: string | null;
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
@@ -48,7 +50,9 @@ export const useAuthStore = defineStore('authStore', () => {
     // Server-verified subscription tier (authoritative; the backend also gates
     // every AI request). Drives entitlement gating in the AI views.
     const tier = computed<'free' | 'sync' | 'pro'>(() => user.value?.tier ?? 'free');
-    const isAiEnabled = computed(() => tier.value !== 'free');
+    // AI is Pro-only (Sync covers cross-device sync + backup + web access, but
+    // not AI). The backend also gates every AI request.
+    const isAiEnabled = computed(() => tier.value === 'pro');
 
     // Local avatar cache — base64 data URL of the last uploaded custom picture.
     // Keyed by the profile_picture value so it auto-invalidates if the picture changes.
@@ -144,7 +148,7 @@ export const useAuthStore = defineStore('authStore', () => {
                 user.value = response.data.user;
                 token.value = response.data.token;
                 isAuthenticated.value = true;
-                syncEnabled.value = response.data.user.sync_enabled === true;
+                // syncEnabled follows the subscription tier (see watch below).
 
                 localStorage.setItem('auth_token', response.data.token);
 
@@ -270,7 +274,7 @@ export const useAuthStore = defineStore('authStore', () => {
         }).then((response) => {
             if (response.data.status === 'success') {
                 user.value = response.data.user;
-                syncEnabled.value = response.data.user.sync_enabled === true;
+                // syncEnabled follows the subscription tier (see watch below).
                 return response.data.user as User;
             }
             return null;
@@ -415,9 +419,7 @@ export const useAuthStore = defineStore('authStore', () => {
         if (savedToken) {
             token.value = savedToken;
             isAuthenticated.value = true;
-            // Load sync preference from local IPC store so syncEnabled is correct
-            // even if the network is down and getUser() fails.
-            loadSyncEnabled();
+            // syncEnabled follows the subscription tier; getUser() loads the tier.
             getUser(true).then((u) => {
                 if (u) loadSettings();
             });
@@ -543,6 +545,13 @@ export const useAuthStore = defineStore('authStore', () => {
             }
         }
     }
+
+    // Sync is a paid feature: it follows the subscription tier (Sync/Pro), not a
+    // manual toggle or the backend `sync_enabled` column. The watch on
+    // `syncEnabled` then starts/stops the sync interval accordingly.
+    watch(tier, (t) => {
+        syncEnabled.value = t !== 'free';
+    }, { immediate: true });
 
     watch(syncEnabled, (enabled) => {
         if (enabled && isAuthenticated.value) {

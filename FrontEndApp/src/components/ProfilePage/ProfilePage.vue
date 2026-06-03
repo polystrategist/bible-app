@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSwitch, NSpin, useMessage } from 'naive-ui';
+import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useMessage } from 'naive-ui';
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
+import { useWebBillingStore, type PlanOption } from '../../store/webBillingStore';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
 import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
@@ -11,8 +12,177 @@ import { DEFAULT_PROFILE_NAMES, getDefaultProfileUrl, useAvatarUrl } from '../..
 
 const loading = ref(false);
 const authStore = useAuthStore();
+const webBilling = useWebBillingStore();
 const message = useMessage();
 const router = useRouter();
+
+// ─── Subscription card (mirrors the mobile SubscriptionCard) ─────────────────
+const plansModalOpen = ref(false);
+
+const tierLabel = computed(
+    () => ({ free: 'Free', sync: 'Sync', pro: 'Pro' })[authStore.tier],
+);
+const tierBlurb = computed(() => {
+    switch (authStore.tier) {
+        case 'pro':
+            return 'Full access to AI study tools, plus everything in Sync.';
+        case 'sync':
+            return 'Your study data syncs across devices. Upgrade to Pro for AI study tools.';
+        default:
+            return 'Unlock cross-device sync and AI-powered Bible study tools.';
+    }
+});
+
+// Live price from the current offering (never hard-coded, so a price change is
+// reflected automatically).
+const renewsLabel = computed(() => {
+    const iso = authStore.user?.subscription_renews_at;
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+});
+
+const syncPlan = computed(
+    () =>
+        webBilling.plans.find((p) => p.id === '$rc_monthly') ??
+        webBilling.plans.find(
+            (p) =>
+                p.title.toLowerCase().includes('sync') &&
+                !p.title.toLowerCase().includes('pro'),
+        ),
+);
+const proPlan = computed(
+    () =>
+        webBilling.plans.find((p) => p.id === 'pro_monthly') ??
+        webBilling.plans.find((p) => p.title.toLowerCase().includes('pro')),
+);
+
+// Live price from the current offering (never hard-coded, so a price change is
+// reflected automatically). Null until plans load.
+const subPrice = computed(() => {
+    const plan =
+        authStore.tier === 'pro'
+            ? proPlan.value
+            : authStore.tier === 'sync'
+              ? syncPlan.value
+              : undefined;
+    return plan ? `${plan.price}/month` : null;
+});
+
+// Plan comparison cards — show the user exactly what each tier includes.
+const planCards = computed(() => [
+    {
+        key: 'sync',
+        name: 'Sync',
+        tagline: 'Sync & back up your study',
+        plan: syncPlan.value,
+        highlight: false,
+        badge: '',
+        features: [
+            'Cross-device sync — notes, highlights, bookmarks & prayer lists',
+            'Cloud backup of your study data',
+            'Web app access',
+        ],
+    },
+    {
+        key: 'pro',
+        name: 'Pro',
+        tagline: 'Everything in Sync, plus AI study tools',
+        plan: proPlan.value,
+        highlight: true,
+        badge: 'Best for study & teaching',
+        features: [
+            'Everything in Sync',
+            'AI verse insights — contextual insight on any passage',
+            'AI Bible chat — Scripture-focused answers',
+            'Sermon outlines, drafts & devotionals',
+        ],
+    },
+]);
+
+async function buyPlan(plan: PlanOption) {
+    const ok = await webBilling.purchase(plan);
+    if (ok) {
+        plansModalOpen.value = false;
+        message.success('Subscription activated.');
+    }
+}
+
+async function viewPlans() {
+    plansModalOpen.value = true;
+    if (webBilling.plans.length === 0) await webBilling.loadPlans();
+}
+
+// Human-readable name + (optional) management deep link for a RevenueCat store.
+function storeInfo(store: string): { where: string; url?: string } {
+    switch (store) {
+        case 'play_store':
+            return {
+                where: 'Google Play (your Android device)',
+                url: 'https://play.google.com/store/account/subscriptions',
+            };
+        case 'app_store':
+        case 'mac_app_store':
+            return { where: 'the App Store (your iPhone, iPad, or Mac)' };
+        case 'amazon':
+            return { where: 'the Amazon Appstore' };
+        case 'test_store':
+            return { where: 'the mobile app (test purchase)' };
+        default:
+            return { where: 'the app where you subscribed' };
+    }
+}
+
+// "Manage subscription" — opens the web (Paddle) management page if the plan was
+// bought on the web; otherwise tells the user which store owns it.
+async function manageSubscription() {
+    const res = await webBilling.manageSubscription();
+    if (res.status === 'managed-elsewhere') {
+        const { where, url } = storeInfo(res.store);
+        message.info(`Your subscription was purchased through ${where}. Manage or cancel it there.`);
+        if (url) void window.browserWindow.openExternal(url);
+    } else if (res.status === 'none') {
+        message.error('Couldn’t open subscription management. Please try again.');
+    }
+}
+
+// "Upgrade to Pro" — a plan bought on mobile must be upgraded on that store
+// (upgrading via the web would create a second, stacked subscription and
+// double-charge). If the plan was bought on the web, the management page is the
+// place to switch.
+async function upgradeToPro() {
+    const res = await webBilling.manageSubscription();
+    if (res.status === 'managed-elsewhere') {
+        const { where, url } = storeInfo(res.store);
+        message.info(`Your subscription is billed through ${where}. Upgrade to Pro there to avoid being charged twice.`);
+        if (url) void window.browserWindow.openExternal(url);
+    } else if (res.status === 'none') {
+        message.error('Couldn’t open subscription management. Please try again.');
+    }
+}
+
+onMounted(() => {
+    // Preload plans so the live price shows for subscribers and "Upgrade to Pro"
+    // / the plan modal are instant.
+    if (webBilling.supported && authStore.user) {
+        void webBilling.loadPlans();
+        // Find out which store the active plan lives on, so we can disable
+        // web-only management when it was bought on mobile.
+        void webBilling.refreshActiveStore();
+    }
+});
+
+// A subscription bought on mobile (Google Play / App Store) can't be managed
+// or upgraded from the web app — it must be handled in the mobile app.
+const subscribedOnMobile = computed(() => webBilling.managedOnMobile);
+const mobileStoreLabel = computed(
+    () => storeInfo(webBilling.activeStore ?? '').where,
+);
 
 // ─── Name / Username / Email editing ─────────────────────────────────────────
 const profileName     = ref(authStore.user?.name ?? '');
@@ -149,10 +319,6 @@ async function logout() {
     router.push('/profile');
 }
 
-async function onSyncToggle(enabled: boolean) {
-    await authStore.setSyncEnabled(enabled);
-    message.success(enabled ? 'Sync enabled.' : 'Sync disabled.');
-}
 
 // Danger Zone
 const dangerZoneOpen = ref(false);
@@ -469,34 +635,116 @@ onBeforeUnmount(destroyCropper);
                 </NButton>
             </div>
 
-            <div class="sync-panel">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <div class="flex items-center gap-2 font-700 mb-1">
-                            <Icon icon="mdi:sync" />
-                            <span>Sync</span>
-                        </div>
-                        <p class="m-0 text-sm opacity-70">
-                            Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
-                        </p>
+            <div class="sub-card">
+                <!-- ── Subscription ───────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="lucide:sparkles" class="sub-head__icon" />
+                        <span class="sub-head__title">Subscription</span>
+                        <span class="plan-pill" :class="`tier-${authStore.tier}`">{{ tierLabel }}</span>
                     </div>
-                    <NSwitch
-                        :value="authStore.syncEnabled"
-                        @update:value="onSyncToggle"
-                    />
+                    <p class="sub-blurb">{{ tierBlurb }}</p>
+
+                    <div
+                        v-if="authStore.tier !== 'free' && (subPrice || renewsLabel)"
+                        class="sub-billing"
+                    >
+                        <Icon icon="lucide:credit-card" />
+                        <span>
+                            <template v-if="subPrice">{{ subPrice }}</template>
+                            <template v-if="subPrice && renewsLabel"> · </template>
+                            <template v-if="renewsLabel">Renews {{ renewsLabel }}</template>
+                        </span>
+                    </div>
+
+                    <!-- Free → open the plan comparison modal -->
+                    <template v-if="authStore.tier === 'free'">
+                        <NButton type="primary" block @click="viewPlans">
+                            <template #icon><Icon icon="lucide:sparkles" /></template>
+                            View plans
+                        </NButton>
+                    </template>
+
+                    <!-- Subscribed → upgrade (Sync only) + manage -->
+                    <template v-else>
+                        <NButton
+                            v-if="authStore.tier === 'sync'"
+                            type="primary"
+                            block
+                            class="mb-2"
+                            :disabled="subscribedOnMobile"
+                            @click="upgradeToPro"
+                        >
+                            <template #icon><Icon icon="lucide:arrow-up" /></template>
+                            Upgrade to Pro
+                        </NButton>
+                        <NButton
+                            block
+                            :disabled="subscribedOnMobile"
+                            @click="manageSubscription"
+                        >
+                            <template #icon><Icon icon="lucide:settings" /></template>
+                            Manage subscription
+                        </NButton>
+
+                        <!-- Plan bought on a mobile store → can't manage it here. -->
+                        <div v-if="subscribedOnMobile" class="manage-elsewhere-note">
+                            <Icon icon="mdi:cellphone-cog" />
+                            <span>
+                                You subscribed through {{ mobileStoreLabel }}. To
+                                upgrade, change, or cancel your plan, please manage it
+                                in the Believers Sword <strong>mobile app</strong>.
+                            </span>
+                        </div>
+                    </template>
                 </div>
-                <div class="sync-footer">
+
+                <div class="sub-divider" />
+
+                <!-- ── Sync ───────────────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="mdi:sync" class="sub-head__icon" />
+                        <span class="sub-head__title">Sync</span>
+                        <span class="onoff-chip" :class="authStore.syncEnabled ? 'is-on' : 'is-off'">
+                            <span class="onoff-dot" /> {{ authStore.syncEnabled ? 'On' : 'Off' }}
+                        </span>
+                    </div>
+                    <p class="sub-blurb">
+                        Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
+                    </p>
                     <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
                         <Icon icon="mdi:check-circle-outline" />
-                        <span>Sync is currently enabled for this account</span>
+                        <span>Sync is included in your subscription and stays on automatically</span>
+                    </div>
+                    <div v-else class="sync-free-notice">
+                        <Icon icon="mdi:lock-outline" />
+                        <span>Cross-device sync is part of the Sync and Pro plans.</span>
                     </div>
                 </div>
-                <div class="sync-free-notice">
-                    <Icon icon="mdi:information-outline" />
-                    <span>
-                        Sync is free while in preview. It may become a paid feature in the
-                        future — we'll let you know before that happens.
-                    </span>
+
+                <div class="sub-divider" />
+
+                <!-- ── AI Assistant ───────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="lucide:sparkles" class="sub-head__icon" />
+                        <span class="sub-head__title">AI Assistant</span>
+                        <span class="onoff-chip" :class="authStore.isAiEnabled ? 'is-on' : 'is-off'">
+                            <span class="onoff-dot" /> {{ authStore.isAiEnabled ? 'On' : 'Off' }}
+                        </span>
+                    </div>
+                    <p class="sub-blurb">
+                        Verse insights, sermon outlines, devotionals, and Bible chat.
+                    </p>
+                    <div v-if="authStore.isAiEnabled" class="sync-footer-item is-active">
+                        <Icon icon="mdi:check-circle-outline" />
+                        <span>Included with Pro — an AI allowance that refreshes every few hours</span>
+                    </div>
+                    <div v-else class="sync-free-notice">
+                        <Icon icon="mdi:lock-outline" />
+                        <span>The AI Assistant is part of the Pro plan.</span>
+                    </div>
                 </div>
             </div>
 
@@ -701,6 +949,57 @@ onBeforeUnmount(destroyCropper);
                         Crop &amp; Upload
                     </NButton>
                 </div>
+            </template>
+        </NModal>
+
+        <!-- Plan comparison modal -->
+        <NModal
+            v-model:show="plansModalOpen"
+            preset="card"
+            title="Choose your plan"
+            :bordered="false"
+            style="max-width: 720px; width: 92vw;"
+        >
+            <div v-if="webBilling.loading" class="sub-plan-loading">
+                <NSpin size="small" /> <span>Loading plans…</span>
+            </div>
+            <template v-else>
+                <div class="plans-grid">
+                    <div
+                        v-for="card in planCards"
+                        :key="card.key"
+                        class="plan-card"
+                        :class="{ 'is-highlight': card.highlight }"
+                    >
+                        <div v-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
+                        <div class="plan-card__name">{{ card.name }}</div>
+                        <div class="plan-card__price">
+                            <template v-if="card.plan">
+                                {{ card.plan.price }}<span class="plan-card__per">/month</span>
+                            </template>
+                            <template v-else>—</template>
+                        </div>
+                        <p class="plan-card__tagline">{{ card.tagline }}</p>
+                        <ul class="plan-card__features">
+                            <li v-for="f in card.features" :key="f">
+                                <Icon icon="lucide:check" /> <span>{{ f }}</span>
+                            </li>
+                        </ul>
+                        <NButton
+                            :type="card.highlight ? 'primary' : 'default'"
+                            block
+                            :disabled="!card.plan || webBilling.purchasingId !== null"
+                            :loading="!!card.plan && webBilling.purchasingId === card.plan.id"
+                            @click="card.plan && buyPlan(card.plan)"
+                        >
+                            Choose {{ card.name }}
+                        </NButton>
+                    </div>
+                </div>
+                <p v-if="!webBilling.supported" class="sub-hint">
+                    Subscribe in the Believers Sword mobile app — your plan works here automatically.
+                </p>
+                <p v-if="webBilling.error" class="sub-error">{{ webBilling.error }}</p>
             </template>
         </NModal>
     </div>
@@ -932,6 +1231,257 @@ body.dark .sync-footer-item.is-active {
 body.dark .sync-free-notice {
     color: #e6b45a;
     background: rgba(216, 162, 58, 0.14);
+}
+
+/* ── Subscription card (Subscription / Sync / AI Assistant) ─────────────── */
+.sub-card {
+    border-radius: 18px;
+    background: rgba(67, 97, 176, 0.10);
+    border: 1px solid rgba(107, 145, 255, 0.20);
+    overflow: hidden;
+}
+
+.sub-section {
+    padding: 18px;
+}
+
+.sub-divider {
+    height: 1px;
+    background: rgba(107, 145, 255, 0.16);
+}
+
+.sub-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sub-head__icon {
+    font-size: 18px;
+    color: #d8a23a;
+}
+
+.sub-head__title {
+    font-weight: 800;
+}
+
+.sub-blurb {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: 0.75;
+}
+
+.sub-billing {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: -6px 0 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.sub-billing .iconify {
+    font-size: 15px;
+    opacity: 0.7;
+}
+
+.manage-elsewhere-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(216, 162, 58, 0.1);
+    border: 1px solid rgba(216, 162, 58, 0.35);
+    font-size: 12px;
+    line-height: 1.4;
+    color: #8a6314;
+}
+
+.manage-elsewhere-note .iconify {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 15px;
+}
+
+body.dark .manage-elsewhere-note {
+    color: #e6b45a;
+    background: rgba(216, 162, 58, 0.14);
+}
+
+.plan-pill {
+    margin-left: auto;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.plan-pill.tier-free {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.14);
+    border-color: rgba(148, 163, 184, 0.30);
+}
+
+.plan-pill.tier-sync {
+    color: #2e8b68;
+    background: rgba(46, 139, 104, 0.16);
+    border-color: rgba(46, 139, 104, 0.30);
+}
+
+.plan-pill.tier-pro {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.16);
+    border-color: rgba(139, 92, 246, 0.30);
+}
+
+.onoff-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.onoff-chip .onoff-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.onoff-chip.is-on {
+    color: #2e8b68;
+    background: rgba(46, 139, 104, 0.16);
+    border-color: rgba(46, 139, 104, 0.30);
+}
+
+.onoff-chip.is-off {
+    color: #b45353;
+    background: rgba(180, 83, 83, 0.16);
+    border-color: rgba(180, 83, 83, 0.30);
+}
+
+.sub-plan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sub-plan-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.sub-hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.sub-error {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #f87171;
+}
+
+/* ── Plan comparison modal ─────────────────────────────────────────────── */
+.plans-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 560px) {
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.plan-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--theme-border, rgba(120, 130, 160, 0.3));
+    background: var(--theme-bg-soft, rgba(120, 130, 160, 0.06));
+}
+
+.plan-card.is-highlight {
+    border-color: rgba(216, 162, 58, 0.55);
+    background: rgba(216, 162, 58, 0.08);
+}
+
+.plan-card__badge {
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: #d8a23a;
+}
+
+.plan-card__name {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.plan-card__price {
+    margin-top: 4px;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.plan-card__per {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+.plan-card__tagline {
+    margin: 4px 0 12px;
+    font-size: 12.5px;
+    opacity: 0.7;
+}
+
+.plan-card__features {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    flex: 1;
+}
+
+.plan-card__features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.plan-card__features li .iconify {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 15px;
+    color: #2e8b68;
 }
 
 .danger-zone {

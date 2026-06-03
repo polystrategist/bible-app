@@ -126,7 +126,7 @@ function isUser(m: AiChatMessage) {
             <h2>AI Bible Study Assistant</h2>
             <p>
                 Generate verse insights, sermon outlines, devotionals, and chat with an
-                assistant. Available on Believers Sword Sync and Pro.
+                assistant. Available with Believers Sword Pro.
             </p>
             <!-- Web purchasing enabled (RevenueCat Web Billing / Paddle) -->
             <template v-if="webBilling.supported">
