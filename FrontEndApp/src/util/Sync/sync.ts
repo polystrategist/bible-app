@@ -175,7 +175,9 @@ export async function runPushSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {
@@ -211,7 +213,9 @@ export async function runPullSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {
@@ -252,7 +256,9 @@ export async function runSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {

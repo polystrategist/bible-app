@@ -209,7 +209,7 @@ Sync runs via `/api/sync` (POST push) and `/api/sync/pull` (GET pull) against th
 ### Frontend State
 
 - **Pinia stores** in `FrontEndApp/src/store/` — one store per feature (BibleStore, bookmark, ClipNotes, useNoteStore, SpaceStudyStore, settingStore, theme, authStore, etc.)
-- **Vue Router** uses hash history (Electron) or web history (web build), configured in `FrontEndApp/src/router/router.ts`
+- **Vue Router** uses hash history (Electron) or web history (web build), configured in `FrontEndApp/src/router/router.ts`. The `beforeEach` guard gates the **web build only** (`!window.isElectron`): unauthenticated → `/login`; authenticated but Free/lapsed → `/subscription-required` (`WebSubscriptionGate.vue`), since web access is a paid Sync/Pro feature. Entitlement uses `authStore.isSyncEntitled` (`tier !== 'free'`); the guard calls `authStore.ensureSession()` first because it can run before `App.vue`'s `initAuth` on a hard reload. The backend also enforces this (`subscribed` middleware on `user-data.php`).
 - **App settings** (window bounds, preferences) are persisted via `electron-store` in `Electron/ElectronStore/Configuration.ts`
 
 ### Build Variants

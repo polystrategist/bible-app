@@ -54,6 +54,11 @@ export const useAuthStore = defineStore('authStore', () => {
     // not AI). The backend also gates every AI request.
     const isAiEnabled = computed(() => tier.value === 'pro');
 
+    // Sync is a paid feature (the Sync **or** Pro tier). Every sync execution
+    // path gates on this so sync never runs for a Free account, even if a stale
+    // `sync_enabled` preference is loaded before the tier resolves at startup.
+    const isSyncEntitled = computed(() => tier.value !== 'free');
+
     // Local avatar cache — base64 data URL of the last uploaded custom picture.
     // Keyed by the profile_picture value so it auto-invalidates if the picture changes.
     const localAvatarKey  = ref<string | null>(localStorage.getItem('profile_avatar_key'));
@@ -295,6 +300,25 @@ export const useAuthStore = defineStore('authStore', () => {
         });
 
         return getUserPromise;
+    }
+
+    /**
+     * Idempotently restore the session and load the user. Safe to call from the
+     * router guard, which can run before App.vue's initAuth on a hard reload —
+     * so it hydrates the persisted token into the store before fetching the
+     * user. Returns the user (or null when signed out / token rejected).
+     */
+    async function ensureSession(): Promise<User | null> {
+        if (!token.value) {
+            const saved = localStorage.getItem('auth_token');
+            if (saved) {
+                token.value = saved;
+                isAuthenticated.value = true;
+            }
+        }
+        if (!token.value) return null;
+        if (user.value) return user.value;
+        return getUser();
     }
 
     // Guard against concurrent flush calls (e.g. focus + online firing together)
@@ -756,6 +780,7 @@ export const useAuthStore = defineStore('authStore', () => {
         token,
         tier,
         isAiEnabled,
+        isSyncEntitled,
         isAuthenticated,
         syncEnabled,
         lastSyncAt,
@@ -768,6 +793,7 @@ export const useAuthStore = defineStore('authStore', () => {
         logout,
         deleteAccount,
         getUser,
+        ensureSession,
         initAuth,
         loadSyncEnabled,
         setSyncEnabled,
