@@ -958,6 +958,7 @@ onBeforeUnmount(destroyCropper);
             preset="card"
             title="Choose your plan"
             :bordered="false"
+            :auto-focus="false"
             style="max-width: 720px; width: 92vw;"
         >
             <div v-if="webBilling.loading" class="sub-plan-loading">

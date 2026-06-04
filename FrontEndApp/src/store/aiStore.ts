@@ -82,8 +82,8 @@ export const useAiStore = defineStore('aiStore', () => {
         return e instanceof AiError ? e : new AiError('unknown', 'Something went wrong.');
     }
 
-    const verseInsight = (reference: string, verseText: string) =>
-        post('verse-insight', { reference, verse_text: verseText });
+    const verseInsight = (reference: string, verseText: string, bibleVersion?: string) =>
+        post('verse-insight', { reference, verse_text: verseText, bible_version: bibleVersion });
     const sermonOutline = (topicOrPassage: string) =>
         post('sermon-outline', { topic_or_passage: topicOrPassage });
     const fullSermon = (topicOrPassage: string) =>

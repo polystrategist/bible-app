@@ -50,9 +50,14 @@ async function runAiInsight() {
 
     aiLoading.value = true;
     try {
+        const bibleVersion =
+            typeof d.bibleVersion === 'string'
+                ? d.bibleVersion.replace(/\.SQLite3$/i, '')
+                : undefined;
         const res = await aiStore.verseInsight(
             aiReference.value,
             stripVerseMarkup(d.text),
+            bibleVersion,
         );
         aiResult.value = res.text;
     } catch (e) {
