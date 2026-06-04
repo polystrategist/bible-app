@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { NTabs, NTabPane, NInput, NButton, NSpin } from 'naive-ui';
+import { NTabs, NTabPane, NInput, NButton, NSpin, useMessage } from 'naive-ui';
 import { Icon } from '@iconify/vue';
-import { ref, h, onMounted, defineComponent, type PropType } from 'vue';
+import { ref, computed, h, onMounted, defineComponent, type PropType } from 'vue';
 import { useAiStore, AiError, AiChatMessage } from '../../store/aiStore';
 import { useAuthStore } from '../../store/authStore';
-import { useWebBillingStore, type PlanOption } from '../../store/webBillingStore';
+import { useWebBillingStore } from '../../store/webBillingStore';
 
 // Inline result/error renderer shared by the single-shot tabs. Defined as a
 // local component so it can be used directly in the template below.
@@ -40,16 +40,83 @@ const AiResult = defineComponent({
 const ai = useAiStore();
 const authStore = useAuthStore();
 const webBilling = useWebBillingStore();
+const message = useMessage();
 
 // Free users: load the web purchase plans (if web billing is configured).
+// Existing subscribers (Sync): also find which store backs their plan, so the
+// "Upgrade to Pro" path can open web management or steer them to the right store.
 onMounted(() => {
     if (!authStore.isAiEnabled && webBilling.supported) {
         webBilling.loadPlans();
+        if (authStore.tier !== 'free') void webBilling.refreshActiveStore();
     }
 });
 
-async function buy(plan: PlanOption) {
-    await webBilling.purchase(plan);
+// The paywall is shown to non-Pro accounts (Free and Sync). A Sync subscriber
+// already pays — they should *upgrade*, not buy a second, stacked subscription.
+const isSubscriber = computed(() => authStore.tier !== 'free');
+
+// AI is a Pro-only feature, so the paywall offers Pro alone (Sync doesn't
+// include AI). Mirror ProfilePage's lookup: prefer the known id, else match
+// by title.
+const proPlan = computed(
+    () =>
+        webBilling.plans.find((p) => p.id === 'pro_monthly') ??
+        webBilling.plans.find((p) => p.title.toLowerCase().includes('pro')),
+);
+
+const proFeatures = [
+    'AI verse insights — contextual insight on any passage',
+    'AI Bible chat — Scripture-focused answers',
+    'Sermon outlines, drafts & devotionals',
+    'Everything in Sync — cross-device sync, backup & web access',
+];
+
+// Human-readable name for the store backing a subscription bought on mobile.
+function storeLabel(store: string): string {
+    switch (store) {
+        case 'play_store':
+            return 'Google Play (your Android device)';
+        case 'app_store':
+        case 'mac_app_store':
+            return 'the App Store (your iPhone, iPad, or Mac)';
+        case 'amazon':
+            return 'the Amazon Appstore';
+        case 'test_store':
+            return 'the mobile app (test purchase)';
+        default:
+            return 'the app where you subscribed';
+    }
+}
+
+// Free → buy Pro directly. Sync subscriber → upgrade the existing subscription
+// in place (backend drives the Paddle plan change, prorated). A plan bought on
+// a mobile store can't be changed from here, so we steer the user to that store.
+async function choosePro() {
+    const plan = proPlan.value;
+    if (!plan) return;
+
+    if (!isSubscriber.value) {
+        await webBilling.purchase(plan);
+        return;
+    }
+
+    const res = await webBilling.upgradeToPro();
+    if (res.status === 'upgraded') {
+        // tier flips reactively → the paywall is replaced by the AI tabs. If the
+        // webhook is still in flight, let the user know it'll activate shortly.
+        if (authStore.isAiEnabled) {
+            message.success('You’re now on Pro — enjoy the AI assistant!');
+        } else {
+            message.info('Upgrade received — your Pro access will activate shortly.');
+        }
+    } else if (res.status === 'managed-elsewhere') {
+        message.info(
+            `Your subscription is billed through ${storeLabel(res.store ?? '')}. Upgrade to Pro there to avoid being charged twice.`,
+        );
+    } else {
+        message.error(webBilling.error ?? 'Couldn’t upgrade. Please try again.');
+    }
 }
 
 // --- Single-shot feature state (insight / sermon / devotional) ---
@@ -126,7 +193,9 @@ function isUser(m: AiChatMessage) {
             <h2>AI Bible Study Assistant</h2>
             <p>
                 Generate verse insights, sermon outlines, devotionals, and chat with an
-                assistant. Available with Believers Sword Pro.
+                assistant.
+                <template v-if="isSubscriber">You’re on Sync — upgrade to Pro to unlock it.</template>
+                <template v-else>Available with Believers Sword Pro.</template>
             </p>
             <!-- Web purchasing enabled (RevenueCat Web Billing / Paddle) -->
             <template v-if="webBilling.supported">
@@ -134,19 +203,30 @@ function isUser(m: AiChatMessage) {
                     <NSpin size="small" /> <span>Loading plans…</span>
                 </div>
                 <div v-else class="ai-plan-list">
-                    <NButton
-                        v-for="plan in webBilling.plans"
-                        :key="plan.id"
-                        type="primary"
-                        size="large"
-                        block
-                        :loading="webBilling.purchasingId === plan.id"
-                        :disabled="webBilling.purchasingId !== null"
-                        @click="buy(plan)"
-                    >
-                        {{ plan.title }} — {{ plan.price }}
-                    </NButton>
-                    <p v-if="webBilling.plans.length === 0" class="ai-paywall__hint">
+                    <!-- AI is Pro-only → offer Pro as a single plan card -->
+                    <div v-if="proPlan" class="plan-card is-highlight">
+                        <div class="plan-card__badge">Best for study &amp; teaching</div>
+                        <div class="plan-card__name">Pro</div>
+                        <div class="plan-card__price">
+                            {{ proPlan.price }}<span class="plan-card__per">/month</span>
+                        </div>
+                        <p class="plan-card__tagline">Everything in Sync, plus AI study tools</p>
+                        <ul class="plan-card__features">
+                            <li v-for="f in proFeatures" :key="f">
+                                <Icon icon="lucide:check" /> <span>{{ f }}</span>
+                            </li>
+                        </ul>
+                        <NButton
+                            type="primary"
+                            block
+                            :loading="webBilling.purchasingId !== null"
+                            :disabled="webBilling.purchasingId !== null"
+                            @click="choosePro"
+                        >
+                            {{ isSubscriber ? 'Upgrade to Pro' : 'Choose Pro' }}
+                        </NButton>
+                    </div>
+                    <p v-else class="ai-paywall__hint">
                         Plans aren't available yet. Please check back soon.
                     </p>
                     <p v-if="webBilling.error" class="ai-plan-error">{{ webBilling.error }}</p>
@@ -247,6 +327,49 @@ function isUser(m: AiChatMessage) {
 .ai-plan-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
 .ai-plan-loading { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; opacity: 0.75; }
 .ai-plan-error { color: #b45353; font-size: 13px; margin-top: 8px; }
+
+/* Pro plan card (paywall) */
+.plan-card {
+    position: relative;
+    border: 1px solid rgba(127, 127, 127, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+.plan-card.is-highlight { border-color: #d8a23a; }
+.plan-card__badge {
+    position: absolute;
+    top: -11px;
+    left: 16px;
+    background: #d8a23a;
+    color: #1a1a1a;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+}
+.plan-card__name { font-size: 18px; font-weight: 700; }
+.plan-card__price { font-size: 26px; font-weight: 700; margin-top: 4px; }
+.plan-card__per { font-size: 13px; font-weight: 400; opacity: 0.6; }
+.plan-card__tagline { margin: 4px 0 12px; font-size: 13px; opacity: 0.75; }
+.plan-card__features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.plan-card__features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+}
+.plan-card__features li svg { margin-top: 2px; color: #2e8b68; flex-shrink: 0; }
 .ai-chat { display: flex; flex-direction: column; height: 60vh; }
 .ai-chat__log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 12px 0; }
 .ai-chat__empty { text-align: center; opacity: 0.6; margin: auto; }

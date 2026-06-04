@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import axios from 'axios';
 import {
     Purchases,
     PurchasesError,
@@ -9,6 +10,16 @@ import {
 import { useAuthStore } from './authStore';
 
 const WEB_KEY = import.meta.env.VITE_REVENUECAT_WEB_KEY as string | undefined;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
+
+/** Outcome of an in-app Sync → Pro upgrade. */
+export type UpgradeResult =
+    /** Upgrade applied; tier is now (or will shortly be) Pro. */
+    | { status: 'upgraded' }
+    /** Plan lives on a mobile store and must be upgraded there. */
+    | { status: 'managed-elsewhere'; store: string | null }
+    /** Couldn't upgrade (API/config error) — `error` holds a user message. */
+    | { status: 'error' };
 
 export interface PlanOption {
     id: string;
@@ -203,6 +214,48 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         }
     }
 
+    /**
+     * Upgrade an existing web (Paddle) Sync subscription to Pro in place.
+     *
+     * RevenueCat can't drive Paddle plan changes, so the backend calls the
+     * Paddle API directly (prorated immediately). The tier then flips when
+     * RevenueCat's PRODUCT_CHANGE webhook lands — so we poll the user a few
+     * times after the request to pick up the new tier without a restart.
+     */
+    async function upgradeToPro(): Promise<UpgradeResult> {
+        error.value = null;
+        const token = authStore.token;
+        if (!token) return { status: 'error' };
+
+        purchasingId.value = 'upgrade';
+        try {
+            await axios.post(
+                `${API_BASE_URL}/subscription/upgrade-to-pro`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e) && e.response?.status === 409) {
+                return { status: 'managed-elsewhere', store: e.response.data?.store ?? null };
+            }
+            error.value = axios.isAxiosError(e)
+                ? (e.response?.data?.message ?? 'Upgrade failed. Please try again.')
+                : 'Upgrade failed. Please try again.';
+            return { status: 'error' };
+        } finally {
+            purchasingId.value = null;
+        }
+
+        // Pull the new tier (webhook → backend). Poll briefly; it's usually
+        // quick. (Cast avoids TS narrowing the reactive getter to a constant.)
+        for (let i = 0; i < 5; i++) {
+            await authStore.getUser(true);
+            if ((authStore.tier as string) === 'pro') break;
+            await new Promise((r) => setTimeout(r, 2000));
+        }
+        return { status: 'upgraded' };
+    }
+
     return {
         supported,
         plans,
@@ -215,5 +268,6 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         refreshActiveStore,
         purchase,
         manageSubscription,
+        upgradeToPro,
     };
 });
