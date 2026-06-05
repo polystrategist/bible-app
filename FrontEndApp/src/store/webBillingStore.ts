@@ -21,6 +21,20 @@ export type UpgradeResult =
     /** Couldn't upgrade (API/config error) — `error` holds a user message. */
     | { status: 'error' };
 
+/** Preview of an upgrade's immediate charge, for the confirm dialog. */
+export type PreviewResult =
+    /** `amount` is in the currency's smallest unit (e.g. "390" = $3.90). */
+    | { status: 'ok'; amount: string; currency: string; nextBilledAt: string | null }
+    | { status: 'managed-elsewhere'; store: string | null }
+    | { status: 'error' };
+
+/** Outcome of scheduling a Pro → Sync downgrade. */
+export type DowngradeResult =
+    /** Scheduled for period end; `effectiveAt` is when Sync takes over. */
+    | { status: 'scheduled'; effectiveAt: string | null }
+    | { status: 'managed-elsewhere'; store: string | null }
+    | { status: 'error' };
+
 export interface PlanOption {
     id: string;
     title: string;
@@ -256,6 +270,102 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         return { status: 'upgraded' };
     }
 
+    /**
+     * Preview the immediate prorated charge of upgrading to Pro, so the caller
+     * can confirm the exact amount before billing. No charge is made.
+     */
+    async function previewUpgradeToPro(): Promise<PreviewResult> {
+        error.value = null;
+        const token = authStore.token;
+        if (!token) return { status: 'error' };
+
+        purchasingId.value = 'preview';
+        try {
+            const res = await axios.post(
+                `${API_BASE_URL}/subscription/preview`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+            return {
+                status: 'ok',
+                amount: String(res.data?.amount ?? '0'),
+                currency: res.data?.currency ?? 'USD',
+                nextBilledAt: res.data?.next_billed_at ?? null,
+            };
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e) && e.response?.status === 409) {
+                return { status: 'managed-elsewhere', store: e.response.data?.store ?? null };
+            }
+            error.value = axios.isAxiosError(e)
+                ? (e.response?.data?.message ?? 'Couldn’t preview the upgrade. Please try again.')
+                : 'Couldn’t preview the upgrade. Please try again.';
+            return { status: 'error' };
+        } finally {
+            purchasingId.value = null;
+        }
+    }
+
+    /**
+     * Schedule a Pro → Sync downgrade for the end of the current billing period.
+     * The user keeps Pro until then — no charge or refund now. Polls the user so
+     * the pending-downgrade banner appears without a restart.
+     */
+    async function downgradeToSync(): Promise<DowngradeResult> {
+        error.value = null;
+        const token = authStore.token;
+        if (!token) return { status: 'error' };
+
+        purchasingId.value = 'downgrade';
+        let effectiveAt: string | null = null;
+        try {
+            const res = await axios.post(
+                `${API_BASE_URL}/subscription/downgrade-to-sync`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+            effectiveAt = res.data?.effective_at ?? null;
+        } catch (e: unknown) {
+            if (axios.isAxiosError(e) && e.response?.status === 409) {
+                return { status: 'managed-elsewhere', store: e.response.data?.store ?? null };
+            }
+            error.value = axios.isAxiosError(e)
+                ? (e.response?.data?.message ?? 'Downgrade failed. Please try again.')
+                : 'Downgrade failed. Please try again.';
+            return { status: 'error' };
+        } finally {
+            purchasingId.value = null;
+        }
+
+        // Refresh so the scheduled-change state (subscription_pending_change_at)
+        // is reflected in the UI.
+        await authStore.getUser(true);
+        return { status: 'scheduled', effectiveAt };
+    }
+
+    /** Cancel a scheduled downgrade — the subscription stays on its current plan. */
+    async function cancelDowngrade(): Promise<boolean> {
+        error.value = null;
+        const token = authStore.token;
+        if (!token) return false;
+
+        purchasingId.value = 'cancel-downgrade';
+        try {
+            await axios.post(
+                `${API_BASE_URL}/subscription/cancel-downgrade`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+        } catch {
+            error.value = 'Couldn’t cancel the scheduled change. Please try again.';
+            return false;
+        } finally {
+            purchasingId.value = null;
+        }
+
+        await authStore.getUser(true);
+        return true;
+    }
+
     return {
         supported,
         plans,
@@ -269,5 +379,8 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         purchase,
         manageSubscription,
         upgradeToPro,
+        previewUpgradeToPro,
+        downgradeToSync,
+        cancelDowngrade,
     };
 });

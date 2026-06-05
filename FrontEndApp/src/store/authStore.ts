@@ -23,6 +23,9 @@ export interface User {
     tier?: 'free' | 'sync' | 'pro';
     /** ISO-8601 renewal/expiry date of the active subscription, or null. */
     subscription_renews_at?: string | null;
+    /** ISO-8601 date a scheduled plan change (e.g. Pro → Sync downgrade) takes
+     *  effect, or null when none is pending. */
+    subscription_pending_change_at?: string | null;
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
