@@ -78,6 +78,25 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             iconColor: 'var(--theme-text-soft)',
             iconColorDisabled: 'color-mix(in srgb, var(--theme-text-soft) 55%, transparent)',
         },
+        // Dropdown menu popup (NDropdown — mode selector, conversation row menu)
+        Dropdown: {
+            color: 'var(--theme-bg-elevated)',
+            optionTextColor: 'var(--theme-text)',
+            optionTextColorHover: 'var(--theme-text)',
+            optionTextColorActive: 'var(--primary-color)',
+            optionColorHover: 'var(--theme-bg-soft)',
+            optionColorActive: 'var(--theme-bg-soft)',
+            prefixColor: 'var(--theme-text-soft)',
+            suffixColor: 'var(--theme-text-soft)',
+            dividerColor: 'var(--theme-border)',
+            groupHeaderTextColor: 'var(--theme-text-soft)',
+        },
+        // Popover panel (NPopover — AI Assistant settings, help/theme menus)
+        Popover: {
+            color: 'var(--theme-bg-elevated)',
+            textColor: 'var(--theme-text)',
+            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--theme-border)',
+        },
     });
 
     function resolveSelectedTheme(value: unknown): typeNameInterface {

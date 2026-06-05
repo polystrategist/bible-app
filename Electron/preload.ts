@@ -110,6 +110,12 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Daily Believers — link metadata extraction (CORS bypass via main process)
     dailyBelieversExtractMetadata: (url: string) => ipcRenderer.invoke('dailyBelievers:extractMetadata', url),
 
+    // AI Assistant conversation history
+    getAiConversations: () => ipcRenderer.invoke('getAiConversations'),
+    getAiConversation: (id: string) => ipcRenderer.invoke('getAiConversation', id),
+    saveAiConversation: (payload: any) => ipcRenderer.invoke('saveAiConversation', payload),
+    deleteAiConversation: (id: string) => ipcRenderer.invoke('deleteAiConversation', id),
+
     // Commentaries
     getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
     hasCommentary: (version: string) => ipcRenderer.invoke('hasCommentary', version),

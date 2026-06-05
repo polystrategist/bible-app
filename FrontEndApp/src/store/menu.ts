@@ -166,6 +166,10 @@ export const useMenuStore = defineStore('useMenuStore', () => {
                 savedLocalTabsKey.push('/daily-believers');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
             }
+            if (!savedLocalTabsKey.includes('/ai-assistant')) {
+                savedLocalTabsKey.push('/ai-assistant');
+                session.set(localSavedTabsKey, savedLocalTabsKey);
+            }
 
             enableTab.value = session.get(localSavedTabsKey);
         }

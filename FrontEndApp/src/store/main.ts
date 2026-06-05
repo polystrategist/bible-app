@@ -8,6 +8,10 @@ export const useMainStore = defineStore('useMainStore', () => {
     const showSettings = ref(false);
     const settingsTab = ref('General');
     const showDonateModal = ref(false);
+    // Set true to ask the Profile page to open the subscription manager (manage
+    // modal for subscribers, plan picker for Free) once it's shown. The page
+    // watches this and resets it.
+    const openSubscriptionRequested = ref(false);
 
     async function getVersions() {
         const versions: {
@@ -38,5 +42,6 @@ export const useMainStore = defineStore('useMainStore', () => {
         appName,
         version,
         showDonateModal,
+        openSubscriptionRequested,
     };
 });

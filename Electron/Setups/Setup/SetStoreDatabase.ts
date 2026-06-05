@@ -6,6 +6,7 @@ import notesMigration from './StoreDB/notes.migration';
 import syncLogsMigration from './StoreDB/sync_logs.migration';
 import cachedSermonsMigration from './StoreDB/cached_sermons.migration';
 import sermonFavoritesMigration from './StoreDB/sermon_favorites.migration';
+import aiConversationsMigration from './StoreDB/ai_conversations.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -31,6 +32,9 @@ export default async () => {
         // setup sermons offline cache + favorites
         await cachedSermonsMigration();
         await sermonFavoritesMigration();
+
+        // setup AI Assistant conversation history
+        await aiConversationsMigration();
     } catch (e) {
         try {
             Log.error(e);

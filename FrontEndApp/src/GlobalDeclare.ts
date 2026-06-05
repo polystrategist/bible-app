@@ -198,6 +198,7 @@ declare global {
                 prayer_lists?: any[];
                 notes?: any[];
                 sermon_favorites?: any[];
+                ai_conversations?: any[];
                 settings?: any;
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
@@ -260,6 +261,35 @@ declare global {
                 go_action: string;
                 verses: string[];
             } | null>;
+
+            // AI Assistant conversation history
+            getAiConversations: () => Promise<Array<{
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            }>>;
+            getAiConversation: (id: string) => Promise<{
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            } | null>;
+            saveAiConversation: (payload: {
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at?: string;
+            }) => Promise<{
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            } | null>;
+            deleteAiConversation: (id: string) => Promise<boolean>;
 
             // Daily Believers — extract OG/oEmbed metadata for a shared link
             dailyBelieversExtractMetadata: (url: string) => Promise<{

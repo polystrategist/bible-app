@@ -289,6 +289,19 @@ const stub: Window['browserWindow'] = {
     onSyncBeforeQuit: () => { /* no-op */ },
     notifySyncBeforeQuitDone: () => { /* no-op */ },
 
+    // ---------- AI Assistant conversation history (backend; paid feature) ----------
+    getAiConversations: async () => apiFetch('/ai-conversations', [] as any[]),
+    getAiConversation: async (id: string) =>
+        apiFetch(`/ai-conversations/${encodeURIComponent(id)}`, null),
+    saveAiConversation: async (payload) =>
+        apiFetch('/ai-conversations', null, { method: 'POST', body: JSON.stringify(payload) }),
+    deleteAiConversation: async (id: string) => {
+        const res = await apiFetch<boolean | null>(
+            `/ai-conversations/${encodeURIComponent(id)}`, null, { method: 'DELETE' },
+        );
+        return res === true;
+    },
+
     // ---------- Sermons offline cache + favorites (no-op on web — backend is source of truth) ----------
     replaceCachedSermons: async () => ({ success: false, error: 'Not available on web' }),
     getCachedSermons: async () => [],

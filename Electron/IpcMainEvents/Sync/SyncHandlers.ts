@@ -127,6 +127,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
         prayer_lists?: any[];
         notes?: any[];
         sermon_favorites?: any[];
+        ai_conversations?: any[];
     }) => {
         const now = new Date().toISOString();
 
@@ -159,6 +160,9 @@ export const SyncHandlers = (win: BrowserWindow) => {
                         }
                         break;
                     }
+                    case 'ai_conversations':
+                        await StoreDB('ai_conversations').where({ id: key }).delete();
+                        break;
                 }
             }
 
@@ -257,6 +261,28 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     created_at: now,
                     updated_at: now,
                 });
+            }
+
+            // 7. AI conversations — keyed by the client conversation id. The
+            //    server stores messages as a JSON string in `messages`; keep it
+            //    verbatim so the renderer can parse it the same way it saved it.
+            for (const conv of pullData.ai_conversations ?? []) {
+                const id: string | undefined = conv?.conversation_id ?? conv?.id;
+                if (!id) continue;
+                const messages = typeof conv.messages === 'string'
+                    ? conv.messages
+                    : JSON.stringify(conv.messages ?? []);
+                const title = conv.title ?? 'New chat';
+                const existing = await StoreDB('ai_conversations').where({ id }).first();
+                if (existing) {
+                    await StoreDB('ai_conversations').where({ id })
+                        .update({ title, messages, deleted: 0, updated_at: now });
+                } else {
+                    await StoreDB('ai_conversations').insert({
+                        id, title, messages, deleted: 0,
+                        created_at: now, updated_at: now,
+                    });
+                }
             }
 
             return { success: true };

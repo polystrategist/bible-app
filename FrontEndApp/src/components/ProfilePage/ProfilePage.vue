@@ -2,6 +2,7 @@
 import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useDialog, useMessage } from 'naive-ui';
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
+import { useMainStore } from '../../store/main';
 import { useWebBillingStore, type PlanOption } from '../../store/webBillingStore';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
@@ -12,6 +13,7 @@ import { DEFAULT_PROFILE_NAMES, getDefaultProfileUrl, useAvatarUrl } from '../..
 
 const loading = ref(false);
 const authStore = useAuthStore();
+const mainStore = useMainStore();
 const webBilling = useWebBillingStore();
 const message = useMessage();
 const dialog = useDialog();
@@ -254,6 +256,20 @@ const pendingDowngradeAt = computed(() => {
     if (Number.isNaN(d.getTime())) return null;
     return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 });
+
+// Open the subscription manager when the dropdown's "Manage subscription" asks
+// for it (subscribers → manage modal; Free → plan picker). `immediate` covers
+// the case where this page mounts after the flag was set during navigation.
+watch(
+    () => mainStore.openSubscriptionRequested,
+    (requested) => {
+        if (!requested) return;
+        mainStore.openSubscriptionRequested = false;
+        if (authStore.tier === 'free') void viewPlans();
+        else void openManage();
+    },
+    { immediate: true },
+);
 
 onMounted(() => {
     // Preload plans so the live price shows for subscribers and "Upgrade to Pro"
@@ -764,7 +780,10 @@ onBeforeUnmount(destroyCropper);
                             class="mb-2 pending-downgrade"
                         >
                             Switching to Sync on {{ pendingDowngradeAt }}.
-                            <NButton text type="primary" size="small" @click="keepPro">Keep Pro</NButton>
+                            <NButton size="small" type="primary" secondary round @click="keepPro">
+                        <template #icon><Icon icon="lucide:undo-2" /></template>
+                        Keep Pro
+                    </NButton>
                         </NAlert>
 
                         <NButton
@@ -1125,7 +1144,10 @@ onBeforeUnmount(destroyCropper);
                     class="mb-3 pending-downgrade"
                 >
                     Switching to Sync on {{ pendingDowngradeAt }}.
-                    <NButton text type="primary" size="small" @click="keepPro">Keep Pro</NButton>
+                    <NButton size="small" type="primary" secondary round @click="keepPro">
+                        <template #icon><Icon icon="lucide:undo-2" /></template>
+                        Keep Pro
+                    </NButton>
                 </NAlert>
 
                 <div class="plans-grid">

@@ -49,10 +49,6 @@ export const useAiStore = defineStore('aiStore', () => {
     const remaining = ref<number | null>(null);
     const resetAt = ref<string | null>(null);
 
-    // Multi-turn chat.
-    const chat = ref<AiChatMessage[]>([]);
-    const chatSending = ref(false);
-
     async function post(path: string, body: Record<string, unknown>): Promise<AiResult> {
         if (!authStore.token) {
             throw new AiError('unknown', 'Please sign in to use AI.');
@@ -91,37 +87,21 @@ export const useAiStore = defineStore('aiStore', () => {
     const devotional = (topicOrReference: string) =>
         post('devotional', { topic_or_reference: topicOrReference });
 
-    /** Append a user message and fetch the assistant reply (rolls back on error). */
-    async function sendChat(content: string): Promise<void> {
-        const text = content.trim();
-        if (!text || chatSending.value) return;
-        chat.value.push({ role: 'user', content: text });
-        chatSending.value = true;
-        try {
-            const result = await post('bible-chat', { messages: chat.value });
-            chat.value.push({ role: 'assistant', content: result.text });
-        } catch (e) {
-            chat.value.pop(); // roll back optimistic user message
-            throw e;
-        } finally {
-            chatSending.value = false;
-        }
-    }
-
-    function clearChat() {
-        chat.value = [];
-    }
+    /**
+     * Multi-turn chat. Stateless on the client — the caller passes the full
+     * message history each turn and the conversation state is owned by the
+     * conversation store (so it can be persisted to SQLite).
+     */
+    const bibleChat = (messages: AiChatMessage[]) =>
+        post('bible-chat', { messages });
 
     return {
         remaining,
         resetAt,
-        chat,
-        chatSending,
         verseInsight,
         sermonOutline,
         fullSermon,
         devotional,
-        sendChat,
-        clearChat,
+        bibleChat,
     };
 });

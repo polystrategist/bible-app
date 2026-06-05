@@ -6,6 +6,7 @@ export interface InternationalMessageInterface {
     Profile: string;
     About: string;
     Settings: string;
+    'Manage subscription'?: string;
     'Search Bible': string;
     'Bible List': string;
     Bookmarks: string;

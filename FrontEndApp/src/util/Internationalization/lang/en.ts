@@ -8,6 +8,7 @@ const message: InternationalMessageType = {
     About: 'About',
     Profile: 'Profile',
     Settings: 'Settings',
+    'Manage subscription': 'Manage subscription',
     'Search Bible': 'Search Bible',
     'Bible List': 'Bible List',
     Bookmarks: 'Bookmarks',
