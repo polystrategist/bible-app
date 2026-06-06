@@ -290,16 +290,6 @@ declare global {
                 updated_at: string;
             } | null>;
             deleteAiConversation: (id: string) => Promise<boolean>;
-
-            // Daily Believers — extract OG/oEmbed metadata for a shared link
-            dailyBelieversExtractMetadata: (url: string) => Promise<{
-                url: string;
-                sourceType: 'website' | 'youtube';
-                sourceDomain: string;
-                title: string;
-                description: string | null;
-                thumbnailUrl: string | null;
-            }>;
         };
     }
 }

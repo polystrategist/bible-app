@@ -18,7 +18,6 @@ import DailyDevotional from './DailyDevotional/DailyDevotional';
 import importing from './importing/importing';
 import exporting from './exporting/exporting';
 import CrossReferences from './CrossReferences/CrossReferences';
-import DailyBelievers from './DailyBelievers/DailyBelievers';
 import AiConversations from './AiConversations/AiConversations';
 
 export default (BrowserWindow: BrowserWindow) => {
@@ -78,9 +77,6 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // cross references
     CrossReferences();
-
-    // daily believers metadata extractor (CORS bypass)
-    DailyBelievers();
 
     // AI Assistant conversation history
     AiConversations();

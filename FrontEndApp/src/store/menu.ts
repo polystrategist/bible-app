@@ -19,8 +19,6 @@ import {
     Settings24Regular,
     BookStar24Regular,
     BookStar24Filled,
-    PeopleCommunity24Regular,
-    PeopleCommunity24Filled,
     Sparkle24Regular,
     Sparkle24Filled,
 } from '@vicons/fluent';
@@ -59,12 +57,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             iconDark: renderNIcon(BookStar24Filled),
         },
         {
-            label: 'Daily Believers',
-            key: '/daily-believers',
-            icon: renderNIcon(PeopleCommunity24Regular),
-            iconDark: renderNIcon(PeopleCommunity24Filled),
-        },
-        {
             label: 'AI Assistant',
             key: '/ai-assistant',
             icon: renderNIcon(Sparkle24Regular),
@@ -99,7 +91,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         'sermons',
         '/prayer-list',
         '/daily-devotional',
-        '/daily-believers',
         '/ai-assistant',
         // '/profile',
         '/settings-page',
@@ -160,10 +151,6 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         if (savedLocalTabsKey) {
             if (!savedLocalTabsKey.includes('/create-sermon')) {
                 savedLocalTabsKey.push('/create-sermon');
-                session.set(localSavedTabsKey, savedLocalTabsKey);
-            }
-            if (!savedLocalTabsKey.includes('/daily-believers')) {
-                savedLocalTabsKey.push('/daily-believers');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
             }
             if (!savedLocalTabsKey.includes('/ai-assistant')) {
