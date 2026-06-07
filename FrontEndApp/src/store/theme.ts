@@ -9,9 +9,9 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     const showThemeChangerDrawer = ref(false);
     const saveThemeStorageKey = 'savedThemeStorage';
     let settingsDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-    const isDark = ref(true);
+    const isDark = ref(false);
     const backgroundTheme = ref<backgroundThemeType>('default');
-    const selectedTheme = ref<typeNameInterface>('default');
+    const selectedTheme = ref<typeNameInterface>('ocean');
     const themeOverrides = ref<any>({
         common: {
             primaryColor: '#f2c423',
@@ -102,7 +102,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     function resolveSelectedTheme(value: unknown): typeNameInterface {
         return typeof value === 'string' && value in themesOptions
             ? value as typeNameInterface
-            : 'default';
+            : 'ocean';
     }
 
     function resolveBackgroundTheme(value: unknown): backgroundThemeType {
@@ -112,7 +112,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     }
 
     function resolveIsDark(value: unknown): boolean {
-        return typeof value === 'boolean' ? value : true;
+        return typeof value === 'boolean' ? value : false;
     }
 
     function applyPrimaryTheme() {
@@ -180,9 +180,11 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             selectedTheme.value = resolveSelectedTheme(savedTheme.selectedTheme);
             isDark.value = resolveIsDark(savedTheme.isDark);
             backgroundTheme.value = resolveBackgroundTheme(savedTheme.backgroundTheme);
-            applyPrimaryTheme();
         }
 
+        // Always apply the primary palette so the default (Ocean) renders for a
+        // fresh user with no saved theme — not just when restoring a saved one.
+        applyPrimaryTheme();
         applyBodyThemeClass();
         changeTheRootProperty();
 
