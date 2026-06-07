@@ -111,6 +111,12 @@ const planCards = computed(() => [
 ]);
 
 async function buyPlan(plan: PlanOption) {
+    // Block checkout until the account email is verified (the store enforces
+    // this too; this surfaces a clear alert before the hosted checkout opens).
+    if (!isEmailVerified.value) {
+        message.warning('Please verify your email address before subscribing.');
+        return;
+    }
     const ok = await webBilling.purchase(plan);
     if (ok) {
         plansModalOpen.value = false;
@@ -203,6 +209,9 @@ async function upgradeToPro() {
             if (res.status === 'upgraded') {
                 manageModalOpen.value = false;
                 message.success('You’re now on Pro. AI study tools are unlocked.');
+            } else if (res.status === 'pending') {
+                manageModalOpen.value = false;
+                message.info('Upgrade received — your Pro access will activate shortly.');
             } else if (res.status === 'managed-elsewhere') {
                 notifyManagedElsewhere(res.store, 'Upgrade to Pro');
             } else {
@@ -320,6 +329,20 @@ const profileRefreshing = ref(false);
 // ─── Email Verification ──────────────────────────────────────────────────────
 const isEmailVerified = computed(() => !!authStore.user?.email_verified_at);
 const resendingVerification = ref(false);
+const checkingVerification = ref(false);
+
+// Re-fetch the account so a just-completed verification (done in the browser)
+// is picked up without restarting the app.
+async function checkVerification() {
+    checkingVerification.value = true;
+    await authStore.getUser(true);
+    checkingVerification.value = false;
+    if (isEmailVerified.value) {
+        message.success('Your email is now verified.');
+    } else {
+        message.info('Still not verified. Click the link in the email, then refresh.');
+    }
+}
 
 async function resendVerification() {
     resendingVerification.value = true;
@@ -660,16 +683,27 @@ onBeforeUnmount(destroyCropper);
                         <strong>June 30, 2026</strong>, or your account will stop working.
                     </p>
                 </div>
-                <NButton
-                    size="small"
-                    type="warning"
-                    :loading="resendingVerification"
-                    :disabled="resendingVerification"
-                    @click="resendVerification"
-                >
-                    <template #icon><Icon icon="mdi:email-fast-outline" /></template>
-                    Resend Email
-                </NButton>
+                <div class="verify-warning-actions">
+                    <NButton
+                        size="small"
+                        :loading="checkingVerification"
+                        :disabled="checkingVerification"
+                        @click="checkVerification"
+                    >
+                        <template #icon><Icon icon="mdi:refresh" /></template>
+                        Refresh
+                    </NButton>
+                    <NButton
+                        size="small"
+                        type="warning"
+                        :loading="resendingVerification"
+                        :disabled="resendingVerification"
+                        @click="resendVerification"
+                    >
+                        <template #icon><Icon icon="mdi:email-fast-outline" /></template>
+                        Resend Email
+                    </NButton>
+                </div>
             </div>
 
             <!-- Row 1: Name | Username -->
@@ -1340,6 +1374,7 @@ body.dark .profile-status-chip.is-enabled {
 .verify-warning {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
     gap: 12px;
     padding: 14px 16px;
     border-radius: 14px;
@@ -1347,11 +1382,25 @@ body.dark .profile-status-chip.is-enabled {
     border: 1px solid rgba(251, 146, 60, 0.32);
 }
 
+/* Keep the message readable; when it can't fit alongside the buttons the
+   actions wrap to their own row instead of squeezing the text. */
+.verify-warning .flex-1 {
+    min-width: 220px;
+}
+
 .verify-warning-icon {
     font-size: 22px;
     color: #fb923c;
     flex-shrink: 0;
     margin-top: 1px;
+}
+
+.verify-warning-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .verify-warning-title {

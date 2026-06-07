@@ -69,11 +69,9 @@ async function choosePro() {
 
     const res = await webBilling.upgradeToPro();
     if (res.status === 'upgraded') {
-        if (authStore.isAiEnabled) {
-            message.success('You’re now on Pro — enjoy the AI assistant!');
-        } else {
-            message.info('Upgrade received — your Pro access will activate shortly.');
-        }
+        message.success('You’re now on Pro — enjoy the AI assistant!');
+    } else if (res.status === 'pending') {
+        message.info('Upgrade received — your Pro access will activate shortly.');
     } else if (res.status === 'managed-elsewhere') {
         message.info(
             `Your subscription is billed through ${storeLabel(res.store ?? '')}. Upgrade to Pro there to avoid being charged twice.`,

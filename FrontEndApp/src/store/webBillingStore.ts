@@ -14,8 +14,11 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 /** Outcome of an in-app Sync → Pro upgrade. */
 export type UpgradeResult =
-    /** Upgrade applied; tier is now (or will shortly be) Pro. */
+    /** Upgrade applied and the verified tier is now Pro. */
     | { status: 'upgraded' }
+    /** Charged & changed on Paddle, but the tier hasn't propagated yet (the
+     *  webhook is slow); the UI will catch up via a background refresh. */
+    | { status: 'pending' }
     /** Plan lives on a mobile store and must be upgraded there. */
     | { status: 'managed-elsewhere'; store: string | null }
     /** Couldn't upgrade (API/config error) — `error` holds a user message. */
@@ -90,8 +93,12 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
 
     let configuredFor: string | null = null;
 
-    /** Configure (or re-point) the SDK to the current signed-in user. */
-    function ensureConfigured(): boolean {
+    /** Configure (or re-point) the SDK to the current signed-in user.
+     *
+     *  The user switch is awaited: until `changeUser` resolves the SDK still
+     *  reports the *previous* user's CustomerInfo, which would make a brand-new
+     *  account look like it already has an active subscription. */
+    async function ensureConfigured(): Promise<boolean> {
         if (!WEB_KEY) return false;
         const appUserId = authStore.user?.id ? String(authStore.user.id) : null;
         if (!appUserId) return false;
@@ -100,8 +107,8 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
             Purchases.configure({ apiKey: WEB_KEY, appUserId });
             configuredFor = appUserId;
         } else if (configuredFor !== appUserId) {
-            void Purchases.getSharedInstance().changeUser(appUserId);
             configuredFor = appUserId;
+            await Purchases.getSharedInstance().changeUser(appUserId);
         }
         return true;
     }
@@ -109,7 +116,7 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
     /** Load the current offering's packages for display. */
     async function loadPlans(): Promise<void> {
         error.value = null;
-        if (!ensureConfigured()) {
+        if (!(await ensureConfigured())) {
             plans.value = [];
             return;
         }
@@ -134,26 +141,27 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         }
     }
 
-    /** Whether the account already has any active entitlement (from ANY store —
-     *  RevenueCat merges mobile + web under the same app user id). */
-    async function hasActiveSubscription(): Promise<boolean> {
-        try {
-            const info = await Purchases.getSharedInstance().getCustomerInfo();
-            return Object.keys(info.entitlements.active ?? {}).length > 0;
-        } catch {
-            return false; // can't verify — don't hard-block
-        }
-    }
-
     /** Run the hosted checkout for a package, then refresh the verified tier. */
     async function purchase(plan: PlanOption): Promise<boolean> {
-        if (!ensureConfigured()) return false;
         error.value = null;
 
-        // Prevent duplicate/stacked subscriptions: if the account already has an
-        // active entitlement (web OR mobile), don't create a second paid
-        // subscription. Direct the user to "Manage subscription" to change it.
-        if (await hasActiveSubscription()) {
+        // Require a verified email before taking payment — the subscription and
+        // its receipts are tied to the account email, so it must be confirmed.
+        if (!authStore.user?.email_verified_at) {
+            error.value =
+                'Please verify your email address before subscribing. Check your inbox for the verification link.';
+            return false;
+        }
+
+        if (!(await ensureConfigured())) return false;
+
+        // Prevent duplicate/stacked subscriptions. The server-verified tier is the
+        // source of truth — the RevenueCat webhook sets it for web AND mobile
+        // purchases alike — so a paid tier means there's already a plan to manage.
+        // (We avoid the client getCustomerInfo() here: its cached entitlements can
+        // lag or report a phantom active sub on a freshly switched account.)
+        await authStore.getUser(true);
+        if (authStore.tier !== 'free') {
             error.value =
                 'You already have an active subscription. Use "Manage subscription" to change or cancel your plan.';
             return false;
@@ -192,7 +200,7 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
     /** Pull CustomerInfo and cache which store the active subscription lives on,
      *  so the UI can disable web-only management for mobile-bought plans. */
     async function refreshActiveStore(): Promise<void> {
-        if (!ensureConfigured()) {
+        if (!(await ensureConfigured())) {
             activeStore.value = null;
             return;
         }
@@ -212,7 +220,7 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
      *  so we report it back as 'managed-elsewhere' instead of silently no-op'ing.
      *  Uses the OS default browser (Electron shell.openExternal). */
     async function manageSubscription(): Promise<ManageResult> {
-        if (!ensureConfigured()) return { status: 'none' };
+        if (!(await ensureConfigured())) return { status: 'none' };
         try {
             const info = await Purchases.getSharedInstance().getCustomerInfo();
             const url = (info as { managementURL?: string | null }).managementURL;
@@ -242,32 +250,50 @@ export const useWebBillingStore = defineStore('webBillingStore', () => {
         if (!token) return { status: 'error' };
 
         purchasingId.value = 'upgrade';
+        // Keep the loading state on through the whole flow (request + the poll
+        // below), so the button stays busy until the tier actually flips — the
+        // poll is the slow part, so resetting before it left no feedback.
         try {
-            await axios.post(
-                `${API_BASE_URL}/subscription/upgrade-to-pro`,
-                {},
-                { headers: { Authorization: `Bearer ${token}` } },
-            );
-        } catch (e: unknown) {
-            if (axios.isAxiosError(e) && e.response?.status === 409) {
-                return { status: 'managed-elsewhere', store: e.response.data?.store ?? null };
+            try {
+                await axios.post(
+                    `${API_BASE_URL}/subscription/upgrade-to-pro`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } },
+                );
+            } catch (e: unknown) {
+                if (axios.isAxiosError(e) && e.response?.status === 409) {
+                    return { status: 'managed-elsewhere', store: e.response.data?.store ?? null };
+                }
+                error.value = axios.isAxiosError(e)
+                    ? (e.response?.data?.message ?? 'Upgrade failed. Please try again.')
+                    : 'Upgrade failed. Please try again.';
+                return { status: 'error' };
             }
-            error.value = axios.isAxiosError(e)
-                ? (e.response?.data?.message ?? 'Upgrade failed. Please try again.')
-                : 'Upgrade failed. Please try again.';
-            return { status: 'error' };
+
+            // The charge/plan change already succeeded. The tier flips when
+            // RevenueCat's PRODUCT_CHANGE webhook reaches our backend, so poll the
+            // user until it lands. (Cast avoids TS narrowing the reactive getter.)
+            for (let i = 0; i < 8; i++) {
+                await authStore.getUser(true);
+                if ((authStore.tier as string) === 'pro') return { status: 'upgraded' };
+                await new Promise((r) => setTimeout(r, 2000));
+            }
+            // Slower than we want to block for — keep refreshing in the background
+            // so the UI catches up once the webhook lands.
+            scheduleTierCatchUp();
+            return { status: 'pending' };
         } finally {
             purchasingId.value = null;
         }
+    }
 
-        // Pull the new tier (webhook → backend). Poll briefly; it's usually
-        // quick. (Cast avoids TS narrowing the reactive getter to a constant.)
-        for (let i = 0; i < 5; i++) {
-            await authStore.getUser(true);
-            if ((authStore.tier as string) === 'pro') break;
-            await new Promise((r) => setTimeout(r, 2000));
+    /** After an in-place plan change, refresh the user a few more times so the
+     *  tier flips in the UI once the (async) webhook reaches the backend, even
+     *  if it lands after we stop blocking the button. */
+    function scheduleTierCatchUp(): void {
+        for (const ms of [5000, 15000, 30000]) {
+            setTimeout(() => void authStore.getUser(true), ms);
         }
-        return { status: 'upgraded' };
     }
 
     /**
