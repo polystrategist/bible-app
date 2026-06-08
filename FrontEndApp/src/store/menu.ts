@@ -7,13 +7,11 @@ import { renderNIcon } from '../util/helper';
 import {
     Book24Filled,
     DocumentQueueMultiple24Filled,
-    TaskListSquareLtr24Filled,
     Person24Filled,
     Settings24Filled,
     HeartCircle24Filled,
     Book24Regular,
     DocumentQueueMultiple24Regular,
-    TaskListSquareLtr24Regular,
     Person24Regular,
     HeartCircle24Regular,
     Settings24Regular,
@@ -22,6 +20,7 @@ import {
     Sparkle24Regular,
     Sparkle24Filled,
 } from '@vicons/fluent';
+import { PrayingHands } from '@vicons/fa';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
     const menuSelected = ref<string>('read-bible');
@@ -47,8 +46,8 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderNIcon(TaskListSquareLtr24Regular),
-            iconDark: renderNIcon(TaskListSquareLtr24Filled),
+            icon: renderNIcon(PrayingHands),
+            iconDark: renderNIcon(PrayingHands),
         },
         {
             label: 'Daily Devotional',

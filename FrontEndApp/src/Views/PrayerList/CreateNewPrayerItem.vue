@@ -1,14 +1,27 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { NButton, NModal, NIcon, NCard, NInput, NCheckbox, useMessage } from 'naive-ui';
+import { ref, h } from 'vue';
+import { NButton, NModal, NIcon, NCard, NInput, NSelect, NCheckbox, useMessage } from 'naive-ui';
 import { Close, Add, Save } from '@vicons/carbon';
+import { Icon } from '@iconify/vue';
 import Editor from '../../components/Editor/Editor.vue';
 import { usePrayerListStore } from '../../store/prayerListStore';
+import { PREDEFINED_GROUPS, groupStyle } from './prayerGroupStyle';
+
+const groupOptions = PREDEFINED_GROUPS.map((g) => ({ label: g, value: g }));
+function renderGroupLabel(option: { label?: string; value?: string | number }) {
+    const s = groupStyle(String(option.value ?? ''));
+    return h('div', { style: 'display:flex;align-items:center;gap:8px;' }, [
+        h(Icon, { icon: s.icon, style: `color:${s.color};font-size:16px;` }),
+        h('span', String(option.label ?? '')),
+    ]);
+}
+
+withDefaults(defineProps<{ showTrigger?: boolean }>(), { showTrigger: true });
 
 const message = useMessage();
 const showModal = ref(false);
 const prayerTitle = ref('');
-const prayerGroup = ref('');
+const prayerGroup = ref<string | null>('');
 const prayerContent = ref('');
 const isAnswered = ref(false);
 
@@ -27,7 +40,7 @@ const SaveEditorContent = () => {
         prayerListStore.savePrayerItem({
             title: prayerTitle.value.trim() || null,
             content: prayerContent.value,
-            group: prayerGroup.value.trim() || null,
+            group: prayerGroup.value?.trim() || null,
             status: isAnswered.value ? 'done' : 'ongoing',
         });
         closeModal();
@@ -35,10 +48,12 @@ const SaveEditorContent = () => {
         if (e instanceof Error) message.error(e.message);
     }
 };
+
+defineExpose({ open: () => (showModal.value = true) });
 </script>
 
 <template>
-    <NButton @click="showModal = true" round secondary size="tiny">
+    <NButton v-if="showTrigger" @click="showModal = true" round secondary size="tiny">
         <template #icon>
             <NIcon><Add /></NIcon>
         </template>
@@ -58,7 +73,15 @@ const SaveEditorContent = () => {
                 </div>
                 <div class="flex flex-col gap-4px">
                     <label class="text-12px font-600 opacity-70">Group</label>
-                    <NInput v-model:value="prayerGroup" placeholder="Family, health, work..." />
+                    <NSelect
+                        v-model:value="prayerGroup"
+                        :options="groupOptions"
+                        :render-label="renderGroupLabel"
+                        filterable
+                        tag
+                        clearable
+                        placeholder="Select or type a group…"
+                    />
                 </div>
                 <NCheckbox v-model:checked="isAnswered">
                     Mark as answered

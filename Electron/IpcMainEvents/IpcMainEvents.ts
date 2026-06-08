@@ -19,6 +19,7 @@ import importing from './importing/importing';
 import exporting from './exporting/exporting';
 import CrossReferences from './CrossReferences/CrossReferences';
 import AiConversations from './AiConversations/AiConversations';
+import PrayerDays from './PrayerDays/PrayerDays';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -80,4 +81,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // AI Assistant conversation history
     AiConversations();
+
+    // Prayer-streak days
+    PrayerDays();
 };

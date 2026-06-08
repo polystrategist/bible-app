@@ -56,7 +56,6 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         key: string | null = null
     ) {
         const theKey = key ? key : Date.now() + '';
-        const findIndex = prayerList.value.findIndex((item) => item.key == key);
         const data = {
             title,
             content,
@@ -65,12 +64,33 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
             key: theKey,
         };
 
-        const saveData = await window.browserWindow.savePrayerItem(JSON.stringify(data));
-        if (findIndex > -1) prayerList.value[findIndex] = data;
-        else {
-            if (data.status != 'done') prayerList.value.push(data);
-        }
+        await window.browserWindow.savePrayerItem(JSON.stringify(data));
+        // Re-fetch from the DB so a status change moves the item between the
+        // ongoing/answered lists correctly (the redesigned page is a single list
+        // with a Mark Answered toggle, not two draggable columns).
+        await loadPrayerLists();
         debouncedRunSync();
+    }
+
+    /**
+     * Flip a prayer between ongoing and answered. Persists + reloads + syncs.
+     */
+    async function toggleStatus(item: {
+        key: string;
+        title?: string | null;
+        content?: string;
+        group?: string | null;
+        status?: string | null;
+    }) {
+        await savePrayerItem(
+            {
+                title: item.title ?? null,
+                content: item.content ?? '',
+                group: item.group ?? null,
+                status: item.status === 'done' ? 'ongoing' : 'done',
+            },
+            item.key
+        );
     }
 
     /**
@@ -111,6 +131,7 @@ export const usePrayerListStore = defineStore('prayerListStoreId', () => {
         resetPrayerItemList,
         removePrayerItem,
         savePrayerItem,
+        toggleStatus,
         reorderPrayerList,
         loadPrayerLists,
         prayerList,

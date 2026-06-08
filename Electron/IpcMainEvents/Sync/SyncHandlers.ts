@@ -125,6 +125,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
         highlights?: any[];
         clip_notes?: any[];
         prayer_lists?: any[];
+        prayer_days?: any[];
         notes?: any[];
         sermon_favorites?: any[];
         ai_conversations?: any[];
@@ -149,6 +150,9 @@ export const SyncHandlers = (win: BrowserWindow) => {
                         break;
                     case 'prayer_lists':
                         await StoreDB('prayer_lists').where({ key }).delete();
+                        break;
+                    case 'prayer_days':
+                        await StoreDB('prayer_days').where({ day: key }).delete();
                         break;
                     case 'notes':
                         await StoreDB('notes').where('note_id', key).delete();
@@ -214,15 +218,35 @@ export const SyncHandlers = (win: BrowserWindow) => {
 
             // 4. Prayer lists
             for (const pl of pullData.prayer_lists ?? []) {
+                // The authoritative original creation time, when the server has it.
+                const clientCreatedAt = pl.client_created_at ?? null;
                 const existing = await StoreDB('prayer_lists').where('key', pl.key).first();
                 if (existing) {
-                    await StoreDB('prayer_lists').where('key', pl.key)
-                        .update({ title: pl.title, content: pl.content, group: pl.group, index: pl.index, status: pl.status, updated_at: now });
+                    const update: any = { title: pl.title, content: pl.content, group: pl.group, index: pl.index, status: pl.status, updated_at: now };
+                    // Only heal created_at from the authoritative client value; never
+                    // let a server insert-time overwrite a correct local created_at.
+                    if (clientCreatedAt) update.created_at = clientCreatedAt;
+                    await StoreDB('prayer_lists').where('key', pl.key).update(update);
                 } else {
+                    // New local row: prefer client created_at, fall back to server time, then now.
+                    const createdAt = clientCreatedAt ?? pl.created_at ?? now;
                     await StoreDB('prayer_lists').insert({
                         key: pl.key, title: pl.title, content: pl.content,
                         group: pl.group, index: pl.index, status: pl.status,
-                        created_at: now, updated_at: now,
+                        created_at: createdAt, updated_at: now,
+                    });
+                }
+            }
+
+            // 4b. Prayer-streak days (created-only, idempotent union)
+            for (const pd of pullData.prayer_days ?? []) {
+                if (!pd.day) continue;
+                const existing = await StoreDB('prayer_days').where('day', pd.day).first();
+                if (!existing) {
+                    await StoreDB('prayer_days').insert({
+                        day: pd.day,
+                        created_at: pd.created_at ?? now,
+                        updated_at: pd.updated_at ?? now,
                     });
                 }
             }

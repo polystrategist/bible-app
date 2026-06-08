@@ -180,7 +180,12 @@ export default () => {
                     }
                 }
 
-                const dataToSave = { ...args, index };
+                // Carry created_at so the original creation time syncs to the
+                // backend and other devices. Preserve it on edits; stamp now for
+                // new items. (The column also has a DB default, but the sync
+                // payload needs the value explicitly.)
+                const createdAt = existingItem?.created_at ?? new Date().toISOString();
+                const dataToSave = { ...args, index, created_at: createdAt };
 
                 const result = await StoreDB(tableName)
                     .insert(dataToSave)

@@ -119,6 +119,10 @@ declare global {
                     updated_at: any;
                 }>
             >;
+            /** Prayer-streak days (YYYY-MM-DD per row). */
+            getPrayerDays: () => Promise<Array<{ day: string; created_at?: string; updated_at?: string }>>;
+            /** Mark today as prayed (idempotent); resolves to the day key. */
+            markPrayedToday: () => Promise<string | null>;
 
             /**
              * Save Prayer List Item
@@ -196,6 +200,7 @@ declare global {
                 highlights?: any[];
                 clip_notes?: any[];
                 prayer_lists?: any[];
+                prayer_days?: any[];
                 notes?: any[];
                 sermon_favorites?: any[];
                 ai_conversations?: any[];

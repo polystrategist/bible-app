@@ -1,249 +1,334 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { NIcon, NButton, useMessage, NDropdown, useDialog } from 'naive-ui';
-import EditPrayerItem from './EditPrayerItem.vue';
-import { Edit, TrashCan, OverflowMenuVertical } from '@vicons/carbon';
-import Draggable from 'vuedraggable';
-import { usePrayerListStore } from '../../store/prayerListStore';
-import NewPrayerItem from './CreateNewPrayerItem.vue';
-import type { Component } from 'vue';
-import { h } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { NIcon, useMessage, useDialog } from 'naive-ui';
+import { Icon } from '@iconify/vue';
+import { PrayingHands } from '@vicons/fa';
 import { useI18n } from 'vue-i18n';
+import { usePrayerListStore } from '../../store/prayerListStore';
+import { usePrayerStreakStore } from '../../store/prayerStreakStore';
+import { usePraySessionStore } from '../../store/praySessionStore';
+import EditPrayerItem from './EditPrayerItem.vue';
+import NewPrayerItem from './CreateNewPrayerItem.vue';
+import PrayerStatsStrip from './components/PrayerStatsStrip.vue';
+import PrayerCard from './components/PrayerCard.vue';
+import PraySession from './PraySession.vue';
 
 const message = useMessage();
-const prayerListStore = usePrayerListStore();
-const editPrayerModal = ref<any>(null);
 const dialog = useDialog();
 const { t } = useI18n();
 
-const renderIcon = (icon: Component) => {
-    return () => {
-        return h(NIcon, null, {
-            default: () => h(icon),
-        });
-    };
-};
+const prayerListStore = usePrayerListStore();
+const streak = usePrayerStreakStore();
+const session = usePraySessionStore();
 
-const removePrayerItem = (key: string) => {
+const editPrayerModal = ref<any>(null);
+const newPrayerModal = ref<any>(null);
+const tab = ref<'ongoing' | 'done'>('ongoing');
+const search = ref('');
+const groupFilter = ref<string | null>(null);
+
+onMounted(() => streak.loadDays());
+
+const ongoing = computed(() => prayerListStore.prayerList);
+const answered = computed(() => prayerListStore.donePrayerList);
+
+const groups = computed(() => {
+    const set = new Set<string>();
+    for (const p of [...ongoing.value, ...answered.value]) {
+        const g = (p.group ?? '').trim();
+        if (g) set.add(g);
+    }
+    return [...set].sort();
+});
+
+const thisWeek = computed(() => {
+    const cutoff = Date.now() - 7 * 86400000;
+    return [...ongoing.value, ...answered.value].filter((p) => {
+        const t = p.created_at ? new Date(p.created_at).getTime() : NaN;
+        return !Number.isNaN(t) && t >= cutoff;
+    }).length;
+});
+
+const visible = computed(() => {
+    const list = tab.value === 'ongoing' ? ongoing.value : answered.value;
+    const q = search.value.trim().toLowerCase();
+    return list.filter((p) => {
+        if (groupFilter.value && (p.group ?? '') !== groupFilter.value) return false;
+        if (!q) return true;
+        return (
+            (p.title ?? '').toLowerCase().includes(q) ||
+            (p.content ?? '').toLowerCase().includes(q) ||
+            (p.group ?? '').toLowerCase().includes(q)
+        );
+    });
+});
+
+function editPrayer(item: any) {
+    editPrayerModal.value?.modalTrigger(item);
+}
+
+async function toggle(item: any) {
     try {
-        prayerListStore.removePrayerItem(key);
+        await prayerListStore.toggleStatus(item);
     } catch (e) {
         if (e instanceof Error) message.error(e.message);
     }
-};
-
-const editPrayerItem = (element: any): void => {
-    editPrayerModal.value?.modalTrigger(element);
-};
-
-async function changeInProgress(item: any) {
-    const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
 }
 
-async function changeInDone(item: any) {
-    const theKeyAction = item.added ? 'added' : item.moved ? 'moved' : 'removed';
-    let theItem = JSON.parse(JSON.stringify(item[theKeyAction].element));
-
-    if (item.added) theItem['status'] = 'done';
-    else if (item.removed) theItem['status'] = 'ongoing';
-
-    await prayerListStore.savePrayerItem(theItem, theItem.key);
+function remove(item: any) {
+    dialog.warning({
+        title: t('Confirm'),
+        content: t('Are You Sure You want to remove?'),
+        positiveText: t('Yes'),
+        negativeText: t('No'),
+        onPositiveClick: () => {
+            try {
+                prayerListStore.removePrayerItem(item.key);
+            } catch (e) {
+                if (e instanceof Error) message.error(e.message);
+            }
+        },
+    });
 }
 
-const dragOptions = {
-    animation: 200,
-    group: 'description',
-    disabled: false,
-    ghostClass: 'ghost',
-};
+function startPray(startIndex = 0) {
+    session.open(ongoing.value as any[], startIndex);
+}
 
-function selectItemFromMenuElement(key: any, element: any) {
-    if (key === 'edit') editPrayerItem(element);
-    else if (key === 'remove') {
-        dialog.warning({
-            title: t('Confirm'),
-            content: t('Are You Sure You want to remove?'),
-            positiveText: t('Yes'),
-            negativeText: t('No'),
-            onPositiveClick: () => {
-                removePrayerItem(element.key);
-            },
-        });
-    }
+function prayThis(item: any) {
+    const idx = ongoing.value.findIndex((p) => p.key === item.key);
+    startPray(idx < 0 ? 0 : idx);
 }
 </script>
+
 <template>
-    <div
-        class="prayer-list-page px-10px h-[100%] overflow-y-auto overflowing-div scroll-bar-sm flex gap-20px pl-30px"
-    >
-        <div class="w-full h-[100%] flex flex-col">
-            <div class="py-10px flex justify-between items-end select-none min-h-40px">
-                <span class="font-700 capitalize">{{ $t('prayer list') }}</span>
-                <NewPrayerItem />
+    <div class="prayer-page scroll-bar-sm">
+        <div class="prayer-page__inner">
+            <!-- Header -->
+            <div class="prayer-head">
+                <NIcon class="prayer-head__leaf"><PrayingHands /></NIcon>
+                <h1 class="prayer-head__title">Pray</h1>
+                <p class="prayer-head__sub">Bring your requests before God</p>
             </div>
-            <Draggable
-                class="list-group prayer-list-column h-[100%] overflow-y-auto overflowing-div p-2"
-                :list="prayerListStore.prayerList"
-                v-bind="dragOptions"
-                group="prayer-list-items"
-                itemKey="name"
-                @change="changeInProgress"
-            >
-                <template #item="{ element }">
-                    <div class="relative prayer-list-item group rounded-md">
-                        <div class="pb-0 duration-200 px-2 pt-2">
-                            <div v-if="element.title" class="font-700 text-13px mb-1 truncate">{{ element.title }}</div>
-                            <div v-if="element.group" class="inline-block text-10px font-600 px-6px py-2px rounded-full mb-6px opacity-60 border border-current">{{ element.group }}</div>
-                            <div
-                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-0"
-                                v-html="element.content"
-                            ></div>
-                            <NDropdown
-                                trigger="click"
-                                :options="[
-                                    {
-                                        label: $t('edit'),
-                                        key: 'edit',
-                                        icon: renderIcon(Edit),
-                                    },
-                                    {
-                                        label: $t('remove'),
-                                        key: 'remove',
-                                        icon: renderIcon(TrashCan),
-                                    },
-                                ]"
-                                @select="(key: string) => selectItemFromMenuElement(key, element)"
-                            >
-                                <NButton
-                                    type="primary"
-                                    size="tiny"
-                                    class="absolute top-1 right-1 invisible group-hover:visible"
-                                >
-                                    <template #icon>
-                                        <NIcon>
-                                            <OverflowMenuVertical />
-                                        </NIcon>
-                                    </template>
-                                </NButton>
-                            </NDropdown>
-                        </div>
-                    </div>
-                </template>
-            </Draggable>
-        </div>
-        <div class="w-full h-[100%] flex flex-col">
-            <div class="py-10px flex justify-between items-end min-h-40px">
-                <span class="font-700 select-none capitalize">{{ $t('answered') }} </span>
+
+            <PrayerStatsStrip
+                :ongoing="ongoing.length"
+                :answered="answered.length"
+                :this-week="thisWeek"
+            />
+
+            <!-- Ongoing / Answered toggle -->
+            <div class="seg">
+                <button
+                    class="seg__btn"
+                    :class="{ 'seg__btn--active': tab === 'ongoing' }"
+                    @click="tab = 'ongoing'"
+                >
+                    <Icon icon="lucide:clock" />
+                    <span>Ongoing</span>
+                    <span class="seg__count">{{ ongoing.length }}</span>
+                </button>
+                <button
+                    class="seg__btn"
+                    :class="{ 'seg__btn--active': tab === 'done' }"
+                    @click="tab = 'done'"
+                >
+                    <Icon icon="lucide:circle-check" />
+                    <span>Answered</span>
+                    <span class="seg__count">{{ answered.length }}</span>
+                </button>
             </div>
-            <Draggable
-                class="list-group list-group-done prayer-list-column h-[100%] overflow-y-auto overflowing-div p-2"
-                :list="prayerListStore.donePrayerList"
-                v-bind="dragOptions"
-                group="prayer-list-items"
-                itemKey="name"
-                @change="changeInDone"
-            >
-                <template #item="{ element }">
-                    <div class="group relative prayer-list-item rounded-md opacity-50">
-                        <div class="px-2 pt-2">
-                            <div v-if="element.title" class="font-700 text-13px mb-1 truncate">{{ element.title }}</div>
-                            <div v-if="element.group" class="inline-block text-10px font-600 px-6px py-2px rounded-full mb-6px opacity-60 border border-current">{{ element.group }}</div>
-                            <div
-                                class="prayer-list-content cursor-move prose-mirror-render-html !pt-0"
-                                v-html="element.content"
-                            ></div>
-                        </div>
-                        <NDropdown
-                            trigger="click"
-                            :options="[
-                                {
-                                    label: $t('edit'),
-                                    key: 'edit',
-                                    icon: renderIcon(Edit),
-                                },
-                                {
-                                    label: $t('remove'),
-                                    key: 'remove',
-                                    icon: renderIcon(TrashCan),
-                                },
-                            ]"
-                            @select="(key: string) => selectItemFromMenuElement(key, element)"
-                        >
-                            <NButton
-                                type="primary"
-                                size="tiny"
-                                class="absolute top-1 right-1 invisible group-hover:visible"
-                                secondary
-                            >
-                                <template #icon>
-                                    <NIcon>
-                                        <OverflowMenuVertical />
-                                    </NIcon>
-                                </template>
-                            </NButton>
-                        </NDropdown>
-                    </div>
-                </template>
-            </Draggable>
+
+            <!-- Search + filter -->
+            <div class="prayer-tools">
+                <div class="prayer-search">
+                    <Icon icon="lucide:search" />
+                    <input v-model="search" type="text" placeholder="Search prayers…" />
+                </div>
+                <select v-model="groupFilter" class="prayer-filter">
+                    <option :value="null">All groups</option>
+                    <option v-for="g in groups" :key="g" :value="g">{{ g }}</option>
+                </select>
+            </div>
+
+            <!-- List -->
+            <div class="prayer-list">
+                <PrayerCard
+                    v-for="p in visible"
+                    :key="p.key"
+                    :prayer="p"
+                    :answered="tab === 'done'"
+                    @edit="editPrayer(p)"
+                    @remove="remove(p)"
+                    @toggle="toggle(p)"
+                    @pray="prayThis(p)"
+                />
+                <div v-if="visible.length === 0" class="prayer-empty">
+                    <Icon :icon="search || groupFilter ? 'lucide:search-x' : 'lucide:hand-heart'" />
+                    <p v-if="search || groupFilter">No prayers match your search</p>
+                    <p v-else-if="tab === 'ongoing'">No ongoing prayers yet</p>
+                    <p v-else>No answered prayers yet</p>
+                </div>
+            </div>
         </div>
+
+        <!-- Floating controls -->
+        <div class="prayer-fabs">
+            <button v-if="ongoing.length" class="prayer-start" @click="startPray(0)">
+                <NIcon class="prayer-start__icon"><PrayingHands /></NIcon>
+                Start Pray
+            </button>
+            <button class="prayer-add" title="New prayer" @click="newPrayerModal?.open()">
+                <Icon icon="lucide:plus" />
+            </button>
+            <NewPrayerItem ref="newPrayerModal" :show-trigger="false" />
+        </div>
+
+        <EditPrayerItem ref="editPrayerModal" />
+        <PraySession />
     </div>
-    <EditPrayerItem ref="editPrayerModal" />
 </template>
 
-<style lang="scss">
-.prayer-list-page {
-    background-color: var(--theme-bg-main, #f9fafb);
-    color: var(--theme-text, #1f2937);
+<style scoped>
+.prayer-page {
+    position: relative;
+    height: 100%;
+    overflow-y: auto;
+    background: var(--theme-bg-main);
+    color: var(--theme-text);
+}
+.prayer-page__inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px 20px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.prayer-list-column {
-    background-color: var(--theme-bg-main, #f9fafb);
-    border: 1px solid var(--theme-border, #e5e7eb);
-    border-radius: 8px;
+.prayer-head { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.prayer-head__leaf { color: var(--primary-color); font-size: 24px; }
+.prayer-head__title { font-size: 30px; font-weight: 800; margin: 2px 0 0; }
+.prayer-head__sub { font-size: 13px; opacity: 0.65; margin: 2px 0 0; }
+
+.seg {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 999px;
+    background: var(--theme-bg-elevated);
+}
+.seg__btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.seg__btn--active { background: var(--theme-bg-main); color: var(--theme-text); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+.seg__count {
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+    color: var(--primary-color);
+    font-size: 11px;
+    font-weight: 700;
 }
 
-.prayer-list-item {
-    background-color: var(--theme-bg-soft, #ffffff);
-    color: var(--theme-text, #1f2937);
-    border: 1px solid var(--theme-border, #e5e7eb);
-    @apply rounded-md relative overflow-hidden cursor-move mb-2 p-1;
-
-    &:hover {
-        background-color: var(--theme-bg-elevated, #f3f4f6);
-    }
-
-    .flip-list-move {
-        transition: transform 0.5s;
-    }
-    .no-move {
-        transition: transform 0s;
-    }
-    .ghost {
-        opacity: 0.5;
-    }
-    .list-group {
-        min-height: 20px;
-    }
+.prayer-tools { display: flex; gap: 8px; }
+.prayer-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 42px;
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    background: var(--theme-bg-soft);
+    opacity: 0.9;
+}
+.prayer-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--theme-text);
+    font-size: 13px;
+}
+.prayer-filter {
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--theme-border);
+    border-radius: 12px;
+    background: var(--theme-bg-soft);
+    color: var(--theme-text);
+    font-size: 13px;
+    cursor: pointer;
 }
 
-// Dark mode specific styles
-body.dark .prayer-list-page {
-    background-color: var(--theme-bg-main, #1f2230);
-    color: var(--theme-text, #ececff);
+.prayer-list { display: flex; flex-direction: column; }
+.prayer-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 48px 0;
+    opacity: 0.55;
+    font-size: 30px;
 }
+.prayer-empty p { font-size: 14px; margin: 0; }
 
-body.dark .prayer-list-column {
-    background-color: var(--theme-bg-main, #1f2230);
-    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
+.prayer-fabs {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
-
-body.dark .prayer-list-item {
-    background-color: var(--theme-bg-soft, rgba(255, 255, 255, 0.06));
-    color: var(--theme-text, #ececff);
-    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.12));
-
-    &:hover {
-        background-color: var(--theme-bg-elevated, rgba(255, 255, 255, 0.12));
-    }
+.prayer-start {
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 24px;
+    border: none;
+    border-radius: 999px;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
+.prayer-start:hover { filter: brightness(1.05); }
+.prayer-start__icon { font-size: 18px; }
+
+.prayer-add {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--theme-border);
+    border-radius: 50%;
+    background: var(--theme-bg-soft);
+    color: var(--theme-text);
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.prayer-add:hover { background: var(--theme-bg-elevated); }
 </style>

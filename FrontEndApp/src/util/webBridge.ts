@@ -222,6 +222,32 @@ const stub: Window['browserWindow'] = {
         return apiFetch(`/prayer-list/${encodeURIComponent(String(key))}`, null, { method: 'DELETE' });
     },
 
+    // ---------- Prayer-streak days ----------
+    // The web build has no dedicated prayer-days REST route, so the streak is
+    // kept in localStorage (per-browser). Electron + mobile persist + sync it.
+    getPrayerDays: async () => {
+        try {
+            const raw = localStorage.getItem('prayer_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            return days.map((day) => ({ day }));
+        } catch {
+            return [];
+        }
+    },
+    markPrayedToday: async () => {
+        const d = new Date();
+        const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        try {
+            const raw = localStorage.getItem('prayer_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            if (!days.includes(day)) {
+                days.push(day);
+                localStorage.setItem('prayer_days', JSON.stringify(days));
+            }
+        } catch { /* ignore */ }
+        return day;
+    },
+
     // ---------- Misc ----------
     updateDownloadProgress: () => { /* no-op listener */ },
     openDonateWindow: () => { warnOnce('openDonateWindow'); },

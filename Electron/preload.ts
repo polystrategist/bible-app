@@ -56,6 +56,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     reorderPrayerListItems: (args: any) =>
         ipcRenderer.invoke('reorderPrayerListItems', JSON.parse(args)),
     deletePrayerListItem: (args: any) => ipcRenderer.invoke('deletePrayerListItem', args),
+
+    // Prayer-streak days
+    getPrayerDays: () => ipcRenderer.invoke('getPrayerDays'),
+    markPrayedToday: () => ipcRenderer.invoke('markPrayedToday'),
     updateDownloadProgress: (progress: { percentage: Function; done: Function }) => {
         // Listen for the event from the main process
         ipcRenderer.on('download-progress', (_, percentage) => {
