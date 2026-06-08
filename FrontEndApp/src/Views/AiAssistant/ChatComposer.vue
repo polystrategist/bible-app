@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, h } from 'vue';
+import { computed, h, ref } from 'vue';
 import { NInput, NButton, NDropdown } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import type { AiMode } from '../../store/conversationStore';
+import VersePickerModal from './VersePickerModal.vue';
 
 const props = defineProps<{
     text: string;
@@ -52,20 +53,20 @@ function onKeydown(e: KeyboardEvent) {
         submit();
     }
 }
+
+// Verse insight uses a book → chapter → verse picker that fills both the
+// reference and the verse text from the user's primary version, so the two
+// always match (no typing / pasting).
+const showPicker = ref(false);
+function onVerseSelected(payload: { reference: string; verseText: string }) {
+    emit('update:reference', payload.reference);
+    emit('update:text', payload.verseText);
+}
 </script>
 
 <template>
     <div class="composer-wrap">
         <div class="composer">
-            <!-- Insight needs a reference in addition to the verse text -->
-            <NInput
-                v-if="isInsight"
-                :value="reference"
-                class="ref-input"
-                placeholder="Reference (e.g. John 3:16)"
-                @update:value="emit('update:reference', $event)"
-            />
-
             <div class="composer__box">
                 <NDropdown
                     trigger="click"
@@ -79,7 +80,22 @@ function onKeydown(e: KeyboardEvent) {
                     </button>
                 </NDropdown>
 
+                <!-- Insight: pick a verse (reference + text always match). Other
+                     modes: free-text input. -->
+                <button
+                    v-if="isInsight"
+                    class="verse-select"
+                    @click="showPicker = true"
+                >
+                    <Icon icon="lucide:book-open" class="verse-select__icon" />
+                    <span class="verse-select__label" :class="{ placeholder: !reference }">
+                        {{ reference || 'Select a verse' }}
+                    </span>
+                    <Icon icon="lucide:chevron-down" class="verse-select__caret" />
+                </button>
+
                 <NInput
+                    v-else
                     :value="text"
                     type="textarea"
                     :autosize="{ minRows: 1, maxRows: 6 }"
@@ -106,6 +122,8 @@ function onKeydown(e: KeyboardEvent) {
                 AI can make mistakes — verify against Scripture.
             </p>
         </div>
+
+        <VersePickerModal v-model:show="showPicker" @select="onVerseSelected" />
     </div>
 </template>
 
@@ -115,7 +133,26 @@ function onKeydown(e: KeyboardEvent) {
     background: linear-gradient(to top, var(--theme-bg-main) 60%, transparent);
 }
 .composer { max-width: 760px; margin: 0 auto; }
-.ref-input { margin-bottom: 8px; }
+
+/* Insight verse-picker trigger — fills the input slot like the textarea would */
+.verse-select {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 0 8px 0 4px;
+    border: none;
+    background: transparent;
+    color: var(--theme-text);
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+}
+.verse-select__icon { opacity: 0.7; flex-shrink: 0; }
+.verse-select__label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.verse-select__label.placeholder { color: var(--theme-text-soft); }
+.verse-select__caret { font-size: 14px; opacity: 0.6; flex-shrink: 0; }
 
 .composer__box {
     display: flex;
