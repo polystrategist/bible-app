@@ -60,6 +60,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Prayer-streak days
     getPrayerDays: () => ipcRenderer.invoke('getPrayerDays'),
     markPrayedToday: (durationSeconds?: number) => ipcRenderer.invoke('markPrayedToday', durationSeconds),
+
+    // Devotion-streak days
+    getDevotionDays: () => ipcRenderer.invoke('getDevotionDays'),
+    markDevotionToday: () => ipcRenderer.invoke('markDevotionToday'),
     updateDownloadProgress: (progress: { percentage: Function; done: Function }) => {
         // Listen for the event from the main process
         ipcRenderer.on('download-progress', (_, percentage) => {

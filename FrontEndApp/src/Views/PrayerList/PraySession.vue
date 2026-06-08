@@ -81,39 +81,41 @@ function done() {
                     <Icon icon="lucide:x" />
                 </button>
 
-                <div class="pray-body">
-                    <div class="pray-icon" :style="{ background: style.color + '24', color: style.color }">
-                        <Icon :icon="style.icon" />
-                    </div>
-                    <div class="pray-tags">
-                        <span
-                            v-if="current?.group"
-                            class="pray-group"
-                            :style="{ background: style.color + '24', color: style.color }"
-                        >{{ current.group }}</span>
-                        <span class="pray-now">
-                            <span class="pray-now__dot" /> Now praying
-                        </span>
-                    </div>
-                    <h2 class="pray-title">{{ current?.title || 'Untitled prayer' }}</h2>
-
-                    <div class="pray-progress">
-                        <div class="pray-progress__track">
-                            <div
-                                class="pray-progress__fill"
-                                :style="{ width: ((index + 1) / total) * 100 + '%' }"
-                            />
+                <div class="pray-scroll">
+                    <div class="pray-body">
+                        <div class="pray-icon" :style="{ background: style.color + '24', color: style.color }">
+                            <Icon :icon="style.icon" />
                         </div>
-                        <span class="pray-progress__label">{{ index + 1 }} of {{ total }}</span>
-                    </div>
+                        <div class="pray-tags">
+                            <span
+                                v-if="current?.group"
+                                class="pray-group"
+                                :style="{ background: style.color + '24', color: style.color }"
+                            >{{ current.group }}</span>
+                            <span class="pray-now">
+                                <span class="pray-now__dot" /> Now praying
+                            </span>
+                        </div>
+                        <h2 class="pray-title">{{ current?.title || 'Untitled prayer' }}</h2>
 
-                    <div
-                        v-if="current?.content"
-                        class="pray-content prose-mirror-render-html"
-                        v-html="current.content"
-                    />
-                    <div class="pray-when">
-                        <Icon icon="lucide:clock" /> {{ relativeTime(current?.created_at) }}
+                        <div class="pray-progress">
+                            <div class="pray-progress__track">
+                                <div
+                                    class="pray-progress__fill"
+                                    :style="{ width: ((index + 1) / total) * 100 + '%' }"
+                                />
+                            </div>
+                            <span class="pray-progress__label">{{ index + 1 }} of {{ total }}</span>
+                        </div>
+
+                        <div
+                            v-if="current?.content"
+                            class="pray-content prose-mirror-render-html"
+                            v-html="current.content"
+                        />
+                        <div class="pray-when">
+                            <Icon icon="lucide:clock" /> {{ relativeTime(current?.created_at) }}
+                        </div>
                     </div>
                 </div>
 
@@ -152,12 +154,26 @@ function done() {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 18px;
     padding: 24px;
     background: var(--theme-bg-main);
     color: var(--theme-text);
+    /* The overlay itself never scrolls — only .pray-scroll does — so the nav
+       and timer controls stay pinned at the bottom. */
+    overflow: hidden;
+}
+
+/* Scrollable middle region. Grows to fill the space between the close button
+   and the bottom controls; the body centers when short and scrolls when tall. */
+.pray-scroll {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .pray-close {
     position: absolute;
@@ -182,6 +198,9 @@ function done() {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    /* Vertically center within .pray-scroll when there's room; auto margins let
+       it scroll (instead of clipping the top) once the content is taller. */
+    margin: auto 0;
 }
 .pray-icon {
     width: 64px;
@@ -220,7 +239,7 @@ function done() {
 .pray-progress__fill { height: 100%; background: var(--primary-color); transition: width 0.25s; }
 .pray-progress__label { font-size: 13px; font-weight: 600; opacity: 0.7; }
 
-.pray-content { font-size: 17px; line-height: 1.6; opacity: 0.85; }
+.pray-content { width: 100%; text-align: left; font-size: 17px; line-height: 1.6; opacity: 0.85; }
 .pray-when {
     display: inline-flex;
     align-items: center;
@@ -230,7 +249,7 @@ function done() {
     margin-top: 16px;
 }
 
-.pray-nav { width: min(560px, 92vw); display: flex; gap: 12px; }
+.pray-nav { width: min(560px, 92vw); display: flex; gap: 12px; flex-shrink: 0; }
 .pray-next {
     flex: 1;
     display: inline-flex;
@@ -267,6 +286,7 @@ function done() {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
     padding: 10px 12px;
     border: 1px solid var(--theme-border);
     border-radius: 18px;

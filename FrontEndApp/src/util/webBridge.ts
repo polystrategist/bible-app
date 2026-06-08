@@ -256,6 +256,28 @@ const stub: Window['browserWindow'] = {
         } catch { /* ignore */ }
         return day;
     },
+    getDevotionDays: async () => {
+        try {
+            const raw = localStorage.getItem('devotion_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            return days.map((day) => ({ day }));
+        } catch {
+            return [];
+        }
+    },
+    markDevotionToday: async () => {
+        const d = new Date();
+        const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        try {
+            const raw = localStorage.getItem('devotion_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            if (!days.includes(day)) {
+                days.push(day);
+                localStorage.setItem('devotion_days', JSON.stringify(days));
+            }
+        } catch { /* ignore */ }
+        return day;
+    },
 
     // ---------- Misc ----------
     updateDownloadProgress: () => { /* no-op listener */ },

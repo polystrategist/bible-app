@@ -4,6 +4,7 @@ import { NSpin, NModal, NSteps, NStep } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { useI18n } from 'vue-i18n';
 import { useBibleStore } from '../../store/BibleStore';
+import { useDevotionStreakStore } from '../../store/devotionStreakStore';
 import { bibleBooks } from '../../util/books';
 import { getBibleService } from '../../services/BibleService';
 
@@ -41,6 +42,17 @@ const devotional = ref<Devotional | null>(null);
 const loading = ref(true);
 const activeStep = ref(0);
 const bibleStore = useBibleStore();
+const devotionStreak = useDevotionStreakStore();
+
+const isLastStep = computed(() => activeStep.value === steps.length - 1);
+
+// Reaching the final "Go" step completes today's devotion — record it toward
+// the day-streak (idempotent + syncs).
+watch(activeStep, (step) => {
+    if (step === steps.length - 1) devotionStreak.recordTodayCompleted();
+});
+
+const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function langCode(): string {
     return localeToLangCode[locale.value] ?? 'en';
@@ -150,7 +162,10 @@ async function loadTodayDevotional() {
     }
 }
 
-onMounted(loadTodayDevotional);
+onMounted(() => {
+    loadTodayDevotional();
+    devotionStreak.loadDays();
+});
 
 watch(locale, loadTodayDevotional);
 </script>
@@ -234,6 +249,28 @@ watch(locale, loadTodayDevotional);
                         <Icon icon="mdi:check-circle" class="text-[var(--primary-color)]" />
                         {{ $t('Completed') }}
                     </span>
+                </div>
+
+                <!-- Day-streak card — shown once the final step is reached -->
+                <div v-if="isLastStep" class="devo-streak">
+                    <div class="devo-streak-count">{{ devotionStreak.currentStreak }}</div>
+                    <div class="devo-streak-label">day streak</div>
+                    <div class="devo-streak-week">
+                        <div
+                            v-for="(d, i) in devotionStreak.weekDays"
+                            :key="i"
+                            class="devo-streak-day"
+                        >
+                            <span class="devo-streak-dow">{{ weekLabels[i] }}</span>
+                            <span
+                                class="devo-streak-pip"
+                                :class="{ filled: d.completed, today: d.isToday }"
+                            >
+                                <Icon v-if="d.completed" icon="mdi:check" />
+                                <template v-else>{{ d.date.getDate() }}</template>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </template>
         </div>
@@ -447,6 +484,66 @@ watch(locale, loadTodayDevotional);
     font-size: 13px;
     font-weight: 500;
     opacity: 0.6;
+}
+
+/* ---- Day-streak card ---- */
+.devo-streak {
+    margin-top: 24px;
+    padding: 22px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+    text-align: center;
+}
+.devo-streak-count {
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--primary-color);
+}
+.devo-streak-label {
+    margin-top: 2px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+.devo-streak-week {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 18px;
+}
+.devo-streak-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+.devo-streak-dow {
+    font-size: 11px;
+    opacity: 0.55;
+}
+.devo-streak-pip {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    font-size: 12px;
+    opacity: 0.85;
+}
+.devo-streak-pip.filled {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    opacity: 1;
+}
+.devo-streak-pip.today {
+    border-color: var(--primary-color);
+    border-width: 2px;
 }
 
 /* ---- Verse Preview Modal ---- */

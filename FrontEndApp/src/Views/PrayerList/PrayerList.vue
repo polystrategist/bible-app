@@ -102,8 +102,9 @@ function prayThis(item: any) {
 </script>
 
 <template>
-    <div class="prayer-page scroll-bar-sm">
-        <div class="prayer-page__inner">
+    <div class="prayer-page">
+        <div class="prayer-scroll scroll-bar-sm">
+            <div class="prayer-page__inner">
             <!-- Header -->
             <div class="prayer-head">
                 <NIcon class="prayer-head__leaf"><PrayingHands /></NIcon>
@@ -170,6 +171,7 @@ function prayThis(item: any) {
                     <p v-else>No answered prayers yet</p>
                 </div>
             </div>
+            </div>
         </div>
 
         <!-- Floating controls -->
@@ -193,9 +195,18 @@ function prayThis(item: any) {
 .prayer-page {
     position: relative;
     height: 100%;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    /* The page itself never scrolls — only .prayer-scroll does — so the
+       floating controls stay pinned to the panel bottom. */
+    overflow: hidden;
     background: var(--theme-bg-main);
     color: var(--theme-text);
+}
+.prayer-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 .prayer-page__inner {
     max-width: 720px;

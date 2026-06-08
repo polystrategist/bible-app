@@ -854,7 +854,7 @@ onBeforeUnmount(() => {
     display: flex;
     gap: 2px;
     padding: 10px 20px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid var(--theme-border, rgba(255,255,255,0.07));
     flex-shrink: 0;
 }
 .tab-btn {
@@ -887,7 +887,7 @@ onBeforeUnmount(() => {
     height: 18px;
     padding: 0 5px;
     border-radius: 999px;
-    background: rgba(111,132,255,0.2);
+    background: color-mix(in srgb, var(--primary-color, #6f84ff) 18%, transparent);
     color: var(--primary-color, #6f84ff);
     font-size: 10px;
     font-weight: 700;
@@ -925,13 +925,13 @@ onBeforeUnmount(() => {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: var(--theme-bg-soft, rgba(255,255,255,0.06));
+    border: 1px solid var(--theme-border, rgba(255,255,255,0.1));
     color: inherit;
     transition: background 0.15s, border-color 0.15s;
     white-space: nowrap;
 }
-.cat-pill:hover { background: rgba(255,255,255,0.1); }
+.cat-pill:hover { background: var(--theme-bg-elevated, rgba(255,255,255,0.1)); }
 .cat-pill.active {
     background: color-mix(in srgb, var(--primary-color, #6f84ff) 20%, transparent);
     border-color: color-mix(in srgb, var(--primary-color, #6f84ff) 60%, transparent);
@@ -942,10 +942,12 @@ onBeforeUnmount(() => {
 .sermon-grid-scroll {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 16px;
+    /* Breathing room so the cards' hover lift + shadow aren't clipped by the
+       scroll container's edges (overflow-y:auto also clips the x-axis). */
+    padding: 4px 4px 16px;
 }
 .sermon-grid-scroll::-webkit-scrollbar { width: 4px; }
-.sermon-grid-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.sermon-grid-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb, rgba(255,255,255,0.16)); border-radius: 4px; }
 
 /* ── Sermon grid ── */
 .sermon-grid {
@@ -958,8 +960,8 @@ onBeforeUnmount(() => {
 .sermon-card {
     border-radius: 14px;
     overflow: hidden;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: var(--theme-bg-soft, rgba(255,255,255,0.04));
+    border: 1px solid var(--theme-border, rgba(255,255,255,0.07));
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
     display: flex;
@@ -967,15 +969,15 @@ onBeforeUnmount(() => {
 }
 .sermon-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    background: rgba(255,255,255,0.07);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    background: var(--theme-bg-elevated, rgba(255,255,255,0.07));
 }
 .card-thumb {
     width: 100%;
     aspect-ratio: 16 / 9;
     position: relative;
     overflow: hidden;
-    background: rgba(255,255,255,0.05);
+    background: var(--theme-bg-elevated, rgba(255,255,255,0.05));
     flex-shrink: 0;
 }
 .card-thumb img {

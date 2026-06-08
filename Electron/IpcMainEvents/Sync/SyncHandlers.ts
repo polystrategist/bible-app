@@ -126,6 +126,7 @@ export const SyncHandlers = (win: BrowserWindow) => {
         clip_notes?: any[];
         prayer_lists?: any[];
         prayer_days?: any[];
+        devotion_days?: any[];
         notes?: any[];
         sermon_favorites?: any[];
         ai_conversations?: any[];
@@ -153,6 +154,9 @@ export const SyncHandlers = (win: BrowserWindow) => {
                         break;
                     case 'prayer_days':
                         await StoreDB('prayer_days').where({ day: key }).delete();
+                        break;
+                    case 'devotion_days':
+                        await StoreDB('devotion_days').where({ day: key }).delete();
                         break;
                     case 'notes':
                         await StoreDB('notes').where('note_id', key).delete();
@@ -254,6 +258,19 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     });
                 } else if (incoming > (existing.duration ?? 0)) {
                     await StoreDB('prayer_days').where('day', pd.day).update({ duration: incoming, updated_at: now });
+                }
+            }
+
+            // 4c. Devotion-streak days (created-only, idempotent union)
+            for (const dd of pullData.devotion_days ?? []) {
+                if (!dd.day) continue;
+                const existing = await StoreDB('devotion_days').where('day', dd.day).first();
+                if (!existing) {
+                    await StoreDB('devotion_days').insert({
+                        day: dd.day,
+                        created_at: dd.created_at ?? now,
+                        updated_at: dd.updated_at ?? now,
+                    });
                 }
             }
 

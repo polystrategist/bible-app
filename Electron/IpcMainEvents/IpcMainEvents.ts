@@ -20,6 +20,7 @@ import exporting from './exporting/exporting';
 import CrossReferences from './CrossReferences/CrossReferences';
 import AiConversations from './AiConversations/AiConversations';
 import PrayerDays from './PrayerDays/PrayerDays';
+import DevotionDays from './DevotionDays/DevotionDays';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -84,4 +85,5 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // Prayer-streak days
     PrayerDays();
+    DevotionDays();
 };
