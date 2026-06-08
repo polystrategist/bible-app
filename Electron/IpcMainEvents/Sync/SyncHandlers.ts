@@ -238,16 +238,22 @@ export const SyncHandlers = (win: BrowserWindow) => {
                 }
             }
 
-            // 4b. Prayer-streak days (created-only, idempotent union)
+            // 4b. Prayer-streak days (union-merged). Per-day `duration` (total
+            //     prayer seconds) is merged as a MAX so the larger total wins —
+            //     idempotent, never double-counts on re-sync.
             for (const pd of pullData.prayer_days ?? []) {
                 if (!pd.day) continue;
+                const incoming = Number(pd.duration ?? 0) || 0;
                 const existing = await StoreDB('prayer_days').where('day', pd.day).first();
                 if (!existing) {
                     await StoreDB('prayer_days').insert({
                         day: pd.day,
+                        duration: incoming,
                         created_at: pd.created_at ?? now,
                         updated_at: pd.updated_at ?? now,
                     });
+                } else if (incoming > (existing.duration ?? 0)) {
+                    await StoreDB('prayer_days').where('day', pd.day).update({ duration: incoming, updated_at: now });
                 }
             }
 

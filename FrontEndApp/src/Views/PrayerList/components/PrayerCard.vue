@@ -26,6 +26,14 @@ const emit = defineEmits<{
 const style = computed(() => groupStyle(props.prayer.group));
 const when = computed(() => relativeTime(props.prayer.created_at));
 
+// Strip the rich-text markup to a single flowing line; the template clamps it
+// to two lines with an ellipsis.
+const preview = computed(() => {
+    const div = document.createElement('div');
+    div.innerHTML = props.prayer.content ?? '';
+    return (div.textContent || '').replace(/\s+/g, ' ').trim();
+});
+
 const renderIcon = (icon: string) => () => h(NIcon, null, { default: () => h(Icon, { icon }) });
 
 const menuOptions = computed(() => [
@@ -61,7 +69,7 @@ function onSelect(key: string) {
                 :style="{ background: style.color + '24', color: style.color }"
             >{{ prayer.group }}</span>
             <div class="pcard__title">{{ prayer.title || 'Untitled prayer' }}</div>
-            <div v-if="prayer.content" class="pcard__content prose-mirror-render-html" v-html="prayer.content" />
+            <div v-if="preview" class="pcard__content">{{ preview }}</div>
             <div class="pcard__footer">
                 <span class="pcard__time">
                     <Icon icon="lucide:clock" /> {{ when }}
@@ -118,7 +126,10 @@ function onSelect(key: string) {
     font-size: 13px;
     opacity: 0.7;
     line-height: 1.35;
-    max-height: 38px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 .pcard__footer {

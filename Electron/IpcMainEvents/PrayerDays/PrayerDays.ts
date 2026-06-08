@@ -29,16 +29,39 @@ export default () => {
         }
     });
 
-    // Mark today as prayed (idempotent). Returns the day key recorded.
-    ipcMain.handle('markPrayedToday', async () => {
+    // Mark today as prayed and add `durationSeconds` to today's total prayer
+    // time. Returns the day key recorded. Idempotent for the day itself; when
+    // today already exists and durationSeconds is 0 it's a no-op (no sync log),
+    // a positive duration accumulates and emits an `updated` log.
+    ipcMain.handle('markPrayedToday', async (_event, durationSeconds: number = 0) => {
         try {
             const day = todayKey();
-            const existing = await StoreDB('prayer_days').where({ day }).first();
-            if (existing) return day;
-
             const now = new Date().toISOString();
+            const add = Math.max(0, Math.floor(durationSeconds || 0));
+            const existing = await StoreDB('prayer_days').where({ day }).first();
+
+            if (existing) {
+                if (add <= 0) return day;
+                const total = (existing.duration ?? 0) + add;
+                const createdAt = existing.created_at ?? now;
+                await StoreDB('prayer_days').where({ day }).update({ duration: total, updated_at: now });
+                try {
+                    await logSyncChange({
+                        table_name: 'prayer_days',
+                        record_key: day,
+                        action: 'updated',
+                        payload: { day, duration: total, created_at: createdAt, updated_at: now },
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('Failed to log sync change for prayer day:', e);
+                }
+                return day;
+            }
+
             await StoreDB('prayer_days').insert({
                 day,
+                duration: add,
                 created_at: now,
                 updated_at: now,
             });
@@ -48,7 +71,7 @@ export default () => {
                     table_name: 'prayer_days',
                     record_key: day,
                     action: 'created',
-                    payload: { day, created_at: now, updated_at: now },
+                    payload: { day, duration: add, created_at: now, updated_at: now },
                     synced: 0,
                 });
             } catch (e) {

@@ -229,12 +229,14 @@ const stub: Window['browserWindow'] = {
         try {
             const raw = localStorage.getItem('prayer_days');
             const days: string[] = raw ? JSON.parse(raw) : [];
-            return days.map((day) => ({ day }));
+            const durRaw = localStorage.getItem('prayer_days_duration');
+            const dur: Record<string, number> = durRaw ? JSON.parse(durRaw) : {};
+            return days.map((day) => ({ day, duration: dur[day] ?? 0 }));
         } catch {
             return [];
         }
     },
-    markPrayedToday: async () => {
+    markPrayedToday: async (durationSeconds = 0) => {
         const d = new Date();
         const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         try {
@@ -243,6 +245,13 @@ const stub: Window['browserWindow'] = {
             if (!days.includes(day)) {
                 days.push(day);
                 localStorage.setItem('prayer_days', JSON.stringify(days));
+            }
+            const add = Math.max(0, Math.floor(durationSeconds || 0));
+            if (add > 0) {
+                const durRaw = localStorage.getItem('prayer_days_duration');
+                const dur: Record<string, number> = durRaw ? JSON.parse(durRaw) : {};
+                dur[day] = (dur[day] ?? 0) + add;
+                localStorage.setItem('prayer_days_duration', JSON.stringify(dur));
             }
         } catch { /* ignore */ }
         return day;

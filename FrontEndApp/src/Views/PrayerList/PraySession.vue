@@ -63,7 +63,7 @@ function prev() {
 }
 async function finish() {
     stopTimer();
-    await streak.recordTodayPrayed();
+    await streak.recordTodayPrayed(elapsed.value);
     finished.value = true;
 }
 function done() {

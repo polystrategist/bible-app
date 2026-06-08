@@ -87,6 +87,7 @@ defineExpose({ modalTrigger });
                         v-model:value="prayerGroup"
                         :options="groupOptions"
                         :render-label="renderGroupLabel"
+                        :virtual-scroll="false"
                         filterable
                         tag
                         clearable

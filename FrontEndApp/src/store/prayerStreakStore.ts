@@ -29,8 +29,16 @@ function dateOnly(d: Date): Date {
  */
 export const usePrayerStreakStore = defineStore('prayerStreakStoreId', () => {
     const days = ref<Set<string>>(new Set());
+    // Per-day total prayer time in seconds, keyed by day (YYYY-MM-DD).
+    const durations = ref<Map<string, number>>(new Map());
 
     const prayedToday = computed(() => days.value.has(dayKey()));
+
+    /** Total prayer time (seconds) for a day (defaults to today). */
+    function durationForDay(day = dayKey()): number {
+        return durations.value.get(day) ?? 0;
+    }
+    const todayDuration = computed(() => durationForDay());
 
     /** Consecutive-day streak ending today (or yesterday if today isn't prayed). */
     const currentStreak = computed(() => {
@@ -66,17 +74,23 @@ export const usePrayerStreakStore = defineStore('prayerStreakStoreId', () => {
 
     async function loadDays() {
         const rows = await window.browserWindow.getPrayerDays();
-        days.value = new Set((rows ?? []).map((r: { day: string }) => r.day));
+        days.value = new Set((rows ?? []).map((r) => r.day));
+        durations.value = new Map((rows ?? []).map((r) => [r.day, r.duration ?? 0]));
     }
 
-    /** Record today as prayed (idempotent) and trigger a sync. */
-    async function recordTodayPrayed() {
-        const day = await window.browserWindow.markPrayedToday();
-        if (day && !days.value.has(day)) {
-            days.value = new Set([...days.value, day]);
-            debouncedRunSync();
+    /**
+     * Record today as prayed and add `durationSeconds` to today's prayer-time
+     * total, then trigger a sync.
+     */
+    async function recordTodayPrayed(durationSeconds = 0) {
+        const day = await window.browserWindow.markPrayedToday(durationSeconds);
+        if (!day) return;
+        days.value = new Set([...days.value, day]);
+        if (durationSeconds > 0) {
+            durations.value = new Map(durations.value).set(day, durationForDay(day) + durationSeconds);
         }
+        debouncedRunSync();
     }
 
-    return { days, prayedToday, currentStreak, weekDays, loadDays, recordTodayPrayed };
+    return { days, durations, prayedToday, todayDuration, durationForDay, currentStreak, weekDays, loadDays, recordTodayPrayed };
 });
