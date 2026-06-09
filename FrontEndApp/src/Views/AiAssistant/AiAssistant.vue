@@ -4,13 +4,14 @@ import { NButton, NTooltip, NPopover, NSwitch } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { useAuthStore } from '../../store/authStore';
 import { useConversationStore, type AiMode } from '../../store/conversationStore';
-import AiPaywall from './AiPaywall.vue';
+import { usePlanModalStore } from '../../store/planModalStore';
 import ConversationSidebar from './ConversationSidebar.vue';
 import ChatThread from './ChatThread.vue';
 import ChatComposer from './ChatComposer.vue';
 
 const authStore = useAuthStore();
 const convo = useConversationStore();
+const planModal = usePlanModalStore();
 
 const collapsed = ref(false);
 const composerText = ref('');
@@ -40,6 +41,12 @@ onMounted(async () => {
 });
 
 function onSend(payload: { mode: AiMode; text: string; reference: string }) {
+    // AI is a Pro feature. Non-subscribers can browse the chat UI, but sending
+    // opens the plan dialog instead of calling the (gated) backend.
+    if (!authStore.isAiEnabled) {
+        planModal.show();
+        return;
+    }
     convo.send(payload);
     composerText.value = '';
     composerReference.value = '';
@@ -69,9 +76,7 @@ async function onToggleSync(value: boolean) {
 
 <template>
     <div class="ai-page">
-        <AiPaywall v-if="!authStore.isAiEnabled" />
-
-        <div v-else class="ai-shell">
+        <div class="ai-shell">
             <ConversationSidebar
                 v-if="!collapsed"
                 :conversations="convo.conversations"

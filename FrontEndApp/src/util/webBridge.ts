@@ -359,6 +359,11 @@ const stub: Window['browserWindow'] = {
         return res === true;
     },
 
+    // ---------- AI insight/sermon cache (local-only convenience; skipped on web — always online) ----------
+    getAiInsight: async () => null,
+    saveAiInsight: async () => false,
+    pruneAiInsights: async () => false,
+
     // ---------- Sermons offline cache + favorites (no-op on web — backend is source of truth) ----------
     replaceCachedSermons: async () => ({ success: false, error: 'Not available on web' }),
     getCachedSermons: async () => [],

@@ -121,6 +121,11 @@ contextBridge.exposeInMainWorld('browserWindow', {
     saveAiConversation: (payload: any) => ipcRenderer.invoke('saveAiConversation', payload),
     deleteAiConversation: (id: string) => ipcRenderer.invoke('deleteAiConversation', id),
 
+    // AI insight/sermon local cache
+    getAiInsight: (key: string) => ipcRenderer.invoke('getAiInsight', key),
+    saveAiInsight: (payload: any) => ipcRenderer.invoke('saveAiInsight', payload),
+    pruneAiInsights: () => ipcRenderer.invoke('pruneAiInsights'),
+
     // Commentaries
     getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
     hasCommentary: (version: string) => ipcRenderer.invoke('hasCommentary', version),

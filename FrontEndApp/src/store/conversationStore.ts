@@ -170,6 +170,18 @@ export const useConversationStore = defineStore('aiConversationStore', () => {
         }
     }
 
+    /**
+     * Start a fresh chat pre-seeded with an existing exchange — used by "Continue
+     * in chat" from a one-shot AI result (insight/sermon), so the generated
+     * content is carried into the thread and the user can ask follow-ups with
+     * full context. Persists immediately so it shows in the saved list.
+     */
+    async function seedConversation(seed: AiChatMessage[]): Promise<void> {
+        newConversation();
+        messages.value = seed.map((m) => ({ role: m.role, content: m.content }));
+        await persist();
+    }
+
     /** Retry the last send after an error (the user turn is already in place). */
     async function retryLast(): Promise<void> {
         const prev = lastSend.value;
@@ -194,6 +206,7 @@ export const useConversationStore = defineStore('aiConversationStore', () => {
         renameConversation,
         deleteConversation,
         send,
+        seedConversation,
         retryLast,
     };
 });

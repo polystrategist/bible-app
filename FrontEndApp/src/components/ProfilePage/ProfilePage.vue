@@ -3,7 +3,9 @@ import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useDialog, useM
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { useMainStore } from '../../store/main';
-import { useWebBillingStore, type PlanOption } from '../../store/webBillingStore';
+import { useWebBillingStore } from '../../store/webBillingStore';
+import { usePlanModalStore } from '../../store/planModalStore';
+import { useSubscriptionPlans } from '../../composables/useSubscriptionPlans';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
 import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
@@ -15,12 +17,13 @@ const loading = ref(false);
 const authStore = useAuthStore();
 const mainStore = useMainStore();
 const webBilling = useWebBillingStore();
+const planModal = usePlanModalStore();
 const message = useMessage();
 const dialog = useDialog();
 const router = useRouter();
 
 // ─── Subscription card (mirrors the mobile SubscriptionCard) ─────────────────
-const plansModalOpen = ref(false);
+// "Choose your plan" is the global PlanModal (App.vue), opened via planModal.
 // Plan-management modal (subscribers: switch plan / open Paddle portal).
 const manageModalOpen = ref(false);
 
@@ -52,81 +55,19 @@ const renewsLabel = computed(() => {
     });
 });
 
-const syncPlan = computed(
-    () =>
-        webBilling.plans.find((p) => p.id === '$rc_monthly') ??
-        webBilling.plans.find(
-            (p) =>
-                p.title.toLowerCase().includes('sync') &&
-                !p.title.toLowerCase().includes('pro'),
-        ),
-);
-const proPlan = computed(
-    () =>
-        webBilling.plans.find((p) => p.id === 'pro_monthly') ??
-        webBilling.plans.find((p) => p.title.toLowerCase().includes('pro')),
-);
+// Plan cards + prices come from the shared composable (single source of truth,
+// with fallback prices so a price always shows even when offerings aren't loaded).
+const { planCards, syncPrice, proPrice } = useSubscriptionPlans();
 
-// Live price from the current offering (never hard-coded, so a price change is
-// reflected automatically). Null until plans load.
 const subPrice = computed(() => {
-    const plan =
-        authStore.tier === 'pro'
-            ? proPlan.value
-            : authStore.tier === 'sync'
-              ? syncPlan.value
-              : undefined;
-    return plan ? `${plan.price}/month` : null;
+    if (authStore.tier === 'pro') return `${proPrice.value}/month`;
+    if (authStore.tier === 'sync') return `${syncPrice.value}/month`;
+    return null;
 });
 
-// Plan comparison cards — show the user exactly what each tier includes.
-const planCards = computed(() => [
-    {
-        key: 'sync',
-        name: 'Sync',
-        tagline: 'Sync & back up your study',
-        plan: syncPlan.value,
-        highlight: false,
-        badge: '',
-        features: [
-            'Cross-device sync — notes, highlights, bookmarks & prayer lists',
-            'Cloud backup of your study data',
-            'Web app access',
-        ],
-    },
-    {
-        key: 'pro',
-        name: 'Pro',
-        tagline: 'Everything in Sync, plus AI study tools',
-        plan: proPlan.value,
-        highlight: true,
-        badge: 'Best for study & teaching',
-        features: [
-            'Everything in Sync',
-            'AI verse insights — contextual insight on any passage',
-            'AI Bible chat — Scripture-focused answers',
-            'Sermon outlines, drafts & devotionals',
-        ],
-    },
-]);
-
-async function buyPlan(plan: PlanOption) {
-    // Block checkout until the account email is verified (the store enforces
-    // this too; this surfaces a clear alert before the hosted checkout opens).
-    if (!isEmailVerified.value) {
-        message.warning('Please verify your email address before subscribing.');
-        return;
-    }
-    const ok = await webBilling.purchase(plan);
-    if (ok) {
-        plansModalOpen.value = false;
-        message.success('Subscription activated.');
-    }
-}
-
-async function viewPlans() {
-    plansModalOpen.value = true;
-    if (webBilling.plans.length === 0) await webBilling.loadPlans();
+// "View plans" opens the global Choose-your-plan dialog (PlanModal in App.vue).
+function viewPlans() {
+    planModal.show();
 }
 
 // Human-readable name + (optional) management deep link for a RevenueCat store.
@@ -197,11 +138,10 @@ async function upgradeToPro() {
     }
 
     const due = formatAmount(preview.amount, preview.currency);
-    const proPrice = proPlan.value?.price ?? '$5.99';
     const renews = renewsLabel.value;
     dialog.warning({
         title: 'Upgrade to Pro',
-        content: `You’ll be charged ${due} today, prorated for the rest of this billing period, then ${proPrice}/month${renews ? ` from ${renews}` : ''}.`,
+        content: `You’ll be charged ${due} today, prorated for the rest of this billing period, then ${proPrice.value}/month${renews ? ` from ${renews}` : ''}.`,
         positiveText: 'Upgrade',
         negativeText: 'Cancel',
         onPositiveClick: async () => {
@@ -820,34 +760,47 @@ onBeforeUnmount(destroyCropper);
                     </NButton>
                         </NAlert>
 
-                        <NButton
-                            v-if="authStore.tier === 'sync'"
-                            type="primary"
-                            block
-                            class="mb-2"
-                            :disabled="subscribedOnMobile || webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
-                            :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
-                            @click="upgradeToPro"
-                        >
-                            <template #icon><Icon icon="lucide:arrow-up" /></template>
-                            Upgrade to Pro
-                        </NButton>
-                        <NButton
-                            block
-                            :disabled="subscribedOnMobile"
-                            @click="openManage"
-                        >
-                            <template #icon><Icon icon="lucide:settings" /></template>
-                            Manage subscription
-                        </NButton>
+                        <!-- Web checkout enabled → in-app upgrade / manage. -->
+                        <template v-if="webBilling.supported">
+                            <NButton
+                                v-if="authStore.tier === 'sync'"
+                                type="primary"
+                                block
+                                class="mb-2"
+                                :disabled="subscribedOnMobile || webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
+                                :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
+                                @click="upgradeToPro"
+                            >
+                                <template #icon><Icon icon="lucide:arrow-up" /></template>
+                                Upgrade to Pro
+                            </NButton>
+                            <NButton
+                                block
+                                :disabled="subscribedOnMobile"
+                                @click="openManage"
+                            >
+                                <template #icon><Icon icon="lucide:settings" /></template>
+                                Manage subscription
+                            </NButton>
 
-                        <!-- Plan bought on a mobile store → can't manage it here. -->
-                        <div v-if="subscribedOnMobile" class="manage-elsewhere-note">
+                            <!-- Plan bought on a mobile store → can't manage it here. -->
+                            <div v-if="subscribedOnMobile" class="manage-elsewhere-note">
+                                <Icon icon="mdi:cellphone-cog" />
+                                <span>
+                                    You subscribed through {{ mobileStoreLabel }}. To
+                                    upgrade, change, or cancel your plan, please manage it
+                                    in the Believers Sword <strong>mobile app</strong>.
+                                </span>
+                            </div>
+                        </template>
+
+                        <!-- Web checkout off (Paddle not yet live) → manage on mobile. -->
+                        <div v-else class="manage-elsewhere-note">
                             <Icon icon="mdi:cellphone-cog" />
                             <span>
-                                You subscribed through {{ mobileStoreLabel }}. To
-                                upgrade, change, or cancel your plan, please manage it
-                                in the Believers Sword <strong>mobile app</strong>.
+                                Manage, upgrade, or cancel your plan in the Believers Sword
+                                <strong>mobile app</strong>. Any changes apply here
+                                automatically.
                             </span>
                         </div>
                     </template>
@@ -1106,57 +1059,7 @@ onBeforeUnmount(destroyCropper);
             </template>
         </NModal>
 
-        <!-- Plan comparison modal -->
-        <NModal
-            v-model:show="plansModalOpen"
-            preset="card"
-            title="Choose your plan"
-            :bordered="false"
-            :auto-focus="false"
-            style="max-width: 720px; width: 92vw;"
-        >
-            <div v-if="webBilling.loading" class="sub-plan-loading">
-                <NSpin size="small" /> <span>Loading plans…</span>
-            </div>
-            <template v-else>
-                <div class="plans-grid">
-                    <div
-                        v-for="card in planCards"
-                        :key="card.key"
-                        class="plan-card"
-                        :class="{ 'is-highlight': card.highlight }"
-                    >
-                        <div v-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
-                        <div class="plan-card__name">{{ card.name }}</div>
-                        <div class="plan-card__price">
-                            <template v-if="card.plan">
-                                {{ card.plan.price }}<span class="plan-card__per">/month</span>
-                            </template>
-                            <template v-else>—</template>
-                        </div>
-                        <p class="plan-card__tagline">{{ card.tagline }}</p>
-                        <ul class="plan-card__features">
-                            <li v-for="f in card.features" :key="f">
-                                <Icon icon="lucide:check" /> <span>{{ f }}</span>
-                            </li>
-                        </ul>
-                        <NButton
-                            :type="card.highlight ? 'primary' : 'default'"
-                            block
-                            :disabled="!card.plan || webBilling.purchasingId !== null"
-                            :loading="!!card.plan && webBilling.purchasingId === card.plan.id"
-                            @click="card.plan && buyPlan(card.plan)"
-                        >
-                            Choose {{ card.name }}
-                        </NButton>
-                    </div>
-                </div>
-                <p v-if="!webBilling.supported" class="sub-hint">
-                    Subscribe in the Believers Sword mobile app — your plan works here automatically.
-                </p>
-                <p v-if="webBilling.error" class="sub-error">{{ webBilling.error }}</p>
-            </template>
-        </NModal>
+        <!-- "Choose your plan" is the global PlanModal, mounted in App.vue. -->
 
         <!-- Manage plan modal (active subscribers): switch plan + Paddle portal -->
         <NModal
@@ -1200,10 +1103,7 @@ onBeforeUnmount(destroyCropper);
                         <div v-else-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
                         <div class="plan-card__name">{{ card.name }}</div>
                         <div class="plan-card__price">
-                            <template v-if="card.plan">
-                                {{ card.plan.price }}<span class="plan-card__per">/month</span>
-                            </template>
-                            <template v-else>—</template>
+                            {{ card.price }}<span class="plan-card__per">/month</span>
                         </div>
                         <p class="plan-card__tagline">{{ card.tagline }}</p>
                         <ul class="plan-card__features">

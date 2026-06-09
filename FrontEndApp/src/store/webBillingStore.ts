@@ -68,8 +68,14 @@ export type ManageResult =
 export const useWebBillingStore = defineStore('webBillingStore', () => {
     const authStore = useAuthStore();
 
-    /** Whether web purchasing is configured at all. */
-    const supported = !!WEB_KEY;
+    // Master kill-switch for web/desktop checkout. Paddle (RevenueCat Web
+    // Billing) is not yet verified for production, so all purchasing on
+    // desktop/web is disabled — the UI falls back to a "subscribe in the mobile
+    // app" notice (see MobileOnlyNotice.vue). Flip to `true` once Paddle is live.
+    const CHECKOUT_ENABLED = false;
+
+    /** Whether web purchasing is available (configured AND enabled). */
+    const supported = !!WEB_KEY && CHECKOUT_ENABLED;
 
     const plans = ref<PlanOption[]>([]);
     const loading = ref(false);

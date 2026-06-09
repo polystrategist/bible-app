@@ -6,6 +6,8 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../../store/authStore';
 import { useWebBillingStore, type PlanOption } from '../../../store/webBillingStore';
+import { useSubscriptionPlans } from '../../../composables/useSubscriptionPlans';
+import MobileOnlyNotice from '../../../components/MobileOnlyNotice.vue';
 
 // Web access is a paid feature (Sync or Pro). The router sends Free/lapsed
 // accounts here. This page lets them subscribe (RevenueCat Web Billing), refresh
@@ -18,44 +20,8 @@ const message = useMessage();
 
 const refreshing = ref(false);
 
-const syncPlan = () =>
-    webBilling.plans.find((p) => p.id === '$rc_monthly') ??
-    webBilling.plans.find(
-        (p) => p.title.toLowerCase().includes('sync') && !p.title.toLowerCase().includes('pro'),
-    );
-const proPlan = () =>
-    webBilling.plans.find((p) => p.id === 'pro_monthly') ??
-    webBilling.plans.find((p) => p.title.toLowerCase().includes('pro'));
-
-const planCards = () => [
-    {
-        key: 'sync',
-        name: 'Sync',
-        tagline: 'Sync & back up your study',
-        plan: syncPlan(),
-        highlight: false,
-        badge: '',
-        features: [
-            'Cross-device sync — notes, highlights, bookmarks & prayer lists',
-            'Cloud backup of your study data',
-            'Web app access',
-        ],
-    },
-    {
-        key: 'pro',
-        name: 'Pro',
-        tagline: 'Everything in Sync, plus AI study tools',
-        plan: proPlan(),
-        highlight: true,
-        badge: 'Best for study & teaching',
-        features: [
-            'Everything in Sync',
-            'AI verse insights — contextual insight on any passage',
-            'AI Bible chat — Scripture-focused answers',
-            'Sermon outlines, drafts & devotionals',
-        ],
-    },
-];
+// Plan cards + prices come from the shared composable (single source of truth).
+const { planCards } = useSubscriptionPlans();
 
 async function buyPlan(plan: PlanOption) {
     const ok = await webBilling.purchase(plan);
@@ -111,7 +77,7 @@ onMounted(() => {
 
             <div v-else-if="webBilling.supported" class="gate__plans">
                 <div
-                    v-for="card in planCards()"
+                    v-for="card in planCards"
                     :key="card.key"
                     class="plan-card"
                     :class="{ 'is-highlight': card.highlight }"
@@ -119,10 +85,7 @@ onMounted(() => {
                     <div v-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
                     <div class="plan-card__name">{{ card.name }}</div>
                     <div class="plan-card__price">
-                        <template v-if="card.plan">
-                            {{ card.plan.price }}<span class="plan-card__per">/month</span>
-                        </template>
-                        <template v-else>—</template>
+                        {{ card.price }}<span class="plan-card__per">/month</span>
                     </div>
                     <p class="plan-card__tagline">{{ card.tagline }}</p>
                     <ul class="plan-card__features">
@@ -142,9 +105,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <p v-else class="gate__hint">
-                Subscribe in the Believers Sword mobile app — your plan works here automatically.
-            </p>
+            <MobileOnlyNotice v-else class="gate__mobile" />
 
             <p v-if="webBilling.error" class="gate__error">{{ webBilling.error }}</p>
 
@@ -269,6 +230,9 @@ onMounted(() => {
 .gate__hint {
     font-size: 14px;
     opacity: 0.8;
+}
+.gate__mobile {
+    margin-top: 8px;
 }
 .gate__error {
     color: #f87171;

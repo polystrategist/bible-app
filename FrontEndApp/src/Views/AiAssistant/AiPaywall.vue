@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue';
 import { computed, onMounted } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { useWebBillingStore } from '../../store/webBillingStore';
+import MobileOnlyNotice from '../../components/MobileOnlyNotice.vue';
 
 const authStore = useAuthStore();
 const webBilling = useWebBillingStore();
@@ -130,11 +131,8 @@ async function choosePro() {
             </div>
         </template>
 
-        <!-- Web purchasing not configured → direct users to mobile -->
-        <p v-else class="ai-paywall__hint">
-            Subscribe in the Believers Sword mobile app to unlock AI. Your subscription
-            works here automatically once active.
-        </p>
+        <!-- Web purchasing off/not configured → direct users to the mobile app -->
+        <MobileOnlyNotice v-else class="ai-paywall__mobile" />
     </div>
 </template>
 
@@ -149,6 +147,7 @@ async function choosePro() {
 .ai-paywall h2 { margin: 8px 0 6px; }
 .ai-paywall > p { opacity: 0.85; line-height: 1.55; }
 .ai-paywall__hint { opacity: 0.7; font-size: 13px; margin-top: 8px; }
+.ai-paywall__mobile { margin-top: 22px; }
 .ai-plan-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
 .ai-plan-loading { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; opacity: 0.75; }
 .ai-plan-error { color: #b45353; font-size: 13px; margin-top: 8px; }

@@ -1,6 +1,12 @@
 import type { Component } from 'vue';
 import { BookmarkAdd, Attachment } from '@vicons/carbon';
-import { EraserSegment24Filled, TabDesktopMultiple20Regular, PaintBrush24Regular, Sparkle24Regular } from '@vicons/fluent';
+import {
+    EraserSegment24Filled,
+    TabDesktopMultiple20Regular,
+    PaintBrush24Regular,
+    Sparkle24Regular,
+    DocumentText24Regular,
+} from '@vicons/fluent';
 
 interface ContextMenuOption {
     label: string;
@@ -9,13 +15,26 @@ interface ContextMenuOption {
     key: string;
 }
 
-export const ContextMenuOptions: ContextMenuOption[] = [
+/**
+ * AI actions, surfaced as their own accented group at the top of the verse
+ * context menu so they're easy to find. Both open the AI result modal.
+ */
+export const AiContextMenuOptions: ContextMenuOption[] = [
     {
         label: 'AI Insight',
         description: 'Understand this verse more deeply',
         icon: Sparkle24Regular,
         key: 'ai-insight',
     },
+    {
+        label: 'Generate Sermon',
+        description: 'Draft a sermon outline from this verse',
+        icon: DocumentText24Regular,
+        key: 'ai-sermon',
+    },
+];
+
+export const ContextMenuOptions: ContextMenuOption[] = [
     {
         label: 'Add to Bookmark',
         icon: BookmarkAdd,

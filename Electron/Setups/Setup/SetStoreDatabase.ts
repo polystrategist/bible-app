@@ -7,6 +7,7 @@ import syncLogsMigration from './StoreDB/sync_logs.migration';
 import cachedSermonsMigration from './StoreDB/cached_sermons.migration';
 import sermonFavoritesMigration from './StoreDB/sermon_favorites.migration';
 import aiConversationsMigration from './StoreDB/ai_conversations.migration';
+import aiInsightsMigration from './StoreDB/ai_insights.migration';
 import prayerDaysMigration from './StoreDB/prayer_days.migration';
 import devotionDaysMigration from './StoreDB/devotion_days.migration';
 import Log from 'electron-log';
@@ -37,6 +38,9 @@ export default async () => {
 
         // setup AI Assistant conversation history
         await aiConversationsMigration();
+
+        // setup AI insight/sermon local cache
+        await aiInsightsMigration();
 
         // setup prayer-streak days
         await prayerDaysMigration();
