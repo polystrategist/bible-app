@@ -11,6 +11,7 @@ import EditPrayerItem from './EditPrayerItem.vue';
 import NewPrayerItem from './CreateNewPrayerItem.vue';
 import PrayerStatsStrip from './components/PrayerStatsStrip.vue';
 import PrayerCard from './components/PrayerCard.vue';
+import PrayerStreakView from './components/PrayerStreakView.vue';
 import PraySession from './PraySession.vue';
 
 const message = useMessage();
@@ -23,7 +24,7 @@ const session = usePraySessionStore();
 
 const editPrayerModal = ref<any>(null);
 const newPrayerModal = ref<any>(null);
-const tab = ref<'ongoing' | 'done'>('ongoing');
+const tab = ref<'ongoing' | 'done' | 'streak'>('ongoing');
 const search = ref('');
 const groupFilter = ref<string | null>(null);
 
@@ -138,39 +139,53 @@ function prayThis(item: any) {
                     <span>Answered</span>
                     <span class="seg__count">{{ answered.length }}</span>
                 </button>
+                <button
+                    class="seg__btn"
+                    :class="{ 'seg__btn--active': tab === 'streak' }"
+                    @click="tab = 'streak'"
+                >
+                    <Icon icon="lucide:flame" />
+                    <span>Daily Streak</span>
+                    <span class="seg__count">{{ streak.currentStreak }}</span>
+                </button>
             </div>
 
-            <!-- Search + filter -->
-            <div class="prayer-tools">
-                <div class="prayer-search">
-                    <Icon icon="lucide:search" />
-                    <input v-model="search" type="text" placeholder="Search prayers…" />
-                </div>
-                <select v-model="groupFilter" class="prayer-filter">
-                    <option :value="null">All groups</option>
-                    <option v-for="g in groups" :key="g" :value="g">{{ g }}</option>
-                </select>
-            </div>
+            <!-- Daily Streak: month calendar + streak summary -->
+            <PrayerStreakView v-if="tab === 'streak'" />
 
-            <!-- List -->
-            <div class="prayer-list">
-                <PrayerCard
-                    v-for="p in visible"
-                    :key="p.key"
-                    :prayer="p"
-                    :answered="tab === 'done'"
-                    @edit="editPrayer(p)"
-                    @remove="remove(p)"
-                    @toggle="toggle(p)"
-                    @pray="prayThis(p)"
-                />
-                <div v-if="visible.length === 0" class="prayer-empty">
-                    <Icon :icon="search || groupFilter ? 'lucide:search-x' : 'lucide:hand-heart'" />
-                    <p v-if="search || groupFilter">No prayers match your search</p>
-                    <p v-else-if="tab === 'ongoing'">No ongoing prayers yet</p>
-                    <p v-else>No answered prayers yet</p>
+            <template v-else>
+                <!-- Search + filter -->
+                <div class="prayer-tools">
+                    <div class="prayer-search">
+                        <Icon icon="lucide:search" />
+                        <input v-model="search" type="text" placeholder="Search prayers…" />
+                    </div>
+                    <select v-model="groupFilter" class="prayer-filter">
+                        <option :value="null">All groups</option>
+                        <option v-for="g in groups" :key="g" :value="g">{{ g }}</option>
+                    </select>
                 </div>
-            </div>
+
+                <!-- List -->
+                <div class="prayer-list">
+                    <PrayerCard
+                        v-for="p in visible"
+                        :key="p.key"
+                        :prayer="p"
+                        :answered="tab === 'done'"
+                        @edit="editPrayer(p)"
+                        @remove="remove(p)"
+                        @toggle="toggle(p)"
+                        @pray="prayThis(p)"
+                    />
+                    <div v-if="visible.length === 0" class="prayer-empty">
+                        <Icon :icon="search || groupFilter ? 'lucide:search-x' : 'lucide:hand-heart'" />
+                        <p v-if="search || groupFilter">No prayers match your search</p>
+                        <p v-else-if="tab === 'ongoing'">No ongoing prayers yet</p>
+                        <p v-else>No answered prayers yet</p>
+                    </div>
+                </div>
+            </template>
             </div>
         </div>
 
