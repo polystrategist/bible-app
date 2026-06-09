@@ -13,6 +13,7 @@ import { usePlanModalStore } from '../../../../store/planModalStore';
 import { useConversationStore } from '../../../../store/conversationStore';
 import { useMenuStore } from '../../../../store/menu';
 import { debouncedRunSync } from '../../../../util/Sync/sync';
+import { renderMarkdown } from '../../../../util/markdown';
 import { colors } from '../../../../util/highlighter';
 
 const bibleStore = useBibleStore();
@@ -263,29 +264,25 @@ onClickOutside(contextMenuRef, (event) => {
             ref="contextMenuRef"
             class="w-220px max-h-300px overflow-y-auto overflowing-div flex flex-col select-none p-5px"
         >
-            <!-- AI actions, grouped + accented at the top so they're easy to find -->
-            <div class="flex items-center gap-5px px-7px pt-3px pb-2px">
-                <NIcon size="12" :component="Sparkle24Regular" class="ai-group-label__icon" />
-                <span class="text-size-10px font-700 uppercase tracking-wide ai-group-label">AI Tools</span>
-            </div>
+            <!-- AI actions — premium blue→purple gradient cards so they stand out. -->
             <div
                 v-for="option in AiContextMenuOptions"
                 :key="option.key"
-                class="ai-menu-item flex items-start pt-4px pb-2px pl-7px pr-1 cursor-pointer rounded-sm"
+                class="ai-grad-card"
                 @click="clickContextMenu(option.key)"
             >
-                <div class="w-25px pt-2px">
-                    <NIcon size="15" :component="option.icon" class="ai-menu-item__icon" />
+                <div class="ai-grad-card__icon">
+                    <NIcon size="16" :component="option.icon" />
                 </div>
-                <div class="flex flex-col leading-tight">
-                    <span class="text-size-15px whitespace-nowrap">{{ $t(option.label) }}</span>
-                    <span v-if="option.description" class="text-size-11px opacity-60">
+                <div class="flex flex-col leading-tight min-w-0">
+                    <span class="text-size-14px font-700 whitespace-nowrap">{{ $t(option.label) }}</span>
+                    <span v-if="option.description" class="text-size-11px ai-grad-card__desc">
                         {{ option.description }}
                     </span>
                 </div>
             </div>
 
-            <div class="h-1px bg-gray-500 bg-opacity-20 my-4px mx-2px"></div>
+            <div class="h-1px bg-gray-500 bg-opacity-20 my-5px mx-2px"></div>
 
             <div
                 v-for="option in ContextMenuOptions"
@@ -362,7 +359,9 @@ onClickOutside(contextMenuRef, (event) => {
         <p v-else-if="aiError" class="ai-insight-error">{{ aiError }}</p>
 
         <template v-else>
-            <div class="ai-insight-text">{{ aiResult }}</div>
+            <div class="ai-insight-scroll">
+                <div class="ai-insight-text markdown-body" v-html="renderMarkdown(aiResult)" />
+            </div>
             <div class="ai-insight-actions">
                 <NButton size="small" secondary @click="copyAiResult">
                     <template #icon>
@@ -388,11 +387,54 @@ onClickOutside(contextMenuRef, (event) => {
     opacity: 0.8;
 }
 
-.ai-insight-text {
-    white-space: pre-wrap;
-    line-height: 1.55;
-    font-size: 14px;
+/* Result scrolls within the modal so long sermons/insights don't overflow. */
+.ai-insight-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin: -2px -2px 0;
 }
+.ai-insight-text {
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+/* Rendered Markdown (mirrors the AI chat thread's .markdown-body). */
+.markdown-body :deep(h2),
+.markdown-body :deep(h3),
+.markdown-body :deep(h4),
+.markdown-body :deep(h5),
+.markdown-body :deep(h6) {
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 14px 0 6px;
+}
+.markdown-body :deep(h2) { font-size: 18px; }
+.markdown-body :deep(h3) { font-size: 16px; }
+.markdown-body :deep(h4) { font-size: 14.5px; }
+.markdown-body :deep(h5),
+.markdown-body :deep(h6) { font-size: 13px; opacity: 0.9; }
+.markdown-body :deep(p) { margin: 8px 0; line-height: 1.6; }
+.markdown-body :deep(ul),
+.markdown-body :deep(ol) { margin: 8px 0; padding-left: 22px; }
+.markdown-body :deep(li) { margin: 3px 0; line-height: 1.5; }
+.markdown-body :deep(strong) { font-weight: 700; }
+.markdown-body :deep(em) { font-style: italic; }
+.markdown-body :deep(code) {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.88em;
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.markdown-body :deep(blockquote) {
+    margin: 8px 0;
+    padding-left: 12px;
+    border-left: 3px solid var(--primary-color);
+    opacity: 0.9;
+}
+.markdown-body :deep(> :first-child) { margin-top: 0; }
+.markdown-body :deep(> :last-child) { margin-bottom: 0; }
 
 .ai-insight-actions {
     display: flex;
@@ -403,19 +445,38 @@ onClickOutside(contextMenuRef, (event) => {
     border-top: 1px solid var(--theme-border, rgba(127, 127, 127, 0.2));
 }
 
-/* AI group in the verse context menu — accented so it stands out / is findable. */
-.ai-group-label {
-    color: var(--primary-color);
-    opacity: 0.9;
+/* AI actions in the verse context menu — premium blue→purple gradient cards. */
+.ai-grad-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 9px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.12),
+        rgba(139, 92, 246, 0.12)
+    );
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    transition: filter 0.15s ease;
 }
-.ai-group-label__icon {
-    color: var(--primary-color);
+.ai-grad-card:hover {
+    filter: brightness(1.08);
 }
-.ai-menu-item__icon {
-    color: var(--primary-color);
+.ai-grad-card__icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    color: #fff;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
 }
-.ai-menu-item:hover {
-    background: color-mix(in srgb, var(--primary-color) 16%, transparent);
+.ai-grad-card__desc {
+    opacity: 0.65;
 }
 
 .ai-insight-error {
