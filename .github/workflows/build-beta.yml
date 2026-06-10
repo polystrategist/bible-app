@@ -84,7 +84,7 @@ jobs:
       - name: Build & publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VITE_API_BASE_URL: https://service-dev.believersword.com
+          VITE_API_BASE_URL: https://service.believersword.com
         run: ${{ matrix.build_script }} -p always
 
   publish:
