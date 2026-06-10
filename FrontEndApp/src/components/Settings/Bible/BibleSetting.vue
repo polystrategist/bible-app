@@ -3,11 +3,13 @@ import { NTabs, NTabPane } from 'naive-ui';
 import InstalledBibles from './InstalledBibles.vue';
 import DownloadBibles from './DownloadBibles.vue';
 import ImportBible from './ImportBible.vue';
+import { useMainStore } from '../../../store/main';
 
+const mainStore = useMainStore();
 const canManageLocalBibleFiles = window.isElectron;
 </script>
 <template>
-    <NTabs type="line" size="small" default-value="Added">
+    <NTabs v-model:value="mainStore.bibleSettingsTab" type="line" size="small">
         <NTabPane name="Added" :tab="$t('Added')">
             <InstalledBibles />
         </NTabPane>

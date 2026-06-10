@@ -7,6 +7,9 @@ export const useMainStore = defineStore('useMainStore', () => {
     const showAbout = ref(false);
     const showSettings = ref(false);
     const settingsTab = ref('General');
+    // Sub-tab inside Settings → Bible ('Added' | 'Download' | 'Import'). Lets
+    // other surfaces deep-link straight to e.g. the Download Bibles tab.
+    const bibleSettingsTab = ref('Added');
     const showDonateModal = ref(false);
     // Set true to ask the Profile page to open the subscription manager (manage
     // modal for subscribers, plan picker for Free) once it's shown. The page
@@ -38,6 +41,7 @@ export const useMainStore = defineStore('useMainStore', () => {
     return {
         showSettings,
         settingsTab,
+        bibleSettingsTab,
         showAbout,
         appName,
         version,
