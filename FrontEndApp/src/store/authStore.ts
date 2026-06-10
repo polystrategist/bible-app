@@ -18,9 +18,9 @@ export interface User {
     username?: string | null;
     email: string;
     pending_email?: string | null;
-    sync_enabled: boolean;
-    /** Server-verified subscription tier (RevenueCat webhook source of truth). */
-    tier?: 'free' | 'sync' | 'pro';
+    /** Server-verified active services, e.g. ["ai","sync"] (RevenueCat webhook
+     *  source of truth). The display tier is derived from this. */
+    services?: string[];
     /** ISO-8601 renewal/expiry date of the active subscription, or null. */
     subscription_renews_at?: string | null;
     /** ISO-8601 date a scheduled plan change (e.g. Pro → Sync downgrade) takes
@@ -50,17 +50,27 @@ export const useAuthStore = defineStore('authStore', () => {
     const isAuthenticated = ref(false);
     const remoteSettings = ref<UserSettings | null>(null);
 
-    // Server-verified subscription tier (authoritative; the backend also gates
-    // every AI request). Drives entitlement gating in the AI views.
-    const tier = computed<'free' | 'sync' | 'pro'>(() => user.value?.tier ?? 'free');
-    // AI is Pro-only (Sync covers cross-device sync + backup + web access, but
-    // not AI). The backend also gates every AI request.
-    const isAiEnabled = computed(() => tier.value === 'pro');
+    // Server-verified active services (authoritative; the backend also gates
+    // every request). The source of truth for entitlement gating.
+    const services = computed<string[]>(() => user.value?.services ?? []);
+    const hasService = (service: string) => services.value.includes(service);
 
-    // Sync is a paid feature (the Sync **or** Pro tier). Every sync execution
-    // path gates on this so sync never runs for a Free account, even if a stale
-    // `sync_enabled` preference is loaded before the tier resolves at startup.
-    const isSyncEntitled = computed(() => tier.value !== 'free');
+    // AI requires the `ai` service (granted by Pro). The backend also gates
+    // every AI request.
+    const isAiEnabled = computed(() => hasService('ai'));
+
+    // Sync is a paid feature (the `sync` service, granted by Sync and Pro).
+    // Every sync execution path gates on this so sync never runs for an
+    // unentitled account, even if a stale `sync_enabled` preference is loaded
+    // before services resolve at startup.
+    const isSyncEntitled = computed(() => hasService('sync'));
+
+    // Display tier derived from the services, for plan labels/badges/pricing:
+    // holds `ai` → Pro, else `sync` → Sync, else Free. Presentation only — all
+    // gating uses the services above.
+    const tier = computed<'free' | 'sync' | 'pro'>(() =>
+        hasService('ai') ? 'pro' : hasService('sync') ? 'sync' : 'free',
+    );
 
     // Local avatar cache — base64 data URL of the last uploaded custom picture.
     // Keyed by the profile_picture value so it auto-invalidates if the picture changes.
@@ -73,14 +83,6 @@ export const useAuthStore = defineStore('authStore', () => {
         (() => {
             try { return JSON.parse(localStorage.getItem('pending_theme_settings') || 'null'); }
             catch { return null; }
-        })()
-    );
-
-    // Pending sync_enabled preference (separate endpoint from theme settings).
-    const pendingSyncEnabled = ref<boolean | null>(
-        (() => {
-            const v = localStorage.getItem('pending_sync_enabled');
-            return v === null ? null : v === '1';
         })()
     );
 
@@ -199,15 +201,12 @@ export const useAuthStore = defineStore('authStore', () => {
                 user.value = null;
                 token.value = null;
                 isAuthenticated.value = false;
-                syncEnabled.value = false;
                 remoteSettings.value = null;
                 pendingSettingsUpdate.value = null;
-                pendingSyncEnabled.value = null;
                 localAvatarKey.value   = null;
                 localAvatarCache.value = null;
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('pending_theme_settings');
-                localStorage.removeItem('pending_sync_enabled');
                 localStorage.removeItem('cached_user');
                 localStorage.removeItem('profile_avatar_key');
                 localStorage.removeItem('profile_avatar_data');
@@ -233,15 +232,12 @@ export const useAuthStore = defineStore('authStore', () => {
         user.value = null;
         token.value = null;
         isAuthenticated.value = false;
-        syncEnabled.value = false;
         remoteSettings.value = null;
         pendingSettingsUpdate.value = null;
-        pendingSyncEnabled.value = null;
         localAvatarKey.value   = null;
         localAvatarCache.value = null;
         localStorage.removeItem('auth_token');
         localStorage.removeItem('pending_theme_settings');
-        localStorage.removeItem('pending_sync_enabled');
         localStorage.removeItem('cached_user');
         localStorage.removeItem('profile_avatar_key');
         localStorage.removeItem('profile_avatar_data');
@@ -333,7 +329,7 @@ export const useAuthStore = defineStore('authStore', () => {
      */
     async function flushPendingSettings(): Promise<boolean> {
         if (isFlushing || !token.value) return false;
-        if (!pendingSettingsUpdate.value && pendingSyncEnabled.value === null) return false;
+        if (!pendingSettingsUpdate.value) return false;
 
         isFlushing = true;
         let allFlushed = true;
@@ -349,26 +345,6 @@ export const useAuthStore = defineStore('authStore', () => {
                         remoteSettings.value = response.data.settings;
                         pendingSettingsUpdate.value = null;
                         localStorage.removeItem('pending_theme_settings');
-                    } else {
-                        allFlushed = false;
-                    }
-                } catch {
-                    allFlushed = false; // Still offline
-                }
-            }
-
-            // Flush sync_enabled preference
-            if (pendingSyncEnabled.value !== null) {
-                try {
-                    const response = await axios.patch(
-                        `${API_BASE_URL}/auth/preferences`,
-                        { sync_enabled: pendingSyncEnabled.value },
-                        { headers: { Authorization: `Bearer ${token.value}` } }
-                    );
-                    if (response.data.status === 'success') {
-                        user.value = response.data.user;
-                        pendingSyncEnabled.value = null;
-                        localStorage.removeItem('pending_sync_enabled');
                     } else {
                         allFlushed = false;
                     }
@@ -487,9 +463,10 @@ export const useAuthStore = defineStore('authStore', () => {
     }
 
     /**
-     * Whether syncing is enabled
+     * Whether cloud sync is enabled — derived purely from entitlement (the
+     * `sync` service). There is no stored toggle; sync runs whenever entitled.
      */
-    const syncEnabled = ref(false);
+    const syncEnabled = computed(() => isSyncEntitled.value);
     const lastSyncAt = ref<string | null>(null);
     let syncInterval: ReturnType<typeof setInterval> | null = null;
     let lastFocusPullAt = 0;
@@ -529,64 +506,16 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
-    async function loadSyncEnabled() {
-        try {
-            const value = await window.browserWindow.getSyncSetting('sync_enabled');
-            syncEnabled.value = value === '1' || value === 1 || value === true;
-        } catch {
-            syncEnabled.value = false;
-        }
-    }
-
-    /**
-     * Toggle cloud sync on/off.
-     * Queues the preference locally so it's not lost if offline.
-     */
-    async function setSyncEnabled(enabled: boolean) {
-        syncEnabled.value = enabled;
-
-        try {
-            await window.browserWindow.setSyncSetting('sync_enabled', enabled ? '1' : '0');
-        } catch {
-            // best-effort
-        }
-
-        // Save to pending in case we're offline
-        pendingSyncEnabled.value = enabled;
-        localStorage.setItem('pending_sync_enabled', enabled ? '1' : '0');
-
-        if (token.value) {
-            try {
-                const response = await axios.patch(
-                    `${API_BASE_URL}/auth/preferences`,
-                    { sync_enabled: enabled },
-                    { headers: { Authorization: `Bearer ${token.value}` } }
-                );
-                if (response.data.status === 'success') {
-                    user.value = response.data.user;
-                    pendingSyncEnabled.value = null;
-                    localStorage.removeItem('pending_sync_enabled');
-                }
-            } catch {
-                // Offline — pending saved, will flush on reconnect
-            }
-        }
-    }
-
-    // Sync is a paid feature: it follows the subscription tier (Sync/Pro), not a
-    // manual toggle or the backend `sync_enabled` column. The watch on
-    // `syncEnabled` then starts/stops the sync interval accordingly.
-    watch(tier, (t) => {
-        syncEnabled.value = t !== 'free';
-    }, { immediate: true });
-
+    // Sync is entitlement-driven: `syncEnabled` is a computed of the `sync`
+    // service, so this watch starts/stops the sync interval whenever entitlement
+    // changes (login, purchase, lapse). `immediate` covers a cached-session start.
     watch(syncEnabled, (enabled) => {
         if (enabled && isAuthenticated.value) {
             startSyncInterval();
         } else {
             stopSyncInterval();
         }
-    });
+    }, { immediate: true });
 
     watch(isAuthenticated, (authenticated) => {
         if (!authenticated) {
@@ -781,6 +710,8 @@ export const useAuthStore = defineStore('authStore', () => {
     return {
         user,
         token,
+        services,
+        hasService,
         tier,
         isAiEnabled,
         isSyncEntitled,
@@ -790,7 +721,6 @@ export const useAuthStore = defineStore('authStore', () => {
         loadLastSyncAt,
         remoteSettings,
         pendingSettingsUpdate,
-        pendingSyncEnabled,
         register,
         login,
         logout,
@@ -798,8 +728,6 @@ export const useAuthStore = defineStore('authStore', () => {
         getUser,
         ensureSession,
         initAuth,
-        loadSyncEnabled,
-        setSyncEnabled,
         loadSettings,
         updateSettings,
         flushPendingSettings,

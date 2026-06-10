@@ -44,7 +44,7 @@ export function useSubscriptionPlans() {
 
     const syncPlan = computed(
         () =>
-            webBilling.plans.find((p) => p.id === '$rc_monthly') ??
+            webBilling.plans.find((p) => p.id === 'sync_monthly') ??
             webBilling.plans.find(
                 (p) =>
                     p.title.toLowerCase().includes('sync') &&
@@ -53,7 +53,7 @@ export function useSubscriptionPlans() {
     );
     const proPlan = computed(
         () =>
-            webBilling.plans.find((p) => p.id === 'pro_monthly') ??
+            webBilling.plans.find((p) => p.id === 'ai_monthly') ??
             webBilling.plans.find((p) => p.title.toLowerCase().includes('pro')),
     );
 
