@@ -3,7 +3,7 @@ import { useWebBillingStore, type PlanOption } from '../store/webBillingStore';
 
 /** A plan column rendered in the Choose-your-plan / Manage / gate UIs. */
 export interface PlanCard {
-    key: 'sync' | 'pro';
+    key: 'sync' | 'ai';
     name: string;
     tagline: string;
     /** Display price — the live store price when available, else the fallback. */
@@ -26,11 +26,11 @@ const SYNC_FEATURES = [
     'Web app access',
 ];
 
-const PRO_FEATURES = [
-    'Everything in Sync',
+const AI_FEATURES = [
     'AI verse insights — contextual insight on any passage',
     'AI Bible chat — Scripture-focused answers',
     'Sermon outlines, drafts & devotionals',
+    'A generous AI allowance that refreshes regularly',
 ];
 
 /**
@@ -72,14 +72,14 @@ export function useSubscriptionPlans() {
             features: SYNC_FEATURES,
         },
         {
-            key: 'pro',
-            name: 'Pro',
-            tagline: 'Everything in Sync, plus AI study tools',
+            key: 'ai',
+            name: 'AI Assistant',
+            tagline: 'AI study tools — insights, chat & sermon prep',
             price: proPrice.value,
             plan: proPlan.value,
             highlight: true,
             badge: 'Best for study & teaching',
-            features: PRO_FEATURES,
+            features: AI_FEATURES,
         },
     ]);
 

@@ -4,7 +4,7 @@ import { Sparkle24Regular } from '@vicons/fluent';
 import { Icon } from '@iconify/vue';
 import { onClickOutside } from '@vueuse/core';
 import { ref, computed, type PropType } from 'vue';
-import { AiContextMenuOptions, ContextMenuOptions } from './ContextMenuOptions';
+import { AiContextMenuOptions, ContextMenuOptions, ClearHighlightOption } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { useAiStore, AiError } from '../../../../store/aiStore';
@@ -191,6 +191,19 @@ const props = defineProps({
     },
 });
 
+// Whether the target verse(s) currently carry a highlight — gates the
+// "Clear Highlight" row so it only appears when there's something to clear.
+const hasHighlight = computed(() => {
+    const verses =
+        props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+    const map = bibleStore.chapterHighlights as any;
+    return verses.some((v) => {
+        if (!v) return false;
+        const key = `${v.book_number}_${v.chapter}_${v.verse}`;
+        return !!(map?.[key] || (v.key && map?.[v.key]));
+    });
+});
+
 async function highlightVerse(color: string) {
     const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
     for (const verseData of verses) {
@@ -262,9 +275,41 @@ onClickOutside(contextMenuRef, (event) => {
     >
         <div
             ref="contextMenuRef"
-            class="w-220px max-h-300px overflow-y-auto overflowing-div flex flex-col select-none p-5px"
+            class="cm-root flex flex-col select-none"
         >
-            <!-- AI actions — premium blue→purple gradient cards so they stand out. -->
+            <!-- ── Verse Actions ──────────────────────────────────── -->
+            <div class="cm-section-label">{{ $t('Verse Actions') }}</div>
+            <template v-for="option in ContextMenuOptions" :key="option.key">
+                <div class="cm-action" @click="clickContextMenu(option.key)">
+                    <div
+                        class="cm-action__icon"
+                        :style="{ color: option.color, background: `${option.color}1f` }"
+                    >
+                        <NIcon size="17" :component="option.icon" />
+                    </div>
+                    <span class="cm-action__label">{{ $t(option.label) }}</span>
+                    <Icon icon="lucide:chevron-right" class="cm-action__chev" />
+                </div>
+                <!-- Color picker drops in directly under Highlight Verse. -->
+                <div
+                    v-if="showColorPicker && option.key === 'highlight-verse'"
+                    class="cm-colors"
+                >
+                    <button
+                        v-for="c in colors"
+                        :key="c.color"
+                        :style="`background: ${c.color}`"
+                        class="h-24px w-24px rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all hover:scale-110"
+                        :title="c.name"
+                        @click="highlightVerse(c.color)"
+                    ></button>
+                </div>
+            </template>
+
+            <!-- ── AI Tools ───────────────────────────────────────── -->
+            <div class="cm-section-label cm-section-label--ai">
+                <Icon icon="lucide:sparkles" /> {{ $t('AI Tools') }}
+            </div>
             <div
                 v-for="option in AiContextMenuOptions"
                 :key="option.key"
@@ -272,45 +317,39 @@ onClickOutside(contextMenuRef, (event) => {
                 @click="clickContextMenu(option.key)"
             >
                 <div class="ai-grad-card__icon">
-                    <NIcon size="16" :component="option.icon" />
+                    <NIcon size="18" :component="option.icon" />
                 </div>
-                <div class="flex flex-col leading-tight min-w-0">
+                <div class="flex flex-col leading-tight min-w-0 flex-1">
                     <span class="text-size-14px font-700 whitespace-nowrap">{{ $t(option.label) }}</span>
                     <span v-if="option.description" class="text-size-11px ai-grad-card__desc">
                         {{ option.description }}
                     </span>
                 </div>
+                <span class="ai-grad-card__badge">AI</span>
             </div>
 
-            <div class="h-1px bg-gray-500 bg-opacity-20 my-5px mx-2px"></div>
-
+            <!-- ── Clear Highlight (destructive) ──────────────────── -->
+            <template v-if="hasHighlight">
+            <div class="cm-divider"></div>
             <div
-                v-for="option in ContextMenuOptions"
-                :key="option.key"
-                class="flex items-start pt-4px pb-2px pl-7px pr-1 cursor-pointer hover:bg-[var(--primary-color)] hover:text-dark-500 rounded-sm"
-                @click="clickContextMenu(option.key)"
+                class="cm-action cm-action--danger"
+                @click="clickContextMenu(ClearHighlightOption.key)"
             >
-                <div class="w-25px pt-2px">
-                    <NIcon size="15" :component="option.icon" />
+                <div
+                    class="cm-action__icon"
+                    :style="{ color: ClearHighlightOption.color, background: `${ClearHighlightOption.color}1f` }"
+                >
+                    <NIcon size="17" :component="ClearHighlightOption.icon" />
                 </div>
-                <div class="flex flex-col leading-tight">
-                    <span class="text-size-15px whitespace-nowrap">{{ $t(option.label) }}</span>
-                    <span v-if="option.description" class="text-size-11px opacity-60">
-                        {{ option.description }}
+                <div class="flex flex-col leading-tight min-w-0 flex-1">
+                    <span class="cm-action__label">{{ $t(ClearHighlightOption.label) }}</span>
+                    <span v-if="ClearHighlightOption.description" class="text-size-11px opacity-55">
+                        {{ ClearHighlightOption.description }}
                     </span>
                 </div>
+                <Icon icon="lucide:chevron-right" class="cm-action__chev" />
             </div>
-            <!-- Color picker for highlight -->
-            <div v-if="showColorPicker" class="flex flex-wrap gap-5px px-7px py-6px border-t border-gray-500 border-opacity-30 mt-4px">
-                <button
-                    v-for="c in colors"
-                    :key="c.color"
-                    :style="`background: ${c.color}`"
-                    class="h-24px w-24px rounded-full cursor-pointer border-2 border-transparent hover:border-white transition-all hover:scale-110"
-                    :title="c.name"
-                    @click="highlightVerse(c.color)"
-                ></button>
-            </div>
+            </template>
         </div>
     </NPopover>
 
@@ -445,21 +484,101 @@ onClickOutside(contextMenuRef, (event) => {
     border-top: 1px solid var(--theme-border, rgba(127, 127, 127, 0.2));
 }
 
+/* ── Verse context menu layout ────────────────────────────────────────── */
+.cm-root {
+    width: 248px;
+    padding: 8px;
+    gap: 2px;
+}
+
+/* Small uppercase section heading ("Verse Actions" / "AI Tools"). */
+.cm-section-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+.cm-section-label--ai {
+    margin-top: 6px;
+    color: #8b5cf6;
+    opacity: 1;
+}
+.cm-section-label--ai .iconify {
+    font-size: 14px;
+}
+
+/* Primary action row — tinted icon tile, label, trailing chevron. */
+.cm-action {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 10px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.13s ease;
+}
+.cm-action:hover {
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+.cm-action__icon {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+}
+.cm-action__label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.cm-action__chev {
+    flex-shrink: 0;
+    font-size: 15px;
+    opacity: 0.35;
+}
+.cm-action--danger:hover {
+    background: rgba(239, 68, 68, 0.12);
+}
+.cm-action--danger .cm-action__label {
+    color: #ef4444;
+}
+
+.cm-divider {
+    height: 1px;
+    margin: 6px 4px;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.cm-colors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px 10px;
+}
+
 /* AI actions in the verse context menu — premium blue→purple gradient cards. */
 .ai-grad-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 9px;
-    margin-bottom: 5px;
-    border-radius: 10px;
+    gap: 11px;
+    padding: 9px 10px;
+    margin-bottom: 4px;
+    border-radius: 12px;
     cursor: pointer;
     background: linear-gradient(
         135deg,
         rgba(59, 130, 246, 0.12),
         rgba(139, 92, 246, 0.12)
     );
-    border: 1px solid rgba(139, 92, 246, 0.35);
+    border: 1px solid rgba(139, 92, 246, 0.30);
     transition: filter 0.15s ease;
 }
 .ai-grad-card:hover {
@@ -467,16 +586,29 @@ onClickOutside(contextMenuRef, (event) => {
 }
 .ai-grad-card__icon {
     flex-shrink: 0;
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     display: grid;
     place-items: center;
-    border-radius: 8px;
+    border-radius: 9px;
     color: #fff;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
 }
 .ai-grad-card__desc {
     opacity: 0.65;
+    white-space: normal;
+    line-height: 1.3;
+}
+.ai-grad-card__badge {
+    flex-shrink: 0;
+    align-self: flex-start;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    color: #c4b5fd;
+    background: rgba(139, 92, 246, 0.22);
 }
 
 .ai-insight-error {

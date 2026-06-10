@@ -137,7 +137,7 @@ function done() {
                         <span class="pray-timer__label">Prayer time</span>
                         <span class="pray-timer__value">{{ timeLabel }}</span>
                     </div>
-                    <button class="pray-finish" @click="finish">
+                    <button class="pray-finish" :disabled="!isLast" @click="finish">
                         <Icon icon="lucide:circle-check" /> Finished
                     </button>
                 </div>
@@ -309,4 +309,5 @@ function done() {
     font-weight: 700;
     cursor: pointer;
 }
+.pray-finish:disabled { background: var(--theme-bg-elevated); color: var(--theme-text-soft); cursor: default; }
 </style>
