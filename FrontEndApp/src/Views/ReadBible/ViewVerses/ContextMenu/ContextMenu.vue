@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { NIcon, NPopover, NModal, NSpin, NButton } from 'naive-ui';
+import { NIcon, NPopover, NModal, NSpin, NButton, useMessage } from 'naive-ui';
 import { Sparkle24Regular } from '@vicons/fluent';
+import { BookmarkFilled } from '@vicons/carbon';
 import { Icon } from '@iconify/vue';
 import { onClickOutside } from '@vueuse/core';
-import { ref, computed, type PropType } from 'vue';
+import { ref, computed, nextTick, watch, type PropType } from 'vue';
 import { AiContextMenuOptions, ContextMenuOptions, ClearHighlightOption } from './ContextMenuOptions';
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
@@ -22,6 +23,7 @@ const authStore = useAuthStore();
 const planModal = usePlanModalStore();
 const convo = useConversationStore();
 const menuStore = useMenuStore();
+const message = useMessage();
 const contextMenuRef = ref(null);
 const emits = defineEmits(['close', 'create-clip-note']);
 const bookmarkStore = useBookmarkStore();
@@ -191,6 +193,44 @@ const props = defineProps({
     },
 });
 
+// Clamped open position. The parent passes the raw cursor x/y; a tall menu
+// opened near the right/bottom edge would otherwise spill off-screen, so once
+// the menu is rendered we measure it and pull it back inside the viewport.
+const posX = ref(0);
+const posY = ref(0);
+
+watch(
+    () => [props.showContextMenu, props.x, props.y] as const,
+    async ([show, x, y]) => {
+        if (!show) return;
+        posX.value = x;
+        posY.value = y;
+        await nextTick();
+        const el = contextMenuRef.value as HTMLElement | null;
+        if (!el) return;
+        const margin = 10;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const { offsetWidth: w, offsetHeight: h } = el;
+        if (x + w + margin > vw) posX.value = Math.max(margin, vw - w - margin);
+        if (y + h + margin > vh) posY.value = Math.max(margin, vh - h - margin);
+    },
+    { immediate: true },
+);
+
+// Whether every target verse is already bookmarked — flips the bookmark row
+// to an "Unbookmark" (remove) action.
+const isBookmarked = computed(() => {
+    const verses =
+        props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+    if (verses.length === 0) return false;
+    return verses.every(
+        (v) =>
+            v &&
+            bookmarkStore.isBookmarkExists(`${v.book_number}_${v.chapter}_${v.verse}`),
+    );
+});
+
 // Whether the target verse(s) currently carry a highlight — gates the
 // "Clear Highlight" row so it only appears when there's something to clear.
 const hasHighlight = computed(() => {
@@ -203,6 +243,23 @@ const hasHighlight = computed(() => {
         return !!(map?.[key] || (v.key && map?.[v.key]));
     });
 });
+
+// Copy the selected verse(s) as `"text" Book chapter:verse` to the clipboard.
+async function copyVerses() {
+    const book = bibleStore.selectedBook.title;
+    const verses =
+        props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
+    const sorted = [...verses].sort((a, b) => (a.verse ?? 0) - (b.verse ?? 0));
+    const text = sorted
+        .map((v) => `"${stripVerseMarkup(v.text ?? '')}" ${book} ${v.chapter}:${v.verse}`)
+        .join('\n');
+    try {
+        await navigator.clipboard.writeText(text);
+        message.success(verses.length > 1 ? 'Verses copied' : 'Verse copied');
+    } catch {
+        message.error('Could not copy. Please try again.');
+    }
+}
 
 async function highlightVerse(color: string) {
     const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
@@ -230,12 +287,21 @@ async function clickContextMenu(key: string) {
         return;
     } else if (key == 'add-to-bookmark') {
         const verses = props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
-        for (const verseData of verses) {
-            bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
-                JSON.stringify(verseData),
-            );
+        if (isBookmarked.value) {
+            for (const verseData of verses) {
+                await window.browserWindow.deleteBookmark(JSON.stringify(verseData));
+            }
+            await bookmarkStore.getBookmarks();
+        } else {
+            for (const verseData of verses) {
+                bookmarkStore.bookmarks = await window.browserWindow.saveBookMark(
+                    JSON.stringify(verseData),
+                );
+            }
         }
         debouncedRunSync();
+    } else if (key == 'copy-verse') {
+        await copyVerses();
     } else if (key == 'create-clip-note') {
         emits('create-clip-note', props.data);
     } else if (key == 'highlight-verse') {
@@ -267,8 +333,9 @@ onClickOutside(contextMenuRef, (event) => {
 <template>
     <NPopover
         :show="showContextMenu"
-        :x="x"
-        :y="y"
+        :x="posX"
+        :y="posY"
+        placement="bottom-start"
         trigger="manual"
         content-style="padding: 0 !important;"
         class="!p-0 !rounded-md"
@@ -285,9 +352,14 @@ onClickOutside(contextMenuRef, (event) => {
                         class="cm-action__icon"
                         :style="{ color: option.color, background: `${option.color}1f` }"
                     >
-                        <NIcon size="17" :component="option.icon" />
+                        <NIcon
+                            size="17"
+                            :component="option.key === 'add-to-bookmark' && isBookmarked ? BookmarkFilled : option.icon"
+                        />
                     </div>
-                    <span class="cm-action__label">{{ $t(option.label) }}</span>
+                    <span class="cm-action__label">
+                        {{ option.key === 'add-to-bookmark' && isBookmarked ? 'Unbookmark' : $t(option.label) }}
+                    </span>
                     <Icon icon="lucide:chevron-right" class="cm-action__chev" />
                 </div>
                 <!-- Color picker drops in directly under Highlight Verse. -->
@@ -489,6 +561,9 @@ onClickOutside(contextMenuRef, (event) => {
     width: 248px;
     padding: 8px;
     gap: 2px;
+    /* Full height normally; only scrolls if the window is too short to fit. */
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
 }
 
 /* Small uppercase section heading ("Verse Actions" / "AI Tools"). */

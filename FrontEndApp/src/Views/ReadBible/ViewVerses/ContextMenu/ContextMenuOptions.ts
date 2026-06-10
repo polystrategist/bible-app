@@ -1,5 +1,5 @@
 import type { Component } from 'vue';
-import { BookmarkAdd, Attachment } from '@vicons/carbon';
+import { BookmarkAdd, Attachment, Copy } from '@vicons/carbon';
 import {
     EraserSegment24Filled,
     TabDesktopMultiple20Regular,
@@ -41,6 +41,12 @@ export const AiContextMenuOptions: ContextMenuOption[] = [
  * under the "Verse Actions" heading.
  */
 export const ContextMenuOptions: ContextMenuOption[] = [
+    {
+        label: 'Copy Verse',
+        icon: Copy,
+        key: 'copy-verse',
+        color: '#06b6d4',
+    },
     {
         label: 'Add to Bookmark',
         icon: BookmarkAdd,
