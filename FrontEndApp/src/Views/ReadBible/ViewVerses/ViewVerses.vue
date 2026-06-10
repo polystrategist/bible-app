@@ -6,6 +6,7 @@ import { Attachment, BookmarkFilled, Copy, Delete, Edit, Add, Close } from '@vic
 import SESSION from '../../../util/session';
 import { useMouse } from '@vueuse/core';
 import ContextMenu from './ContextMenu/ContextMenu.vue';
+import BibleVersionPickerModal from './BibleVersionPickerModal.vue';
 import { useBookmarkStore } from '../../../store/bookmark';
 import CreateClipNoteVue from '../../../components/ClipNotes/CreateClipNote.vue';
 import { useClipNoteStore } from '../../../store/ClipNotes';
@@ -14,9 +15,7 @@ import VerseSelector from '../../../components/VerseSelector.vue';
 import { useI18n } from 'vue-i18n';
 import { FastForward20Regular, SlideSearch28Regular } from '@vicons/fluent';
 import { SlideSearch28Filled } from '@vicons/fluent';
-import { Note24Regular, Note28Filled } from '@vicons/fluent';
 import { useThemeStore } from '../../../store/theme';
-import useNoteStore from '../../../store/useNoteStore';
 import { useTTSStore } from '../../../store/ttsStore';
 import { usePiperTTSStore } from '../../../store/piperTTSStore';
 import { useSettingStore } from '../../../store/settingStore';
@@ -44,7 +43,6 @@ const piperVoiceLabel = computed(() => {
     return `${name.charAt(0).toUpperCase() + name.slice(1)} · ${quality.charAt(0).toUpperCase() + quality.slice(1)}`;
 });
 const themeStore = useThemeStore();
-const noteStore = useNoteStore();
 const ttsStore = useTTSStore();
 const piperStore = usePiperTTSStore();
 const settingStore = useSettingStore();
@@ -64,24 +62,28 @@ let saveScrollTimeout: ReturnType<typeof setTimeout> | null = null;
 let scrollSyncAnimationFrame: number | null = null;
 let pendingScrollSourcePaneIndex: number | null = null;
 
-function versionOptionsForPane(paneIndex: number) {
-    const usedByOtherPanes = bibleStore.selectedBibleVersions.filter(
-        (_: string, i: number) => i !== paneIndex,
-    );
-    return moduleStore.bibleLists
-        .filter(
-            (b: any) =>
-                !b.title.includes('commentaries') && !usedByOtherPanes.includes(b.file_name),
-        )
-        .map((b: any) => ({
-            label: b.title,
-            value: b.file_name,
-        }));
-}
-
 function changeVersion(paneIndex: number, newVersion: string) {
     bibleStore.selectedBibleVersions[paneIndex] = newVersion;
     bibleStore.getVerses();
+}
+
+// Display title for the version shown in a pane (the file name otherwise).
+function versionTitle(fileName: string) {
+    const match = moduleStore.bibleLists.find((b: any) => b.file_name === fileName);
+    return match?.title ?? fileName;
+}
+
+// Version picker dialog — opened from a pane header to switch that pane's version.
+const versionPickerOpen = ref(false);
+const versionPickerPane = ref(0);
+
+function openVersionPicker(paneIndex: number) {
+    versionPickerPane.value = paneIndex;
+    versionPickerOpen.value = true;
+}
+
+function onVersionPicked(fileName: string) {
+    changeVersion(versionPickerPane.value, fileName);
 }
 
 async function versionHasCurrentChapter(versionFile: string) {
@@ -768,18 +770,22 @@ onUnmounted(() => {
 <template>
     <div class="w-full h-full show-chapter-verses flex flex-col read-bible-verses-panel">
         <div
-            class="dark:bg-dark-400 flex items-center py-6px select-none px-10px read-bible-verses-toolbar overflow-x-auto overflow-y-hidden scrollbar-thin"
+            class="dark:bg-dark-400 flex items-center py-6px select-none px-10px read-bible-verses-toolbar"
         >
             <div class="flex-shrink-0">
-                <div
-                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer whitespace-nowrap"
+                <NButton
+                    size="small"
+                    quaternary
+                    circle
+                    :title="$t('Before')"
                     @click="navigateChapter('before')"
                 >
-                    <NIcon :component="FastForward20Regular" size="20" class="rotate-180" />
-                    <span>{{ $t('Before') }}</span>
-                </div>
+                    <template #icon>
+                        <NIcon :component="FastForward20Regular" size="20" class="rotate-180" />
+                    </template>
+                </NButton>
             </div>
-            <div class="flex items-center gap-5px flex-1 min-w-0 mx-8px justify-center">
+            <div class="flex flex-wrap items-center gap-5px flex-1 min-w-0 mx-8px justify-center">
                 <div
                     class="flex items-center gap-5px flex-shrink-0"
                     style="width: clamp(100px, 20%, 200px)"
@@ -810,25 +816,6 @@ onUnmounted(() => {
                         :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular"
                     />
                 </VerseSelector>
-                <NButton
-                    size="small"
-                    quaternary
-                    circle
-                    class="flex-shrink-0"
-                    :title="
-                        noteStore.showNote
-                            ? 'Hide Notes (Ctrl+Shift+N)'
-                            : 'Open Notes (Ctrl+Shift+N)'
-                    "
-                    @click="noteStore.showNote = !noteStore.showNote"
-                >
-                    <template #icon>
-                        <NIcon
-                            :component="noteStore.showNote ? Note28Filled : Note24Regular"
-                            size="20"
-                        />
-                    </template>
-                </NButton>
                 <NButton
                     size="small"
                     quaternary
@@ -882,13 +869,17 @@ onUnmounted(() => {
                 </NButton>
             </div>
             <div class="flex-shrink-0">
-                <div
-                    class="flex items-center hover:text-[var(--primary-color)] cursor-pointer whitespace-nowrap"
+                <NButton
+                    size="small"
+                    quaternary
+                    circle
+                    :title="$t('Next')"
                     @click="navigateChapter('next')"
                 >
-                    <span>{{ $t('Next') }}</span>
-                    <NIcon :component="FastForward20Regular" size="20" />
-                </div>
+                    <template #icon>
+                        <NIcon :component="FastForward20Regular" size="20" />
+                    </template>
+                </NButton>
             </div>
         </div>
         <div
@@ -908,15 +899,17 @@ onUnmounted(() => {
                     <div class="h-full flex flex-col">
                         <!-- Pane header: version selector -->
                         <div class="flex items-center gap-4px px-6px py-4px dark:bg-dark-400 bg-gray-100 border-b border-gray-200 dark:border-dark-200 select-none split-pane-header">
-                            <NSelect
-                                :value="versionFile"
-                                :options="versionOptionsForPane(paneIndex)"
+                            <NButton
                                 size="small"
-                                filterable
-                                :virtual-scroll="false"
-                                to="body"
-                                @update:value="(v: string) => changeVersion(paneIndex, v)"
-                            />
+                                secondary
+                                class="flex-1 !justify-between min-w-0"
+                                @click="openVersionPicker(paneIndex)"
+                            >
+                                <span class="truncate">{{ versionTitle(versionFile) }}</span>
+                                <template #icon>
+                                    <NIcon size="16"><Icon icon="lucide:book-open-text" /></NIcon>
+                                </template>
+                            </NButton>
                             <NButton
                                 v-if="bibleStore.selectedBibleVersions.length > 1"
                                 size="tiny"
@@ -1175,6 +1168,11 @@ onUnmounted(() => {
             @create-clip-note="
                 (data) => (createClipNoteRef ? createClipNoteRef.toggleClipNoteModal(data) : false)
             "
+        />
+        <BibleVersionPickerModal
+            v-model:show="versionPickerOpen"
+            :pane-index="versionPickerPane"
+            @select="onVersionPicked"
         />
         <NPopover
             :show="showPopOver"

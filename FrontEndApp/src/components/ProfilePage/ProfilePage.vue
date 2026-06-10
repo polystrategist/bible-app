@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useDialog, useMessage } from 'naive-ui';
+import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useMessage } from 'naive-ui';
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
 import { useMainStore } from '../../store/main';
 import { useWebBillingStore } from '../../store/webBillingStore';
 import { usePlanModalStore } from '../../store/planModalStore';
 import { useSubscriptionPlans } from '../../composables/useSubscriptionPlans';
+import SubscriptionSections from '../SubscriptionSections.vue';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
 import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
@@ -19,7 +20,6 @@ const mainStore = useMainStore();
 const webBilling = useWebBillingStore();
 const planModal = usePlanModalStore();
 const message = useMessage();
-const dialog = useDialog();
 const router = useRouter();
 
 // ─── Subscription card (mirrors the mobile SubscriptionCard) ─────────────────
@@ -57,7 +57,7 @@ const renewsLabel = computed(() => {
 
 // Plan cards + prices come from the shared composable (single source of truth,
 // with fallback prices so a price always shows even when offerings aren't loaded).
-const { planCards, syncPrice, proPrice } = useSubscriptionPlans();
+const { syncPrice, proPrice } = useSubscriptionPlans();
 
 const subPrice = computed(() => {
     if (authStore.tier === 'pro') return `${proPrice.value}/month`;
@@ -70,141 +70,11 @@ function viewPlans() {
     planModal.show();
 }
 
-// Human-readable name + (optional) management deep link for a RevenueCat store.
-function storeInfo(store: string): { where: string; url?: string } {
-    switch (store) {
-        case 'play_store':
-            return {
-                where: 'Google Play (your Android device)',
-                url: 'https://play.google.com/store/account/subscriptions',
-            };
-        case 'app_store':
-        case 'mac_app_store':
-            return { where: 'the App Store (your iPhone, iPad, or Mac)' };
-        case 'amazon':
-            return { where: 'the Amazon Appstore' };
-        case 'test_store':
-            return { where: 'the mobile app (test purchase)' };
-        default:
-            return { where: 'the app where you subscribed' };
-    }
-}
-
-// "Manage subscription" — opens the web (Paddle) management page if the plan was
-// bought on the web; otherwise tells the user which store owns it.
-async function manageSubscription() {
-    const res = await webBilling.manageSubscription();
-    if (res.status === 'managed-elsewhere') {
-        const { where, url } = storeInfo(res.store);
-        message.info(`Your subscription was purchased through ${where}. Manage or cancel it there.`);
-        if (url) void window.browserWindow.openExternal(url);
-    } else if (res.status === 'none') {
-        message.error('Couldn’t open subscription management. Please try again.');
-    }
-}
-
-// Format a Paddle minor-unit amount (e.g. "390") in its currency (e.g. "$3.90").
-function formatAmount(minor: string, currency: string): string {
-    const value = Number(minor) / 100;
-    if (Number.isNaN(value)) return '';
-    try {
-        return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
-    } catch {
-        return `${value.toFixed(2)} ${currency}`;
-    }
-}
-
-// Route a plan-change result that came back 'managed-elsewhere' (the plan lives
-// on a mobile store) — tell the user where to go and open that store if we can.
-function notifyManagedElsewhere(store: string | null, verb: string) {
-    const { where, url } = storeInfo(store ?? '');
-    message.info(`Your subscription is billed through ${where}. ${verb} there to avoid being charged twice.`);
-    if (url) void window.browserWindow.openExternal(url);
-}
-
-// "Upgrade to Pro" — preview the exact prorated charge first, confirm with the
-// user, then change the plan in place via the backend (prorated immediately)
-// and poll for the tier to flip. A plan bought on mobile can't be upgraded here
-// (it would create a second, stacked subscription and double-charge).
-async function upgradeToPro() {
-    const preview = await webBilling.previewUpgradeToPro();
-    if (preview.status === 'managed-elsewhere') {
-        notifyManagedElsewhere(preview.store, 'Upgrade to Pro');
-        return;
-    }
-    if (preview.status !== 'ok') {
-        message.error(webBilling.error ?? 'Couldn’t start the upgrade. Please try again.');
-        return;
-    }
-
-    const due = formatAmount(preview.amount, preview.currency);
-    const renews = renewsLabel.value;
-    dialog.warning({
-        title: 'Upgrade to Pro',
-        content: `You’ll be charged ${due} today, prorated for the rest of this billing period, then ${proPrice.value}/month${renews ? ` from ${renews}` : ''}.`,
-        positiveText: 'Upgrade',
-        negativeText: 'Cancel',
-        onPositiveClick: async () => {
-            const res = await webBilling.upgradeToPro();
-            if (res.status === 'upgraded') {
-                manageModalOpen.value = false;
-                message.success('You’re now on Pro. AI study tools are unlocked.');
-            } else if (res.status === 'pending') {
-                manageModalOpen.value = false;
-                message.info('Upgrade received — your Pro access will activate shortly.');
-            } else if (res.status === 'managed-elsewhere') {
-                notifyManagedElsewhere(res.store, 'Upgrade to Pro');
-            } else {
-                message.error(webBilling.error ?? 'Upgrade failed. Please try again.');
-            }
-        },
-    });
-}
-
-// "Switch to Sync" — schedule a downgrade for period end (keep Pro until the
-// renewal date, then move to Sync; no charge or refund now).
-function confirmDowngrade() {
-    const renews = renewsLabel.value;
-    dialog.warning({
-        title: 'Switch to Sync?',
-        content: `You’ll keep Pro${renews ? ` until ${renews}` : ' until your renewal date'}, then move to the Sync plan. No charge now, and AI tools stay on until then.`,
-        positiveText: 'Switch to Sync',
-        negativeText: 'Keep Pro',
-        onPositiveClick: async () => {
-            const res = await webBilling.downgradeToSync();
-            if (res.status === 'scheduled') {
-                manageModalOpen.value = false;
-                message.success('Scheduled — you’ll switch to Sync at the end of this billing period.');
-            } else if (res.status === 'managed-elsewhere') {
-                notifyManagedElsewhere(res.store, 'Change your plan');
-            } else {
-                message.error(webBilling.error ?? 'Downgrade failed. Please try again.');
-            }
-        },
-    });
-}
-
-// Cancel a scheduled downgrade — stay on Pro.
-async function keepPro() {
-    const ok = await webBilling.cancelDowngrade();
-    if (ok) message.success('Got it — you’ll stay on Pro.');
-    else message.error(webBilling.error ?? 'Couldn’t cancel the scheduled change. Please try again.');
-}
-
 // Open the in-app plan-management modal (subscribers), preloading plans.
 async function openManage() {
     manageModalOpen.value = true;
     if (webBilling.plans.length === 0) await webBilling.loadPlans();
 }
-
-// ISO date a scheduled downgrade takes effect, formatted, or null when none.
-const pendingDowngradeAt = computed(() => {
-    const iso = authStore.user?.subscription_pending_change_at;
-    if (!iso) return null;
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return null;
-    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-});
 
 // Open the subscription manager when the dropdown's "Manage subscription" asks
 // for it (subscribers → manage modal; Free → plan picker). `immediate` covers
@@ -230,13 +100,6 @@ onMounted(() => {
         void webBilling.refreshActiveStore();
     }
 });
-
-// A subscription bought on mobile (Google Play / App Store) can't be managed
-// or upgraded from the web app — it must be handled in the mobile app.
-const subscribedOnMobile = computed(() => webBilling.managedOnMobile);
-const mobileStoreLabel = computed(
-    () => storeInfo(webBilling.activeStore ?? '').where,
-);
 
 // ─── Name / Username / Email editing ─────────────────────────────────────────
 const profileName     = ref(authStore.user?.name ?? '');
@@ -736,123 +599,11 @@ onBeforeUnmount(destroyCropper);
                         </span>
                     </div>
 
-                    <!-- Free → open the plan comparison modal -->
-                    <template v-if="authStore.tier === 'free'">
-                        <NButton type="primary" block @click="viewPlans">
-                            <template #icon><Icon icon="lucide:sparkles" /></template>
-                            View plans
-                        </NButton>
-                    </template>
-
-                    <!-- Subscribed → upgrade (Sync only) + manage -->
-                    <template v-else>
-                        <!-- Scheduled downgrade → keep the user informed. -->
-                        <NAlert
-                            v-if="pendingDowngradeAt"
-                            type="warning"
-                            :bordered="false"
-                            class="mb-2 pending-downgrade"
-                        >
-                            Switching to Sync on {{ pendingDowngradeAt }}.
-                            <NButton size="small" type="primary" secondary round @click="keepPro">
-                        <template #icon><Icon icon="lucide:undo-2" /></template>
-                        Keep Pro
-                    </NButton>
-                        </NAlert>
-
-                        <!-- Web checkout enabled → in-app upgrade / manage. -->
-                        <template v-if="webBilling.supported">
-                            <NButton
-                                v-if="authStore.tier === 'sync'"
-                                type="primary"
-                                block
-                                class="mb-2"
-                                :disabled="subscribedOnMobile || webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
-                                :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
-                                @click="upgradeToPro"
-                            >
-                                <template #icon><Icon icon="lucide:arrow-up" /></template>
-                                Upgrade to Pro
-                            </NButton>
-                            <NButton
-                                block
-                                :disabled="subscribedOnMobile"
-                                @click="openManage"
-                            >
-                                <template #icon><Icon icon="lucide:settings" /></template>
-                                Manage subscription
-                            </NButton>
-
-                            <!-- Plan bought on a mobile store → can't manage it here. -->
-                            <div v-if="subscribedOnMobile" class="manage-elsewhere-note">
-                                <Icon icon="mdi:cellphone-cog" />
-                                <span>
-                                    You subscribed through {{ mobileStoreLabel }}. To
-                                    upgrade, change, or cancel your plan, please manage it
-                                    in the Believers Sword <strong>mobile app</strong>.
-                                </span>
-                            </div>
-                        </template>
-
-                        <!-- Web checkout off (Paddle not yet live) → manage on mobile. -->
-                        <div v-else class="manage-elsewhere-note">
-                            <Icon icon="mdi:cellphone-cog" />
-                            <span>
-                                Manage, upgrade, or cancel your plan in the Believers Sword
-                                <strong>mobile app</strong>. Any changes apply here
-                                automatically.
-                            </span>
-                        </div>
-                    </template>
                 </div>
 
                 <div class="sub-divider" />
 
-                <!-- ── Sync ───────────────────────────────────────────── -->
-                <div class="sub-section">
-                    <div class="sub-head">
-                        <Icon icon="mdi:sync" class="sub-head__icon" />
-                        <span class="sub-head__title">Sync</span>
-                        <span class="onoff-chip" :class="authStore.syncEnabled ? 'is-on' : 'is-off'">
-                            <span class="onoff-dot" /> {{ authStore.syncEnabled ? 'On' : 'Off' }}
-                        </span>
-                    </div>
-                    <p class="sub-blurb">
-                        Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
-                    </p>
-                    <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
-                        <Icon icon="mdi:check-circle-outline" />
-                        <span>Sync is included in your subscription and stays on automatically</span>
-                    </div>
-                    <div v-else class="sync-free-notice">
-                        <Icon icon="mdi:lock-outline" />
-                        <span>Cross-device sync is part of the Sync and Pro plans.</span>
-                    </div>
-                </div>
-
-                <div class="sub-divider" />
-
-                <!-- ── AI Assistant ───────────────────────────────────── -->
-                <div class="sub-section">
-                    <div class="sub-head">
-                        <Icon icon="lucide:sparkles" class="sub-head__icon" />
-                        <span class="sub-head__title">AI Assistant</span>
-                        <span class="onoff-chip" :class="authStore.isAiEnabled ? 'is-on' : 'is-off'">
-                            <span class="onoff-dot" /> {{ authStore.isAiEnabled ? 'On' : 'Off' }}
-                        </span>
-                    </div>
-                    <p class="sub-blurb">
-                        Verse insights, sermon outlines, devotionals, and Bible chat.
-                    </p>
-                    <div v-if="authStore.isAiEnabled" class="sync-footer-item is-active">
-                        <Icon icon="mdi:check-circle-outline" />
-                        <span>Included with Pro — an AI allowance that refreshes every few hours</span>
-                    </div>
-                    <div v-else class="sync-free-notice">
-                        <Icon icon="mdi:lock-outline" />
-                        <span>The AI Assistant is part of the Pro plan.</span>
-                    </div>
-                </div>
+                <SubscriptionSections />
             </div>
 
             <!-- Denomination -->
@@ -1073,81 +824,10 @@ onBeforeUnmount(destroyCropper);
             <div v-if="webBilling.loading" class="sub-plan-loading">
                 <NSpin size="small" /> <span>Loading plans…</span>
             </div>
-            <template v-else>
-                <NAlert
-                    v-if="pendingDowngradeAt"
-                    type="warning"
-                    :bordered="false"
-                    class="mb-3 pending-downgrade"
-                >
-                    Switching to Sync on {{ pendingDowngradeAt }}.
-                    <NButton size="small" type="primary" secondary round @click="keepPro">
-                        <template #icon><Icon icon="lucide:undo-2" /></template>
-                        Keep Pro
-                    </NButton>
-                </NAlert>
-
-                <div class="plans-grid">
-                    <div
-                        v-for="card in planCards"
-                        :key="card.key"
-                        class="plan-card"
-                        :class="{ 'is-highlight': card.highlight, 'is-current': card.key === authStore.tier }"
-                    >
-                        <div
-                            v-if="card.key === authStore.tier"
-                            class="plan-card__badge plan-card__badge--current"
-                        >
-                            Current plan
-                        </div>
-                        <div v-else-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
-                        <div class="plan-card__name">{{ card.name }}</div>
-                        <div class="plan-card__price">
-                            {{ card.price }}<span class="plan-card__per">/month</span>
-                        </div>
-                        <p class="plan-card__tagline">{{ card.tagline }}</p>
-                        <ul class="plan-card__features">
-                            <li v-for="f in card.features" :key="f">
-                                <Icon icon="lucide:check" /> <span>{{ f }}</span>
-                            </li>
-                        </ul>
-
-                        <!-- Current plan → no action -->
-                        <NButton v-if="card.key === authStore.tier" block disabled>
-                            Current plan
-                        </NButton>
-                        <!-- Sync subscriber → upgrade to Pro -->
-                        <NButton
-                            v-else-if="card.key === 'pro'"
-                            type="primary"
-                            block
-                            :disabled="webBilling.purchasingId !== null"
-                            :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
-                            @click="upgradeToPro"
-                        >
-                            Upgrade to Pro
-                        </NButton>
-                        <!-- Pro subscriber → downgrade to Sync (at period end) -->
-                        <NButton
-                            v-else
-                            block
-                            :disabled="webBilling.purchasingId !== null || !!pendingDowngradeAt"
-                            :loading="webBilling.purchasingId === 'downgrade'"
-                            @click="confirmDowngrade"
-                        >
-                            {{ pendingDowngradeAt ? 'Switch scheduled' : 'Switch to Sync' }}
-                        </NButton>
-                    </div>
-                </div>
-
-                <div class="manage-portal-row">
-                    <NButton text type="primary" @click="manageSubscription">
-                        <template #icon><Icon icon="lucide:external-link" /></template>
-                        Payment method &amp; cancel
-                    </NButton>
-                </div>
-                <p v-if="webBilling.error" class="sub-error">{{ webBilling.error }}</p>
-            </template>
+            <div v-else class="sub-card">
+                <SubscriptionSections @purchased="manageModalOpen = false" />
+            </div>
+            <p v-if="webBilling.error" class="sub-error">{{ webBilling.error }}</p>
         </NModal>
     </div>
 </template>
@@ -1433,6 +1113,28 @@ body.dark .sync-free-notice {
     font-size: 13px;
     line-height: 1.4;
     opacity: 0.75;
+}
+
+.sub-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.sub-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+    opacity: 0.9;
+}
+.sub-features li .iconify {
+    margin-top: 2px;
+    color: #2e8b68;
+    flex-shrink: 0;
 }
 
 .sub-billing {

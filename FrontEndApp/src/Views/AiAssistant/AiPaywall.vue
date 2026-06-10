@@ -28,7 +28,7 @@ const isSubscriber = computed(() => authStore.tier !== 'free');
 // include AI). Prefer the known id, else match by title.
 const proPlan = computed(
     () =>
-        webBilling.plans.find((p) => p.id === 'pro_monthly') ??
+        webBilling.plans.find((p) => p.id === 'ai_monthly') ??
         webBilling.plans.find((p) => p.title.toLowerCase().includes('pro')),
 );
 
