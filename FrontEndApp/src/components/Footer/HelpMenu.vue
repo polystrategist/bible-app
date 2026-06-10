@@ -4,9 +4,11 @@ import { QuestionCircle24Regular } from '@vicons/fluent';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMenuStore } from '../../store/menu';
+import { useFeedbackModalStore } from '../../store/feedbackModalStore';
 
 const { t } = useI18n();
 const menuStore = useMenuStore();
+const feedbackModal = useFeedbackModalStore();
 const show = ref(false);
 
 function navigate(path: string) {
@@ -17,6 +19,11 @@ function navigate(path: string) {
 function open(url: string) {
     show.value = false;
     window.browserWindow.openExternal(url);
+}
+
+function openFeedback() {
+    show.value = false;
+    feedbackModal.show();
 }
 </script>
 <template>
@@ -68,6 +75,12 @@ function open(url: string) {
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="navigate('/about-page')">
                 ℹ️&nbsp; {{ $t('About') }}
+            </NButton>
+        </div>
+        <NDivider style="margin: 0" />
+        <div class="flex flex-col p-2">
+            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="openFeedback">
+                📝&nbsp; {{ t('Feedback') }}
             </NButton>
         </div>
     </NPopover>

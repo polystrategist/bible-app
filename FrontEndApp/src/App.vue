@@ -24,6 +24,7 @@ import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
 import SyncAnnouncementModal from './components/SyncAnnouncementModal.vue';
 import PlanModal from './components/PlanModal.vue';
+import FeedbackModal from './components/FeedbackModal.vue';
 import { useAuthStore } from './store/authStore';
 import FlipBook from './Views/ReadBible/FlipBook/FlipBook.vue';
 import VersionSelectModal from './Views/ReadBible/FlipBook/VersionSelectModal.vue';
@@ -170,6 +171,7 @@ onMounted(async () => {
                     <FlipBook />
                     <SyncAnnouncementModal />
                     <PlanModal />
+                    <FeedbackModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>
