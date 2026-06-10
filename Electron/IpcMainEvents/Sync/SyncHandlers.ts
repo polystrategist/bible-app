@@ -125,8 +125,11 @@ export const SyncHandlers = (win: BrowserWindow) => {
         highlights?: any[];
         clip_notes?: any[];
         prayer_lists?: any[];
+        prayer_days?: any[];
+        devotion_days?: any[];
         notes?: any[];
         sermon_favorites?: any[];
+        ai_conversations?: any[];
     }) => {
         const now = new Date().toISOString();
 
@@ -149,6 +152,12 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     case 'prayer_lists':
                         await StoreDB('prayer_lists').where({ key }).delete();
                         break;
+                    case 'prayer_days':
+                        await StoreDB('prayer_days').where({ day: key }).delete();
+                        break;
+                    case 'devotion_days':
+                        await StoreDB('devotion_days').where({ day: key }).delete();
+                        break;
                     case 'notes':
                         await StoreDB('notes').where('note_id', key).delete();
                         break;
@@ -159,6 +168,9 @@ export const SyncHandlers = (win: BrowserWindow) => {
                         }
                         break;
                     }
+                    case 'ai_conversations':
+                        await StoreDB('ai_conversations').where({ id: key }).delete();
+                        break;
                 }
             }
 
@@ -210,15 +222,54 @@ export const SyncHandlers = (win: BrowserWindow) => {
 
             // 4. Prayer lists
             for (const pl of pullData.prayer_lists ?? []) {
+                // The authoritative original creation time, when the server has it.
+                const clientCreatedAt = pl.client_created_at ?? null;
                 const existing = await StoreDB('prayer_lists').where('key', pl.key).first();
                 if (existing) {
-                    await StoreDB('prayer_lists').where('key', pl.key)
-                        .update({ title: pl.title, content: pl.content, group: pl.group, index: pl.index, status: pl.status, updated_at: now });
+                    const update: any = { title: pl.title, content: pl.content, group: pl.group, index: pl.index, status: pl.status, updated_at: now };
+                    // Only heal created_at from the authoritative client value; never
+                    // let a server insert-time overwrite a correct local created_at.
+                    if (clientCreatedAt) update.created_at = clientCreatedAt;
+                    await StoreDB('prayer_lists').where('key', pl.key).update(update);
                 } else {
+                    // New local row: prefer client created_at, fall back to server time, then now.
+                    const createdAt = clientCreatedAt ?? pl.created_at ?? now;
                     await StoreDB('prayer_lists').insert({
                         key: pl.key, title: pl.title, content: pl.content,
                         group: pl.group, index: pl.index, status: pl.status,
-                        created_at: now, updated_at: now,
+                        created_at: createdAt, updated_at: now,
+                    });
+                }
+            }
+
+            // 4b. Prayer-streak days (union-merged). Per-day `duration` (total
+            //     prayer seconds) is merged as a MAX so the larger total wins —
+            //     idempotent, never double-counts on re-sync.
+            for (const pd of pullData.prayer_days ?? []) {
+                if (!pd.day) continue;
+                const incoming = Number(pd.duration ?? 0) || 0;
+                const existing = await StoreDB('prayer_days').where('day', pd.day).first();
+                if (!existing) {
+                    await StoreDB('prayer_days').insert({
+                        day: pd.day,
+                        duration: incoming,
+                        created_at: pd.created_at ?? now,
+                        updated_at: pd.updated_at ?? now,
+                    });
+                } else if (incoming > (existing.duration ?? 0)) {
+                    await StoreDB('prayer_days').where('day', pd.day).update({ duration: incoming, updated_at: now });
+                }
+            }
+
+            // 4c. Devotion-streak days (created-only, idempotent union)
+            for (const dd of pullData.devotion_days ?? []) {
+                if (!dd.day) continue;
+                const existing = await StoreDB('devotion_days').where('day', dd.day).first();
+                if (!existing) {
+                    await StoreDB('devotion_days').insert({
+                        day: dd.day,
+                        created_at: dd.created_at ?? now,
+                        updated_at: dd.updated_at ?? now,
                     });
                 }
             }
@@ -257,6 +308,28 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     created_at: now,
                     updated_at: now,
                 });
+            }
+
+            // 7. AI conversations — keyed by the client conversation id. The
+            //    server stores messages as a JSON string in `messages`; keep it
+            //    verbatim so the renderer can parse it the same way it saved it.
+            for (const conv of pullData.ai_conversations ?? []) {
+                const id: string | undefined = conv?.conversation_id ?? conv?.id;
+                if (!id) continue;
+                const messages = typeof conv.messages === 'string'
+                    ? conv.messages
+                    : JSON.stringify(conv.messages ?? []);
+                const title = conv.title ?? 'New chat';
+                const existing = await StoreDB('ai_conversations').where({ id }).first();
+                if (existing) {
+                    await StoreDB('ai_conversations').where({ id })
+                        .update({ title, messages, deleted: 0, updated_at: now });
+                } else {
+                    await StoreDB('ai_conversations').insert({
+                        id, title, messages, deleted: 0,
+                        created_at: now, updated_at: now,
+                    });
+                }
             }
 
             return { success: true };

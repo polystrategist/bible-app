@@ -119,6 +119,14 @@ declare global {
                     updated_at: any;
                 }>
             >;
+            /** Prayer-streak days (YYYY-MM-DD per row, with total prayer seconds). */
+            getPrayerDays: () => Promise<Array<{ day: string; duration?: number; created_at?: string; updated_at?: string }>>;
+            /** Mark today as prayed and add `durationSeconds` to today's total; resolves to the day key. */
+            markPrayedToday: (durationSeconds?: number) => Promise<string | null>;
+            /** Devotion-streak days (YYYY-MM-DD per row). */
+            getDevotionDays: () => Promise<Array<{ day: string; created_at?: string; updated_at?: string }>>;
+            /** Mark today as a completed devotion (idempotent); resolves to the day key. */
+            markDevotionToday: () => Promise<string | null>;
 
             /**
              * Save Prayer List Item
@@ -196,8 +204,11 @@ declare global {
                 highlights?: any[];
                 clip_notes?: any[];
                 prayer_lists?: any[];
+                prayer_days?: any[];
+                devotion_days?: any[];
                 notes?: any[];
                 sermon_favorites?: any[];
+                ai_conversations?: any[];
                 settings?: any;
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
@@ -261,15 +272,52 @@ declare global {
                 verses: string[];
             } | null>;
 
-            // Daily Believers — extract OG/oEmbed metadata for a shared link
-            dailyBelieversExtractMetadata: (url: string) => Promise<{
-                url: string;
-                sourceType: 'website' | 'youtube';
-                sourceDomain: string;
+            // AI Assistant conversation history
+            getAiConversations: () => Promise<Array<{
+                id: string;
                 title: string;
-                description: string | null;
-                thumbnailUrl: string | null;
-            }>;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            }>>;
+            getAiConversation: (id: string) => Promise<{
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            } | null>;
+            saveAiConversation: (payload: {
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at?: string;
+            }) => Promise<{
+                id: string;
+                title: string;
+                messages: Array<{ role: string; content: string }>;
+                created_at: string;
+                updated_at: string;
+            } | null>;
+            deleteAiConversation: (id: string) => Promise<boolean>;
+
+            // AI insight/sermon local cache (device-local, pruned after 3 days)
+            getAiInsight: (key: string) => Promise<{
+                key: string;
+                mode: string;
+                reference: string;
+                version: string | null;
+                content: string;
+                created_at: string;
+            } | null>;
+            saveAiInsight: (payload: {
+                key: string;
+                mode: string;
+                reference: string;
+                version?: string | null;
+                content: string;
+            }) => Promise<boolean>;
+            pruneAiInsights: () => Promise<boolean>;
         };
     }
 }

@@ -6,6 +6,7 @@ export interface InternationalMessageInterface {
     Profile: string;
     About: string;
     Settings: string;
+    'Manage subscription'?: string;
     'Search Bible': string;
     'Bible List': string;
     Bookmarks: string;
@@ -247,6 +248,13 @@ export interface InternationalMessageInterface {
     "Go"?: string;
     "Back"?: string;
     "Completed"?: string;
+    "Finish"?: string;
+    "Start Devotion again"?: string;
+    "Do you want to go through today's devotion again?"?: string;
+    "Today's devotion complete!"?: string;
+    "Come back later or tomorrow for your next devotion."?: string;
+    "Next devotion"?: string;
+    "day streak"?: string;
     "Day"?: string;
     "verse-reader-desc"?: string;
     "browser-tts-desc"?: string;

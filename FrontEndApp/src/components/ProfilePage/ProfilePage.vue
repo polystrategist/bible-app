@@ -1,7 +1,11 @@
 <script lang="ts" setup>
-import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSwitch, NSpin, useMessage } from 'naive-ui';
+import { NAlert, NButton, NForm, NInput, NModal, NSelect, NSpin, useDialog, useMessage } from 'naive-ui';
 import { computed, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../store/authStore';
+import { useMainStore } from '../../store/main';
+import { useWebBillingStore } from '../../store/webBillingStore';
+import { usePlanModalStore } from '../../store/planModalStore';
+import { useSubscriptionPlans } from '../../composables/useSubscriptionPlans';
 import { Icon } from '@iconify/vue';
 import { useRouter } from 'vue-router';
 import { DENOMINATION_OPTIONS, normalizeDenominationCode } from '../../util/denominations';
@@ -11,8 +15,228 @@ import { DEFAULT_PROFILE_NAMES, getDefaultProfileUrl, useAvatarUrl } from '../..
 
 const loading = ref(false);
 const authStore = useAuthStore();
+const mainStore = useMainStore();
+const webBilling = useWebBillingStore();
+const planModal = usePlanModalStore();
 const message = useMessage();
+const dialog = useDialog();
 const router = useRouter();
+
+// ─── Subscription card (mirrors the mobile SubscriptionCard) ─────────────────
+// "Choose your plan" is the global PlanModal (App.vue), opened via planModal.
+// Plan-management modal (subscribers: switch plan / open Paddle portal).
+const manageModalOpen = ref(false);
+
+const tierLabel = computed(
+    () => ({ free: 'Free', sync: 'Sync', pro: 'Pro' })[authStore.tier],
+);
+const tierBlurb = computed(() => {
+    switch (authStore.tier) {
+        case 'pro':
+            return 'Full access to AI study tools, plus everything in Sync.';
+        case 'sync':
+            return 'Your study data syncs across devices. Upgrade to Pro for AI study tools.';
+        default:
+            return 'Unlock cross-device sync and AI-powered Bible study tools.';
+    }
+});
+
+// Live price from the current offering (never hard-coded, so a price change is
+// reflected automatically).
+const renewsLabel = computed(() => {
+    const iso = authStore.user?.subscription_renews_at;
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+});
+
+// Plan cards + prices come from the shared composable (single source of truth,
+// with fallback prices so a price always shows even when offerings aren't loaded).
+const { planCards, syncPrice, proPrice } = useSubscriptionPlans();
+
+const subPrice = computed(() => {
+    if (authStore.tier === 'pro') return `${proPrice.value}/month`;
+    if (authStore.tier === 'sync') return `${syncPrice.value}/month`;
+    return null;
+});
+
+// "View plans" opens the global Choose-your-plan dialog (PlanModal in App.vue).
+function viewPlans() {
+    planModal.show();
+}
+
+// Human-readable name + (optional) management deep link for a RevenueCat store.
+function storeInfo(store: string): { where: string; url?: string } {
+    switch (store) {
+        case 'play_store':
+            return {
+                where: 'Google Play (your Android device)',
+                url: 'https://play.google.com/store/account/subscriptions',
+            };
+        case 'app_store':
+        case 'mac_app_store':
+            return { where: 'the App Store (your iPhone, iPad, or Mac)' };
+        case 'amazon':
+            return { where: 'the Amazon Appstore' };
+        case 'test_store':
+            return { where: 'the mobile app (test purchase)' };
+        default:
+            return { where: 'the app where you subscribed' };
+    }
+}
+
+// "Manage subscription" — opens the web (Paddle) management page if the plan was
+// bought on the web; otherwise tells the user which store owns it.
+async function manageSubscription() {
+    const res = await webBilling.manageSubscription();
+    if (res.status === 'managed-elsewhere') {
+        const { where, url } = storeInfo(res.store);
+        message.info(`Your subscription was purchased through ${where}. Manage or cancel it there.`);
+        if (url) void window.browserWindow.openExternal(url);
+    } else if (res.status === 'none') {
+        message.error('Couldn’t open subscription management. Please try again.');
+    }
+}
+
+// Format a Paddle minor-unit amount (e.g. "390") in its currency (e.g. "$3.90").
+function formatAmount(minor: string, currency: string): string {
+    const value = Number(minor) / 100;
+    if (Number.isNaN(value)) return '';
+    try {
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(value);
+    } catch {
+        return `${value.toFixed(2)} ${currency}`;
+    }
+}
+
+// Route a plan-change result that came back 'managed-elsewhere' (the plan lives
+// on a mobile store) — tell the user where to go and open that store if we can.
+function notifyManagedElsewhere(store: string | null, verb: string) {
+    const { where, url } = storeInfo(store ?? '');
+    message.info(`Your subscription is billed through ${where}. ${verb} there to avoid being charged twice.`);
+    if (url) void window.browserWindow.openExternal(url);
+}
+
+// "Upgrade to Pro" — preview the exact prorated charge first, confirm with the
+// user, then change the plan in place via the backend (prorated immediately)
+// and poll for the tier to flip. A plan bought on mobile can't be upgraded here
+// (it would create a second, stacked subscription and double-charge).
+async function upgradeToPro() {
+    const preview = await webBilling.previewUpgradeToPro();
+    if (preview.status === 'managed-elsewhere') {
+        notifyManagedElsewhere(preview.store, 'Upgrade to Pro');
+        return;
+    }
+    if (preview.status !== 'ok') {
+        message.error(webBilling.error ?? 'Couldn’t start the upgrade. Please try again.');
+        return;
+    }
+
+    const due = formatAmount(preview.amount, preview.currency);
+    const renews = renewsLabel.value;
+    dialog.warning({
+        title: 'Upgrade to Pro',
+        content: `You’ll be charged ${due} today, prorated for the rest of this billing period, then ${proPrice.value}/month${renews ? ` from ${renews}` : ''}.`,
+        positiveText: 'Upgrade',
+        negativeText: 'Cancel',
+        onPositiveClick: async () => {
+            const res = await webBilling.upgradeToPro();
+            if (res.status === 'upgraded') {
+                manageModalOpen.value = false;
+                message.success('You’re now on Pro. AI study tools are unlocked.');
+            } else if (res.status === 'pending') {
+                manageModalOpen.value = false;
+                message.info('Upgrade received — your Pro access will activate shortly.');
+            } else if (res.status === 'managed-elsewhere') {
+                notifyManagedElsewhere(res.store, 'Upgrade to Pro');
+            } else {
+                message.error(webBilling.error ?? 'Upgrade failed. Please try again.');
+            }
+        },
+    });
+}
+
+// "Switch to Sync" — schedule a downgrade for period end (keep Pro until the
+// renewal date, then move to Sync; no charge or refund now).
+function confirmDowngrade() {
+    const renews = renewsLabel.value;
+    dialog.warning({
+        title: 'Switch to Sync?',
+        content: `You’ll keep Pro${renews ? ` until ${renews}` : ' until your renewal date'}, then move to the Sync plan. No charge now, and AI tools stay on until then.`,
+        positiveText: 'Switch to Sync',
+        negativeText: 'Keep Pro',
+        onPositiveClick: async () => {
+            const res = await webBilling.downgradeToSync();
+            if (res.status === 'scheduled') {
+                manageModalOpen.value = false;
+                message.success('Scheduled — you’ll switch to Sync at the end of this billing period.');
+            } else if (res.status === 'managed-elsewhere') {
+                notifyManagedElsewhere(res.store, 'Change your plan');
+            } else {
+                message.error(webBilling.error ?? 'Downgrade failed. Please try again.');
+            }
+        },
+    });
+}
+
+// Cancel a scheduled downgrade — stay on Pro.
+async function keepPro() {
+    const ok = await webBilling.cancelDowngrade();
+    if (ok) message.success('Got it — you’ll stay on Pro.');
+    else message.error(webBilling.error ?? 'Couldn’t cancel the scheduled change. Please try again.');
+}
+
+// Open the in-app plan-management modal (subscribers), preloading plans.
+async function openManage() {
+    manageModalOpen.value = true;
+    if (webBilling.plans.length === 0) await webBilling.loadPlans();
+}
+
+// ISO date a scheduled downgrade takes effect, formatted, or null when none.
+const pendingDowngradeAt = computed(() => {
+    const iso = authStore.user?.subscription_pending_change_at;
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+});
+
+// Open the subscription manager when the dropdown's "Manage subscription" asks
+// for it (subscribers → manage modal; Free → plan picker). `immediate` covers
+// the case where this page mounts after the flag was set during navigation.
+watch(
+    () => mainStore.openSubscriptionRequested,
+    (requested) => {
+        if (!requested) return;
+        mainStore.openSubscriptionRequested = false;
+        if (authStore.tier === 'free') void viewPlans();
+        else void openManage();
+    },
+    { immediate: true },
+);
+
+onMounted(() => {
+    // Preload plans so the live price shows for subscribers and "Upgrade to Pro"
+    // / the plan modal are instant.
+    if (webBilling.supported && authStore.user) {
+        void webBilling.loadPlans();
+        // Find out which store the active plan lives on, so we can disable
+        // web-only management when it was bought on mobile.
+        void webBilling.refreshActiveStore();
+    }
+});
+
+// A subscription bought on mobile (Google Play / App Store) can't be managed
+// or upgraded from the web app — it must be handled in the mobile app.
+const subscribedOnMobile = computed(() => webBilling.managedOnMobile);
+const mobileStoreLabel = computed(
+    () => storeInfo(webBilling.activeStore ?? '').where,
+);
 
 // ─── Name / Username / Email editing ─────────────────────────────────────────
 const profileName     = ref(authStore.user?.name ?? '');
@@ -45,6 +269,20 @@ const profileRefreshing = ref(false);
 // ─── Email Verification ──────────────────────────────────────────────────────
 const isEmailVerified = computed(() => !!authStore.user?.email_verified_at);
 const resendingVerification = ref(false);
+const checkingVerification = ref(false);
+
+// Re-fetch the account so a just-completed verification (done in the browser)
+// is picked up without restarting the app.
+async function checkVerification() {
+    checkingVerification.value = true;
+    await authStore.getUser(true);
+    checkingVerification.value = false;
+    if (isEmailVerified.value) {
+        message.success('Your email is now verified.');
+    } else {
+        message.info('Still not verified. Click the link in the email, then refresh.');
+    }
+}
 
 async function resendVerification() {
     resendingVerification.value = true;
@@ -149,10 +387,6 @@ async function logout() {
     router.push('/profile');
 }
 
-async function onSyncToggle(enabled: boolean) {
-    await authStore.setSyncEnabled(enabled);
-    message.success(enabled ? 'Sync enabled.' : 'Sync disabled.');
-}
 
 // Danger Zone
 const dangerZoneOpen = ref(false);
@@ -389,16 +623,27 @@ onBeforeUnmount(destroyCropper);
                         <strong>June 30, 2026</strong>, or your account will stop working.
                     </p>
                 </div>
-                <NButton
-                    size="small"
-                    type="warning"
-                    :loading="resendingVerification"
-                    :disabled="resendingVerification"
-                    @click="resendVerification"
-                >
-                    <template #icon><Icon icon="mdi:email-fast-outline" /></template>
-                    Resend Email
-                </NButton>
+                <div class="verify-warning-actions">
+                    <NButton
+                        size="small"
+                        :loading="checkingVerification"
+                        :disabled="checkingVerification"
+                        @click="checkVerification"
+                    >
+                        <template #icon><Icon icon="mdi:refresh" /></template>
+                        Refresh
+                    </NButton>
+                    <NButton
+                        size="small"
+                        type="warning"
+                        :loading="resendingVerification"
+                        :disabled="resendingVerification"
+                        @click="resendVerification"
+                    >
+                        <template #icon><Icon icon="mdi:email-fast-outline" /></template>
+                        Resend Email
+                    </NButton>
+                </div>
             </div>
 
             <!-- Row 1: Name | Username -->
@@ -469,34 +714,144 @@ onBeforeUnmount(destroyCropper);
                 </NButton>
             </div>
 
-            <div class="sync-panel">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <div class="flex items-center gap-2 font-700 mb-1">
-                            <Icon icon="mdi:sync" />
-                            <span>Sync</span>
-                        </div>
-                        <p class="m-0 text-sm opacity-70">
-                            Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
-                        </p>
+            <div class="sub-card">
+                <!-- ── Subscription ───────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="lucide:sparkles" class="sub-head__icon" />
+                        <span class="sub-head__title">Subscription</span>
+                        <span class="plan-pill" :class="`tier-${authStore.tier}`">{{ tierLabel }}</span>
                     </div>
-                    <NSwitch
-                        :value="authStore.syncEnabled"
-                        @update:value="onSyncToggle"
-                    />
+                    <p class="sub-blurb">{{ tierBlurb }}</p>
+
+                    <div
+                        v-if="authStore.tier !== 'free' && (subPrice || renewsLabel)"
+                        class="sub-billing"
+                    >
+                        <Icon icon="lucide:credit-card" />
+                        <span>
+                            <template v-if="subPrice">{{ subPrice }}</template>
+                            <template v-if="subPrice && renewsLabel"> · </template>
+                            <template v-if="renewsLabel">Renews {{ renewsLabel }}</template>
+                        </span>
+                    </div>
+
+                    <!-- Free → open the plan comparison modal -->
+                    <template v-if="authStore.tier === 'free'">
+                        <NButton type="primary" block @click="viewPlans">
+                            <template #icon><Icon icon="lucide:sparkles" /></template>
+                            View plans
+                        </NButton>
+                    </template>
+
+                    <!-- Subscribed → upgrade (Sync only) + manage -->
+                    <template v-else>
+                        <!-- Scheduled downgrade → keep the user informed. -->
+                        <NAlert
+                            v-if="pendingDowngradeAt"
+                            type="warning"
+                            :bordered="false"
+                            class="mb-2 pending-downgrade"
+                        >
+                            Switching to Sync on {{ pendingDowngradeAt }}.
+                            <NButton size="small" type="primary" secondary round @click="keepPro">
+                        <template #icon><Icon icon="lucide:undo-2" /></template>
+                        Keep Pro
+                    </NButton>
+                        </NAlert>
+
+                        <!-- Web checkout enabled → in-app upgrade / manage. -->
+                        <template v-if="webBilling.supported">
+                            <NButton
+                                v-if="authStore.tier === 'sync'"
+                                type="primary"
+                                block
+                                class="mb-2"
+                                :disabled="subscribedOnMobile || webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
+                                :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
+                                @click="upgradeToPro"
+                            >
+                                <template #icon><Icon icon="lucide:arrow-up" /></template>
+                                Upgrade to Pro
+                            </NButton>
+                            <NButton
+                                block
+                                :disabled="subscribedOnMobile"
+                                @click="openManage"
+                            >
+                                <template #icon><Icon icon="lucide:settings" /></template>
+                                Manage subscription
+                            </NButton>
+
+                            <!-- Plan bought on a mobile store → can't manage it here. -->
+                            <div v-if="subscribedOnMobile" class="manage-elsewhere-note">
+                                <Icon icon="mdi:cellphone-cog" />
+                                <span>
+                                    You subscribed through {{ mobileStoreLabel }}. To
+                                    upgrade, change, or cancel your plan, please manage it
+                                    in the Believers Sword <strong>mobile app</strong>.
+                                </span>
+                            </div>
+                        </template>
+
+                        <!-- Web checkout off (Paddle not yet live) → manage on mobile. -->
+                        <div v-else class="manage-elsewhere-note">
+                            <Icon icon="mdi:cellphone-cog" />
+                            <span>
+                                Manage, upgrade, or cancel your plan in the Believers Sword
+                                <strong>mobile app</strong>. Any changes apply here
+                                automatically.
+                            </span>
+                        </div>
+                    </template>
                 </div>
-                <div class="sync-footer">
+
+                <div class="sub-divider" />
+
+                <!-- ── Sync ───────────────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="mdi:sync" class="sub-head__icon" />
+                        <span class="sub-head__title">Sync</span>
+                        <span class="onoff-chip" :class="authStore.syncEnabled ? 'is-on' : 'is-off'">
+                            <span class="onoff-dot" /> {{ authStore.syncEnabled ? 'On' : 'Off' }}
+                        </span>
+                    </div>
+                    <p class="sub-blurb">
+                        Keep your bookmarks, highlights, notes, and prayer lists backed up and in sync across devices.
+                    </p>
                     <div v-if="authStore.syncEnabled" class="sync-footer-item is-active">
                         <Icon icon="mdi:check-circle-outline" />
-                        <span>Sync is currently enabled for this account</span>
+                        <span>Sync is included in your subscription and stays on automatically</span>
+                    </div>
+                    <div v-else class="sync-free-notice">
+                        <Icon icon="mdi:lock-outline" />
+                        <span>Cross-device sync is part of the Sync and Pro plans.</span>
                     </div>
                 </div>
-                <div class="sync-free-notice">
-                    <Icon icon="mdi:information-outline" />
-                    <span>
-                        Sync is free while in preview. It may become a paid feature in the
-                        future — we'll let you know before that happens.
-                    </span>
+
+                <div class="sub-divider" />
+
+                <!-- ── AI Assistant ───────────────────────────────────── -->
+                <div class="sub-section">
+                    <div class="sub-head">
+                        <Icon icon="lucide:sparkles" class="sub-head__icon" />
+                        <span class="sub-head__title">AI Assistant</span>
+                        <span class="onoff-chip" :class="authStore.isAiEnabled ? 'is-on' : 'is-off'">
+                            <span class="onoff-dot" /> {{ authStore.isAiEnabled ? 'On' : 'Off' }}
+                        </span>
+                    </div>
+                    <p class="sub-blurb">
+                        Verse insights, sermon outlines, devotionals, and Bible chat.
+                    </p>
+                    <div v-if="authStore.isAiEnabled" class="sync-footer-item is-active">
+                        <Icon icon="mdi:check-circle-outline" />
+                        <span>Included with Pro — an AI allowance that refreshes every few hours</span>
+                    </div>
+                    <div v-else class="sync-free-notice">
+                        <Icon icon="mdi:lock-outline" />
+                        <span>The AI Assistant is part of the Pro plan.</span>
+                    </div>
                 </div>
             </div>
 
@@ -703,6 +1058,97 @@ onBeforeUnmount(destroyCropper);
                 </div>
             </template>
         </NModal>
+
+        <!-- "Choose your plan" is the global PlanModal, mounted in App.vue. -->
+
+        <!-- Manage plan modal (active subscribers): switch plan + Paddle portal -->
+        <NModal
+            v-model:show="manageModalOpen"
+            preset="card"
+            title="Manage plan"
+            :bordered="false"
+            :auto-focus="false"
+            style="max-width: 720px; width: 92vw;"
+        >
+            <div v-if="webBilling.loading" class="sub-plan-loading">
+                <NSpin size="small" /> <span>Loading plans…</span>
+            </div>
+            <template v-else>
+                <NAlert
+                    v-if="pendingDowngradeAt"
+                    type="warning"
+                    :bordered="false"
+                    class="mb-3 pending-downgrade"
+                >
+                    Switching to Sync on {{ pendingDowngradeAt }}.
+                    <NButton size="small" type="primary" secondary round @click="keepPro">
+                        <template #icon><Icon icon="lucide:undo-2" /></template>
+                        Keep Pro
+                    </NButton>
+                </NAlert>
+
+                <div class="plans-grid">
+                    <div
+                        v-for="card in planCards"
+                        :key="card.key"
+                        class="plan-card"
+                        :class="{ 'is-highlight': card.highlight, 'is-current': card.key === authStore.tier }"
+                    >
+                        <div
+                            v-if="card.key === authStore.tier"
+                            class="plan-card__badge plan-card__badge--current"
+                        >
+                            Current plan
+                        </div>
+                        <div v-else-if="card.badge" class="plan-card__badge">{{ card.badge }}</div>
+                        <div class="plan-card__name">{{ card.name }}</div>
+                        <div class="plan-card__price">
+                            {{ card.price }}<span class="plan-card__per">/month</span>
+                        </div>
+                        <p class="plan-card__tagline">{{ card.tagline }}</p>
+                        <ul class="plan-card__features">
+                            <li v-for="f in card.features" :key="f">
+                                <Icon icon="lucide:check" /> <span>{{ f }}</span>
+                            </li>
+                        </ul>
+
+                        <!-- Current plan → no action -->
+                        <NButton v-if="card.key === authStore.tier" block disabled>
+                            Current plan
+                        </NButton>
+                        <!-- Sync subscriber → upgrade to Pro -->
+                        <NButton
+                            v-else-if="card.key === 'pro'"
+                            type="primary"
+                            block
+                            :disabled="webBilling.purchasingId !== null"
+                            :loading="webBilling.purchasingId === 'preview' || webBilling.purchasingId === 'upgrade'"
+                            @click="upgradeToPro"
+                        >
+                            Upgrade to Pro
+                        </NButton>
+                        <!-- Pro subscriber → downgrade to Sync (at period end) -->
+                        <NButton
+                            v-else
+                            block
+                            :disabled="webBilling.purchasingId !== null || !!pendingDowngradeAt"
+                            :loading="webBilling.purchasingId === 'downgrade'"
+                            @click="confirmDowngrade"
+                        >
+                            {{ pendingDowngradeAt ? 'Switch scheduled' : 'Switch to Sync' }}
+                        </NButton>
+                    </div>
+                </div>
+
+                <div class="manage-portal-row">
+                    <NButton text type="primary" @click="manageSubscription">
+                        <template #icon><Icon icon="lucide:external-link" /></template>
+                        Payment method &amp; cancel
+                    </NButton>
+                </div>
+                <p v-if="webBilling.error" class="sub-error">{{ webBilling.error }}</p>
+            </template>
+        </NModal>
     </div>
 </template>
 
@@ -828,6 +1274,7 @@ body.dark .profile-status-chip.is-enabled {
 .verify-warning {
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap;
     gap: 12px;
     padding: 14px 16px;
     border-radius: 14px;
@@ -835,11 +1282,25 @@ body.dark .profile-status-chip.is-enabled {
     border: 1px solid rgba(251, 146, 60, 0.32);
 }
 
+/* Keep the message readable; when it can't fit alongside the buttons the
+   actions wrap to their own row instead of squeezing the text. */
+.verify-warning .flex-1 {
+    min-width: 220px;
+}
+
 .verify-warning-icon {
     font-size: 22px;
     color: #fb923c;
     flex-shrink: 0;
     margin-top: 1px;
+}
+
+.verify-warning-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .verify-warning-title {
@@ -932,6 +1393,283 @@ body.dark .sync-footer-item.is-active {
 body.dark .sync-free-notice {
     color: #e6b45a;
     background: rgba(216, 162, 58, 0.14);
+}
+
+/* ── Subscription card (Subscription / Sync / AI Assistant) ─────────────── */
+.sub-card {
+    border-radius: 18px;
+    background: rgba(67, 97, 176, 0.10);
+    border: 1px solid rgba(107, 145, 255, 0.20);
+    overflow: hidden;
+}
+
+.sub-section {
+    padding: 18px;
+}
+
+.sub-divider {
+    height: 1px;
+    background: rgba(107, 145, 255, 0.16);
+}
+
+.sub-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sub-head__icon {
+    font-size: 18px;
+    color: #d8a23a;
+}
+
+.sub-head__title {
+    font-weight: 800;
+}
+
+.sub-blurb {
+    margin: 0 0 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: 0.75;
+}
+
+.sub-billing {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: -6px 0 14px;
+    font-size: 12.5px;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.sub-billing .iconify {
+    font-size: 15px;
+    opacity: 0.7;
+}
+
+.manage-elsewhere-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(216, 162, 58, 0.1);
+    border: 1px solid rgba(216, 162, 58, 0.35);
+    font-size: 12px;
+    line-height: 1.4;
+    color: #8a6314;
+}
+
+.manage-elsewhere-note .iconify {
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 15px;
+}
+
+body.dark .manage-elsewhere-note {
+    color: #e6b45a;
+    background: rgba(216, 162, 58, 0.14);
+}
+
+.plan-pill {
+    margin-left: auto;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.plan-pill.tier-free {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.14);
+    border-color: rgba(148, 163, 184, 0.30);
+}
+
+.plan-pill.tier-sync {
+    color: #2e8b68;
+    background: rgba(46, 139, 104, 0.16);
+    border-color: rgba(46, 139, 104, 0.30);
+}
+
+.plan-pill.tier-pro {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.16);
+    border-color: rgba(139, 92, 246, 0.30);
+}
+
+.onoff-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.onoff-chip .onoff-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.onoff-chip.is-on {
+    color: #2e8b68;
+    background: rgba(46, 139, 104, 0.16);
+    border-color: rgba(46, 139, 104, 0.30);
+}
+
+.onoff-chip.is-off {
+    color: #b45353;
+    background: rgba(180, 83, 83, 0.16);
+    border-color: rgba(180, 83, 83, 0.30);
+}
+
+.sub-plan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sub-plan-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.sub-hint {
+    margin: 4px 0 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.sub-error {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #f87171;
+}
+
+.mb-2 {
+    margin-bottom: 8px;
+}
+
+.mb-3 {
+    margin-bottom: 12px;
+}
+
+.manage-portal-row {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.pending-downgrade :deep(.n-button) {
+    margin-left: 8px;
+}
+
+/* ── Plan comparison modal ─────────────────────────────────────────────── */
+.plans-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 560px) {
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.plan-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--theme-border, rgba(120, 130, 160, 0.3));
+    background: var(--theme-bg-soft, rgba(120, 130, 160, 0.06));
+}
+
+.plan-card.is-highlight {
+    border-color: rgba(216, 162, 58, 0.55);
+    background: rgba(216, 162, 58, 0.08);
+}
+
+.plan-card__badge {
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: #d8a23a;
+}
+
+.plan-card.is-current {
+    border-color: rgba(99, 179, 117, 0.55);
+    background: rgba(99, 179, 117, 0.08);
+}
+
+.plan-card__badge--current {
+    background: #63b375;
+}
+
+.plan-card__name {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.plan-card__price {
+    margin-top: 4px;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.plan-card__per {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+.plan-card__tagline {
+    margin: 4px 0 12px;
+    font-size: 12.5px;
+    opacity: 0.7;
+}
+
+.plan-card__features {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    flex: 1;
+}
+
+.plan-card__features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.plan-card__features li .iconify {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 15px;
+    color: #2e8b68;
 }
 
 .danger-zone {

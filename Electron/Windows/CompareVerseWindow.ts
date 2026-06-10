@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
-import { isDev, isNightly } from '../config';
+import { isDev, isBeta } from '../config';
 import path from 'path';
 import fs from 'fs';
 import { getBibleVersionDb } from '../Modules/Bible/Common/BibleVersionCache';
@@ -12,7 +12,7 @@ export const CompareVerseIpcEvents = () => {
             args: { book_number: number; chapter: number; verse: number; book_name: string }
         ) => {
             let iconPath = path.join(__dirname, 'assets', 'icon.ico');
-            if (isDev || isNightly) iconPath = path.join('assets', 'icon.ico');
+            if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
             const win = new BrowserWindow({
                 width: 520,
@@ -24,7 +24,7 @@ export const CompareVerseIpcEvents = () => {
                 icon: iconPath,
                 webPreferences: {
                     preload: path.join(__dirname, '../preload.js'),
-                    devTools: isDev || isNightly,
+                    devTools: isDev || isBeta,
                 },
                 show: false,
             });

@@ -3,8 +3,11 @@ import { useAuthStore } from '../../store/authStore';
 import useNoteStore from '../../store/useNoteStore';
 import { useBookmarkStore } from '../../store/bookmark';
 import { usePrayerListStore } from '../../store/prayerListStore';
+import { usePrayerStreakStore } from '../../store/prayerStreakStore';
+import { useDevotionStreakStore } from '../../store/devotionStreakStore';
 import { useBibleStore } from '../../store/BibleStore';
 import { useClipNoteStore } from '../../store/ClipNotes';
+import { useConversationStore } from '../../store/conversationStore';
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
@@ -22,7 +25,7 @@ async function pushSync(token: string): Promise<number> {
 
     if (!unsyncedChanges.length) return 0;
 
-    const ALLOWED_TABLES = ['bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'notes', 'sermon_favorites'];
+    const ALLOWED_TABLES = ['bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'prayer_days', 'devotion_days', 'notes', 'sermon_favorites', 'ai_conversations'];
     const ALLOWED_ACTIONS = ['created', 'updated', 'deleted'];
 
     // Discard legacy entries: no record_key, unknown table name, or unknown action.
@@ -106,7 +109,7 @@ async function pullSync(token: string): Promise<void> {
 
         if (response.data.status !== 'success') return;
 
-        const { sync_logs, bookmarks, highlights, clip_notes, prayer_lists, notes, sermon_favorites, settings, has_more, next_cursor, last_sync_timestamp } = response.data;
+        const { sync_logs, bookmarks, highlights, clip_notes, prayer_lists, prayer_days, devotion_days, notes, sermon_favorites, ai_conversations, settings, has_more, next_cursor, last_sync_timestamp } = response.data;
         const authStore = useAuthStore();
 
         await window.browserWindow.applyPullData({
@@ -115,8 +118,11 @@ async function pullSync(token: string): Promise<void> {
             highlights,
             clip_notes,
             prayer_lists,
+            prayer_days,
+            devotion_days,
             notes,
             sermon_favorites,
+            ai_conversations,
             settings,
         });
 
@@ -143,8 +149,11 @@ function reloadStoresAfterPull() {
     useNoteStore().loadNote();
     useBookmarkStore().getBookmarks();
     usePrayerListStore().loadPrayerLists();
+    usePrayerStreakStore().loadDays();
+    useDevotionStreakStore().loadDays();
     useBibleStore().getChapterHighlights();
     useClipNoteStore().getClipNotes();
+    useConversationStore().loadConversations();
 }
 
 /**
@@ -175,7 +184,9 @@ export async function runPushSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {
@@ -211,7 +222,9 @@ export async function runPullSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {
@@ -252,7 +265,9 @@ export async function runSync(): Promise<void> {
     if (Date.now() < backoffUntil) return;
 
     const authStore = useAuthStore();
-    if (!authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
+    // Sync is a paid feature — never run it for a Free account, even if a stale
+    // `syncEnabled` preference is set before the tier resolves.
+    if (!authStore.isSyncEntitled || !authStore.syncEnabled || !authStore.isAuthenticated || !authStore.token) return;
 
     isSyncing = true;
     try {

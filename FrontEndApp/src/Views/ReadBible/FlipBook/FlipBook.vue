@@ -368,6 +368,22 @@ watch(() => flipbookStore.currentPage, () => {
                                         <h1>{{ flipbookStore.bookTitle }} <span>{{ flipbookStore.chapterNumber }}</span></h1>
                                     </div>
 
+                                    <!-- No verses loaded for this version/chapter -->
+                                    <div v-if="flipbookStore.verses.length === 0" class="flipbook-empty">
+                                        <Icon icon="mdi:book-alert-outline" class="flipbook-empty-icon" />
+                                        <p class="flipbook-empty-title">
+                                            {{ flipbookStore.loadError ? "Couldn't open this version" : 'No verses found here' }}
+                                        </p>
+                                        <p class="flipbook-empty-desc">
+                                            This Bible version may not be fully downloaded, or doesn’t include
+                                            {{ flipbookStore.bookTitle }} {{ flipbookStore.chapterNumber }}. Try a different version.
+                                        </p>
+                                        <NButton size="small" secondary @click="flipbookStore.changeVersion()">
+                                            <template #icon><Icon icon="mdi:book-open-page-variant" /></template>
+                                            Choose another version
+                                        </NButton>
+                                    </div>
+
                                     <div
                                         v-for="verse in flipbookStore.currentPageVerses"
                                         :key="verse.verse"
@@ -510,6 +526,22 @@ watch(() => flipbookStore.currentPage, () => {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
     color: #ccc;
+
+    /* The toolbar is always dark, so force naive-ui's buttons/icons light
+       regardless of the app's (light/dark) theme — otherwise they render
+       dark-on-dark and are invisible. */
+    :deep(.n-button) {
+        --n-text-color: #cfd2da;
+        --n-text-color-hover: #ffffff;
+        --n-text-color-pressed: #ffffff;
+        --n-text-color-focus: #ffffff;
+        --n-text-color-disabled: rgba(255, 255, 255, 0.25);
+        color: #cfd2da;
+    }
+    :deep(.n-button:hover) {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+    }
 }
 .flipbook-toolbar-left {
     display: flex;
@@ -637,6 +669,34 @@ watch(() => flipbookStore.currentPage, () => {
     }
 }
 
+/* ── empty / error state ── */
+.flipbook-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 48px 16px;
+    color: #6a6a6a;
+}
+.flipbook-empty-icon {
+    font-size: 40px;
+    opacity: 0.6;
+}
+.flipbook-empty-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #3a3a3a;
+    margin: 4px 0 0;
+}
+.flipbook-empty-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 340px;
+    margin: 0 0 8px;
+}
+
 /* ── verse ── */
 .flipbook-verse {
     display: flex;
@@ -700,6 +760,19 @@ watch(() => flipbookStore.currentPage, () => {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
     color: #999;
+
+    /* Force naive-ui buttons light on the always-dark footer (see toolbar). */
+    :deep(.n-button) {
+        --n-text-color: #b8bcc6;
+        --n-text-color-hover: #ffffff;
+        --n-text-color-pressed: #ffffff;
+        --n-text-color-focus: #ffffff;
+        color: #b8bcc6;
+    }
+    :deep(.n-button:hover) {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+    }
 }
 .flipbook-page-num {
     font-size: 12px;

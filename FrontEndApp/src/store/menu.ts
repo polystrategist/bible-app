@@ -7,21 +7,20 @@ import { renderNIcon } from '../util/helper';
 import {
     Book24Filled,
     DocumentQueueMultiple24Filled,
-    TaskListSquareLtr24Filled,
     Person24Filled,
     Settings24Filled,
     HeartCircle24Filled,
     Book24Regular,
     DocumentQueueMultiple24Regular,
-    TaskListSquareLtr24Regular,
     Person24Regular,
     HeartCircle24Regular,
     Settings24Regular,
     BookStar24Regular,
     BookStar24Filled,
-    PeopleCommunity24Regular,
-    PeopleCommunity24Filled,
+    Sparkle24Regular,
+    Sparkle24Filled,
 } from '@vicons/fluent';
+import { PrayingHands } from '@vicons/fa';
 
 export const useMenuStore = defineStore('useMenuStore', () => {
     const menuSelected = ref<string>('read-bible');
@@ -47,8 +46,8 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         {
             label: 'Prayer List',
             key: '/prayer-list',
-            icon: renderNIcon(TaskListSquareLtr24Regular),
-            iconDark: renderNIcon(TaskListSquareLtr24Filled),
+            icon: renderNIcon(PrayingHands),
+            iconDark: renderNIcon(PrayingHands),
         },
         {
             label: 'Daily Devotional',
@@ -57,10 +56,10 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             iconDark: renderNIcon(BookStar24Filled),
         },
         {
-            label: 'Daily Believers',
-            key: '/daily-believers',
-            icon: renderNIcon(PeopleCommunity24Regular),
-            iconDark: renderNIcon(PeopleCommunity24Filled),
+            label: 'AI Assistant',
+            key: '/ai-assistant',
+            icon: renderNIcon(Sparkle24Regular),
+            iconDark: renderNIcon(Sparkle24Filled),
         },
     ]);
 
@@ -91,7 +90,7 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         'sermons',
         '/prayer-list',
         '/daily-devotional',
-        '/daily-believers',
+        '/ai-assistant',
         // '/profile',
         '/settings-page',
         '/create-sermon',
@@ -153,8 +152,8 @@ export const useMenuStore = defineStore('useMenuStore', () => {
                 savedLocalTabsKey.push('/create-sermon');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
             }
-            if (!savedLocalTabsKey.includes('/daily-believers')) {
-                savedLocalTabsKey.push('/daily-believers');
+            if (!savedLocalTabsKey.includes('/ai-assistant')) {
+                savedLocalTabsKey.push('/ai-assistant');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
             }
 

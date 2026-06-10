@@ -1,18 +1,38 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { NButton, NModal, NIcon, NCard, NInput, NCheckbox, useMessage } from 'naive-ui';
+import { ref, computed, h } from 'vue';
+import { NButton, NModal, NIcon, NCard, NInput, NSelect, NCheckbox, useMessage } from 'naive-ui';
 import { Save } from '@vicons/carbon';
+import { Icon } from '@iconify/vue';
 import Editor from '../../components/Editor/Editor.vue';
 import { usePrayerListStore } from '../../store/prayerListStore';
+import { PREDEFINED_GROUPS, groupStyle } from './prayerGroupStyle';
+function renderGroupLabel(option: { label?: string; value?: string | number }) {
+    const s = groupStyle(String(option.value ?? ''));
+    return h('div', { style: 'display:flex;align-items:center;gap:8px;' }, [
+        h(Icon, { icon: s.icon, style: `color:${s.color};font-size:16px;` }),
+        h('span', String(option.label ?? '')),
+    ]);
+}
 
 const keyOfItem = ref('');
 const prayerTitle = ref('');
-const prayerGroup = ref('');
+const prayerGroup = ref<string | null>('');
 const prayerItemContent = ref('');
 const isAnswered = ref(false);
 const prayerListStore = usePrayerListStore();
 const showModal = ref(false);
 const message = useMessage();
+
+// Include the current value when it's a custom group not in the presets, so it
+// (and its icon) still renders in the select.
+const groupOptions = computed(() => {
+    const opts = PREDEFINED_GROUPS.map((g) => ({ label: g, value: g }));
+    const cur = prayerGroup.value?.trim();
+    if (cur && !PREDEFINED_GROUPS.some((g) => g.toLowerCase() === cur.toLowerCase())) {
+        opts.unshift({ label: cur, value: cur });
+    }
+    return opts;
+});
 
 const SaveEditorContent = () => {
     try {
@@ -20,7 +40,7 @@ const SaveEditorContent = () => {
             {
                 title: prayerTitle.value.trim() || null,
                 content: prayerItemContent.value,
-                group: prayerGroup.value.trim() || null,
+                group: prayerGroup.value?.trim() || null,
                 status: isAnswered.value ? 'done' : 'ongoing',
             },
             keyOfItem.value
@@ -63,7 +83,16 @@ defineExpose({ modalTrigger });
                 </div>
                 <div class="flex flex-col gap-4px">
                     <label class="text-12px font-600 opacity-70">Group</label>
-                    <NInput v-model:value="prayerGroup" placeholder="Family, health, work..." />
+                    <NSelect
+                        v-model:value="prayerGroup"
+                        :options="groupOptions"
+                        :render-label="renderGroupLabel"
+                        :virtual-scroll="false"
+                        filterable
+                        tag
+                        clearable
+                        placeholder="Select or type a group…"
+                    />
                 </div>
                 <NCheckbox v-model:checked="isAnswered">
                     Mark as answered

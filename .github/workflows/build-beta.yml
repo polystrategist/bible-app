@@ -1,0 +1,124 @@
+name: Build & Release (Beta)
+
+on:
+  push:
+    tags:
+      - 'v*-beta*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            build_script: "yarn beta:rename && yarn build:front && yarn electron:build && yarn electron:builder"
+          - os: macos-latest
+            build_script: "yarn beta:rename && yarn build:front && yarn electron:build && yarn electron:builder --mac"
+          - os: ubuntu-latest
+            build_script: "yarn beta:rename && yarn build:front && yarn electron:build && yarn electron:builder --linux"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag is on development
+        shell: bash
+        run: |
+          if ! git merge-base --is-ancestor ${{ github.sha }} origin/development; then
+            echo "::error::Beta release tags must be on the development branch."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install root dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install frontend dependencies
+        run: cd FrontEndApp && yarn install --frozen-lockfile
+
+      # Stamp the package version from the tag (e.g. v1.6.0-beta.1 -> 1.6.0-beta.1).
+      # The separate `beta.yml` update channel comes from `channel: 'beta'` in the
+      # publish config (set by the `beta:rename` script), NOT from the -beta version
+      # suffix — electron-builder does not auto-derive the channel file here. That
+      # keeps the production auto-updater (which reads `latest.yml`) from seeing betas.
+      - name: Set beta version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "Setting package version to $VERSION"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+
+      # Linux only: install required system libraries for Electron
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      # macOS only: upscale icon.png to 512x512 and generate icon.icns
+      - name: Generate macOS icon
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p assets/icon.iconset
+          sips -z 16 16     assets/icon.png --out assets/icon.iconset/icon_16x16.png
+          sips -z 32 32     assets/icon.png --out assets/icon.iconset/icon_16x16@2x.png
+          sips -z 32 32     assets/icon.png --out assets/icon.iconset/icon_32x32.png
+          sips -z 64 64     assets/icon.png --out assets/icon.iconset/icon_32x32@2x.png
+          sips -z 128 128   assets/icon.png --out assets/icon.iconset/icon_128x128.png
+          sips -z 256 256   assets/icon.png --out assets/icon.iconset/icon_128x128@2x.png
+          sips -z 256 256   assets/icon.png --out assets/icon.iconset/icon_256x256.png
+          sips -z 512 512   assets/icon.png --out assets/icon.iconset/icon_256x256@2x.png
+          sips -z 512 512   assets/icon.png --out assets/icon.iconset/icon_512x512.png
+          iconutil -c icns assets/icon.iconset -o assets/icon.icns
+
+      - name: Build & publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_API_BASE_URL: https://service.believersword.com
+        run: ${{ matrix.build_script }} -p always
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          if [ -s release_note.md ]; then
+            echo "Using release_note.md from repository."
+            cp release_note.md notes.md
+          else
+            echo "release_note.md missing or empty — falling back to auto-generated notes."
+            PREV_TAG=$(gh release list --limit 1 --exclude-drafts --json tagName -q '.[0].tagName' || echo "")
+            if [ -n "$PREV_TAG" ]; then
+              gh api repos/${{ github.repository }}/releases/generate-notes \
+                -f tag_name="$TAG" -f previous_tag_name="$PREV_TAG" \
+                --jq '.body' > notes.md
+            else
+              gh api repos/${{ github.repository }}/releases/generate-notes \
+                -f tag_name="$TAG" \
+                --jq '.body' > notes.md
+            fi
+          fi
+
+      - name: Publish prerelease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release edit "$TAG" --draft=false --prerelease --notes-file notes.md

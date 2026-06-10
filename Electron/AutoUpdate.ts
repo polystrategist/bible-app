@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater, UpdateInfo } from 'electron-updater';
 import Log from 'electron-log';
 import { saveWindowState } from './util/window';
+import { isBeta } from './config';
 
 let errorAlreadyShown = false;
 
@@ -76,6 +77,19 @@ export default (mainWindow: BrowserWindow) => {
     if (updateConfig.provider === 'electron-updater') {
         autoUpdater.autoDownload = false;
         autoUpdater.autoInstallOnAppQuit = true;
+        // Channel isolation (both variants publish to the same GitHub repo):
+        //   - Beta pins the 'beta' channel, so it only ever reads beta.yml — it will
+        //     never offer a stable build, even one with a higher version. Beta stays beta.
+        //   - Prod stays on the default 'latest' channel with prereleases disallowed,
+        //     so it never picks up a beta.
+        // NOTE: this only works because the beta build actually emits a beta.yml — that
+        // comes from `channel: 'beta'` in the publish config (set by `beta:rename`), not
+        // from the -beta version suffix. Without it, beta builds publish latest.yml and
+        // get offered stable releases (since e.g. 1.5.6 > 1.5.6-beta.2 in semver).
+        autoUpdater.allowPrerelease = isBeta;
+        if (isBeta) {
+            autoUpdater.channel = 'beta';
+        }
 
         registerHandler('install-update', () => {
             saveWindowState();

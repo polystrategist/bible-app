@@ -38,7 +38,7 @@ Stores all local data changes pending synchronization.
 ```sql
 CREATE TABLE sync_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    table_name TEXT NOT NULL,        -- e.g., 'bookmarks', 'highlights', 'clip_notes', 'prayer_lists'
+    table_name TEXT NOT NULL,        -- e.g., 'bookmarks', 'highlights', 'clip_notes', 'prayer_lists', 'prayer_days'
     record_key TEXT NOT NULL,        -- Unique identifier for the record
     action TEXT NOT NULL,            -- 'created', 'updated', 'deleted'
     payload JSON,                    -- The data that was changed
@@ -332,6 +332,7 @@ Authorization: Bearer <your-token>
     "highlights": [...],
     "clip_notes": [...],
     "prayer_lists": [...],
+    "prayer_days": [...],
     "last_sync_timestamp": "2025-01-01T12:00:00.000Z"
 }
 ```

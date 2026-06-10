@@ -1,7 +1,7 @@
 import Log from 'electron-log';
 import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
-import { isDev, isNightly } from './config';
+import { isDev, isBeta } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
@@ -24,7 +24,7 @@ async function createWindow() {
 
     let iconPath = path.join(__dirname, 'assets', 'icon.ico');
 
-    if (isDev || isNightly) iconPath = path.join('assets', 'icon.ico');
+    if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
     const windowState = createWindowState();
 
@@ -69,7 +69,7 @@ async function createWindow() {
     // Modules
     BibleModules();
 
-    // auto updater (always called so IPC handlers are registered; internal check skips auto-update in dev/nightly)
+    // auto updater (always called so IPC handlers are registered; internal check skips auto-update on unpackaged dev builds)
     AppUpdater(mainWindow);
 
     // and load the index.html of the app.

@@ -23,6 +23,9 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
     const fontSize = ref(SESSION.get(STORAGE_KEY_FONT_SIZE) || 18);
     const verses = ref<any[]>([]);
     const isLoading = ref(false);
+    // True when the last load threw (vs. simply returning no verses), so the UI
+    // can distinguish "couldn't open this version" from "no verses in chapter".
+    const loadError = ref(false);
 
     // Flipbook's own book/chapter tracking (independent of main reader)
     const activeBookNumber = ref<number>(0);
@@ -105,6 +108,7 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
 
     async function loadVerses() {
         isLoading.value = true;
+        loadError.value = false;
 
         try {
             const arg = {
@@ -114,15 +118,20 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
             };
             const bibleService = getBibleService();
             const result = await bibleService.getVerses(arg);
-            verses.value = result.map((v: any) => ({
-                book_number: v.book_number,
-                chapter: v.chapter,
-                verse: v.verse,
-                text: v.version?.[0]?.text ?? '',
-            }));
+            // getVerses can return a sparse array (indexed by verse-1); filter
+            // holes/invalid rows so a missing verse can't break paging.
+            verses.value = (result ?? [])
+                .filter((v: any) => v && v.verse != null)
+                .map((v: any) => ({
+                    book_number: v.book_number,
+                    chapter: v.chapter,
+                    verse: v.verse,
+                    text: v.version?.[0]?.text ?? '',
+                }));
         } catch (e) {
             console.error('Failed to load flipbook verses:', e);
             verses.value = [];
+            loadError.value = true;
         }
 
         // Restore saved page position for this version+book+chapter
@@ -254,6 +263,7 @@ export const useFlipbookStore = defineStore('useFlipbookStore', () => {
         fontSize,
         verses,
         isLoading,
+        loadError,
         activeBookNumber,
         activeChapter,
         activeBook,

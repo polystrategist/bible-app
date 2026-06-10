@@ -937,6 +937,11 @@
   dependencies:
     type-fest "^2.19.0"
 
+"@revenuecat/purchases-js@^1.41.2":
+  version "1.41.2"
+  resolved "https://registry.yarnpkg.com/@revenuecat/purchases-js/-/purchases-js-1.41.2.tgz#4cd3136c6e0972bca365073217ac9cb11b9caa4d"
+  integrity sha512-i58OLvqWz/RUEmhwx4QzPybsVyNrrhxEvmMXSmtgcqwDDYiulUmdrqciarGxvOUNLoLyD7jVuiw+dTDMZnbd3w==
+
 "@rollup/pluginutils@^5.1.0":
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-5.1.0.tgz#7e53eddc8c7f483a4ad0b94afb1f7f5fd3c771e0"

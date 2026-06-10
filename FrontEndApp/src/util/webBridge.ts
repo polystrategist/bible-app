@@ -222,6 +222,63 @@ const stub: Window['browserWindow'] = {
         return apiFetch(`/prayer-list/${encodeURIComponent(String(key))}`, null, { method: 'DELETE' });
     },
 
+    // ---------- Prayer-streak days ----------
+    // The web build has no dedicated prayer-days REST route, so the streak is
+    // kept in localStorage (per-browser). Electron + mobile persist + sync it.
+    getPrayerDays: async () => {
+        try {
+            const raw = localStorage.getItem('prayer_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            const durRaw = localStorage.getItem('prayer_days_duration');
+            const dur: Record<string, number> = durRaw ? JSON.parse(durRaw) : {};
+            return days.map((day) => ({ day, duration: dur[day] ?? 0 }));
+        } catch {
+            return [];
+        }
+    },
+    markPrayedToday: async (durationSeconds = 0) => {
+        const d = new Date();
+        const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        try {
+            const raw = localStorage.getItem('prayer_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            if (!days.includes(day)) {
+                days.push(day);
+                localStorage.setItem('prayer_days', JSON.stringify(days));
+            }
+            const add = Math.max(0, Math.floor(durationSeconds || 0));
+            if (add > 0) {
+                const durRaw = localStorage.getItem('prayer_days_duration');
+                const dur: Record<string, number> = durRaw ? JSON.parse(durRaw) : {};
+                dur[day] = (dur[day] ?? 0) + add;
+                localStorage.setItem('prayer_days_duration', JSON.stringify(dur));
+            }
+        } catch { /* ignore */ }
+        return day;
+    },
+    getDevotionDays: async () => {
+        try {
+            const raw = localStorage.getItem('devotion_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            return days.map((day) => ({ day }));
+        } catch {
+            return [];
+        }
+    },
+    markDevotionToday: async () => {
+        const d = new Date();
+        const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        try {
+            const raw = localStorage.getItem('devotion_days');
+            const days: string[] = raw ? JSON.parse(raw) : [];
+            if (!days.includes(day)) {
+                days.push(day);
+                localStorage.setItem('devotion_days', JSON.stringify(days));
+            }
+        } catch { /* ignore */ }
+        return day;
+    },
+
     // ---------- Misc ----------
     updateDownloadProgress: () => { /* no-op listener */ },
     openDonateWindow: () => { warnOnce('openDonateWindow'); },
@@ -289,6 +346,24 @@ const stub: Window['browserWindow'] = {
     onSyncBeforeQuit: () => { /* no-op */ },
     notifySyncBeforeQuitDone: () => { /* no-op */ },
 
+    // ---------- AI Assistant conversation history (backend; paid feature) ----------
+    getAiConversations: async () => apiFetch('/ai-conversations', [] as any[]),
+    getAiConversation: async (id: string) =>
+        apiFetch(`/ai-conversations/${encodeURIComponent(id)}`, null),
+    saveAiConversation: async (payload) =>
+        apiFetch('/ai-conversations', null, { method: 'POST', body: JSON.stringify(payload) }),
+    deleteAiConversation: async (id: string) => {
+        const res = await apiFetch<boolean | null>(
+            `/ai-conversations/${encodeURIComponent(id)}`, null, { method: 'DELETE' },
+        );
+        return res === true;
+    },
+
+    // ---------- AI insight/sermon cache (local-only convenience; skipped on web — always online) ----------
+    getAiInsight: async () => null,
+    saveAiInsight: async () => false,
+    pruneAiInsights: async () => false,
+
     // ---------- Sermons offline cache + favorites (no-op on web — backend is source of truth) ----------
     replaceCachedSermons: async () => ({ success: false, error: 'Not available on web' }),
     getCachedSermons: async () => [],
@@ -313,30 +388,6 @@ const stub: Window['browserWindow'] = {
     getDevotionalByDay: async (day: number, languageCode: string = 'en') => {
         const params = new URLSearchParams({ lang: languageCode });
         return apiFetch(`/devotional/${day}?${params}`, null);
-    },
-
-    // ---------- Daily Believers ----------
-    dailyBelieversExtractMetadata: async (url: string) => {
-        // Web build cannot bypass CORS — best-effort YouTube oEmbed only;
-        // other URLs throw so the caller can show a helpful error.
-        const normalized = url.startsWith('http') ? url : `https://${url}`;
-        const host = new URL(normalized).host.toLowerCase().replace(/^www\./, '');
-        if (host.includes('youtube.com') || host === 'youtu.be') {
-            const res = await fetch(
-                `https://www.youtube.com/oembed?url=${encodeURIComponent(normalized)}&format=json`
-            );
-            if (!res.ok) throw new Error(`Could not load YouTube metadata (${res.status}).`);
-            const data = await res.json();
-            return {
-                url: normalized,
-                sourceType: 'youtube' as const,
-                sourceDomain: 'youtube.com',
-                title: data.title ?? 'YouTube video',
-                description: data.author_name ? `By ${data.author_name}` : null,
-                thumbnailUrl: data.thumbnail_url ?? null,
-            };
-        }
-        throw new Error('Link previews for non-YouTube URLs require the desktop app.');
     },
 
     getCrossReferences: async (args) => {

@@ -1,4 +1,3 @@
-import { isNightly } from '../../../config';
 import { app, ipcMain } from 'electron';
 import { getBibleVersionDb } from './BibleVersionCache';
 

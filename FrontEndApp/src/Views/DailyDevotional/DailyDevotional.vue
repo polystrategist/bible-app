@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { NSpin, NModal, NSteps, NStep } from 'naive-ui';
+import { NSpin, NModal, NSteps, NStep, useDialog } from 'naive-ui';
 import { Icon } from '@iconify/vue';
 import { useI18n } from 'vue-i18n';
 import { useBibleStore } from '../../store/BibleStore';
+import { useDevotionStreakStore } from '../../store/devotionStreakStore';
 import { bibleBooks } from '../../util/books';
 import { getBibleService } from '../../services/BibleService';
 
@@ -37,10 +38,42 @@ const steps = [
 ] as const;
 
 const { locale, t } = useI18n();
+const dialog = useDialog();
 const devotional = ref<Devotional | null>(null);
 const loading = ref(true);
 const activeStep = ref(0);
+// When true, show ONLY the completion/streak card (today's devotion is done).
+const finished = ref(false);
 const bibleStore = useBibleStore();
+const devotionStreak = useDevotionStreakStore();
+
+// Reaching the final "Go" step completes today's devotion — record it toward
+// the day-streak (idempotent + syncs).
+watch(activeStep, (step) => {
+    if (step === steps.length - 1) devotionStreak.recordTodayCompleted();
+});
+
+// Finish the devotion → collapse to the completion-only view.
+function finishDevotion() {
+    devotionStreak.recordTodayCompleted();
+    finished.value = true;
+}
+
+// "Start Devotion again" — confirm, then re-open the steps from the beginning.
+function restartDevotion() {
+    dialog.warning({
+        title: t('Start Devotion again'),
+        content: t("Do you want to go through today's devotion again?"),
+        positiveText: t('Yes'),
+        negativeText: t('No'),
+        onPositiveClick: () => {
+            finished.value = false;
+            activeStep.value = 0;
+        },
+    });
+}
+
+const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function langCode(): string {
     return localeToLangCode[locale.value] ?? 'en';
@@ -60,6 +93,14 @@ const today = new Date();
 const dateLabel = today.toLocaleDateString(undefined, {
     weekday: 'long',
     year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+});
+
+// When today's devotion is done, the next one unlocks tomorrow.
+const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+const tomorrowLabel = tomorrow.toLocaleDateString(undefined, {
+    weekday: 'long',
     month: 'long',
     day: 'numeric',
 });
@@ -150,7 +191,13 @@ async function loadTodayDevotional() {
     }
 }
 
-onMounted(loadTodayDevotional);
+onMounted(() => {
+    loadTodayDevotional();
+    // If today's devotion is already done, open straight to the completion view.
+    devotionStreak.loadDays().then(() => {
+        if (devotionStreak.completedToday) finished.value = true;
+    });
+});
 
 watch(locale, loadTodayDevotional);
 </script>
@@ -170,6 +217,8 @@ watch(locale, loadTodayDevotional);
             </div>
 
             <template v-else>
+                <!-- In-progress devotion — hidden once finished -->
+                <template v-if="!finished">
                 <!-- Header -->
                 <div class="devo-header">
                     <p class="devo-date">{{ dateLabel }}</p>
@@ -230,10 +279,54 @@ watch(locale, loadTodayDevotional);
                         {{ $t('Next') }}
                         <Icon icon="mdi:arrow-right" class="text-sm" />
                     </button>
-                    <span v-else class="devo-finished">
-                        <Icon icon="mdi:check-circle" class="text-[var(--primary-color)]" />
-                        {{ $t('Completed') }}
-                    </span>
+                    <button
+                        v-else
+                        class="devo-nav-btn devo-nav-btn-primary"
+                        @click="finishDevotion"
+                    >
+                        <Icon icon="mdi:check-circle" class="text-sm" />
+                        {{ $t('Finish') }}
+                    </button>
+                </div>
+                </template>
+
+                <!-- Completion-only view — today's devotion is done -->
+                <div v-else class="devo-complete">
+                    <div class="devo-complete-badge">
+                        <Icon icon="mdi:check-circle" />
+                    </div>
+                    <h2 class="devo-complete-title">{{ $t("Today's devotion complete!") }}</h2>
+                    <p class="devo-complete-sub">
+                        {{ $t('Come back later or tomorrow for your next devotion.') }}
+                    </p>
+                    <div class="devo-complete-next">
+                        <Icon icon="mdi:calendar-arrow-right" class="text-sm" />
+                        <span>{{ $t('Next devotion') }} · {{ tomorrowLabel }}</span>
+                    </div>
+
+                    <div class="devo-streak-count">{{ devotionStreak.currentStreak }}</div>
+                    <div class="devo-streak-label">{{ $t('day streak') }}</div>
+                    <div class="devo-streak-week">
+                        <div
+                            v-for="(d, i) in devotionStreak.weekDays"
+                            :key="i"
+                            class="devo-streak-day"
+                        >
+                            <span class="devo-streak-dow">{{ weekLabels[i] }}</span>
+                            <span
+                                class="devo-streak-pip"
+                                :class="{ filled: d.completed, today: d.isToday }"
+                            >
+                                <Icon v-if="d.completed" icon="mdi:check" />
+                                <template v-else>{{ d.date.getDate() }}</template>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button class="devo-restart" @click="restartDevotion">
+                        <Icon icon="mdi:refresh" class="text-sm" />
+                        {{ $t('Start Devotion again') }}
+                    </button>
                 </div>
             </template>
         </div>
@@ -448,6 +541,112 @@ watch(locale, loadTodayDevotional);
     font-weight: 500;
     opacity: 0.6;
 }
+
+/* ---- Completion + day-streak card ---- */
+.devo-complete {
+    margin-top: 24px;
+    padding: 26px 18px 22px;
+    border-radius: 18px;
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+    text-align: center;
+}
+.devo-complete-badge {
+    font-size: 44px;
+    line-height: 1;
+    color: var(--primary-color);
+}
+.devo-complete-title {
+    margin-top: 10px;
+    font-size: 19px;
+    font-weight: 800;
+}
+.devo-complete-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.7;
+}
+.devo-complete-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+}
+.devo-streak-count {
+    margin-top: 22px;
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--primary-color);
+}
+.devo-streak-label {
+    margin-top: 2px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+.devo-streak-week {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 18px;
+}
+.devo-streak-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+.devo-streak-dow {
+    font-size: 11px;
+    opacity: 0.55;
+}
+.devo-streak-pip {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    font-size: 12px;
+    opacity: 0.85;
+}
+.devo-streak-pip.filled {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    opacity: 1;
+}
+.devo-streak-pip.today {
+    border-color: var(--primary-color);
+    border-width: 2px;
+}
+
+.devo-restart {
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+.devo-restart:hover { filter: brightness(1.05); }
 
 /* ---- Verse Preview Modal ---- */
 .verse-preview-list {

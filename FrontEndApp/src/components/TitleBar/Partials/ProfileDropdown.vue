@@ -10,8 +10,9 @@ import {
     useMessage,
     MessageReactive,
 } from 'naive-ui';
-import { Login, Logout as LogoutIcon, UserProfile as UserIcon } from '@vicons/carbon';
+import { Login, Logout as LogoutIcon, Settings as SettingsIcon, UserProfile as UserIcon } from '@vicons/carbon';
 import { useMenuStore } from '../../../store/menu';
+import { useMainStore } from '../../../store/main';
 import { useAuthStore } from '../../../store/authStore';
 import { useAvatarUrl } from '../../../util/avatar';
 import { useRouter } from 'vue-router';
@@ -23,6 +24,7 @@ const dialog = useDialog();
 const authStore = useAuthStore();
 const message = useMessage();
 const menuStore = useMenuStore();
+const mainStore = useMainStore();
 const { t } = useI18n();
 let loadingReactive: MessageReactive | null = null;
 
@@ -55,12 +57,39 @@ const firstName = computed(() => {
     return authStore.user?.name?.split(' ')[0] ?? t('Account');
 });
 
+// Current plan label for the header chip — null for Free (no chip up top).
+const tierLabel = computed(() => {
+    switch (authStore.tier) {
+        case 'pro':
+            return 'Pro';
+        case 'sync':
+            return 'Sync';
+        default:
+            return null;
+    }
+});
+
+// Plan name for the "Manage subscription" row chip — always shows, incl. Free.
+const planName = computed(() => tierLabel.value ?? 'Free');
+
 // 25px for the compact trigger chip; 50px for the dropdown header
 const avatarSmall  = useAvatarUrl(25);
 const avatarMedium = useAvatarUrl(50);
 
 function goToProfile() {
     showDropdown.value = false;
+    menuStore.setMenu('/profile');
+}
+
+function goToSettings() {
+    showDropdown.value = false;
+    menuStore.setMenu('/settings-page');
+}
+
+function goToManageSubscription() {
+    showDropdown.value = false;
+    // Ask the Profile page to open the subscription manager once it's shown.
+    mainStore.openSubscriptionRequested = true;
     menuStore.setMenu('/profile');
 }
 
@@ -121,6 +150,11 @@ async function logout() {
                     </div>
                 </template>
                 {{ firstName }}
+                <span
+                    v-if="tierLabel"
+                    class="plan-chip plan-chip--mini"
+                    :class="`tier-${authStore.tier}`"
+                >{{ tierLabel }}</span>
             </NButton>
         </template>
 
@@ -153,13 +187,6 @@ async function logout() {
 
             <!-- Sync status -->
             <div class="mx-4 mb-2 flex flex-col gap-1">
-                <div
-                    v-if="authStore.syncEnabled"
-                    class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 w-fit"
-                >
-                    <Icon icon="mdi:cloud-check" />
-                    <span>{{ $t('Sync Enabled') }}</span>
-                </div>
                 <div class="flex items-center gap-1 text-xs opacity-40 px-1">
                     <Icon icon="mdi:clock-outline" style="font-size: 12px" />
                     <span>{{ $t('Last sync') }}: {{ formatLastSync(authStore.lastSyncAt) }}</span>
@@ -180,6 +207,32 @@ async function logout() {
                         <NIcon><UserIcon /></NIcon>
                     </template>
                     {{ $t('Profile') }}
+                </NButton>
+                <NButton
+                    quaternary
+                    type="primary"
+                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
+                    @click="goToSettings"
+                >
+                    <template #icon>
+                        <NIcon><SettingsIcon /></NIcon>
+                    </template>
+                    {{ $t('Settings') }}
+                </NButton>
+                <NButton
+                    quaternary
+                    type="primary"
+                    style="justify-content: flex-start; padding: 8px 10px; border-radius: 8px"
+                    @click="goToManageSubscription"
+                >
+                    <template #icon>
+                        <NIcon><Icon icon="lucide:credit-card" /></NIcon>
+                    </template>
+                    {{ $t('Manage subscription') }}
+                    <span
+                        class="plan-chip plan-chip--mini ml-auto"
+                        :class="`tier-${authStore.tier}`"
+                    >{{ planName }}</span>
                 </NButton>
             </div>
             <NDivider style="margin: 0" />
@@ -208,3 +261,44 @@ async function logout() {
         {{ $t('Sign In') }}
     </NButton>
 </template>
+
+<style scoped>
+/* Tier chips — colours mirror the Subscription card's plan pills
+   (Sync = green, Pro = purple). */
+.plan-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    border: 1px solid transparent;
+}
+
+/* Compact variant shown beside the username in the header trigger. */
+.plan-chip--mini {
+    margin-left: 6px;
+    padding: 0 7px;
+    font-size: 10px;
+}
+
+.plan-chip.tier-free {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.16);
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+.plan-chip.tier-sync {
+    color: #2e8b68;
+    background: rgba(46, 139, 104, 0.16);
+    border-color: rgba(46, 139, 104, 0.3);
+}
+
+.plan-chip.tier-pro {
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.16);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+</style>

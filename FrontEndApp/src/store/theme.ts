@@ -9,9 +9,9 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     const showThemeChangerDrawer = ref(false);
     const saveThemeStorageKey = 'savedThemeStorage';
     let settingsDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-    const isDark = ref(true);
+    const isDark = ref(false);
     const backgroundTheme = ref<backgroundThemeType>('default');
-    const selectedTheme = ref<typeNameInterface>('default');
+    const selectedTheme = ref<typeNameInterface>('ocean');
     const themeOverrides = ref<any>({
         common: {
             primaryColor: '#f2c423',
@@ -78,12 +78,31 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             iconColor: 'var(--theme-text-soft)',
             iconColorDisabled: 'color-mix(in srgb, var(--theme-text-soft) 55%, transparent)',
         },
+        // Dropdown menu popup (NDropdown — mode selector, conversation row menu)
+        Dropdown: {
+            color: 'var(--theme-bg-elevated)',
+            optionTextColor: 'var(--theme-text)',
+            optionTextColorHover: 'var(--theme-text)',
+            optionTextColorActive: 'var(--primary-color)',
+            optionColorHover: 'var(--theme-bg-soft)',
+            optionColorActive: 'var(--theme-bg-soft)',
+            prefixColor: 'var(--theme-text-soft)',
+            suffixColor: 'var(--theme-text-soft)',
+            dividerColor: 'var(--theme-border)',
+            groupHeaderTextColor: 'var(--theme-text-soft)',
+        },
+        // Popover panel (NPopover — AI Assistant settings, help/theme menus)
+        Popover: {
+            color: 'var(--theme-bg-elevated)',
+            textColor: 'var(--theme-text)',
+            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--theme-border)',
+        },
     });
 
     function resolveSelectedTheme(value: unknown): typeNameInterface {
         return typeof value === 'string' && value in themesOptions
             ? value as typeNameInterface
-            : 'default';
+            : 'ocean';
     }
 
     function resolveBackgroundTheme(value: unknown): backgroundThemeType {
@@ -93,7 +112,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     }
 
     function resolveIsDark(value: unknown): boolean {
-        return typeof value === 'boolean' ? value : true;
+        return typeof value === 'boolean' ? value : false;
     }
 
     function applyPrimaryTheme() {
@@ -161,9 +180,11 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             selectedTheme.value = resolveSelectedTheme(savedTheme.selectedTheme);
             isDark.value = resolveIsDark(savedTheme.isDark);
             backgroundTheme.value = resolveBackgroundTheme(savedTheme.backgroundTheme);
-            applyPrimaryTheme();
         }
 
+        // Always apply the primary palette so the default (Ocean) renders for a
+        // fresh user with no saved theme — not just when restoring a saved one.
+        applyPrimaryTheme();
         applyBodyThemeClass();
         changeTheRootProperty();
 

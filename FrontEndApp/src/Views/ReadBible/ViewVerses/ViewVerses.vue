@@ -1002,7 +1002,7 @@ onUnmounted(() => {
                                                 'context-menu-active-verse':
                                                     contextMenuVerseKey === verse.version[paneIndex].key,
                                             }"
-                                            @contextmenu.prevent="clickContextMenu({ ...verse, key: verse.version[paneIndex].key }, paneIndex)"
+                                            @contextmenu.prevent="clickContextMenu({ ...verse, key: verse.version[paneIndex].key, text: verse.version[paneIndex].text, bibleVersion: verse.version[paneIndex].version }, paneIndex)"
                                         >
                                             <div :style="`font-size:${fontSize}px`">
                                                 <span
@@ -1156,11 +1156,13 @@ onUnmounted(() => {
                     {{ selectedVerseNumbers.length }} verse{{ selectedVerseNumbers.length > 1 ? 's' : '' }} selected
                 </span>
                 <button
-                    class="opacity-75 hover:opacity-100 ml-4px text-white leading-none"
+                    class="opacity-75 hover:opacity-100 ml-4px text-white leading-none flex items-center"
                     title="Clear selection (Esc)"
                     @mousedown.stop
                     @click="clearVerseSelection"
-                >✕</button>
+                >
+                    <NIcon size="16"><Close /></NIcon>
+                </button>
             </div>
         </Transition>
         <ContextMenu

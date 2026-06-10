@@ -22,6 +22,9 @@ import { useMainStore } from './store/main';
 import { useI18n } from 'vue-i18n';
 import AboutModal from './components/About/AboutModal.vue';
 import SettingsModal from './components/Settings/SettingsModal.vue';
+import SyncAnnouncementModal from './components/SyncAnnouncementModal.vue';
+import PlanModal from './components/PlanModal.vue';
+import FeedbackModal from './components/FeedbackModal.vue';
 import { useAuthStore } from './store/authStore';
 import FlipBook from './Views/ReadBible/FlipBook/FlipBook.vue';
 import VersionSelectModal from './Views/ReadBible/FlipBook/VersionSelectModal.vue';
@@ -30,7 +33,7 @@ import { computed } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
-const isPopupWindow = computed(() => route.name === 'CompareVerse' || (!window.isElectron && route.name === 'Login'));
+const isPopupWindow = computed(() => route.name === 'CompareVerse' || (!window.isElectron && (route.name === 'Login' || route.name === 'SubscriptionRequired')));
 
 const isMounted = ref(false);
 const authStore = useAuthStore();
@@ -66,6 +69,9 @@ onBeforeMount(async () => {
 onMounted(async () => {
     // Initialize auth (token + user + sync state) on every app launch
     authStore.initAuth();
+
+    // Drop AI insight/sermon cache entries older than 3 days (best-effort).
+    void window.browserWindow?.pruneAiInsights?.();
 
     isMounted.value = true;
 });
@@ -163,6 +169,9 @@ onMounted(async () => {
                     <SettingsModal />
                     <VersionSelectModal />
                     <FlipBook />
+                    <SyncAnnouncementModal />
+                    <PlanModal />
+                    <FeedbackModal />
                 </NMessageProvider>
             </NNotificationProvider>
         </NDialogProvider>

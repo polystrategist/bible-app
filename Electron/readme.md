@@ -1,20 +1,25 @@
-if you developing, make sure to change `config.ts`:
+The build variant is controlled by environment variables (see `config.ts`), not by editing source.
+The `*:rename` yarn scripts set the matching `name` / `productName` / `appId` in `package.json`.
+
+if developing (uses the beta identity, separate userData from prod):
 
 ```ts
+// process.env.APP_IS_DEV=yes, process.env.APP_IS_BETA=yes
 export const isDev = true;
-export const isNightly = true;
+export const isBeta = true;
 ```
 
-if deploying nightly:
+if deploying beta:
+
+```ts
+// process.env.APP_IS_BETA=yes
+export const isDev = false;
+export const isBeta = true;
+```
+
+if deploying production:
 
 ```ts
 export const isDev = false;
-export const isNightly = true;
-```
-
-if deploying production change config to:
-
-```ts
-export const isDev = false;
-export const isNightly = false;
+export const isBeta = false;
 ```

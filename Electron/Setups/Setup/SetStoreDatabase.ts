@@ -6,6 +6,10 @@ import notesMigration from './StoreDB/notes.migration';
 import syncLogsMigration from './StoreDB/sync_logs.migration';
 import cachedSermonsMigration from './StoreDB/cached_sermons.migration';
 import sermonFavoritesMigration from './StoreDB/sermon_favorites.migration';
+import aiConversationsMigration from './StoreDB/ai_conversations.migration';
+import aiInsightsMigration from './StoreDB/ai_insights.migration';
+import prayerDaysMigration from './StoreDB/prayer_days.migration';
+import devotionDaysMigration from './StoreDB/devotion_days.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -31,6 +35,18 @@ export default async () => {
         // setup sermons offline cache + favorites
         await cachedSermonsMigration();
         await sermonFavoritesMigration();
+
+        // setup AI Assistant conversation history
+        await aiConversationsMigration();
+
+        // setup AI insight/sermon local cache
+        await aiInsightsMigration();
+
+        // setup prayer-streak days
+        await prayerDaysMigration();
+
+        // setup devotion-streak days
+        await devotionDaysMigration();
     } catch (e) {
         try {
             Log.error(e);

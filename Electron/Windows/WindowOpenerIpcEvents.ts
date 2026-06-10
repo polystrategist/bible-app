@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { isDev, isNightly } from './../config';
+import { isDev, isBeta } from './../config';
 
 export const WindowOpenerIpcEvents = (win: BrowserWindow) => {
     ipcMain.handle('open-donate-window', (event, payload) => {
@@ -14,7 +14,7 @@ export const WindowOpenerIpcEvents = (win: BrowserWindow) => {
         const windowHeight = Math.round(height * 0.7);
         let iconPath = path.join(__dirname, 'assets', 'icon.ico');
 
-        if (isDev || isNightly) iconPath = path.join('assets', 'icon.ico');
+        if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
         const win = new BrowserWindow({
             width: 700,
