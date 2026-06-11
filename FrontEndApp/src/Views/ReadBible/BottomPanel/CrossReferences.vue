@@ -5,6 +5,7 @@ import { useCrossReferencesStore } from '../../../store/crossReferencesStore';
 import { useBibleStore } from '../../../store/BibleStore';
 import { useModuleStore } from '../../../store/moduleStore';
 import { bibleBooks } from '../../../util/books';
+import { stripVerseHtml } from '../../../util/helper';
 
 const crossRefStore = useCrossReferencesStore();
 const bibleStore = useBibleStore();
@@ -135,7 +136,7 @@ onMounted(() => load());
                                         <div class="text-[10px] font-600 text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                                             {{ getVersionTitle(item.version) }}
                                         </div>
-                                        <div class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed" v-html="item.text" />
+                                        <div class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">{{ stripVerseHtml(item.text) }}</div>
                                     </div>
 
                                     <div v-if="!popoverLoading && !popoverTexts.length" class="text-xs text-gray-400">

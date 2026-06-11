@@ -379,6 +379,9 @@ const stub: Window['browserWindow'] = {
     // ---------- Shell ----------
     openExternal: async (url: string) => { window.open(url, '_blank', 'noopener,noreferrer'); },
 
+    // ---------- Clipboard ----------
+    writeClipboard: async (text: string) => { await navigator.clipboard.writeText(text); },
+
     // ---------- Cross References ----------
     // ---------- Devotional ----------
     getTodayDevotional: async (languageCode: string = 'en') => {

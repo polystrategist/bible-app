@@ -187,6 +187,9 @@ contextBridge.exposeInMainWorld('browserWindow', {
     // Shell
     openExternal: (url: string) => ipcRenderer.invoke('openExternal', url),
 
+    // Clipboard (native — navigator.clipboard is unreliable in the renderer)
+    writeClipboard: (text: string) => ipcRenderer.invoke('writeClipboard', text),
+
     // Cross References
     getCrossReferences: (args: { book_number: number; chapter: number; verse: number }) =>
         ipcRenderer.invoke('getCrossReferences', args),

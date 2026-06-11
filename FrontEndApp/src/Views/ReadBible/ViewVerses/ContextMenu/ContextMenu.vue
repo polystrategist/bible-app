@@ -15,6 +15,7 @@ import { useConversationStore } from '../../../../store/conversationStore';
 import { useMenuStore } from '../../../../store/menu';
 import { debouncedRunSync } from '../../../../util/Sync/sync';
 import { renderMarkdown } from '../../../../util/markdown';
+import { stripVerseHtml } from '../../../../util/helper';
 import { colors } from '../../../../util/highlighter';
 
 const bibleStore = useBibleStore();
@@ -48,13 +49,6 @@ const aiTitle = computed(() =>
         : `AI Insight · ${aiReference.value}`,
 );
 
-function stripVerseMarkup(text: string): string {
-    return (text ?? '')
-        .replace(/<[^>]*>/g, ' ') // tags (<S>, <J>, <f>…)
-        .replace(/\s+/g, ' ')
-        .trim();
-}
-
 // Cache key for the local ai_insights store: mode + reference + (insight) version.
 function aiCacheKey(): string {
     return `${aiKind.value}:${aiReference.value}:${aiVersion.value ?? ''}`;
@@ -73,7 +67,7 @@ async function runAi(kind: AiKind, opts: { force?: boolean } = {}) {
         kind === 'insight' && typeof d.bibleVersion === 'string'
             ? d.bibleVersion.replace(/\.SQLite3$/i, '')
             : undefined;
-    aiVerseText.value = stripVerseMarkup(d.text ?? '');
+    aiVerseText.value = stripVerseHtml(d.text ?? '');
     aiResult.value = '';
     aiError.value = '';
     aiUpgrade.value = false;
@@ -244,17 +238,32 @@ const hasHighlight = computed(() => {
     });
 });
 
+// Write [text] to the clipboard, preferring Electron's native clipboard. The
+// renderer's navigator.clipboard is unreliable on desktop (it needs a secure
+// context/focus and silently rejects — the cause of "Could not copy"), so route
+// through the IPC bridge first and only fall back to the web API.
+async function writeToClipboard(text: string): Promise<void> {
+    const bridge = window.browserWindow as any;
+    if (bridge?.writeClipboard) {
+        await bridge.writeClipboard(text);
+        return;
+    }
+    await navigator.clipboard.writeText(text);
+}
+
 // Copy the selected verse(s) as `"text" Book chapter:verse` to the clipboard.
+// With no multi-selection this copies props.data — the verse the context menu
+// was opened on.
 async function copyVerses() {
     const book = bibleStore.selectedBook.title;
     const verses =
         props.selectedVersesData.length > 0 ? props.selectedVersesData : [props.data];
     const sorted = [...verses].sort((a, b) => (a.verse ?? 0) - (b.verse ?? 0));
     const text = sorted
-        .map((v) => `"${stripVerseMarkup(v.text ?? '')}" ${book} ${v.chapter}:${v.verse}`)
+        .map((v) => `"${stripVerseHtml(v.text ?? '')}" ${book} ${v.chapter}:${v.verse}`)
         .join('\n');
     try {
-        await navigator.clipboard.writeText(text);
+        await writeToClipboard(text);
         message.success(verses.length > 1 ? 'Verses copied' : 'Verse copied');
     } catch {
         message.error('Could not copy. Please try again.');
