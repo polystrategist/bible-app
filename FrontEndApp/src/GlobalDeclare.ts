@@ -229,6 +229,9 @@ declare global {
             // Shell
             openExternal: (url: string) => Promise<void>;
 
+            // Clipboard
+            writeClipboard: (text: string) => Promise<void>;
+
             // Cross References
             getCrossReferences: (args: {
                 book_number: number;
