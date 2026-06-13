@@ -280,6 +280,7 @@ async function highlightVerse(color: string) {
         );
     }
     await bibleStore.getChapterHighlights();
+    await bibleStore.getHighlights();
     debouncedRunSync();
     showColorPicker.value = false;
     emits('close');
