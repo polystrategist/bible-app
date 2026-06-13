@@ -39,6 +39,32 @@ export const DevotionalsDB = knex({
     },
 });
 
+// Game content DBs (read-only seeded content). User data (lives, progress)
+// lives in StoreDB. Seeded by SetGamesDB.ts into userData\Games\.
+export const QaGamesDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\Games\\qa_games.db`,
+    },
+});
+
+export const TfGamesDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\Games\\tf_games.db`,
+    },
+});
+
+export const FpGamesDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\Games\\fp_games.db`,
+    },
+});
+
 export const setDB = (pathOfDb: string) => {
     return knex({
         client: 'sqlite3',
