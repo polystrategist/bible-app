@@ -9,15 +9,15 @@ const question = computed(() => store.currentQuestion as any);
 
 function answerClass(i: number) {
     if (store.gameState !== 'answered') {
-        return 'bg-white dark:bg-dark-600 border-neutral-200 dark:border-neutral-700 hover:border-blue-400';
+        return 'bg-neutral-100 dark:bg-dark-600 hover:bg-blue-50 dark:hover:bg-dark-700 text-neutral-800 dark:text-neutral-100';
     }
     if (i === store.shuffledCorrectIndex) {
-        return 'bg-green-50 dark:bg-green-900 border-green-500 text-green-700 dark:text-green-300';
+        return 'bg-green-500 text-white shadow-md shadow-green-500/30';
     }
     if (i === store.selectedAnswerIndex && !store.lastAnswerCorrect) {
-        return 'bg-red-50 dark:bg-red-900 border-red-500 text-red-700 dark:text-red-300';
+        return 'bg-red-500 text-white shadow-md shadow-red-500/30';
     }
-    return 'bg-white dark:bg-dark-600 border-neutral-200 dark:border-neutral-700 opacity-50';
+    return 'bg-neutral-100 dark:bg-dark-600 text-neutral-500 dark:text-neutral-400 opacity-60';
 }
 </script>
 
@@ -63,7 +63,7 @@ function answerClass(i: number) {
                     v-for="(opt, i) in store.shuffledOptions"
                     :key="i"
                     :disabled="store.gameState === 'answered'"
-                    class="w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-neutral-800 dark:text-neutral-100"
+                    class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all"
                     :class="answerClass(i)"
                     @click="store.submitQAAnswer(i)"
                 >{{ opt }}</button>

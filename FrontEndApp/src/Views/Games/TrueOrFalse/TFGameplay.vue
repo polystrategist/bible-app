@@ -15,8 +15,8 @@ function btnClass(isTrue: boolean) {
             ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
             : 'bg-red-500 hover:bg-red-600 text-white';
     }
-    if (correct) return 'bg-green-100 dark:bg-green-900 border-2 border-green-500 text-green-700 dark:text-green-300';
-    if (selected) return 'bg-red-100 dark:bg-red-900 border-2 border-red-500 text-red-700 dark:text-red-300';
+    if (correct) return 'bg-green-500 text-white shadow-md shadow-green-500/30';
+    if (selected) return 'bg-red-600 text-white shadow-md shadow-red-600/30';
     return 'opacity-40 ' + (isTrue ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white');
 }
 </script>

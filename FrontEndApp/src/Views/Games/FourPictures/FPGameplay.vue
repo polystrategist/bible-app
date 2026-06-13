@@ -42,7 +42,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
 <template>
     <div class="space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">4 Pictures 1 Word</h2>
+            <div class="flex items-center gap-2">
+                <button
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-dark-600 transition-colors"
+                    title="Back to games"
+                    @click="emit('exit')"
+                >&larr;</button>
+                <h2 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">4 Pictures 1 Word</h2>
+            </div>
             <div class="flex items-center gap-3 text-sm text-neutral-500">
                 <span class="text-red-500">&#10084; {{ store.lives }}</span>
                 <span>{{ store.fpProgressSummary.completed }}/{{ store.fpProgressSummary.total }}</span>
@@ -91,27 +98,29 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
             </div>
 
             <!-- Answer slots -->
-            <div class="flex gap-2 justify-center flex-wrap">
+            <div class="flex gap-2 justify-center flex-wrap pt-1">
                 <div
                     v-for="(letter, i) in store.fpGuessedLetters"
                     :key="i"
-                    class="w-10 h-10 rounded-lg border-2 flex items-center justify-center text-lg font-bold select-none transition-colors"
-                    :class="letter ? 'border-amber-400 bg-amber-50 dark:bg-amber-900 text-amber-700 dark:text-amber-200 cursor-pointer' : 'border-neutral-300 dark:border-neutral-600'"
+                    class="w-11 h-12 rounded-xl flex items-center justify-center text-xl font-extrabold select-none transition-all"
+                    :class="letter
+                        ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 cursor-pointer hover:bg-amber-600'
+                        : 'bg-neutral-200/70 dark:bg-dark-700'"
                     @click="letter && store.fpRemoveLetter(i)"
                 >{{ letter }}</div>
             </div>
 
             <!-- Letter tray -->
-            <div class="flex gap-2 justify-center flex-wrap">
+            <div class="flex gap-2 justify-center flex-wrap pt-2">
                 <button
                     v-for="(letter, i) in store.fpScrambledLetters"
                     :key="i"
-                    class="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-dark-700 hover:bg-neutral-200 dark:hover:bg-neutral-600 flex items-center justify-center text-sm font-bold text-neutral-700 dark:text-neutral-200 transition-colors"
+                    class="w-11 h-12 rounded-xl bg-white dark:bg-dark-600 shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-95 flex items-center justify-center text-base font-bold text-neutral-700 dark:text-neutral-100 transition-all"
                     @click="store.fpTapLetter(letter)"
                 >{{ letter }}</button>
             </div>
 
-            <p class="text-xs text-neutral-400 text-center">Type or click letters to guess · click a filled slot to clear it</p>
+            <p class="text-xs text-neutral-400 text-center pt-1">Type or click letters to guess · tap a filled slot to clear it</p>
         </template>
     </div>
 </template>
