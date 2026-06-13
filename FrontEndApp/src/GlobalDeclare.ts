@@ -210,6 +210,9 @@ declare global {
                 sermon_favorites?: any[];
                 ai_conversations?: any[];
                 settings?: any;
+                game_lives?: any[];
+                qa_group_progress?: any[];
+                tf_group_progress?: any[];
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;
