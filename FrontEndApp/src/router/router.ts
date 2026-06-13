@@ -93,6 +93,15 @@ export const routes: Array<RouteRecordRaw> = [
         path: '/ai-assistant',
         component: AiAssistant,
     },
+    {
+        // Bible Games — Electron-only (needs bundled game DBs + local progress).
+        // Lazy-loaded so the web bundle never pulls it in; the guard redirects
+        // any web user who reaches it.
+        name: 'Games',
+        path: '/games',
+        component: () => import('../Views/Games/Games.vue'),
+        beforeEnter: () => (window.isElectron ? true : { name: 'PrayerList' }),
+    },
 ];
 const router = createRouter({
     history: createWebHashHistory(),

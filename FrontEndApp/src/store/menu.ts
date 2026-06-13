@@ -19,6 +19,8 @@ import {
     BookStar24Filled,
     Sparkle24Regular,
     Sparkle24Filled,
+    Games24Regular,
+    Games24Filled,
 } from '@vicons/fluent';
 import { PrayingHands } from '@vicons/fa';
 
@@ -61,6 +63,12 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             icon: renderNIcon(Sparkle24Regular),
             iconDark: renderNIcon(Sparkle24Filled),
         },
+        {
+            label: 'Games',
+            key: '/games',
+            icon: renderNIcon(Games24Regular),
+            iconDark: renderNIcon(Games24Filled),
+        },
     ]);
 
     const bottomMenuTabs = ref([
@@ -95,6 +103,8 @@ export const useMenuStore = defineStore('useMenuStore', () => {
         '/settings-page',
         '/create-sermon',
         '/donate-page',
+        // Games is desktop-only (bundled game DBs + local progress).
+        ...(window.isElectron ? ['/games'] : []),
     ]);
     watch(
         () => enableTab.value,
@@ -154,6 +164,15 @@ export const useMenuStore = defineStore('useMenuStore', () => {
             }
             if (!savedLocalTabsKey.includes('/ai-assistant')) {
                 savedLocalTabsKey.push('/ai-assistant');
+                session.set(localSavedTabsKey, savedLocalTabsKey);
+            }
+            // Games is desktop-only: add it for existing Electron users, and
+            // strip any stale entry from a web profile.
+            if (window.isElectron && !savedLocalTabsKey.includes('/games')) {
+                savedLocalTabsKey.push('/games');
+                session.set(localSavedTabsKey, savedLocalTabsKey);
+            } else if (!window.isElectron && savedLocalTabsKey.includes('/games')) {
+                savedLocalTabsKey = savedLocalTabsKey.filter((t: string) => t !== '/games');
                 session.set(localSavedTabsKey, savedLocalTabsKey);
             }
 
