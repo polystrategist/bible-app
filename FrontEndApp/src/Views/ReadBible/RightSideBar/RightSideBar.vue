@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { NButton, NIcon, NTooltip, useMessage } from 'naive-ui';
+import { NIcon, NTooltip, useMessage } from 'naive-ui';
 import { onBeforeMount, ref } from 'vue';
 import { rightSideBarBottomMenu, rightSideBarMenus } from './RightSideBar';
 import Bookmarks from './Bookmarks/Bookmarks.vue';
@@ -27,7 +27,6 @@ function selectRightSideBarBottomMenu(key: string) {
         rightSideStore.showBottomPane = false;
         return;
     }
-
     rightSideStore.lastSelectedBottomMenu = key;
     rightSideStore.showBottomPane = true;
 }
@@ -36,7 +35,6 @@ onBeforeMount(() => {
     const saveMenuKey = SESSION.get(SavedRightSideBar);
     if (saveMenuKey && saveMenuKey !== 'bible-lists') selectedButton.value = saveMenuKey;
     else selectRightSideBarMenu('bible-bookmarks');
-
     window.message = useMessage();
 });
 </script>
@@ -46,7 +44,7 @@ onBeforeMount(() => {
             @resized="rightSideStore.resizingPaneRightSide"
             horizontal
             :dbl-click-splitter="false"
-            class="splitpanes_show_bar w-[calc(100%-40px)] h-full"
+            class="splitpanes_show_bar w-[calc(100%-48px)] h-full"
             :class="{ 'splitter-hidden': !rightSideStore.showBottomPane }"
         >
             <Pane
@@ -72,54 +70,85 @@ onBeforeMount(() => {
                 :min-size="rightSideStore.rightSidePaneSplitStartUpValue[1].min"
                 :max-size="rightSideStore.rightSidePaneSplitStartUpValue[1].max"
             >
-                <div class="p2 h-full">
+                <div class="p-2 h-full">
                     <BottomContents :selected-menu-key="rightSideStore.lastSelectedBottomMenu" />
                 </div>
             </Pane>
         </Splitpanes>
+
+        <!-- VS Code-style activity bar -->
         <div
-            class="w-40px min-w-40px bg-gray-100 dark:bg-dark-800 pt-3 text-size-20px flex flex-col justify-between items-center pb-3 read-bible-right-toolbar"
+            class="w-48px min-w-48px bg-gray-100 dark:bg-dark-800 flex flex-col items-center justify-between py-2 read-bible-right-toolbar border-l border-gray-200 dark:border-dark-600"
         >
-            <div class="flex flex-col items-center gap-1">
-                <NTooltip v-for="menu in rightSideBarMenus" :placement="'left'">
+            <!-- Primary tabs: Bookmarks, Highlights, Clip Notes -->
+            <div class="flex flex-col items-center w-full gap-1">
+                <NTooltip v-for="menu in rightSideBarMenus" :key="menu.key" :placement="'left'">
                     <template #trigger>
                         <div
-                            :key="menu.key"
-                            :class="{
-                                'bg-[var(--primary-color)] !text-black !hover:bg-[var(--primary-color)] !hover:text-black':
-                                    selectedButton == menu.key,
-                            }"
-                            class="w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 flex items-center justify-center py-1 rounded-md cursor-pointer"
+                            class="relative w-full h-44px flex items-center justify-center cursor-pointer transition-all duration-150 rounded-sm"
+                            :class="
+                                selectedButton == menu.key
+                                    ? 'text-[var(--primary-color)]'
+                                    : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
+                            "
                             @click="selectRightSideBarMenu(menu.key)"
                         >
-                            <NIcon :component="themeStore.isDark ? menu.iconDark : menu.icon" />
+                            <!-- Active accent bar on the left edge (facing the content panel) -->
+                            <div
+                                class="absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full transition-all duration-150"
+                                :class="
+                                    selectedButton == menu.key
+                                        ? 'bg-[var(--primary-color)]'
+                                        : 'bg-transparent'
+                                "
+                            ></div>
+                            <NIcon
+                                :component="themeStore.isDark ? menu.iconDark : menu.icon"
+                                size="20"
+                            />
                         </div>
                     </template>
                     <span class="capitalize select-none">{{ $t(menu.title) }}</span>
                 </NTooltip>
             </div>
-            <div>
-                <template v-for="menu in rightSideBarBottomMenu">
-                    <NButton
-                        v-if="typeof menu.show === 'undefined' && !menu.show"
-                        :key="menu.key"
-                        quaternary
-                        :class="{
-                            '!bg-[var(--primary-color)] hover:!bg-[var(--primary-color)]':
-                                rightSideStore.lastSelectedBottomMenu == menu.key,
-                            'h-75px': menu.key === 'dictionary',
-                            'h-27px': menu.key !== 'dictionary',
-                        }"
-                        class="relative !p-0 !min-w-27px w-27px hover:bg-[var(--primary-color-light)] dark:hover:bg-[var(--primary-color-light)] dark:hover:bg-opacity-25 hover:bg-opacity-20 !rounded-md !cursor-pointer flex items-center justify-center"
-                        @click="selectRightSideBarBottomMenu(menu.key)"
+
+            <!-- Separator -->
+            <div class="w-6 border-t border-gray-300 dark:border-dark-500 my-1"></div>
+
+            <!-- Utility tabs: Dictionary, References -->
+            <div class="flex flex-col items-center w-full gap-1">
+                <template v-for="menu in rightSideBarBottomMenu" :key="menu.key">
+                    <NTooltip
+                        v-if="typeof menu.show === 'undefined' || menu.show !== false"
+                        :placement="'left'"
                     >
-                        <span
-                            class="absolute left-1/2 top-1/2 text-[10px] font-700 leading-none whitespace-nowrap capitalize tracking-[0.08em] select-none"
-                            style="transform: translate(-50%, -50%) rotate(-90deg);"
-                        >
-                            {{ $t('dictionary') }}
-                        </span>
-                    </NButton>
+                        <template #trigger>
+                            <div
+                                class="relative w-full h-44px flex items-center justify-center cursor-pointer transition-all duration-150 rounded-sm"
+                                :class="
+                                    rightSideStore.lastSelectedBottomMenu == menu.key
+                                        ? 'text-[var(--primary-color)]'
+                                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200'
+                                "
+                                @click="selectRightSideBarBottomMenu(menu.key)"
+                            >
+                                <!-- Active accent bar -->
+                                <div
+                                    class="absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full transition-all duration-150"
+                                    :class="
+                                        rightSideStore.lastSelectedBottomMenu == menu.key
+                                            ? 'bg-[var(--primary-color)]'
+                                            : 'bg-transparent'
+                                    "
+                                ></div>
+                                <NIcon
+                                    :component="themeStore.isDark ? menu.iconDark : menu.icon"
+                                    size="20"
+                                />
+                            </div>
+                        </template>
+                        <span class="capitalize select-none">{{ $t(menu.title) }}</span>
+                    </NTooltip>
                 </template>
             </div>
         </div>

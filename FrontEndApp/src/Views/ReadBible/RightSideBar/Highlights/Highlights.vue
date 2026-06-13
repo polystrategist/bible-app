@@ -1,41 +1,41 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { NButton, NIcon, NPopconfirm } from 'naive-ui';
 import { Delete16Filled, Delete16Regular } from '@vicons/fluent';
 import { useThemeStore } from '../../../../store/theme';
 import { getBibleService } from '../../../../services/BibleService';
+import { useVirtualList } from '@vueuse/core';
 
 const themeStore = useThemeStore();
 const bibleStore = useBibleStore();
 const selectedHighlight = ref<string | null>(null);
 const versePreviews = ref<Record<string, string>>({});
 
-function selectBookVerse(
-    key: string,
-    { book_number, chapter, verse }: { book_number: number; chapter: number; verse: number },
-) {
-    selectedHighlight.value = key;
+onMounted(() => {
+    // Load all highlights at once so virtual scroll has the full dataset
+    bibleStore.highlightLimit = 5000;
+    bibleStore.highlightPage = 1;
+    bibleStore.getHighlights();
+});
+
+const { list, containerProps, wrapperProps } = useVirtualList(
+    computed(() => bibleStore.allHighlights),
+    { itemHeight: 68, overscan: 6 },
+);
+
+function selectBookVerse(highlight: any) {
+    selectedHighlight.value = highlight.key;
     if (
-        bibleStore.selectedBookNumber === book_number &&
-        bibleStore.selectedChapter === chapter
+        bibleStore.selectedBookNumber === highlight.book_number &&
+        bibleStore.selectedChapter === highlight.chapter
     ) {
-        bibleStore.setActiveVerse(verse);
+        bibleStore.setActiveVerse(highlight.verse);
     } else {
-        bibleStore.selectVerse(book_number, chapter, verse);
+        bibleStore.selectVerse(highlight.book_number, highlight.chapter, highlight.verse);
     }
     bibleStore.AutoScrollSavedPosition(100);
-}
-
-function beforePage() {
-    if (bibleStore.highlightPage > 1) bibleStore.highlightPage--;
-    bibleStore.getHighlights();
-}
-
-function nextPage() {
-    if (bibleStore.allHighlights.length == bibleStore.highlightLimit) bibleStore.highlightPage++;
-    bibleStore.getHighlights();
 }
 
 function handleRemoveHighlight(highlight: any) {
@@ -49,7 +49,6 @@ async function loadVersePreviews() {
     const bibleService = getBibleService();
     const previews: Record<string, string> = {};
 
-    // Group highlights by book+chapter to batch fetches
     const chapters = new Map<string, { book_number: number; chapter: number }>();
     for (const hl of bibleStore.allHighlights) {
         const chKey = `${hl.book_number}_${hl.chapter}`;
@@ -58,7 +57,6 @@ async function loadVersePreviews() {
         }
     }
 
-    // Fetch each chapter once
     for (const [, { book_number, chapter }] of chapters) {
         try {
             const verses = await bibleService.getVerses({
@@ -74,89 +72,79 @@ async function loadVersePreviews() {
                 }
             }
         } catch {
-            // Skip on error
+            // skip on error
         }
     }
 
     versePreviews.value = previews;
 }
 
-// Reload previews when highlights or selected version changes
 watch(
     () => [bibleStore.allHighlights, bibleStore.selectedBibleVersions[0]],
-    () => {
-        loadVersePreviews();
-    },
+    () => loadVersePreviews(),
     { immediate: true },
 );
 </script>
 
 <template>
     <RightSideBarContainer :title="$t('Highlights')">
-        <div class="h-full flex flex-col">
-            <div class="h-full overflow-y-auto overflowing-div">
+        <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only">
+            <div v-bind="wrapperProps">
                 <div
-                    v-for="(highlight, key) in bibleStore.allHighlights"
-                    :key="key"
-                    class="relative dark:hover:bg-light-50 dark:hover:bg-opacity-20 hover:bg-gray-800 hover:bg-opacity-20 cursor-pointer flex justify-between items-center"
+                    v-for="{ data: highlight } in list"
+                    :key="highlight.key"
+                    class="relative cursor-pointer flex justify-between items-center min-h-[68px]"
                     :class="{
                         'dark:bg-light-50 dark:bg-opacity-10 bg-gray-800 bg-opacity-10':
-                            selectedHighlight == (key as any),
+                            selectedHighlight == highlight.key,
+                        'dark:hover:bg-light-50 dark:hover:bg-opacity-10 hover:bg-gray-800 hover:bg-opacity-10':
+                            selectedHighlight != highlight.key,
                     }"
+                    @click="selectBookVerse(highlight)"
                 >
                     <div
-                        class="absolute transition-all top-0 left-0 h-0 w-5px bg-[var(--primary-color)] opacity-50"
-                        :class="{ '!h-full': selectedHighlight == (key as any) }"
+                        class="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--primary-color)] transition-opacity duration-150"
+                        :class="selectedHighlight == highlight.key ? 'opacity-100' : 'opacity-0'"
                     ></div>
-                    <div
-                        class="w-full p-10px relative"
-                        @click="selectBookVerse(key as any, highlight)"
-                    >
+                    <div class="w-full px-3 py-2 relative">
                         <div class="flex items-center gap-6px font-700">
                             <span
-                                class="inline-block w-12px h-12px rounded-full flex-shrink-0"
+                                class="inline-block w-10px h-10px rounded-full flex-shrink-0"
                                 :style="`background: ${highlight.content}`"
                             ></span>
-                            <span v-if="highlight.book_number">
+                            <span v-if="highlight.book_number" class="text-sm">
                                 {{ $t(bibleStore.getBook(highlight.book_number).title) }}
                                 {{ highlight.chapter }}:{{ highlight.verse }}
                             </span>
-                            <NPopconfirm @positive-click="handleRemoveHighlight(highlight)">
-                                <template #trigger>
-                                    <NButton
-                                        secondary
-                                        circle
-                                        size="tiny"
-                                        type="error"
-                                        class="absolute top-5px right-5px"
-                                    >
-                                        <template #icon>
-                                            <NIcon v-if="themeStore.isDark"
-                                                ><Delete16Filled
-                                            /></NIcon>
-                                            <NIcon v-else><Delete16Regular /></NIcon>
-                                        </template>
-                                    </NButton>
-                                </template>
-                                Remove This Highlight?
-                            </NPopconfirm>
                         </div>
                         <div
                             v-if="versePreviews[highlight.key]"
-                            class="text-xs opacity-60 mt-2px ml-18px"
+                            class="text-xs opacity-50 mt-1 ml-4"
                         >
                             {{ versePreviews[highlight.key] }}
                         </div>
+                        <div v-else class="text-xs opacity-20 mt-1 ml-4 italic">
+                            {{ $t(bibleStore.getBook(highlight.book_number).title) }} {{ highlight.chapter }}:{{ highlight.verse }}
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="flex justify-between select-none">
-                <div @click="beforePage" class="cursor-pointer hover:text-[var(--primary-color)]">
-                    {{ $t('Before') }}
-                </div>
-                <div>{{ bibleStore.highlightPage }}</div>
-                <div @click="nextPage" class="cursor-pointer hover:text-[var(--primary-color)]">
-                    {{ $t('Next') }}
+                    <NPopconfirm @positive-click="handleRemoveHighlight(highlight)" @click.stop>
+                        <template #trigger>
+                            <NButton
+                                secondary
+                                circle
+                                size="tiny"
+                                type="error"
+                                class="flex-shrink-0 mr-2"
+                                @click.stop
+                            >
+                                <template #icon>
+                                    <NIcon v-if="themeStore.isDark"><Delete16Filled /></NIcon>
+                                    <NIcon v-else><Delete16Regular /></NIcon>
+                                </template>
+                            </NButton>
+                        </template>
+                        Remove This Highlight?
+                    </NPopconfirm>
                 </div>
             </div>
         </div>
