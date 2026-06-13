@@ -410,6 +410,24 @@ const stub: Window['browserWindow'] = {
         params.set('verse', String(verse));
         return apiFetch(`/bible/verse-text?${params}`, []);
     },
+
+    // ---------- Games (Electron-only — the /games route redirects web users) ----------
+    gameGetLives: async () => 7,
+    gameLoseLife: async () => 7,
+    gameNextRecoveryAt: async () => null,
+    gameRefillLives: async () => { /* no-op */ },
+    qaGetGroups: async () => [],
+    qaGetQuestionsForGroup: async () => [],
+    qaGetAllGroupProgress: async () => [],
+    qaSaveGroupProgress: async () => ({ newlyPassed: false }),
+    tfGetGroups: async () => [],
+    tfGetStatementsForGroup: async () => [],
+    tfGetAllGroupProgress: async () => [],
+    tfSaveGroupProgress: async () => ({ newlyPassed: false }),
+    fpGetLevels: async () => [],
+    fpGetSolvedLevelIds: async () => [],
+    fpMarkLevelSolved: async () => { /* no-op */ },
+    fpGetImagesBasePath: async () => '',
 };
 
 export function installWebBridge() {

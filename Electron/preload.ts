@@ -195,4 +195,30 @@ contextBridge.exposeInMainWorld('browserWindow', {
         ipcRenderer.invoke('getCrossReferences', args),
     getVerseText: (args: { bible_versions: string[]; book_number: number; chapter: number; verse: number }) =>
         ipcRenderer.invoke('getVerseText', args),
+
+    // Games — lives
+    gameGetLives: () => ipcRenderer.invoke('game:getLives'),
+    gameLoseLife: () => ipcRenderer.invoke('game:loseLife'),
+    gameNextRecoveryAt: () => ipcRenderer.invoke('game:nextRecoveryAt'),
+    gameRefillLives: () => ipcRenderer.invoke('game:refillLives'),
+
+    // Games — Q&A
+    qaGetGroups: () => ipcRenderer.invoke('qa:getGroups'),
+    qaGetQuestionsForGroup: (groupId: number) => ipcRenderer.invoke('qa:getQuestionsForGroup', groupId),
+    qaGetAllGroupProgress: () => ipcRenderer.invoke('qa:getAllGroupProgress'),
+    qaSaveGroupProgress: (args: { groupId: number; correctCount: number; totalCount: number; passingScore: number }) =>
+        ipcRenderer.invoke('qa:saveGroupProgress', args),
+
+    // Games — True/False
+    tfGetGroups: () => ipcRenderer.invoke('tf:getGroups'),
+    tfGetStatementsForGroup: (groupId: number) => ipcRenderer.invoke('tf:getStatementsForGroup', groupId),
+    tfGetAllGroupProgress: () => ipcRenderer.invoke('tf:getAllGroupProgress'),
+    tfSaveGroupProgress: (args: { groupId: number; correctCount: number; totalCount: number; passingScore: number }) =>
+        ipcRenderer.invoke('tf:saveGroupProgress', args),
+
+    // Games — Four Pictures (local-only)
+    fpGetLevels: () => ipcRenderer.invoke('fp:getLevels'),
+    fpGetSolvedLevelIds: () => ipcRenderer.invoke('fp:getSolvedLevelIds'),
+    fpMarkLevelSolved: (levelId: number) => ipcRenderer.invoke('fp:markLevelSolved', levelId),
+    fpGetImagesBasePath: () => ipcRenderer.invoke('fp:getImagesBasePath'),
 });
