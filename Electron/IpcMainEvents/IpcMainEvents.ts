@@ -22,6 +22,7 @@ import AiConversations from './AiConversations/AiConversations';
 import AiInsights from './AiInsights/AiInsights';
 import PrayerDays from './PrayerDays/PrayerDays';
 import DevotionDays from './DevotionDays/DevotionDays';
+import Games from './Games/Games';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -90,4 +91,7 @@ export default (BrowserWindow: BrowserWindow) => {
     // Prayer-streak days
     PrayerDays();
     DevotionDays();
+
+    // Games (lives + Q&A + True/False + Four Pictures)
+    Games();
 };
