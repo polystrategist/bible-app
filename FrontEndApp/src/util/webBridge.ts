@@ -416,6 +416,7 @@ const stub: Window['browserWindow'] = {
     gameLoseLife: async () => 7,
     gameNextRecoveryAt: async () => null,
     gameRefillLives: async () => { /* no-op */ },
+    gameResetProgress: async () => { /* no-op */ },
     qaGetGroups: async () => [],
     qaGetQuestionsForGroup: async () => [],
     qaGetAllGroupProgress: async () => [],

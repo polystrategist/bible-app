@@ -201,6 +201,7 @@ contextBridge.exposeInMainWorld('browserWindow', {
     gameLoseLife: () => ipcRenderer.invoke('game:loseLife'),
     gameNextRecoveryAt: () => ipcRenderer.invoke('game:nextRecoveryAt'),
     gameRefillLives: () => ipcRenderer.invoke('game:refillLives'),
+    gameResetProgress: () => ipcRenderer.invoke('game:resetProgress'),
 
     // Games — Q&A
     qaGetGroups: () => ipcRenderer.invoke('qa:getGroups'),

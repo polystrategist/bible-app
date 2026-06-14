@@ -330,6 +330,7 @@ declare global {
             gameLoseLife: () => Promise<number>;
             gameNextRecoveryAt: () => Promise<string | null>;
             gameRefillLives: () => Promise<void>;
+            gameResetProgress: () => Promise<void>;
 
             // Games — Q&A
             qaGetGroups: () => Promise<Array<{ id: number; name: string; display_order: number; required_completed: number; passing_score: number }>>;

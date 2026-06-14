@@ -88,6 +88,10 @@ export const useGamesStore = defineStore('useGamesStore', () => {
     const currentFpLevelIndex = ref(0);
     const fpGuessedLetters = ref<string[]>([]);
     const fpScrambledLetters = ref<string[]>([]);
+    // Whether each tray tile has been consumed (one letter per tile).
+    const fpTrayUsed = ref<boolean[]>([]);
+    // For each answer slot, which tray tile filled it (so clearing frees the tile).
+    const fpSlotTray = ref<(number | null)[]>([]);
 
     // ── Computed ─────────────────────────────────────────────────────────────
     const qaProgressSummary = computed(() => ({
@@ -363,6 +367,15 @@ export const useGamesStore = defineStore('useGamesStore', () => {
         if (!level) return;
         fpGuessedLetters.value = new Array(level.word.length).fill('');
         fpScrambledLetters.value = buildFPScramble(level.word);
+        fpTrayUsed.value = new Array(fpScrambledLetters.value.length).fill(false);
+        fpSlotTray.value = new Array(level.word.length).fill(null);
+    }
+
+    // Clear all placed letters, freeing every tray tile (used when a guess is wrong).
+    function clearFpGuess() {
+        fpGuessedLetters.value = fpGuessedLetters.value.map(() => '');
+        fpSlotTray.value = fpSlotTray.value.map(() => null);
+        fpTrayUsed.value = fpTrayUsed.value.map(() => false);
     }
 
     function startFPGame() {
@@ -379,21 +392,57 @@ export const useGamesStore = defineStore('useGamesStore', () => {
         gameState.value = 'playing';
     }
 
-    function fpTapLetter(letter: string) {
+    // Place a specific tray tile (by index) into the next empty answer slot and
+    // mark that tile as consumed so it can't be used again.
+    function fpTapTrayLetter(trayIndex: number) {
         if (gameState.value !== 'playing') return;
+        if (fpTrayUsed.value[trayIndex]) return;
         const emptyIndex = fpGuessedLetters.value.findIndex((l) => l === '');
         if (emptyIndex === -1) return;
-        const next = [...fpGuessedLetters.value];
-        next[emptyIndex] = letter;
-        fpGuessedLetters.value = next;
+
+        const nextGuess = [...fpGuessedLetters.value];
+        nextGuess[emptyIndex] = fpScrambledLetters.value[trayIndex];
+        fpGuessedLetters.value = nextGuess;
+
+        const nextSlotTray = [...fpSlotTray.value];
+        nextSlotTray[emptyIndex] = trayIndex;
+        fpSlotTray.value = nextSlotTray;
+
+        const nextUsed = [...fpTrayUsed.value];
+        nextUsed[trayIndex] = true;
+        fpTrayUsed.value = nextUsed;
+
         void checkFPAnswer();
+    }
+
+    // Keyboard entry: consume the first unused tray tile matching the letter.
+    function fpTapLetter(letter: string) {
+        if (gameState.value !== 'playing') return;
+        const trayIndex = fpScrambledLetters.value.findIndex(
+            (l, i) => l === letter && !fpTrayUsed.value[i],
+        );
+        if (trayIndex === -1) return;
+        fpTapTrayLetter(trayIndex);
     }
 
     function fpRemoveLetter(index: number) {
         if (gameState.value !== 'playing') return;
-        const next = [...fpGuessedLetters.value];
-        next[index] = '';
-        fpGuessedLetters.value = next;
+        if (fpGuessedLetters.value[index] === '') return;
+
+        const trayIndex = fpSlotTray.value[index];
+        if (trayIndex != null) {
+            const nextUsed = [...fpTrayUsed.value];
+            nextUsed[trayIndex] = false;
+            fpTrayUsed.value = nextUsed;
+        }
+
+        const nextGuess = [...fpGuessedLetters.value];
+        nextGuess[index] = '';
+        fpGuessedLetters.value = nextGuess;
+
+        const nextSlotTray = [...fpSlotTray.value];
+        nextSlotTray[index] = null;
+        fpSlotTray.value = nextSlotTray;
     }
 
     async function checkFPAnswer() {
@@ -420,7 +469,7 @@ export const useGamesStore = defineStore('useGamesStore', () => {
                 gameState.value = 'gameOver';
                 return;
             }
-            fpGuessedLetters.value = new Array(level.word.length).fill('');
+            clearFpGuess();
         }
     }
 
@@ -435,11 +484,21 @@ export const useGamesStore = defineStore('useGamesStore', () => {
         shuffledCorrectIndex.value = 0;
         fpGuessedLetters.value = [];
         fpScrambledLetters.value = [];
+        fpTrayUsed.value = [];
+        fpSlotTray.value = [];
     }
 
     function dispose() {
         if (recoveryTimer) clearTimeout(recoveryTimer);
         recoveryTimer = null;
+    }
+
+    // Debug: wipe all progress + refill lives, then reload the catalog.
+    async function resetAllProgress() {
+        if (!window.isElectron) return;
+        exitGame();
+        await window.browserWindow.gameResetProgress();
+        await init();
     }
 
     return {
@@ -453,14 +512,14 @@ export const useGamesStore = defineStore('useGamesStore', () => {
         startTFGame, submitTFAnswer, nextTFQuestion,
         // FP
         fpLevels, fpSolvedIds, fpImagesBasePath, fpProgressSummary,
-        currentFpLevel, fpGuessedLetters, fpScrambledLetters,
-        startFPGame, fpTapLetter, fpRemoveLetter,
+        currentFpLevel, fpGuessedLetters, fpScrambledLetters, fpTrayUsed,
+        startFPGame, fpTapLetter, fpTapTrayLetter, fpRemoveLetter,
         // Shared game state
         activeGameType, currentGroupId, gameState, currentQuestion,
         totalItems, canPlay, scorePercentage, score, streak, bestStreak,
         lastAnswerCorrect, selectedAnswerIndex, shuffledOptions, shuffledCorrectIndex,
         currentIndex, newlyPassed, exitGame,
         // Lifecycle
-        init, refreshAfterSync, dispose,
+        init, refreshAfterSync, dispose, resetAllProgress,
     };
 });

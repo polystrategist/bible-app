@@ -184,6 +184,57 @@ export default function Games() {
         }
     });
 
+    // ── Debug: reset all game progress + lives ───────────────────────────────
+    // Clears qa/tf group progress (synced as deletions so it propagates),
+    // fpow level progress (local-only), and refills lives to full.
+    ipcMain.handle('game:resetProgress', async () => {
+        try {
+            // Q&A + True/False progress — log each deletion for sync, then delete.
+            for (const [table, prefix] of [
+                ['qa_group_progress', 'qa_group_'],
+                ['tf_group_progress', 'tf_group_'],
+            ] as const) {
+                const rows = await StoreDB(table).select();
+                for (const row of rows) {
+                    try {
+                        await logSyncChange({
+                            table_name: table,
+                            record_key: `${prefix}${row.group_id}`,
+                            action: 'deleted',
+                            payload: row,
+                            synced: 0,
+                        });
+                    } catch (e) {
+                        Log.error(`[Games] logSync reset ${table} failed:`, e);
+                    }
+                }
+                await StoreDB(table).del();
+            }
+
+            // Four Pictures progress is device-local only (not synced).
+            await StoreDB('fpow_level_progress').del();
+
+            // Refill lives — mark every still-lost life as recovered.
+            const liveRows = await StoreDB('game_lives').where('recovered', 0).select('life_lost_at');
+            await StoreDB('game_lives').where('recovered', 0).update({ recovered: 1 });
+            for (const row of liveRows) {
+                try {
+                    await logSyncChange({
+                        table_name: 'game_lives',
+                        record_key: row.life_lost_at,
+                        action: 'updated',
+                        payload: { life_lost_at: row.life_lost_at, recovered: 1 },
+                        synced: 0,
+                    });
+                } catch (e) {
+                    Log.error('[Games] logSync reset lives failed:', e);
+                }
+            }
+        } catch (e) {
+            Log.error('[Games] game:resetProgress error:', e);
+        }
+    });
+
     // ── Q&A ────────────────────────────────────────────────────────────────
 
     ipcMain.handle('qa:getGroups', async () => {
