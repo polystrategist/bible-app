@@ -362,6 +362,51 @@ Authorization: Bearer <your-token>
 
 ---
 
+## Games Data Sync
+
+The Bible Games feature (Q&A, True/False, 4 Pictures 1 Word) syncs the user's
+shared life pool and per-group progress so play state follows the account across
+desktop and mobile. Game **content** (questions, statements, levels) is bundled
+read-only and never synced — only user progress is.
+
+### Synced tables
+
+| Local table (`Store.db`) | `record_key` convention | Merge strategy on pull |
+|---|---|---|
+| `game_lives` | the `life_lost_at` ISO-8601 UTC string | insert if new; `recovered` is permanent (never downgraded) |
+| `qa_group_progress` | `qa_group_<group_id>` | `high_score_percentage` = MAX, `is_completed` = OR, `times_played` = MAX, `completed_at` = earliest |
+| `tf_group_progress` | `tf_group_<group_id>` | same as `qa_group_progress` |
+
+These three names are added to the push allowlist in `sync.ts` and to the backend
+`SyncController::ALLOWED_TABLES`. The pull response returns `game_lives`,
+`qa_group_progress`, and `tf_group_progress` arrays, applied by `applyPullData`.
+
+### `game_lives` phantom-row handling
+
+The backend stores two columns for a lost life: `life_key` (the full-precision
+client ISO string, used as the unique key) and `life_lost_at` (a MySQL timestamp
+that truncates sub-second precision). On pull, the client keys off `life_key`
+(falling back to `life_lost_at` for legacy rows) and deletes any local row whose
+`life_lost_at` matches the truncated backend value but differs from `life_key` —
+this removes phantom duplicates created before the `life_key` fix. `recovered = 1`
+is never reverted to `0`.
+
+### Lives recovery
+
+Lives regenerate one at a time, 2 hours after each was lost (matches mobile
+`games_service.dart`). Recovery is computed locally on read (`game:getLives`);
+each recovery also logs a `game_lives` `updated` sync change so the recovered
+state propagates to other devices.
+
+### `fpow_level_progress` is device-local
+
+4 Pictures 1 Word level progress is intentionally **not** synced on desktop — the
+backend `ALLOWED_TABLES` does not include `fpow_level_progress`, so it is never
+pushed or pulled. The table exists in `Store.db` for parity with mobile and to
+persist progress between sessions on the same device.
+
+---
+
 ## Implementation Details
 
 ### Frontend Integration

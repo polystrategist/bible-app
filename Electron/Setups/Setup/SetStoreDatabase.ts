@@ -10,6 +10,10 @@ import aiConversationsMigration from './StoreDB/ai_conversations.migration';
 import aiInsightsMigration from './StoreDB/ai_insights.migration';
 import prayerDaysMigration from './StoreDB/prayer_days.migration';
 import devotionDaysMigration from './StoreDB/devotion_days.migration';
+import gameLivesMigration from './StoreDB/game_lives.migration';
+import qaGroupProgressMigration from './StoreDB/qa_group_progress.migration';
+import tfGroupProgressMigration from './StoreDB/tf_group_progress.migration';
+import fpowLevelProgressMigration from './StoreDB/fpow_level_progress.migration';
 import Log from 'electron-log';
 
 export default async () => {
@@ -47,6 +51,12 @@ export default async () => {
 
         // setup devotion-streak days
         await devotionDaysMigration();
+
+        // setup games: shared lives + per-group progress (+ local-only FP levels)
+        await gameLivesMigration();
+        await qaGroupProgressMigration();
+        await tfGroupProgressMigration();
+        await fpowLevelProgressMigration();
     } catch (e) {
         try {
             Log.error(e);

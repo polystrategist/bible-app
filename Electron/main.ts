@@ -10,6 +10,10 @@ import AppUpdater from './AutoUpdate';
 import { setupPortableMode } from './util/portable';
 import { createWindowState, attachWindowStateManager, saveWindowState } from './util/window';
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
+import { registerGameImagesScheme, registerGameImagesProtocol } from './util/gameImagesProtocol';
+
+// Custom scheme registration must happen before app `ready`.
+registerGameImagesScheme();
 
 // Suppress EPIPE errors when stdout/stderr pipe is closed (e.g. terminal closed after launch)
 process.stdout.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'EPIPE') return; });
@@ -113,6 +117,9 @@ app.whenReady().then(async () => {
         app.quit();
         return;
     }
+
+    // Serve 4 Pictures 1 Word images via gameimg:// (after images are seeded).
+    registerGameImagesProtocol();
 
     await createWindow();
     app.on('activate', function () {

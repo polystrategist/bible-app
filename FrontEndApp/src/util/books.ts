@@ -521,3 +521,25 @@ export const bibleBooks: Array<BookInfo> = [
         deuterocanonical: false,
     },
 ];
+
+/** Full book title for a book_number (e.g. 10 → "Genesis"), or null if unknown. */
+export function bookTitleByNumber(book_number: number): string | null {
+    const book = bibleBooks.find((b) => b.book_number === book_number);
+    return book ? book.title : null;
+}
+
+/**
+ * Turn a "book:chapter:verse" (optionally "...-verseEnd") proof reference into a
+ * readable label like "Genesis 2:7". Book names come from `bibleBooks`, the same
+ * source the primary Bible version uses. Returns the input unchanged if it isn't
+ * in that numeric format or the book number is unknown.
+ */
+export function formatProofReference(proof: string): string {
+    if (!proof) return proof;
+    const m = proof.trim().match(/^(\d+):(\d+):(\d+)(?:-(\d+))?$/);
+    if (!m) return proof;
+    const title = bookTitleByNumber(Number(m[1]));
+    if (!title) return proof;
+    const verses = m[4] ? `${m[3]}-${m[4]}` : m[3];
+    return `${title} ${m[2]}:${verses}`;
+}

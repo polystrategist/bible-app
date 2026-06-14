@@ -210,6 +210,9 @@ declare global {
                 sermon_favorites?: any[];
                 ai_conversations?: any[];
                 settings?: any;
+                game_lives?: any[];
+                qa_group_progress?: any[];
+                tf_group_progress?: any[];
             }) => Promise<{ success: boolean; error?: string }>;
             onSyncBeforeQuit: (cb: () => void) => void;
             notifySyncBeforeQuitDone: () => void;
@@ -321,6 +324,31 @@ declare global {
                 content: string;
             }) => Promise<boolean>;
             pruneAiInsights: () => Promise<boolean>;
+
+            // Games — lives (shared 7-life pool)
+            gameGetLives: () => Promise<number>;
+            gameLoseLife: () => Promise<number>;
+            gameNextRecoveryAt: () => Promise<string | null>;
+            gameRefillLives: () => Promise<void>;
+            gameResetProgress: () => Promise<void>;
+
+            // Games — Q&A
+            qaGetGroups: () => Promise<Array<{ id: number; name: string; display_order: number; required_completed: number; passing_score: number }>>;
+            qaGetQuestionsForGroup: (groupId: number) => Promise<Array<{ id: number; group_id: number; question: string; options: string[]; answer: number; proof: string; explanation: string | null }>>;
+            qaGetAllGroupProgress: () => Promise<Array<{ group_id: number; is_completed: number; high_score_percentage: number; times_played: number; completed_at: string | null; updated_at: string }>>;
+            qaSaveGroupProgress: (args: { groupId: number; correctCount: number; totalCount: number; passingScore: number }) => Promise<{ newlyPassed: boolean }>;
+
+            // Games — True/False
+            tfGetGroups: () => Promise<Array<{ id: number; name: string; display_order: number; required_completed: number; passing_score: number }>>;
+            tfGetStatementsForGroup: (groupId: number) => Promise<Array<{ id: number; group_id: number; statement: string; answer: number; proof: string; explanation: string | null }>>;
+            tfGetAllGroupProgress: () => Promise<Array<{ group_id: number; is_completed: number; high_score_percentage: number; times_played: number; completed_at: string | null; updated_at: string }>>;
+            tfSaveGroupProgress: (args: { groupId: number; correctCount: number; totalCount: number; passingScore: number }) => Promise<{ newlyPassed: boolean }>;
+
+            // Games — Four Pictures (device-local only)
+            fpGetLevels: () => Promise<Array<{ id: number; level_order: number; word: string; image1: string; image2: string; image3: string; image4: string }>>;
+            fpGetSolvedLevelIds: () => Promise<number[]>;
+            fpMarkLevelSolved: (levelId: number) => Promise<void>;
+            fpGetImagesBasePath: () => Promise<string>;
         };
     }
 }

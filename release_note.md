@@ -1,6 +1,2 @@
 ## Updates
-- Sync and Pro Plans
-- UX and UX Big Update
-- Improved Prayer Page
-- Improved Daily Devotion Page
-- Make Things Simple
+- Added games corner on the APP to test your knowledge about the bible as part of the entertainment part of the app.

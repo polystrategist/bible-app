@@ -130,8 +130,17 @@ export const SyncHandlers = (win: BrowserWindow) => {
         notes?: any[];
         sermon_favorites?: any[];
         ai_conversations?: any[];
+        game_lives?: any[];
+        qa_group_progress?: any[];
+        tf_group_progress?: any[];
     }) => {
         const now = new Date().toISOString();
+        // Earlier of two nullable ISO timestamps (mirrors mobile _earliestTimestamp).
+        const earliest = (a: string | null | undefined, b: string | null | undefined): string | null => {
+            if (!a) return b ?? null;
+            if (!b) return a ?? null;
+            return a <= b ? a : b;
+        };
 
         try {
             // 0. Process deletions from sync_logs
@@ -328,6 +337,91 @@ export const SyncHandlers = (win: BrowserWindow) => {
                     await StoreDB('ai_conversations').insert({
                         id, title, messages, deleted: 0,
                         created_at: now, updated_at: now,
+                    });
+                }
+            }
+
+            // 8. game_lives — the backend stores the full-precision `life_key`
+            //    plus a truncated MySQL `life_lost_at`. Match on life_key; delete
+            //    any phantom row that an earlier truncated value created, and
+            //    never downgrade recovered=1 (mirrors mobile _applyPullGameLives).
+            for (const life of pullData.game_lives ?? []) {
+                const lifeKey: string | undefined =
+                    (typeof life.life_key === 'string' && life.life_key.length > 0)
+                        ? life.life_key
+                        : (life.life_lost_at as string | undefined);
+                if (!lifeKey) continue;
+
+                const incomingRecovered = (life.recovered === true || life.recovered === 1) ? 1 : 0;
+
+                const backendLifeLostAt: string | undefined = life.life_lost_at;
+                if (backendLifeLostAt && backendLifeLostAt.length > 0 && backendLifeLostAt !== lifeKey) {
+                    await StoreDB('game_lives').where('life_lost_at', backendLifeLostAt).delete();
+                }
+
+                const existing = await StoreDB('game_lives').where('life_lost_at', lifeKey).first();
+                if (!existing) {
+                    await StoreDB('game_lives').insert({
+                        life_lost_at: lifeKey,
+                        recovered: incomingRecovered,
+                        created_at: now,
+                    });
+                } else if (incomingRecovered === 1 && !existing.recovered) {
+                    await StoreDB('game_lives').where('life_lost_at', lifeKey).update({ recovered: 1 });
+                }
+            }
+
+            // 9. qa_group_progress — upsert; high score MAX, is_completed OR,
+            //    times_played MAX, completed_at earliest (mirrors mobile).
+            for (const p of pullData.qa_group_progress ?? []) {
+                if (p.group_id == null) continue;
+                const incomingCompleted = (p.is_completed === true || p.is_completed === 1) ? 1 : 0;
+                const incomingScore = Number(p.high_score_percentage ?? 0) || 0;
+                const incomingPlayed = Number(p.times_played ?? 0) || 0;
+                const existing = await StoreDB('qa_group_progress').where('group_id', p.group_id).first();
+                if (!existing) {
+                    await StoreDB('qa_group_progress').insert({
+                        group_id: p.group_id,
+                        is_completed: incomingCompleted,
+                        high_score_percentage: incomingScore,
+                        times_played: incomingPlayed,
+                        completed_at: p.completed_at ?? null,
+                        updated_at: now,
+                    });
+                } else {
+                    await StoreDB('qa_group_progress').where('group_id', p.group_id).update({
+                        is_completed: (existing.is_completed === 1 || incomingCompleted === 1) ? 1 : 0,
+                        high_score_percentage: Math.max(existing.high_score_percentage ?? 0, incomingScore),
+                        times_played: Math.max(existing.times_played ?? 0, incomingPlayed),
+                        completed_at: earliest(existing.completed_at, p.completed_at),
+                        updated_at: now,
+                    });
+                }
+            }
+
+            // 10. tf_group_progress — same merge semantics as qa_group_progress.
+            for (const p of pullData.tf_group_progress ?? []) {
+                if (p.group_id == null) continue;
+                const incomingCompleted = (p.is_completed === true || p.is_completed === 1) ? 1 : 0;
+                const incomingScore = Number(p.high_score_percentage ?? 0) || 0;
+                const incomingPlayed = Number(p.times_played ?? 0) || 0;
+                const existing = await StoreDB('tf_group_progress').where('group_id', p.group_id).first();
+                if (!existing) {
+                    await StoreDB('tf_group_progress').insert({
+                        group_id: p.group_id,
+                        is_completed: incomingCompleted,
+                        high_score_percentage: incomingScore,
+                        times_played: incomingPlayed,
+                        completed_at: p.completed_at ?? null,
+                        updated_at: now,
+                    });
+                } else {
+                    await StoreDB('tf_group_progress').where('group_id', p.group_id).update({
+                        is_completed: (existing.is_completed === 1 || incomingCompleted === 1) ? 1 : 0,
+                        high_score_percentage: Math.max(existing.high_score_percentage ?? 0, incomingScore),
+                        times_played: Math.max(existing.times_played ?? 0, incomingPlayed),
+                        completed_at: earliest(existing.completed_at, p.completed_at),
+                        updated_at: now,
                     });
                 }
             }
