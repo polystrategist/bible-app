@@ -143,6 +143,10 @@ export interface InternationalMessageInterface {
     teal: string;
     cobalt: string;
     orchid: string;
+    sage?: string;
+    ochre?: string;
+    Presets?: string;
+    customColors?: string;
     forest: string;
     dawn: string;
     dusk: string;
