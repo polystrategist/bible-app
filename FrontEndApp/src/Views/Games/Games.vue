@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import { NButton } from 'naive-ui';
 import { useGamesStore } from '../../store/useGamesStore';
+import { useNavBadgesStore } from '../../store/navBadgesStore';
 import LivesBar from './components/LivesBar.vue';
 import GameCard from './components/GameCard.vue';
 import QAGroupsList from './QuestionAndAnswer/QAGroupsList.vue';
@@ -13,11 +14,16 @@ import FPGameplay from './FourPictures/FPGameplay.vue';
 type Screen = 'hub' | 'qa-groups' | 'qa-play' | 'tf-groups' | 'tf-play' | 'fp-play';
 
 const store = useGamesStore();
+const navBadges = useNavBadgesStore();
 const activeScreen = ref<Screen>('hub');
 const isDev = import.meta.env.DEV;
 const isResetting = ref(false);
 
-onMounted(() => store.init());
+onMounted(() => {
+    store.init();
+    // Visiting the game hub clears its nav dot for the next 10 hours.
+    navBadges.markGamesVisited();
+});
 onUnmounted(() => store.dispose());
 
 async function onDebugReset() {

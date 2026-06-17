@@ -3,7 +3,7 @@ import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { Icon } from '@iconify/vue';
 import { usePraySessionStore } from '../../store/praySessionStore';
 import { usePrayerStreakStore } from '../../store/prayerStreakStore';
-import { groupStyle, relativeTime } from './prayerGroupStyle';
+import { groupStyle } from './prayerGroupStyle';
 import PrayerFinished from './PrayerFinished.vue';
 
 const session = usePraySessionStore();
@@ -98,48 +98,44 @@ function done() {
                         </div>
                         <h2 class="pray-title">{{ current?.title || 'Untitled prayer' }}</h2>
 
-                        <div class="pray-progress">
-                            <div class="pray-progress__track">
-                                <div
-                                    class="pray-progress__fill"
-                                    :style="{ width: ((index + 1) / total) * 100 + '%' }"
-                                />
-                            </div>
-                            <span class="pray-progress__label">{{ index + 1 }} of {{ total }}</span>
-                        </div>
-
                         <div
                             v-if="current?.content"
                             class="pray-content prose-mirror-render-html"
                             v-html="current.content"
                         />
-                        <div class="pray-when">
-                            <Icon icon="lucide:clock" /> {{ relativeTime(current?.created_at) }}
-                        </div>
                     </div>
-                </div>
-
-                <div class="pray-nav">
-                    <button class="pray-next" :disabled="isLast" @click="next">
-                        <span v-if="isLast">Last prayer</span>
-                        <span v-else>Next <Icon icon="lucide:chevron-right" /></span>
-                    </button>
-                    <button class="pray-circle" :disabled="index === 0" @click="prev">
-                        <Icon icon="lucide:chevron-left" />
-                    </button>
                 </div>
 
                 <div class="pray-timer">
-                    <button class="pray-circle" @click="paused = !paused">
-                        <Icon :icon="paused ? 'lucide:play' : 'lucide:pause'" />
-                    </button>
-                    <div class="pray-timer__text">
-                        <span class="pray-timer__label">Prayer time</span>
-                        <span class="pray-timer__value">{{ timeLabel }}</span>
+                    <div class="pray-progress">
+                        <div class="pray-progress__track">
+                            <div
+                                class="pray-progress__fill"
+                                :style="{ width: ((index + 1) / total) * 100 + '%' }"
+                            />
+                        </div>
+                        <span class="pray-progress__label">{{ index + 1 }} of {{ total }}</span>
                     </div>
-                    <button class="pray-finish" :disabled="!isLast" @click="finish">
-                        <Icon icon="lucide:circle-check" /> Finished
-                    </button>
+                    <div class="pray-timer__row">
+                        <button class="pray-circle" @click="paused = !paused">
+                            <Icon :icon="paused ? 'lucide:play' : 'lucide:pause'" />
+                        </button>
+                        <div class="pray-timer__text">
+                            <span class="pray-timer__label">Prayer time</span>
+                            <span class="pray-timer__value">{{ timeLabel }}</span>
+                        </div>
+                        <div class="pray-timer__actions">
+                            <button class="pray-circle" :disabled="index === 0" @click="prev">
+                                <Icon icon="lucide:chevron-left" />
+                            </button>
+                            <button v-if="!isLast" class="pray-finish" @click="next">
+                                Next <Icon icon="lucide:chevron-right" />
+                            </button>
+                            <button v-else class="pray-finish" @click="finish">
+                                <Icon icon="lucide:circle-check" /> Finished
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </template>
         </div>
@@ -228,7 +224,7 @@ function done() {
 .pray-now__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color); }
 .pray-title { font-size: 28px; font-weight: 800; margin: 0 0 18px; }
 
-.pray-progress { width: 100%; display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.pray-progress { width: 100%; display: flex; align-items: center; gap: 12px; }
 .pray-progress__track {
     flex: 1;
     height: 6px;
@@ -240,32 +236,7 @@ function done() {
 .pray-progress__label { font-size: 13px; font-weight: 600; opacity: 0.7; }
 
 .pray-content { width: 100%; text-align: left; font-size: 17px; line-height: 1.6; opacity: 0.85; }
-.pray-when {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: 16px;
-}
 
-.pray-nav { width: min(560px, 92vw); display: flex; gap: 12px; flex-shrink: 0; }
-.pray-next {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 16px;
-    border: none;
-    border-radius: 999px;
-    background: var(--primary-color);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-}
-.pray-next:disabled { background: var(--theme-bg-elevated); color: var(--theme-text-soft); cursor: default; }
 .pray-circle {
     width: 52px;
     height: 52px;
@@ -284,19 +255,21 @@ function done() {
 .pray-timer {
     width: min(560px, 92vw);
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     flex-shrink: 0;
     padding: 10px 12px;
     border: 1px solid var(--theme-border);
     border-radius: 18px;
     background: var(--theme-bg-soft);
 }
+.pray-timer__row { display: flex; align-items: center; gap: 12px; }
 .pray-timer__text { display: flex; flex-direction: column; }
+.pray-timer__actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
 .pray-timer__label { font-size: 11px; opacity: 0.6; }
 .pray-timer__value { font-size: 20px; font-weight: 800; }
 .pray-finish {
-    margin-left: auto;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -309,5 +282,4 @@ function done() {
     font-weight: 700;
     cursor: pointer;
 }
-.pray-finish:disabled { background: var(--theme-bg-elevated); color: var(--theme-text-soft); cursor: default; }
 </style>
