@@ -24,6 +24,7 @@ const SYNC_FEATURES = [
     'Cross-device sync — notes, highlights, bookmarks, prayer lists & more',
     'Cloud backup of your study data',
     'Web app access',
+    'No ads',
 ];
 
 const AI_FEATURES = [

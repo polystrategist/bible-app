@@ -11,11 +11,11 @@ type themeOptionsType = {
         dark: colorTypes;
         light: colorTypes;
     };
-    Nature: {
+    nature: {
         dark: colorTypes;
         light: colorTypes;
     };
-    Sky: {
+    sky: {
         dark: colorTypes;
         light: colorTypes;
     };
@@ -71,6 +71,14 @@ type themeOptionsType = {
         dark: colorTypes;
         light: colorTypes;
     };
+    sage: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    ochre: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
 };
 
 export const themesOptions: themeOptionsType = {
@@ -89,7 +97,7 @@ export const themesOptions: themeOptionsType = {
         } as colorTypes,
     },
 
-    Nature: {
+    nature: {
         dark: {
             primaryColor: '#A4BE7B',
             primaryColorHover: '#5F8D4E',
@@ -104,7 +112,7 @@ export const themesOptions: themeOptionsType = {
         } as colorTypes,
     },
 
-    Sky: {
+    sky: {
         dark: {
             primaryColor: '#59C1BD',
             primaryColorHover: '#A0E4CB',
@@ -313,12 +321,42 @@ export const themesOptions: themeOptionsType = {
             primaryColorPressed: '#E6C7FF',
         },
     },
+
+    sage: {
+        dark: {
+            primaryColor: '#6BAE8E',
+            primaryColorHover: '#4A9B73',
+            primaryColorSuppl: '#6BAE8E',
+            primaryColorPressed: '#B9DBC9',
+        },
+        light: {
+            primaryColor: '#4A9B73',
+            primaryColorHover: '#6BAE8E',
+            primaryColorSuppl: '#6BAE8E',
+            primaryColorPressed: '#B9DBC9',
+        },
+    },
+
+    ochre: {
+        dark: {
+            primaryColor: '#E8A83E',
+            primaryColorHover: '#D4922A',
+            primaryColorSuppl: '#E8A83E',
+            primaryColorPressed: '#F2CE8A',
+        },
+        light: {
+            primaryColor: '#D4922A',
+            primaryColorHover: '#E8A83E',
+            primaryColorSuppl: '#E8A83E',
+            primaryColorPressed: '#F2CE8A',
+        },
+    },
 };
 
 export type typeNameInterface =
     | 'default'
-    | 'Nature'
-    | 'Sky'
+    | 'nature'
+    | 'sky'
     | 'ocean'
     | 'reds'
     | 'olive'
@@ -331,7 +369,9 @@ export type typeNameInterface =
     | 'indigo'
     | 'teal'
     | 'cobalt'
-    | 'orchid';
+    | 'orchid'
+    | 'sage'
+    | 'ochre';
 
 export function getTheme(name: typeNameInterface) {
     return themesOptions[name];

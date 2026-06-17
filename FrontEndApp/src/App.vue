@@ -8,11 +8,15 @@ import {
     NLayout,
     NLayoutSider,
     NMenu,
+    NBadge,
     MenuOption,
 } from 'naive-ui';
 import ReadBible from './Views/ReadBible/ReadBible.vue';
 import { useMenuStore } from './store/menu';
-import { onBeforeMount, onMounted, ref, watch } from 'vue';
+import { usePrayerStreakStore } from './store/prayerStreakStore';
+import { useDevotionStreakStore } from './store/devotionStreakStore';
+import { useNavBadgesStore } from './store/navBadgesStore';
+import { onBeforeMount, onMounted, ref, watch, h } from 'vue';
 import { useThemeStore } from './store/theme';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
@@ -47,10 +51,42 @@ watch(() => authStore.isAuthenticated, (authenticated) => {
 const isMenuCollapse = 'is-menu-collapse';
 const menuStore = useMenuStore();
 const themeStore = useThemeStore();
+const prayerStreak = usePrayerStreakStore();
+const devotionStreak = useDevotionStreakStore();
+const navBadges = useNavBadgesStore();
 const isSideBarCollapse = ref(true);
 const savedLocaleKey = 'saveLanguageStorageKey';
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 useMainStore();
+
+// Which sidebar entries should show a daily "attention" red dot.
+function dotForKey(key: string): boolean {
+    if (key === '/prayer-list') return !prayerStreak.prayedToday;
+    if (key === '/daily-devotional') return !devotionStreak.completedToday;
+    if (key === '/games') return navBadges.showGamesDot;
+    return false;
+}
+
+// Upper sidebar menu options, with the icon wrapped in an NBadge dot when the
+// matching daily activity is pending. Mirrors the inline map previously in the
+// template; moved here so the badge render lives in TS.
+const upperMenuOptions = computed<MenuOption[]>(() =>
+    menuStore.menuUpperTabs
+        .filter((item) => menuStore.enableTab.includes(item.key))
+        .map((item) => {
+            const iconRender = themeStore.isDark ? item.iconDark : item.icon;
+            return {
+                label: t(item.label),
+                key: item.key,
+                icon: () =>
+                    h(
+                        NBadge,
+                        { dot: true, show: dotForKey(item.key) },
+                        { default: iconRender }
+                    ),
+            };
+        })
+);
 
 function triggerSideBarCollapse(collapse: boolean) {
     isSideBarCollapse.value = collapse;
@@ -72,6 +108,10 @@ onMounted(async () => {
 
     // Drop AI insight/sermon cache entries older than 3 days (best-effort).
     void window.browserWindow?.pruneAiInsights?.();
+
+    // Load streak days so the Prayer/Devotion nav dots are accurate from launch.
+    void prayerStreak.loadDays();
+    void devotionStreak.loadDays();
 
     isMounted.value = true;
 });
@@ -112,19 +152,7 @@ onMounted(async () => {
                                         :inverted="false"
                                         :collapsed-icon-size="20"
                                         :indent="15"
-                                        :options="
-                                            menuStore.menuUpperTabs
-                                                .filter((item) =>
-                                                    menuStore.enableTab.includes(item.key)
-                                                )
-                                                .map((item) => ({
-                                                    label: $t(item.label),
-                                                    key: item.key,
-                                                    icon: themeStore.isDark
-                                                        ? item.iconDark
-                                                        : item.icon,
-                                                }))
-                                        "
+                                        :options="upperMenuOptions"
                                     />
                                     <NMenu
                                         :value="menuStore.menuSelected"

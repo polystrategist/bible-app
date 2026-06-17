@@ -7,6 +7,8 @@ import {
     PaintBucket24Regular,
 } from '@vicons/fluent';
 import { themesOptions } from '../../util/themes';
+import { appearanceThemeOptions } from '../../util/appearanceThemes';
+import { themePresets, type ThemePreset } from '../../util/themePresets';
 
 const themeStore = useThemeStore();
 
@@ -16,6 +18,32 @@ defineProps({
         default: 'bottom-end',
     },
 });
+
+function appearanceFor(key: string) {
+    return appearanceThemeOptions.find((a) => a.key === key);
+}
+
+function applyPreset(preset: ThemePreset) {
+    const ap = appearanceFor(preset.appearance);
+    if (ap) themeStore.applyAppearanceTheme(ap);
+    themeStore.changePrimaryColor(preset.accent);
+}
+
+function isPresetActive(preset: ThemePreset): boolean {
+    const ap = appearanceFor(preset.appearance);
+    return (
+        !!ap &&
+        themeStore.isDark === ap.isDark &&
+        themeStore.backgroundTheme === ap.backgroundTheme &&
+        themeStore.selectedTheme === preset.accent
+    );
+}
+
+function presetAccentColor(preset: ThemePreset): string {
+    const c = themesOptions[preset.accent];
+    if (!c) return 'var(--primary-color)';
+    return themeStore.isDark ? c.dark.primaryColor : c.light.primaryColor;
+}
 </script>
 <template>
     <NPopover trigger="click" :placement="placement as any">
@@ -31,6 +59,26 @@ defineProps({
             <div class="mb-5">
                 <div class="capitalize">{{ $t('customize') }}</div>
                 <small> {{ $t('Pick a style and color for you') }} </small>
+            </div>
+            <div class="mb-5">
+                <div class="capitalize">{{ $t('Presets') }}</div>
+                <div class="grid grid-cols-2 gap-1">
+                    <NButton
+                        v-for="preset in themePresets"
+                        :key="preset.name"
+                        @click="applyPreset(preset)"
+                        :type="isPresetActive(preset) ? 'primary' : 'default'"
+                        secondary
+                        round
+                        size="small"
+                        class="px-2"
+                    >
+                        <template #icon>
+                            <Circle24Filled :color="presetAccentColor(preset)" />
+                        </template>
+                        <span>{{ preset.name }}</span>
+                    </NButton>
+                </div>
             </div>
             <div class="mb-5">
                 <div class="capitalize">{{ $t('color') }}</div>
