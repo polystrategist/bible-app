@@ -145,6 +145,13 @@ export interface InternationalMessageInterface {
     orchid: string;
     sage?: string;
     ochre?: string;
+    mocha?: string;
+    garnet?: string;
+    sapphire?: string;
+    grape?: string;
+    pine?: string;
+    plum?: string;
+    mono?: string;
     Presets?: string;
     customColors?: string;
     forest: string;

@@ -65,9 +65,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
                     title="Back to games"
                     @click="emit('exit')"
                 ><span class="text-base leading-none mr-1">&larr;</span> Back</NButton>
-                <h2 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">4 Pictures 1 Word</h2>
+                <h2 class="text-lg font-bold text-[var(--theme-text)]">4 Pictures 1 Word</h2>
             </div>
-            <div class="flex items-center gap-3 text-sm text-neutral-500">
+            <div class="flex items-center gap-3 text-sm text-[var(--theme-text-soft)]">
                 <span class="text-red-500">&#10084; {{ store.lives }}</span>
                 <span>{{ store.fpProgressSummary.completed }}/{{ store.fpProgressSummary.total }}</span>
             </div>
@@ -76,21 +76,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
         <!-- Completed -->
         <div
             v-if="store.gameState === 'completed'"
-            class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-600 text-center space-y-4"
+            class="p-6 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)] text-center space-y-4"
         >
             <p class="text-4xl">🏆</p>
-            <p class="text-xl font-bold text-neutral-900 dark:text-neutral-100">All levels complete!</p>
-            <p class="text-neutral-500">You solved all {{ store.fpProgressSummary.total }} levels.</p>
+            <p class="text-xl font-bold text-[var(--theme-text)]">All levels complete!</p>
+            <p class="text-[var(--theme-text-soft)]">You solved all {{ store.fpProgressSummary.total }} levels.</p>
             <NButton size="large" :color="ACCENT" :focusable="false" @click="emit('exit')">Back to Hub</NButton>
         </div>
 
         <!-- Game over -->
         <div
             v-else-if="store.gameState === 'gameOver'"
-            class="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-600 text-center space-y-4"
+            class="p-6 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)] text-center space-y-4"
         >
             <p class="text-3xl">💔</p>
-            <p class="text-xl font-bold text-neutral-900 dark:text-neutral-100">Out of lives</p>
+            <p class="text-xl font-bold text-[var(--theme-text)]">Out of lives</p>
             <div class="flex gap-3 justify-center pt-1">
                 <NButton
                     size="large"
@@ -110,7 +110,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
                     v-for="(src, i) in images"
                     :key="i"
                     type="button"
-                    class="block p-0 border-0 aspect-square w-full rounded-xl overflow-hidden bg-neutral-100 dark:bg-dark-700 cursor-zoom-in"
+                    class="block p-0 border-0 aspect-square w-full rounded-xl overflow-hidden bg-[var(--theme-bg-soft)] cursor-zoom-in"
                     @click="openLightbox(src)"
                 >
                     <img :src="src" class="w-full h-full object-cover" :alt="`clue ${i + 1}`" @error="onImgError" />
@@ -125,7 +125,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
                     class="w-11 h-12 rounded-xl flex items-center justify-center text-xl font-extrabold select-none transition-all"
                     :class="letter
                         ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30 cursor-pointer hover:bg-amber-600'
-                        : 'bg-neutral-200/70 dark:bg-dark-700'"
+                        : 'bg-[var(--theme-bg-soft)]'"
                     @click="letter && store.fpRemoveLetter(i)"
                 >{{ letter }}</div>
             </div>
@@ -144,13 +144,13 @@ onUnmounted(() => window.removeEventListener('keydown', onKeyDown));
                     >{{ letter }}</NButton>
                     <div
                         v-else
-                        class="rounded-xl bg-neutral-100/60 dark:bg-dark-700/40"
+                        class="rounded-xl bg-[var(--theme-bg-soft)]"
                         :style="{ width: '2.75rem', height: '3rem' }"
                     />
                 </template>
             </div>
 
-            <p class="text-xs text-neutral-400 text-center pt-1">Type or click letters to guess · tap a filled slot to clear it</p>
+            <p class="text-xs text-[var(--theme-text-soft)] text-center pt-1">Type or click letters to guess · tap a filled slot to clear it</p>
         </template>
 
         <!-- Image lightbox -->

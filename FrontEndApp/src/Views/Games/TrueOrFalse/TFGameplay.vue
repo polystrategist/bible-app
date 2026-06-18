@@ -29,7 +29,7 @@ function tfBtnProps(isTrue: boolean) {
             <NButton quaternary size="small" :focusable="false" @click="emit('back')">
                 <span class="text-base leading-none mr-1">&larr;</span> Groups
             </NButton>
-            <div class="flex items-center gap-3 text-sm text-neutral-500">
+            <div class="flex items-center gap-3 text-sm text-[var(--theme-text-soft)]">
                 <span class="text-red-500">&#10084; {{ store.lives }}</span>
                 <span>Score: {{ store.score }}/{{ store.totalItems }}</span>
             </div>
@@ -37,7 +37,7 @@ function tfBtnProps(isTrue: boolean) {
 
         <div
             v-if="store.gameState === 'gameOver' || store.gameState === 'completed'"
-            class="max-w-sm mx-auto mt-2 p-8 rounded-3xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-500 text-center space-y-5 shadow-xl shadow-black/5 dark:shadow-black/40"
+            class="max-w-sm mx-auto mt-2 p-8 rounded-3xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)] text-center space-y-5 shadow-xl shadow-black/5 dark:shadow-black/40"
         >
             <div
                 class="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-4xl"
@@ -45,22 +45,22 @@ function tfBtnProps(isTrue: boolean) {
             >{{ store.gameState === 'completed' ? '🎉' : '💔' }}</div>
 
             <div class="space-y-1">
-                <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                <p class="text-2xl font-bold text-[var(--theme-text)]">
                     {{ store.gameState === 'completed' ? (store.newlyPassed ? 'Passed!' : 'Completed!') : 'Out of lives' }}
                 </p>
-                <p class="text-sm text-neutral-500">
+                <p class="text-sm text-[var(--theme-text-soft)]">
                     {{ store.gameState === 'gameOver' ? 'Better luck next time' : store.newlyPassed ? 'Great job — you cleared this group!' : 'Keep practicing to pass' }}
                 </p>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <div class="p-3 rounded-2xl bg-neutral-50 dark:bg-dark-900 border border-neutral-200/70 dark:border-white/5">
-                    <p class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ store.score }}<span class="text-base font-bold text-neutral-400">/{{ store.totalItems }}</span></p>
-                    <p class="text-xs text-neutral-400 mt-0.5">Score · {{ store.scorePercentage }}%</p>
+                <div class="p-3 rounded-2xl bg-[var(--theme-bg-soft)] border border-[var(--theme-border)]">
+                    <p class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ store.score }}<span class="text-base font-bold text-[var(--theme-text-soft)]">/{{ store.totalItems }}</span></p>
+                    <p class="text-xs text-[var(--theme-text-soft)] mt-0.5">Score · {{ store.scorePercentage }}%</p>
                 </div>
-                <div class="p-3 rounded-2xl bg-neutral-50 dark:bg-dark-900 border border-neutral-200/70 dark:border-white/5">
+                <div class="p-3 rounded-2xl bg-[var(--theme-bg-soft)] border border-[var(--theme-border)]">
                     <p class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ store.bestStreak }}</p>
-                    <p class="text-xs text-neutral-400 mt-0.5">Best streak</p>
+                    <p class="text-xs text-[var(--theme-text-soft)] mt-0.5">Best streak</p>
                 </div>
             </div>
 
@@ -71,9 +71,9 @@ function tfBtnProps(isTrue: boolean) {
         </div>
 
         <template v-else-if="statement">
-            <div class="p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-600">
-                <p class="text-xs text-neutral-400 mb-2 font-medium">Statement {{ store.currentIndex + 1 }} of {{ store.totalItems }}</p>
-                <p class="text-base font-medium text-neutral-900 dark:text-neutral-100 leading-relaxed">{{ statement.statement }}</p>
+            <div class="p-5 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)]">
+                <p class="text-xs text-[var(--theme-text-soft)] mb-2 font-medium">Statement {{ store.currentIndex + 1 }} of {{ store.totalItems }}</p>
+                <p class="text-base font-medium text-[var(--theme-text)] leading-relaxed">{{ statement.statement }}</p>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -96,8 +96,8 @@ function tfBtnProps(isTrue: boolean) {
             </div>
 
             <template v-if="store.gameState === 'answered'">
-                <div v-if="statement.proof || statement.explanation" class="text-sm text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-dark-700 p-3 rounded-xl border border-neutral-200 dark:border-neutral-700 space-y-1">
-                    <p v-if="statement.proof" class="font-medium text-neutral-500 dark:text-neutral-400">{{ formatProofReference(statement.proof) }}</p>
+                <div v-if="statement.proof || statement.explanation" class="text-sm text-[var(--theme-text)] bg-[var(--theme-bg-soft)] p-3 rounded-xl border border-[var(--theme-border)] space-y-1">
+                    <p v-if="statement.proof" class="font-medium text-[var(--theme-text-soft)]">{{ formatProofReference(statement.proof) }}</p>
                     <p v-if="statement.explanation">{{ statement.explanation }}</p>
                 </div>
                 <NButton block size="large" :color="ACCENT" :focusable="false" @click="store.nextTFQuestion()">
