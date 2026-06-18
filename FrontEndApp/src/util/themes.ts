@@ -79,6 +79,34 @@ type themeOptionsType = {
         dark: colorTypes;
         light: colorTypes;
     };
+    mocha: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    garnet: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    sapphire: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    grape: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    pine: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    plum: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
+    mono: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
 };
 
 export const themesOptions: themeOptionsType = {
@@ -351,6 +379,111 @@ export const themesOptions: themeOptionsType = {
             primaryColorPressed: '#F2CE8A',
         },
     },
+
+    mocha: {
+        dark: {
+            primaryColor: '#B8896E',
+            primaryColorHover: '#CBA188',
+            primaryColorSuppl: '#A8795F',
+            primaryColorPressed: '#DDC0AC',
+        },
+        light: {
+            primaryColor: '#8A6552',
+            primaryColorHover: '#B8896E',
+            primaryColorSuppl: '#A8795F',
+            primaryColorPressed: '#DDC0AC',
+        },
+    },
+
+    garnet: {
+        dark: {
+            primaryColor: '#D2566A',
+            primaryColorHover: '#E07E8D',
+            primaryColorSuppl: '#C13F52',
+            primaryColorPressed: '#EBB0BA',
+        },
+        light: {
+            primaryColor: '#A52A3C',
+            primaryColorHover: '#D2566A',
+            primaryColorSuppl: '#C13F52',
+            primaryColorPressed: '#EBB0BA',
+        },
+    },
+
+    sapphire: {
+        dark: {
+            primaryColor: '#4A74D6',
+            primaryColorHover: '#7C9BE6',
+            primaryColorSuppl: '#3A60C0',
+            primaryColorPressed: '#B3C6F0',
+        },
+        light: {
+            primaryColor: '#244A99',
+            primaryColorHover: '#4A74D6',
+            primaryColorSuppl: '#3A60C0',
+            primaryColorPressed: '#B3C6F0',
+        },
+    },
+
+    grape: {
+        dark: {
+            primaryColor: '#9460EE',
+            primaryColorHover: '#B58FF4',
+            primaryColorSuppl: '#7E47E0',
+            primaryColorPressed: '#D6C2FA',
+        },
+        light: {
+            primaryColor: '#6A2FCC',
+            primaryColorHover: '#9460EE',
+            primaryColorSuppl: '#7E47E0',
+            primaryColorPressed: '#D6C2FA',
+        },
+    },
+
+    pine: {
+        dark: {
+            primaryColor: '#3FA67E',
+            primaryColorHover: '#6BC09E',
+            primaryColorSuppl: '#2E8E6B',
+            primaryColorPressed: '#A9E0CB',
+        },
+        light: {
+            primaryColor: '#217256',
+            primaryColorHover: '#3FA67E',
+            primaryColorSuppl: '#2E8E6B',
+            primaryColorPressed: '#A9E0CB',
+        },
+    },
+
+    plum: {
+        dark: {
+            primaryColor: '#C25A78',
+            primaryColorHover: '#D6859B',
+            primaryColorSuppl: '#B0496A',
+            primaryColorPressed: '#ECC2CF',
+        },
+        light: {
+            primaryColor: '#8A2F4A',
+            primaryColorHover: '#C25A78',
+            primaryColorSuppl: '#B0496A',
+            primaryColorPressed: '#ECC2CF',
+        },
+    },
+
+    mono: {
+        dark: {
+            primaryColor: '#F2F2F2',
+            primaryColorHover: '#FFFFFF',
+            primaryColorSuppl: '#D4D4D4',
+            primaryColorPressed: '#E5E5E5',
+        },
+        light: {
+            primaryColor: '#1A1A1A',
+            primaryColorHover: '#000000',
+            primaryColorSuppl: '#404040',
+            primaryColorPressed: '#2A2A2A',
+        },
+    },
 };
 
 export type typeNameInterface =
@@ -371,7 +504,14 @@ export type typeNameInterface =
     | 'cobalt'
     | 'orchid'
     | 'sage'
-    | 'ochre';
+    | 'ochre'
+    | 'mocha'
+    | 'garnet'
+    | 'sapphire'
+    | 'grape'
+    | 'pine'
+    | 'plum'
+    | 'mono';
 
 export function getTheme(name: typeNameInterface) {
     return themesOptions[name];

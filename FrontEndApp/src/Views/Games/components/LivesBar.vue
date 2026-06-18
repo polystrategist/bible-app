@@ -38,13 +38,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="flex items-center justify-between p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-600">
+    <div class="flex items-center justify-between p-4 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)]">
         <div>
-            <p class="text-xs font-bold tracking-widest text-neutral-400 uppercase mb-2">Lives</p>
+            <p class="text-xs font-bold tracking-widest text-[var(--theme-text-soft)] uppercase mb-2">Lives</p>
             <div class="flex gap-1">
                 <span v-for="i in MAX_LIVES" :key="i" class="text-xl leading-none">
                     <span v-if="i <= lives" class="text-red-500">&#10084;</span>
-                    <span v-else class="text-neutral-300 dark:text-neutral-600">&#10084;</span>
+                    <span v-else class="text-[var(--theme-text-soft)]">&#10084;</span>
                 </span>
             </div>
         </div>
@@ -54,7 +54,7 @@ onUnmounted(() => {
                 class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
             >Full</span>
             <template v-else-if="countdown">
-                <p class="text-xs text-neutral-400 mb-1">Next heart in</p>
+                <p class="text-xs text-[var(--theme-text-soft)] mb-1">Next heart in</p>
                 <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">{{ countdown }}</span>
             </template>
         </div>

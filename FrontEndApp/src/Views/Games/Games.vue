@@ -61,10 +61,10 @@ function onTFGroupSelected(groupId: number) {
     <div class="h-full overflow-hidden p-4 max-w-2xl mx-auto flex flex-col">
         <!-- Hub -->
         <div v-if="activeScreen === 'hub'" class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1">
-            <h1 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 pt-1">Bible Games</h1>
+            <h1 class="text-xl font-bold text-[var(--theme-text)] pt-1">Bible Games</h1>
             <LivesBar :lives="store.lives" :next-recovery-at="store.nextRecoveryAt" />
             <div v-if="store.isLoading" class="space-y-3">
-                <div v-for="i in 3" :key="i" class="h-28 rounded-xl bg-neutral-100 dark:bg-dark-600 animate-pulse" />
+                <div v-for="i in 3" :key="i" class="h-28 rounded-xl bg-[var(--theme-bg-soft)] animate-pulse" />
             </div>
             <template v-else>
                 <GameCard

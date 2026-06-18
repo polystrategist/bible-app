@@ -13,7 +13,7 @@ const emit = defineEmits<{ play: [] }>();
 
 <template>
     <div
-        class="rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-dark-600 p-4 transition-shadow"
+        class="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg-elevated)] p-4 transition-shadow"
         :class="disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'"
         @click="!disabled && emit('play')"
     >
@@ -25,21 +25,21 @@ const emit = defineEmits<{ play: [] }>();
                 {{ emoji }}
             </div>
             <div class="flex-1 min-w-0">
-                <p class="font-semibold text-sm text-neutral-900 dark:text-neutral-100">{{ title }}</p>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-2">{{ description }}</p>
+                <p class="font-semibold text-sm text-[var(--theme-text)]">{{ title }}</p>
+                <p class="text-xs text-[var(--theme-text-soft)] mt-0.5 line-clamp-2">{{ description }}</p>
                 <div class="mt-3">
-                    <div class="h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-700 overflow-hidden">
+                    <div class="h-1.5 rounded-full bg-[var(--theme-bg-soft)] overflow-hidden">
                         <div
                             class="h-full rounded-full transition-all"
                             :style="{ width: (progress.total ? (progress.completed / progress.total) * 100 : 0) + '%', background: color }"
                         />
                     </div>
-                    <p class="text-xs text-neutral-400 mt-1.5 font-medium">
+                    <p class="text-xs text-[var(--theme-text-soft)] mt-1.5 font-medium">
                         {{ progress.completed }} / {{ progress.total }} complete
                     </p>
                 </div>
             </div>
-            <span class="text-neutral-300 dark:text-neutral-600 text-lg">&rsaquo;</span>
+            <span class="text-[var(--theme-text-soft)] text-lg">&rsaquo;</span>
         </div>
     </div>
 </template>
