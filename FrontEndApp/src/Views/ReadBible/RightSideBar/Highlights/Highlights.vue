@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { NButton, NIcon, NPopconfirm } from 'naive-ui';
 import { Delete16Filled, Delete16Regular } from '@vicons/fluent';
@@ -87,8 +86,7 @@ watch(
 </script>
 
 <template>
-    <RightSideBarContainer :title="$t('Highlights')">
-        <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only">
+    <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only">
             <div v-bind="wrapperProps">
                 <div
                     v-for="{ data: highlight } in list"
@@ -147,6 +145,5 @@ watch(
                     </NPopconfirm>
                 </div>
             </div>
-        </div>
-    </RightSideBarContainer>
+    </div>
 </template>

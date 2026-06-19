@@ -2,7 +2,6 @@
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { debouncedRunSync } from '../../../../util/Sync/sync';
-import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
 import { TrashCan } from '@vicons/carbon';
 import { NIcon, NPopconfirm } from 'naive-ui';
 import { ref } from 'vue';
@@ -25,8 +24,7 @@ async function deleteBookmark(verse: any) {
 }
 </script>
 <template>
-    <RightSideBarContainer :title="$t('Bookmarks')">
-        <div class="h-full overflow-auto overflowing-div scroll-hover-only">
+    <div class="h-full overflow-auto overflowing-div scroll-hover-only">
         <div
             v-for="(bookmark, key) in (bookmarkStore.bookmarks as bookmarksType)"
             :key="key"
@@ -58,6 +56,5 @@ async function deleteBookmark(verse: any) {
                 </NPopconfirm>
             </div>
         </div>
-        </div>
-    </RightSideBarContainer>
+    </div>
 </template>

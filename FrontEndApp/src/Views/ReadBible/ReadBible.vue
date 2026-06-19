@@ -3,7 +3,7 @@ import { Splitpanes, Pane } from 'splitpanes';
 import { onBeforeMount, ref } from 'vue';
 import SESSION from '../../util/session';
 import LeftSideBar from './LeftSideBar/LeftSideBar.vue';
-import RightSideBar from './RightSideBar/RightSideBar.vue';
+import RightSidePanel from './RightSideBar/RightSidePanel.vue';
 import ViewVerses from './ViewVerses/ViewVerses.vue';
 import BottomPanel from './BottomPanel/BottomPanel.vue';
 import useNoteStore from '../../store/useNoteStore';
@@ -17,7 +17,7 @@ const settingStore = useSettingStore();
 const splitPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
     { min: 15, max: 30, size: 20 },
     { min: 30, max: 60, size: 60 },
-    { min: 15, max: 30, size: 25 },
+    { min: 12, max: 45, size: 25 },
 ]);
 
 const verseViewPaneSizes = ref<Array<{ min: number; max: number; size: number }>>([
@@ -102,7 +102,7 @@ onBeforeMount(() => {
             :min-size="splitPaneSizes[2].min"
             :max-size="splitPaneSizes[2].max"
         >
-            <RightSideBar />
+            <RightSidePanel />
         </Pane>
     </Splitpanes>
 </template>

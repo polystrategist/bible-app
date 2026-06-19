@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { useClipNoteStore } from '../../../../store/ClipNotes';
 import { useVirtualList } from '@vueuse/core';
@@ -45,8 +44,7 @@ function stripHtml(html: string) {
 }
 </script>
 <template>
-    <RightSideBarContainer :title="$t('Clip Notes')">
-        <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only the-clip-notes-side-bar">
+    <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only the-clip-notes-side-bar">
             <div v-bind="wrapperProps">
                 <div
                     v-for="{ data: clipNote } in list"
@@ -100,8 +98,7 @@ function stripHtml(html: string) {
                     </div>
                 </div>
             </div>
-        </div>
-    </RightSideBarContainer>
+    </div>
 </template>
 <style lang="scss">
 .the-clip-notes-side-bar {
