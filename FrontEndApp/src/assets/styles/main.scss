@@ -785,6 +785,23 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-ro
     border-color: var(--theme-border) !important;
 }
 
+/* The default theme (Clear Sky, White & Dark, Dark & White) skips the themed
+   background rules above, so the right sidebar fell back to bg-gray-100 — a grey
+   that doesn't match the title bar. Match the NLayoutHeader colour (naive-ui
+   cardColor: #fff light / rgb(24,24,28) dark) so the right sidebar and title bar
+   read as one continuous surface. */
+body.theme-bg-default .read-bible-right-panel,
+body.theme-bg-default .read-bible-right-toolbar,
+body.theme-bg-default .read-bible-right-content {
+    background-color: #fff !important;
+}
+
+body.dark.theme-bg-default .read-bible-right-panel,
+body.dark.theme-bg-default .read-bible-right-toolbar,
+body.dark.theme-bg-default .read-bible-right-content {
+    background-color: rgb(24, 24, 28) !important;
+}
+
 .spicy-sunrise {
     background: var(--gradient-spicy-sunrise);
 }
