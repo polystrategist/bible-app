@@ -21,7 +21,7 @@ onMounted(() => {
 
 const { list, containerProps, wrapperProps } = useVirtualList(
     computed(() => bibleStore.allHighlights),
-    { itemHeight: 68, overscan: 6 },
+    { itemHeight: 50, overscan: 8 },
 );
 
 function selectBookVerse(highlight: any) {
@@ -91,7 +91,7 @@ watch(
                 <div
                     v-for="{ data: highlight } in list"
                     :key="highlight.key"
-                    class="relative cursor-pointer flex justify-between items-center min-h-[68px]"
+                    class="relative cursor-pointer flex justify-between items-center min-h-[50px]"
                     :class="{
                         'dark:bg-light-50 dark:bg-opacity-10 bg-gray-800 bg-opacity-10':
                             selectedHighlight == highlight.key,
@@ -104,7 +104,7 @@ watch(
                         class="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--primary-color)] transition-opacity duration-150"
                         :class="selectedHighlight == highlight.key ? 'opacity-100' : 'opacity-0'"
                     ></div>
-                    <div class="w-full px-3 py-2 relative">
+                    <div class="w-full px-3 py-1 relative">
                         <div class="flex items-center gap-6px font-700">
                             <span
                                 class="inline-block w-10px h-10px rounded-full flex-shrink-0"
@@ -117,11 +117,11 @@ watch(
                         </div>
                         <div
                             v-if="versePreviews[highlight.key]"
-                            class="text-xs opacity-50 mt-1 ml-4"
+                            class="text-xs opacity-50 mt-0.5 ml-4 truncate"
                         >
                             {{ versePreviews[highlight.key] }}
                         </div>
-                        <div v-else class="text-xs opacity-20 mt-1 ml-4 italic">
+                        <div v-else class="text-xs opacity-20 mt-0.5 ml-4 italic truncate">
                             {{ $t(bibleStore.getBook(highlight.book_number).title) }} {{ highlight.chapter }}:{{ highlight.verse }}
                         </div>
                     </div>

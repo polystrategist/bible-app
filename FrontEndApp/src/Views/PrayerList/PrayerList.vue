@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n';
 import { usePrayerListStore } from '../../store/prayerListStore';
 import { usePrayerStreakStore } from '../../store/prayerStreakStore';
 import { usePraySessionStore } from '../../store/praySessionStore';
+import { useNavBadgesStore } from '../../store/navBadgesStore';
 import EditPrayerItem from './EditPrayerItem.vue';
 import NewPrayerItem from './CreateNewPrayerItem.vue';
 import PrayerStatsStrip from './components/PrayerStatsStrip.vue';
@@ -21,6 +22,7 @@ const { t } = useI18n();
 const prayerListStore = usePrayerListStore();
 const streak = usePrayerStreakStore();
 const session = usePraySessionStore();
+const navBadges = useNavBadgesStore();
 
 const editPrayerModal = ref<any>(null);
 const newPrayerModal = ref<any>(null);
@@ -28,7 +30,11 @@ const tab = ref<'ongoing' | 'done' | 'streak'>('ongoing');
 const search = ref('');
 const groupFilter = ref<string | null>(null);
 
-onMounted(() => streak.loadDays());
+onMounted(() => {
+    streak.loadDays();
+    // Visiting the Prayer page clears its nav dot for the rest of the day.
+    navBadges.markPrayerVisited();
+});
 
 const ongoing = computed(() => prayerListStore.prayerList);
 const answered = computed(() => prayerListStore.donePrayerList);
