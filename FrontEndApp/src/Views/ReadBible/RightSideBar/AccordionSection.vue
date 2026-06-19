@@ -19,11 +19,14 @@ const emit = defineEmits<{ (e: 'toggle'): void }>();
         class="flex flex-col min-h-0 overflow-hidden"
         :class="{ 'accordion-animate': animate !== false }"
     >
-        <button
-            type="button"
+        <div
+            role="button"
+            tabindex="0"
             class="accordion-header h-8 min-h-8 w-full select-none flex items-center gap-1.5 px-2 cursor-pointer transition-colors duration-150 focus:outline-none"
             :aria-expanded="expanded"
             @click="emit('toggle')"
+            @keydown.enter="emit('toggle')"
+            @keydown.space.prevent="emit('toggle')"
         >
             <NIcon
                 size="14"
@@ -39,7 +42,7 @@ const emit = defineEmits<{ (e: 'toggle'): void }>();
             <span class="ml-auto flex items-center" @click.stop>
                 <slot name="actions" />
             </span>
-        </button>
+        </div>
         <div class="flex-1 min-h-0 overflow-hidden">
             <slot />
         </div>
@@ -51,18 +54,17 @@ const emit = defineEmits<{ (e: 'toggle'): void }>();
     transition: height 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Use the panel's own themed surface so the theme colour reaches the header
-   AND it stays seamless with the content (same colour = no fill-edge / border).
-   The explicit value also overrides the native <button> grey background, which
-   is what made the bars look light/un-themed. */
+/* VS Code Explorer-style section header: a faint translucent bar over the
+   panel surface. Neutral + low-alpha so it adapts to any theme (lightens on
+   dark, darkens on light), reads as a subtle bar, and has no hard border line.
+   The explicit value also overrides the native <button> grey background. */
 .accordion-header {
-    background-color: var(--theme-bg-elevated, #ffffff);
+    background-color: rgba(128, 128, 128, 0.1);
     color: var(--theme-text, #333333);
 }
 
-/* Hover/focus: a gentle step to the soft surface for affordance. */
 .accordion-header:hover,
 .accordion-header:focus-visible {
-    background-color: var(--theme-bg-soft, #ebebeb);
+    background-color: rgba(128, 128, 128, 0.16);
 }
 </style>

@@ -22,7 +22,11 @@ const sectionStates = computed<PanelSectionState[]>(() =>
     }))
 );
 
-const heights = computed(() => computeLayout(containerHeight.value, sectionStates.value));
+// Floor the measured height: useElementSize reports fractional, slightly
+// jittery values (zoom / fractional DPI). Without flooring, those sub-pixel
+// fluctuations recompute section heights every frame and the height transition
+// animates each one — which shows up as a constant "wiggle" in the bottom bars.
+const heights = computed(() => computeLayout(Math.floor(containerHeight.value), sectionStates.value));
 
 function hasDividerAfter(index: number): boolean {
     return (
@@ -36,6 +40,21 @@ function hasDividerAfter(index: number): boolean {
 // While dragging, section height transitions are turned off so the divider
 // tracks the pointer instantly; toggles still animate.
 const dragging = ref(false);
+
+// Animate section heights ONLY for the duration of a toggle. Otherwise idle
+// re-measures (the panel height jittering across a pixel boundary) would be
+// animated by the height transition and show up as a constant wiggle.
+const animatingToggle = ref(false);
+let toggleTimer: ReturnType<typeof setTimeout> | undefined;
+function toggleSection(key: string) {
+    animatingToggle.value = true;
+    store.toggle(key);
+    clearTimeout(toggleTimer);
+    toggleTimer = setTimeout(() => {
+        animatingToggle.value = false;
+    }, 260);
+}
+
 let dragKeyA = '';
 let dragKeyB = '';
 let startY = 0;
@@ -98,10 +117,10 @@ onBeforeMount(() => {
                 :title="$t(section.title)"
                 :icon="section.icon"
                 :expanded="store.isExpanded(section.key)"
-                :animate="!dragging"
+                :animate="animatingToggle && !dragging"
                 class="flex-shrink-0"
                 :style="{ height: heights[section.key] + 'px' }"
-                @toggle="store.toggle(section.key)"
+                @toggle="toggleSection(section.key)"
             >
                 <component :is="section.component" />
             </AccordionSection>
