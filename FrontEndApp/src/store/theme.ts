@@ -137,6 +137,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         applyPrimaryTheme();
 
         applyBodyThemeClass();
+        persistSplashTheme();
         SESSION.set(saveThemeStorageKey, {
             selectedTheme: selectedTheme.value,
             isDark: itsDark,
@@ -187,6 +188,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
         applyPrimaryTheme();
         applyBodyThemeClass();
         changeTheRootProperty();
+        persistSplashTheme();
 
         // When remote settings load (after login/initAuth), apply them.
         // Skip if there are pending local changes — local always wins until flushed.
@@ -200,6 +202,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             applyPrimaryTheme();
             applyBodyThemeClass();
             changeTheRootProperty();
+            persistSplashTheme();
             // Keep localStorage in sync
             SESSION.set(saveThemeStorageKey, {
                 selectedTheme: selectedTheme.value,
@@ -212,6 +215,22 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     function changeTheRootProperty() {
         document.documentElement.style.setProperty('--primary-color', themeOverrides.value.common.primaryColor);
         document.documentElement.style.setProperty('--primary-color-light', themeOverrides.value.common.primaryColorHover);
+    }
+
+    // Mirror the resolved theme colors into the Electron store so the NEXT launch's
+    // loading splash can match the user's theme. Best-effort; no-op on web.
+    function persistSplashTheme() {
+        if (!window.isElectron || !window.browserWindow) return;
+        try {
+            const cs = getComputedStyle(document.body);
+            window.browserWindow.setSplashTheme({
+                bg: cs.getPropertyValue('--theme-bg-main').trim() || '#ffffff',
+                text: cs.getPropertyValue('--theme-text').trim() || '#333333',
+                accent: themeOverrides.value.common.primaryColor || '#279EFF',
+            });
+        } catch {
+            /* splash theming is best-effort — ignore */
+        }
     }
 
     function changePrimaryColor(key: typeNameInterface) {

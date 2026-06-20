@@ -1,5 +1,5 @@
 import Log from 'electron-log';
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { isDev, isBeta } from './config';
 import { setupDefault } from './Setups/setup';
@@ -11,6 +11,7 @@ import { setupPortableMode } from './util/portable';
 import { createWindowState, attachWindowStateManager, saveWindowState } from './util/window';
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 import { registerGameImagesScheme, registerGameImagesProtocol } from './util/gameImagesProtocol';
+import { createSplashWindow, closeSplash } from './Windows/SplashWindow';
 
 // Custom scheme registration must happen before app `ready`.
 registerGameImagesScheme();
@@ -22,6 +23,11 @@ process.stderr.on('error', (err: NodeJS.ErrnoException) => { if (err.code === 'E
 // Check if running in portable mode
 setupPortableMode();
 
+// When the loading splash was shown, so the main window can be held back until the
+// splash has been visible for at least its minimum duration.
+let splashShownAt = 0;
+const MIN_SPLASH_MS = 3000;
+
 async function createWindow() {
     const savedScale = Number(appConfig.get('setting.appScale', 1));
     const appScale = Number.isFinite(savedScale) ? Math.min(1.5, Math.max(0.75, savedScale)) : 1;
@@ -31,6 +37,12 @@ async function createWindow() {
     if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
     const windowState = createWindowState();
+
+    // Match the hidden main window's background to the saved splash/theme background so
+    // that, whenever it is finally shown, there is no white flash. Defaults to white.
+    const savedSplashBg = appConfig.get('setting.splashTheme.bg') as string | undefined;
+    const bgColor = savedSplashBg && savedSplashBg.trim() ? savedSplashBg.trim() : '#ffffff';
+    let mainRevealed = false;
 
     const mainWindow = new BrowserWindow({
         x: windowState.x,
@@ -45,6 +57,7 @@ async function createWindow() {
             devTools: true,
         },
         show: false,
+        backgroundColor: bgColor,
         alwaysOnTop: true,
         frame: false,
     });
@@ -76,28 +89,59 @@ async function createWindow() {
     // auto updater (always called so IPC handlers are registered; internal check skips auto-update on unpackaged dev builds)
     AppUpdater(mainWindow);
 
+    // Reveal the main window only once the renderer signals it is fully rendered
+    // (window.browserWindow.appReady()), and only after the splash has been visible for
+    // at least MIN_SPLASH_MS. Until then the main window stays hidden behind the splash,
+    // so the user never sees the app assembling.
+    let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
+    const revealMainWindow = () => {
+        if (mainRevealed || mainWindow.isDestroyed()) return;
+        const minRemaining = Math.max(0, MIN_SPLASH_MS - (Date.now() - splashShownAt));
+        setTimeout(() => {
+            if (mainRevealed || mainWindow.isDestroyed()) return;
+            mainRevealed = true;
+            if (fallbackTimer) clearTimeout(fallbackTimer);
+
+            mainWindow.show();
+            if (windowState.isFullScreen) {
+                mainWindow.setFullScreen(true);
+            } else if (windowState.isMaximized) {
+                mainWindow.maximize();
+            }
+            closeSplash();
+
+            // this will turn off always on top after opening the application
+            setTimeout(() => {
+                if (mainWindow.isDestroyed()) return;
+                mainWindow.setAlwaysOnTop(false);
+                mainWindow.focus();
+            }, 1000);
+        }, minRemaining);
+    };
+
+    ipcMain.once('app-ready', revealMainWindow);
+    // Safety net so the window is never stuck hidden if the ready signal never arrives.
+    fallbackTimer = setTimeout(revealMainWindow, 20000);
+
     // and load the index.html of the app.
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
-
-    mainWindow.show();
-
-    if (windowState.isFullScreen) {
-        mainWindow.setFullScreen(true);
-    } else if (windowState.isMaximized) {
-        mainWindow.maximize();
-    }
-
-    // this will turn off always on top after opening the application
-    setTimeout(() => {
-        mainWindow.setAlwaysOnTop(false);
-        mainWindow.focus();
-    }, 1000);
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+    // Quit a second instance before showing anything.
+    if (!app.requestSingleInstanceLock()) {
+        app.quit();
+        return;
+    }
+
+    // Show the loading splash immediately — before DB setup and before the main window
+    // loads — so the whole startup is covered instead of a blank screen.
+    createSplashWindow();
+    splashShownAt = Date.now();
+
     if (isDev) {
         try {
             const { default: installExtension } = await import('electron-devtools-installer');
@@ -114,6 +158,7 @@ app.whenReady().then(async () => {
         Log.info('Database setup completed successfully');
     } catch (e) {
         Log.error('Database setup failed:', e);
+        closeSplash();
         app.quit();
         return;
     }

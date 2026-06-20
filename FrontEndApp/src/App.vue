@@ -61,7 +61,7 @@ useMainStore();
 
 // Which sidebar entries should show a daily "attention" red dot.
 function dotForKey(key: string): boolean {
-    if (key === '/prayer-list') return !prayerStreak.prayedToday;
+    if (key === '/prayer-list') return !prayerStreak.prayedToday && !navBadges.prayerVisitedToday;
     if (key === '/daily-devotional') return !devotionStreak.completedToday;
     if (key === '/games') return navBadges.showGamesDot;
     return false;

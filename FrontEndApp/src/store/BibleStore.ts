@@ -1,7 +1,7 @@
 import { useClipNoteStore } from './ClipNotes';
 import { defineStore } from 'pinia';
 import { debouncedRunSync } from '../util/Sync/sync';
-import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, ref, watch } from 'vue';
 import { setScrollTopState } from '../util/AutoScroll';
 import SESSION from '../util/session';
 import { bibleBooks } from '../util/books';
@@ -116,6 +116,8 @@ export const useBibleStore = defineStore('useBibleStore', () => {
     }
 
     let getVersesRequestId = 0;
+    // Fire the splash "app-ready" signal exactly once, after the first chapter loads.
+    let signaledAppReady = false;
 
     function hasLoadedCurrentChapterVersion(versionFile: string) {
         return verses.value.some(
@@ -149,6 +151,12 @@ export const useBibleStore = defineStore('useBibleStore', () => {
             if (requestId === getVersesRequestId) {
                 isLoadingVerses.value = false;
                 loadingVerseVersions.value = [];
+                if (!signaledAppReady) {
+                    signaledAppReady = true;
+                    // First chapter is loaded — wait one paint so verses are on screen,
+                    // then tell the main process to reveal the window and close the splash.
+                    nextTick(() => requestAnimationFrame(() => window.browserWindow?.appReady?.()));
+                }
             }
         }
     }

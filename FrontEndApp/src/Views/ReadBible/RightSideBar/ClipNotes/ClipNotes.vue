@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import RightSideBarContainer from '../../../../components/ReadBible/RightSideBarContainer.vue';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { useClipNoteStore } from '../../../../store/ClipNotes';
 import { useVirtualList } from '@vueuse/core';
@@ -19,7 +18,7 @@ onMounted(() => {
 
 const { list, containerProps, wrapperProps } = useVirtualList(
     computed(() => clipNoteStore.clipNotes),
-    { itemHeight: 80, overscan: 6 },
+    { itemHeight: 54, overscan: 8 },
 );
 
 function noteKey(clipNote: any) {
@@ -45,13 +44,12 @@ function stripHtml(html: string) {
 }
 </script>
 <template>
-    <RightSideBarContainer :title="$t('Clip Notes')">
-        <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only the-clip-notes-side-bar">
+    <div v-bind="containerProps" class="h-full overflowing-div scroll-hover-only the-clip-notes-side-bar">
             <div v-bind="wrapperProps">
                 <div
                     v-for="{ data: clipNote } in list"
                     :key="noteKey(clipNote)"
-                    class="relative group cursor-pointer flex items-stretch min-h-[80px] px-2 py-1"
+                    class="relative group cursor-pointer flex items-stretch min-h-[54px] px-2 py-1"
                     @click="selectBookVerse(clipNote)"
                 >
                     <!-- Selected accent bar -->
@@ -62,7 +60,7 @@ function stripHtml(html: string) {
 
                     <!-- Card -->
                     <div
-                        class="w-full rounded-md p-2 flex flex-col gap-1 ring-1 ring-black ring-opacity-5 shadow-sm transition-shadow group-hover:shadow-md"
+                        class="w-full rounded-md px-2 py-1 flex flex-col gap-0.5 ring-1 ring-black ring-opacity-5 shadow-sm transition-shadow group-hover:shadow-md"
                         :style="`background-color: ${clipNote.color}`"
                     >
                         <!-- Header: reference + delete -->
@@ -94,14 +92,13 @@ function stripHtml(html: string) {
                         </div>
 
                         <!-- Content preview -->
-                        <div class="text-xs text-dark-800 opacity-75 line-clamp-2 leading-relaxed">
+                        <div class="text-xs text-dark-800 opacity-75 line-clamp-1 leading-snug">
                             {{ stripHtml(clipNote.content) }}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </RightSideBarContainer>
+    </div>
 </template>
 <style lang="scss">
 .the-clip-notes-side-bar {

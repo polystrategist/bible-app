@@ -669,7 +669,6 @@ body.theme-bg-amethyst {
 
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-verses-panel,
-body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-content,
 body[class*='theme-bg-']:not(.theme-bg-default) .take-note-root {
     background-color: var(--theme-bg-main) !important;
     color: var(--theme-text);
@@ -755,7 +754,6 @@ body .n-date-panel .n-button:not(.n-button--primary-type) {
 
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-left-panel,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-panel,
-body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-right-toolbar,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-verses-toolbar,
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-version-sticky,
 body[class*='theme-bg-']:not(.theme-bg-default) .take-note-editor-panel {
@@ -783,6 +781,19 @@ body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-ro
 body[class*='theme-bg-']:not(.theme-bg-default) .read-bible-layout .take-note-root .take-note-editor-panel {
     background-color: var(--theme-bg-soft) !important;
     border-color: var(--theme-border) !important;
+}
+
+/* The default theme (Clear Sky, White & Dark, Dark & White) skips the themed
+   background rules above, so the right sidebar fell back to bg-gray-100 — a grey
+   that doesn't match the title bar. Match the NLayoutHeader colour (naive-ui
+   cardColor: #fff light / rgb(24,24,28) dark) so the right sidebar and title bar
+   read as one continuous surface. */
+body.theme-bg-default .read-bible-right-panel {
+    background-color: #fff !important;
+}
+
+body.dark.theme-bg-default .read-bible-right-panel {
+    background-color: rgb(24, 24, 28) !important;
 }
 
 .spicy-sunrise {

@@ -106,6 +106,8 @@ const stub: Window['browserWindow'] = {
     onWindowMaximized: () => { warnOnce('onWindowMaximized'); },
     getAppScale: async () => 1,
     setAppScale: async (scale: number) => scale,
+    appReady: () => { /* no-op on web — no splash window */ },
+    setSplashTheme: async () => { /* no-op on web — no splash window */ },
 
     // ---------- Bible reads ----------
     getAvailableBibles: async () => apiFetch('/bible/version-details', [] as string[]),

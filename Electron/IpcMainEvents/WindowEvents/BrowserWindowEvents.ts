@@ -76,6 +76,10 @@ export const windowBrowserEvents = (win: BrowserWindow) => {
     });
     ipcMain.handle('getAppScale', () => getAppScale(win));
     ipcMain.handle('setAppScale', (_event, scale: number) => setAppScale(win, scale));
+    // Persist current theme colors so the next launch's loading splash matches them.
+    ipcMain.handle('set-splash-theme', (_event, payload) => {
+        appConfig.set('setting.splashTheme', payload);
+    });
     ipcMain.handle('openExternal', (_event, url: string) => shell.openExternal(url));
     // Native clipboard write. navigator.clipboard is unreliable in the renderer
     // (needs a secure context/focus and silently rejects), so verse copy routes

@@ -2,7 +2,6 @@
 import { useBookmarkStore } from '../../../../store/bookmark';
 import { useBibleStore } from '../../../../store/BibleStore';
 import { debouncedRunSync } from '../../../../util/Sync/sync';
-import RightSideBarContainer from './../../../../components/ReadBible/RightSideBarContainer.vue';
 import { TrashCan } from '@vicons/carbon';
 import { NIcon, NPopconfirm } from 'naive-ui';
 import { ref } from 'vue';
@@ -25,8 +24,7 @@ async function deleteBookmark(verse: any) {
 }
 </script>
 <template>
-    <RightSideBarContainer :title="$t('Bookmarks')">
-        <div class="h-full overflow-auto overflowing-div scroll-hover-only">
+    <div class="h-full overflow-auto overflowing-div scroll-hover-only">
         <div
             v-for="(bookmark, key) in (bookmarkStore.bookmarks as bookmarksType)"
             :key="key"
@@ -40,7 +38,7 @@ async function deleteBookmark(verse: any) {
                 class="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--primary-color)] transition-opacity duration-150"
                 :class="selectedBookmarkKey == key ? 'opacity-100' : 'opacity-0'"
             ></div>
-            <div class="w-full px-3 py-2" @click="selectBookVerse(key as string, bookmark)">
+            <div class="w-full px-3 py-1.5" @click="selectBookVerse(key as string, bookmark)">
                 <span class="font-600 text-sm mr-1">{{ $t(bibleStore.getBook(bookmark.book_number).title) }}</span>
                 <span class="opacity-60 text-sm">{{ bookmark.chapter }}:{{ bookmark.verse }}</span>
             </div>
@@ -58,6 +56,5 @@ async function deleteBookmark(verse: any) {
                 </NPopconfirm>
             </div>
         </div>
-        </div>
-    </RightSideBarContainer>
+    </div>
 </template>

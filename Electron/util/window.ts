@@ -9,6 +9,12 @@ export function createWindowState() {
     return windowStateKeeper({
         defaultWidth: 1200,
         defaultHeight: 750,
+        // Do NOT auto-restore maximize/fullscreen here: manage() would call
+        // win.maximize(), which forces a `show: false` window visible — popping the
+        // main window open next to the splash. We restore these ourselves when the
+        // window is actually revealed (see revealMainWindow in main.ts).
+        maximize: false,
+        fullScreen: false,
     });
 }
 

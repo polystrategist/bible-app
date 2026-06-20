@@ -3,21 +3,34 @@ import { ref, computed } from 'vue';
 import session from '../util/session';
 
 /**
- * Sidebar nav-badge state. Currently owns the Games hub "attention dot",
- * mirroring the mobile ReaderBottomNavigation games dot: the dot shows when the
- * game hub hasn't been visited in the last 10 hours, and clears on visit.
+ * Sidebar nav-badge state.
  *
- * Local-only (not synced) — mirrors mobile, which stores the timestamp in
- * SharedPreferences (key `games_hub_last_visited_at`). Prayer/Devotion dots are
- * derived directly from their streak stores by the consumer (App.vue), so they
- * are not duplicated here.
+ * - Games hub "attention dot": shows when the hub hasn't been visited in the
+ *   last 10 hours, clears on visit (mirrors mobile ReaderBottomNavigation).
+ * - Prayer "visited today" flag: visiting the Prayer page clears its nav dot
+ *   for the rest of the day (the dot's base condition — "haven't prayed today" —
+ *   lives in the streak store and is combined by the consumer, App.vue).
+ *
+ * Local-only (not synced). Devotion's dot is still derived purely from its
+ * streak store by the consumer.
  */
 const GAMES_LAST_VISITED_KEY = 'games_hub_last_visited_at';
 const GAMES_ATTENTION_DELAY_MS = 10 * 60 * 60 * 1000; // 10 hours
-const TICK_MS = 60 * 1000; // re-evaluate the 10h boundary every minute (mirrors mobile's timer)
+const TICK_MS = 60 * 1000; // re-evaluate the boundaries every minute (mirrors mobile's timer)
+const PRAYER_VISITED_DAY_KEY = 'prayer_dot_last_visited_day';
+
+/** Local calendar date (YYYY-MM-DD) for a timestamp. */
+function dayKeyOf(ts: number): string {
+    const d = new Date(ts);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+}
 
 export const useNavBadgesStore = defineStore('navBadgesStoreId', () => {
     const gamesLastVisited = ref<string | null>(session.get(GAMES_LAST_VISITED_KEY) ?? null);
+    // Day (YYYY-MM-DD) the Prayer page was last opened.
+    const prayerVisitedDay = ref<string | null>(session.get(PRAYER_VISITED_DAY_KEY) ?? null);
     const now = ref<number>(Date.now());
 
     // Single app-lifetime ticker (the store is a singleton), so the dot
@@ -40,5 +53,18 @@ export const useNavBadgesStore = defineStore('navBadgesStoreId', () => {
         gamesLastVisited.value = iso;
     }
 
-    return { showGamesDot, markGamesVisited };
+    // True once the Prayer page has been opened today; re-derives daily via the
+    // ticker (`now`) so the dot can reappear the next day if still unprayed.
+    const prayerVisitedToday = computed(
+        () => prayerVisitedDay.value !== null && prayerVisitedDay.value === dayKeyOf(now.value)
+    );
+
+    /** Record a Prayer-page visit now, clearing the prayer dot until tomorrow. */
+    function markPrayerVisited() {
+        const key = dayKeyOf(Date.now());
+        session.set(PRAYER_VISITED_DAY_KEY, key);
+        prayerVisitedDay.value = key;
+    }
+
+    return { showGamesDot, markGamesVisited, prayerVisitedToday, markPrayerVisited };
 });
