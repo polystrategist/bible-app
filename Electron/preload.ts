@@ -7,6 +7,11 @@ contextBridge.exposeInMainWorld('browserWindow', {
     isWindowBrowserMaximized: () => ipcRenderer.invoke('isWindowBrowserMaximized'),
     getAppScale: () => ipcRenderer.invoke('getAppScale'),
     setAppScale: (scale: number) => ipcRenderer.invoke('setAppScale', scale),
+    // Tell main the app has fully rendered, so it can close the splash and show the window.
+    appReady: () => ipcRenderer.send('app-ready'),
+    // Persist the current theme colors so the next launch's splash can match them.
+    setSplashTheme: (payload: { bg: string; text: string; accent: string }) =>
+        ipcRenderer.invoke('set-splash-theme', payload),
     versions: () => ipcRenderer.invoke('versions'),
     getAvailableBibles: () => ipcRenderer.invoke('availableBibles'),
     deleteBible: (fileName: string) => ipcRenderer.invoke('deleteBible', fileName),
