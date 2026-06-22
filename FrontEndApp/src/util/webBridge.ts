@@ -34,6 +34,50 @@ async function apiFetch<T>(path: string, fallback: T, options: RequestInit = {})
     }
 }
 
+/**
+ * Largest `limit` the REST API accepts on paginated list endpoints
+ * (clip-notes, highlights). Requests above this 422 with a validation error.
+ */
+const API_MAX_LIMIT = 200;
+
+/**
+ * Fetch a paginated list endpoint, honoring the caller's requested `limit`.
+ *
+ * Callers (e.g. the sidebar lists) pass a large `limit` to mean "give me the
+ * whole dataset for virtual scrolling", but the API caps `limit` at
+ * {@link API_MAX_LIMIT}. When more is requested we page through the endpoint in
+ * API-legal chunks and concatenate, stopping once a short page signals the end.
+ */
+async function fetchPagedList(
+    path: string,
+    opts: { page?: number; search?: string | null; limit?: number },
+): Promise<any[]> {
+    const requested = Number(opts.limit) || API_MAX_LIMIT;
+    const search = opts.search ?? null;
+
+    // Small request — a single page honoring the caller's page/limit verbatim.
+    if (requested <= API_MAX_LIMIT) {
+        const params = new URLSearchParams({ page: String(opts.page ?? 1), limit: String(requested) });
+        if (search) params.set('search', String(search));
+        return apiFetch(`${path}?${params}`, []);
+    }
+
+    // Large request — walk every page until the dataset is exhausted. The page
+    // cap is a safety net against an unbounded loop, set well above any realistic
+    // per-user record count.
+    const all: any[] = [];
+    const MAX_PAGES = 500;
+    for (let page = 1; page <= MAX_PAGES; page++) {
+        const params = new URLSearchParams({ page: String(page), limit: String(API_MAX_LIMIT) });
+        if (search) params.set('search', String(search));
+        const rows = await apiFetch<any[]>(`${path}?${params}`, []);
+        if (!Array.isArray(rows) || rows.length === 0) break;
+        all.push(...rows);
+        if (rows.length < API_MAX_LIMIT) break;
+    }
+    return all;
+}
+
 function buildBibleVersesPath(version: string, bookNumber: number, chapter: number) {
     const params = new URLSearchParams();
     params.append('versions[]', version);
@@ -157,9 +201,7 @@ const stub: Window['browserWindow'] = {
     },
     getHighlights: async (args: string) => {
         const { page, search, limit } = JSON.parse(args);
-        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-        if (search) params.set('search', search);
-        return apiFetch(`/highlights?${params}`, []);
+        return fetchPagedList('/highlights', { page, search, limit });
     },
     saveHighlight: async (args: string) => {
         const body = JSON.parse(args);
@@ -187,9 +229,7 @@ const stub: Window['browserWindow'] = {
     // ---------- Clip Notes ----------
     getClipNotes: async (args: string) => {
         const { page, search, limit } = JSON.parse(args);
-        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-        if (search) params.set('search', search);
-        return apiFetch(`/clip-notes?${params}`, []);
+        return fetchPagedList('/clip-notes', { page, search, limit });
     },
     getChapterClipNotes: async (args: string) => {
         const { book_number, chapter } = JSON.parse(args);
