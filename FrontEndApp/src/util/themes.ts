@@ -11,6 +11,10 @@ type themeOptionsType = {
         dark: colorTypes;
         light: colorTypes;
     };
+    gold: {
+        dark: colorTypes;
+        light: colorTypes;
+    };
     nature: {
         dark: colorTypes;
         light: colorTypes;
@@ -110,7 +114,24 @@ type themeOptionsType = {
 };
 
 export const themesOptions: themeOptionsType = {
+    // Brand accent — the app's default. Same indigo in light and dark.
     default: {
+        dark: {
+            primaryColor: '#4A3AFF',
+            primaryColorHover: '#6B5CFF',
+            primaryColorSuppl: '#5E4FFF',
+            primaryColorPressed: '#3A2BE0',
+        } as colorTypes,
+        light: {
+            primaryColor: '#4A3AFF',
+            primaryColorHover: '#6B5CFF',
+            primaryColorSuppl: '#5E4FFF',
+            primaryColorPressed: '#3A2BE0',
+        } as colorTypes,
+    },
+
+    // Former 'default' (gold) — renamed so 'default' can be the brand indigo.
+    gold: {
         dark: {
             primaryColor: '#F2C423',
             primaryColorHover: 'rgba(238, 167, 24, 0.212)',
@@ -488,6 +509,7 @@ export const themesOptions: themeOptionsType = {
 
 export type typeNameInterface =
     | 'default'
+    | 'gold'
     | 'nature'
     | 'sky'
     | 'ocean'

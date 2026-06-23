@@ -1,5 +1,6 @@
 export type backgroundThemeType =
     | 'default'
+    | 'irisdark'
     | 'sepia'
     | 'forest'
     | 'dawn'
@@ -30,6 +31,13 @@ export type appearanceThemeOption = {
 };
 
 export const appearanceThemeOptions: appearanceThemeOption[] = [
+    {
+        key: 'irisdark',
+        label: 'irisdark',
+        isDark: true,
+        backgroundTheme: 'irisdark',
+        swatch: '#2e3650',
+    },
     {
         key: 'light',
         label: 'light',

@@ -8,10 +8,13 @@ export interface ThemePreset {
 }
 
 export const themePresets: ThemePreset[] = [
+    // Brand default
+    { name: 'Default', appearance: 'light', accent: 'default' },
+    { name: 'Default Dark', appearance: 'irisdark', accent: 'default' },
     // Light
     { name: 'Candlelight', appearance: 'parchment', accent: 'ochre' },
     { name: 'Morning Sepia', appearance: 'sepia', accent: 'ember' },
-    { name: 'Soft Day', appearance: 'cream', accent: 'default' },
+    { name: 'Soft Day', appearance: 'cream', accent: 'gold' },
     { name: 'Dawnlight', appearance: 'dawn', accent: 'rose' },
     { name: 'Forest Walk', appearance: 'forest', accent: 'sage' },
     { name: 'Arctic Focus', appearance: 'arctic', accent: 'cobalt' },
@@ -29,7 +32,7 @@ export const themePresets: ThemePreset[] = [
     { name: 'White & Dark', appearance: 'light', accent: 'mono' },
     // Dark
     { name: 'Nordic Night', appearance: 'nord', accent: 'sky' },
-    { name: 'Midnight Gold', appearance: 'midnight', accent: 'default' },
+    { name: 'Midnight Gold', appearance: 'midnight', accent: 'gold' },
     { name: 'Obsidian Mint', appearance: 'abyss', accent: 'mint' },
     { name: 'Amethyst Dreams', appearance: 'amethyst', accent: 'orchid' },
     { name: 'Deep Ocean', appearance: 'oceanic', accent: 'teal' },
@@ -41,7 +44,7 @@ export const themePresets: ThemePreset[] = [
     { name: 'Sapphire Night', appearance: 'midnight', accent: 'sapphire' },
     { name: 'Royal Grape', appearance: 'amethyst', accent: 'grape' },
     { name: 'Deep Pine', appearance: 'emerald', accent: 'pine' },
-    { name: 'Espresso', appearance: 'mocha', accent: 'default' },
+    { name: 'Espresso', appearance: 'mocha', accent: 'gold' },
     { name: 'Wine Cellar', appearance: 'crimson', accent: 'plum' },
     { name: 'Dark & White', appearance: 'night', accent: 'mono' },
 ];

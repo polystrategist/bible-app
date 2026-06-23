@@ -10,14 +10,16 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     const saveThemeStorageKey = 'savedThemeStorage';
     let settingsDebounceTimer: ReturnType<typeof setTimeout> | null = null;
     const isDark = ref(false);
+    // Brand default for a fresh session: plain light surface (same background as
+    // the Clear Sky preset) + indigo 'default' accent.
     const backgroundTheme = ref<backgroundThemeType>('default');
-    const selectedTheme = ref<typeNameInterface>('ocean');
+    const selectedTheme = ref<typeNameInterface>('default');
     const themeOverrides = ref<any>({
         common: {
-            primaryColor: '#f2c423',
-            primaryColorHover: 'rgba(238, 167, 24, 0.212)',
-            primaryColorSuppl: '#E4BB2F',
-            primaryColorPressed: '#E5BD1D',
+            primaryColor: '#4A3AFF',
+            primaryColorHover: '#6B5CFF',
+            primaryColorSuppl: '#5E4FFF',
+            primaryColorPressed: '#3A2BE0',
         },
         Input: {
             color: 'var(--theme-bg-elevated)',
@@ -102,7 +104,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
     function resolveSelectedTheme(value: unknown): typeNameInterface {
         return typeof value === 'string' && value in themesOptions
             ? value as typeNameInterface
-            : 'ocean';
+            : 'default';
     }
 
     function resolveBackgroundTheme(value: unknown): backgroundThemeType {
@@ -226,7 +228,7 @@ export const useThemeStore = defineStore('useThemeStore', () => {
             window.browserWindow.setSplashTheme({
                 bg: cs.getPropertyValue('--theme-bg-main').trim() || '#ffffff',
                 text: cs.getPropertyValue('--theme-text').trim() || '#333333',
-                accent: themeOverrides.value.common.primaryColor || '#279EFF',
+                accent: themeOverrides.value.common.primaryColor || '#4A3AFF',
             });
         } catch {
             /* splash theming is best-effort — ignore */

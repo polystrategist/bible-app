@@ -26,6 +26,7 @@ const showCustom = ref(false);
 // Preview background/foreground per appearance (mirrors mobile kAppearanceThemes),
 // used to render the preset tiles like the mobile app.
 const APPEARANCE_PREVIEW: Record<string, { bg: string; fg: string }> = {
+    irisdark: { bg: '#1A1E29', fg: '#E6E8F2' },
     light: { bg: '#E8E8E8', fg: '#1A1A1A' },
     night: { bg: '#5F5F67', fg: '#FFFFFF' },
     sepia: { bg: '#F4EDDD', fg: '#3F2F1E' },
