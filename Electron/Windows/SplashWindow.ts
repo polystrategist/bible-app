@@ -1,3 +1,4 @@
+import Log from 'electron-log';
 import { BrowserWindow, screen } from 'electron';
 import path from 'path';
 import { isDev, isBeta } from '../config';
@@ -61,6 +62,25 @@ function resolveTheme(): Required<SplashTheme> {
     };
 }
 
+// Minimal self-contained splash used only when splash.html cannot be loaded
+// (e.g. a packaged build whose frontend dist predates the file). Guarantees the
+// loading window is never a silent blank box — it still shows the themed name
+// and spinner. Kept dependency-free (no external SVG) so it can never itself fail.
+function fallbackSplashDataUrl(theme: Required<SplashTheme>): string {
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
+        html,body{width:100%;height:100%;margin:0;background:${theme.bg};overflow:hidden;
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none}
+        .wrap{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .name{font-size:26px;font-weight:800;letter-spacing:.5px;color:${theme.text}}
+        .spinner{margin-top:28px;width:30px;height:30px;border-radius:50%;
+            border:3px solid color-mix(in srgb, ${theme.text} 18%, transparent);
+            border-top-color:${theme.accent};animation:spin .8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style></head><body><div class="wrap"><div class="name">Believers Sword</div>
+        <div class="spinner"></div></div></body></html>`;
+    return `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+}
+
 export function createSplashWindow(): BrowserWindow {
     let iconPath = path.join(__dirname, 'assets', 'icon.ico');
     if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
@@ -87,6 +107,19 @@ export function createSplashWindow(): BrowserWindow {
 
     splashWindow.once('ready-to-show', () => {
         if (splashWindow && !splashWindow.isDestroyed()) splashWindow.show();
+    });
+
+    // If splash.html can't be loaded (missing from a stale dist, dev server not
+    // up yet, etc.) the window would otherwise paint only its backgroundColor and
+    // look blank. Log the failure and swap in a self-contained fallback so the
+    // loading screen always shows the themed name + spinner. Guard against the
+    // fallback's own (data: URL) load to avoid a loop.
+    let usedFallback = false;
+    splashWindow.webContents.on('did-fail-load', (_e, errorCode, errorDescription, validatedURL) => {
+        Log.warn(`[splash] failed to load (${errorCode} ${errorDescription}): ${validatedURL}`);
+        if (usedFallback || !splashWindow || splashWindow.isDestroyed()) return;
+        usedFallback = true;
+        splashWindow.loadURL(fallbackSplashDataUrl(theme));
     });
 
     const query = { bg: theme.bg, text: theme.text, accent: theme.accent };
