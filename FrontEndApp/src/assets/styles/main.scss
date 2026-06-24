@@ -487,6 +487,66 @@ body.theme-bg-amethyst .opacity-80 {
     color: var(--theme-text-soft);
 }
 
+/* Brand default dark background (irisdark) — same naive-ui component treatment
+   as the enumerated custom background themes above, generated for the brand key
+   so the long selector lists don't need editing. (The light Default reuses the
+   plain 'light'/'default' background, so it needs no block here.) */
+@each $t in irisdark {
+    body.theme-bg-#{$t} {
+        color: var(--theme-text);
+    }
+
+    body.theme-bg-#{$t} .n-layout,
+    body.theme-bg-#{$t} .n-layout-scroll-container {
+        background-color: var(--theme-bg-main) !important;
+        color: var(--theme-text);
+    }
+
+    body.theme-bg-#{$t} .n-layout-header,
+    body.theme-bg-#{$t} .n-layout-footer,
+    body.theme-bg-#{$t} .n-layout-sider {
+        background-color: var(--theme-bg-soft) !important;
+        color: var(--theme-text) !important;
+    }
+
+    body.theme-bg-#{$t} .n-card,
+    body.theme-bg-#{$t} .n-popover,
+    body.theme-bg-#{$t} .n-base-selection,
+    body.theme-bg-#{$t} .n-input,
+    body.theme-bg-#{$t} .n-drawer,
+    body.theme-bg-#{$t} .n-modal {
+        background-color: var(--theme-bg-elevated) !important;
+        color: var(--theme-text) !important;
+        border-color: var(--theme-border) !important;
+    }
+
+    body.theme-bg-#{$t} .n-menu-item-content,
+    body.theme-bg-#{$t} .n-menu-item-content-header,
+    body.theme-bg-#{$t} .n-menu-item-content__icon {
+        color: var(--theme-text) !important;
+    }
+
+    body.theme-bg-#{$t} .n-base-selection-label,
+    body.theme-bg-#{$t} .n-input__input-el,
+    body.theme-bg-#{$t} .n-button {
+        color: var(--theme-text) !important;
+    }
+
+    body.theme-bg-#{$t} .opacity-70,
+    body.theme-bg-#{$t} .opacity-80 {
+        color: var(--theme-text-soft);
+    }
+}
+
+body.theme-bg-irisdark {
+    --theme-bg-main: #1a1e29;
+    --theme-bg-soft: #20242f;
+    --theme-bg-elevated: #262c3b;
+    --theme-border: #353c4e;
+    --theme-text: #e6e8f2;
+    --theme-text-soft: #9aa1b6;
+}
+
 body.theme-bg-sepia {
     --theme-bg-main: #f4eddd;
     --theme-bg-soft: #efe5d0;

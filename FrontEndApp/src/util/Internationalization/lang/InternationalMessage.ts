@@ -152,6 +152,8 @@ export interface InternationalMessageInterface {
     pine?: string;
     plum?: string;
     mono?: string;
+    gold?: string;
+    irisdark?: string;
     Presets?: string;
     customColors?: string;
     forest: string;

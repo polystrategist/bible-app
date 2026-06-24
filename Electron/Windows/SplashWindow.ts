@@ -19,7 +19,7 @@ import { createWindowState } from '../util/window';
 
 type SplashTheme = { bg?: string; text?: string; accent?: string };
 
-const DEFAULTS: Required<SplashTheme> = { bg: '#ffffff', text: '#333333', accent: '#279EFF' };
+const DEFAULTS: Required<SplashTheme> = { bg: '#f5f5f5', text: '#333333', accent: '#4A3AFF' };
 
 const SPLASH_WIDTH = 440;
 const SPLASH_HEIGHT = 320;

@@ -127,6 +127,7 @@ const message: InternationalMessageType = {
 
     // Colors
     default: 'default',
+    gold: 'gold',
     nature: 'nature',
     Nature: 'Nature',
     ocean: 'ocean',
@@ -184,6 +185,7 @@ const message: InternationalMessageType = {
     "Are You Sure You want to remove?": 'Are You Sure You want to remove?',
     "Add to Bookmark": 'Add to Bookmark',
     night: 'night',
+    irisdark: 'Default Dark',
     customize: 'customize',
     'Pick a style and color for you': 'Pick a style and color for you',
     color: 'theme primary color',
