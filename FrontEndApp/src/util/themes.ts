@@ -114,13 +114,14 @@ type themeOptionsType = {
 };
 
 export const themesOptions: themeOptionsType = {
-    // Brand accent — the app's default. Same indigo in light and dark.
+    // Brand accent — the app's default. Indigo in light; a lighter periwinkle
+    // indigo in dark so the accent stays easy on the eyes on dark surfaces.
     default: {
         dark: {
-            primaryColor: '#4A3AFF',
-            primaryColorHover: '#6B5CFF',
-            primaryColorSuppl: '#5E4FFF',
-            primaryColorPressed: '#3A2BE0',
+            primaryColor: '#9B8CFF',
+            primaryColorHover: '#B1A6FF',
+            primaryColorSuppl: '#A99BFF',
+            primaryColorPressed: '#7C6BFF',
         } as colorTypes,
         light: {
             primaryColor: '#4A3AFF',
