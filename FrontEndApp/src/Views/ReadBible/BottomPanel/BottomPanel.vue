@@ -322,14 +322,17 @@ function changePaneSizes(sizes: Array<any>) {
     flex-direction: column;
 }
 
-:deep(.take-note-tabs .n-tabs-pane-wrapper) {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+/* card-type tabs aren't animated, so naive-ui renders no `.n-tabs-pane-wrapper`;
+   the panes are direct flex children of `.n-tabs`. Constrain them here so the
+   active pane fills the remaining height and scrolls internally (tab nav stays pinned). */
+:deep(.take-note-tabs .n-tabs-nav) {
+    flex-shrink: 0;
 }
 
 :deep(.take-note-tabs .n-tab-pane) {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
     padding: 0;
 }
 </style>

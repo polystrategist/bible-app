@@ -5,10 +5,12 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMenuStore } from '../../store/menu';
 import { useFeedbackModalStore } from '../../store/feedbackModalStore';
+import { useKeyboardShortcutsModalStore } from '../../store/keyboardShortcutsModalStore';
 
 const { t } = useI18n();
 const menuStore = useMenuStore();
 const feedbackModal = useFeedbackModalStore();
+const keyboardShortcutsModal = useKeyboardShortcutsModalStore();
 const show = ref(false);
 
 function navigate(path: string) {
@@ -24,6 +26,11 @@ function open(url: string) {
 function openFeedback() {
     show.value = false;
     feedbackModal.show();
+}
+
+function openKeyboardShortcuts() {
+    show.value = false;
+    keyboardShortcutsModal.show();
 }
 </script>
 <template>
@@ -48,6 +55,9 @@ function openFeedback() {
         <div class="flex flex-col p-2">
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="navigate('/help-portal')">
                 📖&nbsp; {{ t('Help Portal') }}
+            </NButton>
+            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="openKeyboardShortcuts">
+                ⌨️&nbsp; {{ t('Keyboard Shortcuts') }}
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://believersword.com')">
                 🌐&nbsp; {{ t('Visit Website') }}

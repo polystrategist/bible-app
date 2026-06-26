@@ -251,6 +251,7 @@ export interface InternationalMessageInterface {
     "Logged Out"?: string;
     "Are you sure you want to logout?"?: string;
     "Help Portal"?: string;
+    "Keyboard Shortcuts"?: string;
     "Visit Website"?: string;
     "Release Notes"?: string;
     "Type a word above to see its definition"?: string;

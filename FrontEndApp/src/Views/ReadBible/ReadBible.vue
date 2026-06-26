@@ -84,7 +84,7 @@ onBeforeMount(() => {
                     </div>
                 </Pane>
                 <Pane
-                    class="relative !overflow-auto"
+                    class="relative !overflow-hidden"
                     :size="noteStore.showNote ? verseViewPaneSizes[1].size : 0"
                     :min-size="verseViewPaneSizes[1].min"
                     :max-size="verseViewPaneSizes[1].max"

@@ -79,7 +79,7 @@ onMounted(() => load());
             </span>
         </div>
 
-        <NSpin :show="crossRefStore.isLoading" class="flex-1 min-h-0" content-class="h-full">
+        <div class="flex-1 min-h-0 relative">
             <NScrollbar class="h-full">
                 <NEmpty
                     v-if="!crossRefStore.isLoading && !crossRefStore.references.length"
@@ -88,7 +88,7 @@ onMounted(() => load());
                     class="py-4"
                 />
 
-                <div class="flex flex-wrap gap-1.5 pr-1">
+                <div class="flex flex-wrap gap-1.5 pr-1 pb-3">
                     <NPopover
                         v-for="(ref, index) in crossRefStore.references"
                         :key="index"
@@ -148,6 +148,13 @@ onMounted(() => load());
                     </NPopover>
                 </div>
             </NScrollbar>
-        </NSpin>
+
+            <div
+                v-if="crossRefStore.isLoading"
+                class="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-dark-800/60"
+            >
+                <NSpin size="small" />
+            </div>
+        </div>
     </div>
 </template>
