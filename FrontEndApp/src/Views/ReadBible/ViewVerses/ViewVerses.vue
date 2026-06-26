@@ -659,8 +659,14 @@ function handleVerseMouseDown(event: MouseEvent, verseNum: number) {
     bibleStore.setActiveVerse(verseNum);
 }
 
+const verseSelectorRef = ref<{ open: () => void } | null>(null);
+
 function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Escape') clearVerseSelection();
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
+        event.preventDefault();
+        verseSelectorRef.value?.open();
+    }
 }
 
 function deleteClipNote(args: { book_number: number; chapter: number; verse: number }) {
@@ -810,7 +816,7 @@ onUnmounted(() => {
                         "
                     />
                 </div>
-                <VerseSelector circle>
+                <VerseSelector ref="verseSelectorRef" circle>
                     <NIcon
                         size="25"
                         :component="themeStore.isDark ? SlideSearch28Filled : SlideSearch28Regular"

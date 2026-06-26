@@ -252,6 +252,7 @@ const message: InternationalMessageType = {
     "Logged Out": "Logged Out",
     "Are you sure you want to logout?": "Are you sure you want to logout?",
     "Help Portal": "Help Portal",
+    "Keyboard Shortcuts": "Keyboard Shortcuts",
     "Visit Website": "Visit Website",
     "Release Notes": "Release Notes",
     "Type a word above to see its definition": "Type a word above to see its definition",
