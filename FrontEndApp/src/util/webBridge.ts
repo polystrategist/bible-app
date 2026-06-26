@@ -471,6 +471,13 @@ const stub: Window['browserWindow'] = {
     fpGetSolvedLevelIds: async () => [],
     fpMarkLevelSolved: async () => { /* no-op */ },
     fpGetImagesBasePath: async () => '',
+
+    // ---------- Encouragement reminders (desktop-only; no-op on web) ----------
+    getReminderEnabled: async () => false,
+    setReminderEnabled: async (value: boolean) => { warnOnce('setReminderEnabled'); return value; },
+    getReminderAutoStart: async () => false,
+    setReminderAutoStart: async (value: boolean) => { warnOnce('setReminderAutoStart'); return value; },
+    reminderRecordActivity: async () => { /* no-op on web — no tray/scheduler */ },
 };
 
 export function installWebBridge() {

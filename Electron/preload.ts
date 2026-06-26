@@ -227,4 +227,11 @@ contextBridge.exposeInMainWorld('browserWindow', {
     fpGetSolvedLevelIds: () => ipcRenderer.invoke('fp:getSolvedLevelIds'),
     fpMarkLevelSolved: (levelId: number) => ipcRenderer.invoke('fp:markLevelSolved', levelId),
     fpGetImagesBasePath: () => ipcRenderer.invoke('fp:getImagesBasePath'),
+
+    // Encouragement reminders
+    getReminderEnabled: () => ipcRenderer.invoke('reminders:get-enabled'),
+    setReminderEnabled: (value: boolean) => ipcRenderer.invoke('reminders:set-enabled', value),
+    getReminderAutoStart: () => ipcRenderer.invoke('reminders:get-autostart'),
+    setReminderAutoStart: (value: boolean) => ipcRenderer.invoke('reminders:set-autostart', value),
+    reminderRecordActivity: () => ipcRenderer.invoke('reminders:record-activity'),
 });

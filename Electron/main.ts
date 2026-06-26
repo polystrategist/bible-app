@@ -12,6 +12,9 @@ import { createWindowState, attachWindowStateManager, saveWindowState } from './
 import { clearBibleVersionCache } from './Modules/Bible/Common/BibleVersionCache';
 import { registerGameImagesScheme, registerGameImagesProtocol } from './util/gameImagesProtocol';
 import { createSplashWindow, closeSplash } from './Windows/SplashWindow';
+import { startedHidden } from './util/autoLaunch';
+import { createAppTray } from './util/appTray';
+import { startReminderScheduler, recordActivity, getReminderEnabled, applyAutoLaunch } from './Reminders/ReminderScheduler';
 
 // Custom scheme registration must happen before app `ready`.
 registerGameImagesScheme();
@@ -27,6 +30,11 @@ setupPortableMode();
 // splash has been visible for at least its minimum duration.
 let splashShownAt = 0;
 const MIN_SPLASH_MS = 3000;
+
+// Tracks the live main window so the tray can re-show it, and whether the user
+// chose a real Quit (vs. close-to-tray, which keeps the app alive for reminders).
+let currentWindow: BrowserWindow | null = null;
+let isQuiting = false;
 
 async function createWindow() {
     const savedScale = Number(appConfig.get('setting.appScale', 1));
@@ -71,6 +79,20 @@ async function createWindow() {
 
     // Tracks resize, move, close and persists window state automatically
     attachWindowStateManager(mainWindow, windowState);
+
+    // Expose the live window to the tray / show helpers.
+    currentWindow = mainWindow;
+    mainWindow.on('closed', () => {
+        if (currentWindow === mainWindow) currentWindow = null;
+    });
+    // Close-to-tray: keep the app alive so reminders can fire, unless the user
+    // explicitly chose Quit (tray menu sets isQuiting) or reminders are off.
+    mainWindow.on('close', (e) => {
+        if (!isQuiting && getReminderEnabled()) {
+            e.preventDefault();
+            mainWindow.hide();
+        }
+    });
 
     // Ensure a single instance of the app
     const gotTheLock = app.requestSingleInstanceLock();
@@ -127,6 +149,30 @@ async function createWindow() {
     await mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, './index.html')}`);
 }
 
+// Re-show the main window (recreating it if it was destroyed), e.g. from the tray.
+async function showMainWindow() {
+    if (!currentWindow || currentWindow.isDestroyed()) {
+        await createWindow();
+    }
+    if (currentWindow) {
+        if (currentWindow.isMinimized()) currentWindow.restore();
+        currentWindow.show();
+        currentWindow.focus();
+    }
+}
+
+// Fully quit (bypasses close-to-tray).
+function quitApp() {
+    isQuiting = true;
+    app.quit();
+}
+
+// Reveal the existing window when the app is launched a second time.
+app.on('second-instance', () => {
+    recordActivity();
+    void showMainWindow();
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -137,10 +183,15 @@ app.whenReady().then(async () => {
         return;
     }
 
+    // When auto-started at login, stay in the tray without flashing the UI.
+    const launchedHidden = startedHidden();
+
     // Show the loading splash immediately — before DB setup and before the main window
     // loads — so the whole startup is covered instead of a blank screen.
-    createSplashWindow();
-    splashShownAt = Date.now();
+    if (!launchedHidden) {
+        createSplashWindow();
+        splashShownAt = Date.now();
+    }
 
     if (isDev) {
         try {
@@ -167,6 +218,18 @@ app.whenReady().then(async () => {
     registerGameImagesProtocol();
 
     await createWindow();
+    if (launchedHidden) currentWindow?.hide();
+
+    // Reminders: mirror the settings to the OS login-item, create the tray, and
+    // start the inactivity scheduler so nudges fire even when the window is hidden.
+    applyAutoLaunch();
+    const trayIcon = (isDev || isBeta)
+        ? path.join('assets', 'icon.ico')
+        : path.join(__dirname, 'assets', 'icon.ico');
+    createAppTray({ iconPath: trayIcon, onOpen: showMainWindow, onQuit: quitApp });
+    startReminderScheduler();
+    app.on('browser-window-focus', () => recordActivity());
+
     app.on('activate', function () {
         // On macOS, it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
@@ -178,11 +241,14 @@ app.whenReady().then(async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        // Clean up Bible version cache to prevent memory leaks
-        clearBibleVersionCache();
-        app.quit();
-    }
+    // Clean up Bible version cache to prevent memory leaks
+    clearBibleVersionCache();
+    // macOS keeps apps alive by convention.
+    if (process.platform === 'darwin') return;
+    // Stay alive in the tray while reminders are on (unless the user chose Quit),
+    // so inactivity nudges can still fire after the window is closed.
+    if (getReminderEnabled() && !isQuiting) return;
+    app.quit();
 });
 
 // Clean up resources before quitting
