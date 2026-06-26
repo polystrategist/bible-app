@@ -104,7 +104,7 @@ watch(
                         class="absolute left-0 top-0 bottom-0 w-[2px] bg-[var(--primary-color)] transition-opacity duration-150"
                         :class="selectedHighlight == highlight.key ? 'opacity-100' : 'opacity-0'"
                     ></div>
-                    <div class="w-full px-3 py-1 relative">
+                    <div class="w-full min-w-0 px-3 py-1 relative">
                         <div class="flex items-center gap-6px font-700">
                             <span
                                 class="inline-block w-10px h-10px rounded-full flex-shrink-0"

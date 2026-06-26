@@ -79,7 +79,7 @@ onMounted(() => load());
             </span>
         </div>
 
-        <NSpin :show="crossRefStore.isLoading" class="flex-1 min-h-0">
+        <NSpin :show="crossRefStore.isLoading" class="flex-1 min-h-0" content-class="h-full">
             <NScrollbar class="h-full">
                 <NEmpty
                     v-if="!crossRefStore.isLoading && !crossRefStore.references.length"

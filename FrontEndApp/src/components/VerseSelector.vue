@@ -2,7 +2,7 @@
 import { NButton, NModal, NCard, NInput } from 'naive-ui';
 import { useBibleStore } from './../store/BibleStore';
 import { bibleBooks, BookInfo } from '../util/books';
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { useSettingStore } from '../store/settingStore';
 
 const settings = useSettingStore();
@@ -75,6 +75,15 @@ function selectVerse(verse: number) {
 function resetSearch() {
     searchQuery.value = '';
 }
+
+const searchInputRef = ref<InstanceType<typeof NInput> | null>(null);
+
+function open() {
+    showOuter.value = true;
+    nextTick(() => searchInputRef.value?.focus());
+}
+
+defineExpose({ open });
 </script>
 <template>
     <NButton @click="showOuter = true" :quaternary="props.quaternary" :size="props.size as any" :circle="props.circle" :title="title">
@@ -86,10 +95,11 @@ function resetSearch() {
     <NModal v-model:show="showOuter" @update:show="(val) => !val && resetSearch()">
         <NCard style="width: 600px; max-height: 80vh;" title="Select Bible" class="my-30px" content-style="max-height: calc(80vh - 110px); overflow-y: auto; padding: 16px;">
             <template #header-extra>
-                <NInput 
-                    v-model:value="searchQuery" 
-                    type="text" 
-                    placeholder="Search books..." 
+                <NInput
+                    ref="searchInputRef"
+                    v-model:value="searchQuery"
+                    type="text"
+                    placeholder="Search books..."
                     style="width: 200px"
                     clearable
                 />

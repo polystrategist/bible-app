@@ -12,3 +12,5 @@ settings.local.json
 .claude/settings.local.json
 **/.venv
 dist-web
+combined.log
+error.log
