@@ -413,12 +413,28 @@ const strongsPopover = ref<{
     below: boolean;
     loading: boolean;
     entry: any | null;
-}>({ show: false, x: 0, y: 0, below: false, loading: false, entry: null });
+    maxHeight: number;
+}>({ show: false, x: 0, y: 0, below: false, loading: false, entry: null, maxHeight: 320 });
 
 let strongsRequestId = 0;
-// The <s> badge the popover is currently anchored to, so clicking the same
-// badge again toggles it closed (clicking a different badge moves it instead).
+// The Strong's word the popover is currently anchored to, so clicking the same
+// word again toggles it closed (clicking a different word moves it instead).
 let activeStrongsEl: HTMLElement | null = null;
+
+// Reading-first lexicon affordance: replace each "word<s>NNN</s>" with the bare
+// word wrapped in a clickable, dotted-underlined span (the number is dropped
+// from view — it still appears in the popover header). The optional middle group
+// handles red-letter words where a closing tag (e.g. </j>) sits between the word
+// and its <s> tag, and search-highlight wrappers (</span>) — the tag is consumed
+// and re-emitted so nesting stays valid.
+function wrapStrongsWords(html: string): string {
+    if (!html) return html;
+    return html.replace(
+        /([^\s<>]+)((?:<\/[a-zA-Z]+>)?)<[sS]>\s*(\d+)\s*<\/[sS]>/g,
+        (_m, word, closeTag, num) =>
+            `<span class="strongs-word" data-strong="${num}">${word}</span>${closeTag}`,
+    );
+}
 
 function closeStrongsPopover() {
     strongsPopover.value.show = false;
@@ -430,10 +446,12 @@ function closeStrongsPopover() {
 
 function onStrongsOutsideClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    // Keep open when interacting inside the popover (scroll, select text) or
-    // when clicking another <s> (re-handled by handleStrongsMouseDown).
+    // Keep open when interacting inside the popover (scroll, select text).
     if (target?.closest?.('.strongs-tooltip')) return;
-    if (target?.closest?.('s')) return;
+    // A LEFT-click on another Strong's word is re-handled by
+    // handleStrongsMouseDown (toggle/move), so don't close here. Any other button
+    // (e.g. right-click for the context menu) dismisses the popover.
+    if (event.button === 0 && target?.closest?.('.strongs-word')) return;
     closeStrongsPopover();
 }
 
@@ -445,45 +463,58 @@ function onStrongsScroll(event: Event) {
     closeStrongsPopover();
 }
 
-// Verse selection fires on mousedown (handleVerseMouseDown), which adds
-// .the-selected-verse and hides the <s> badge before a click can land — so the
-// badge must be handled on mousedown too, stopping propagation so the tap
-// neither selects the verse nor hides the badge.
+// A Strong's word is a plain-click target on mousedown: it opens the lexicon and
+// stops propagation so the click doesn't also set the active verse. Modifier
+// clicks (Ctrl/Cmd/Shift) are let through untouched so multi-select and range
+// selection still work on tagged words; plain text falls through to normal verse
+// selection.
 async function handleStrongsMouseDown(event: MouseEvent, verse: any) {
     if (!settingStore.showStrongsNumbers) return;
+    // Left-click only — let right/middle click fall through to the context menu.
+    if (event.button !== 0) return;
+    // Let multi-select / range-select pass through to handleVerseMouseDown.
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
 
     const target = event.target as HTMLElement;
-    const strongsEl = target?.closest?.('s') as HTMLElement | null;
+    const strongsEl = target?.closest?.('.strongs-word') as HTMLElement | null;
     if (!strongsEl) return; // plain text → let normal verse selection happen
 
     event.preventDefault();
     event.stopPropagation();
 
-    // Toggle: clicking the same badge again closes the open popover.
+    // Toggle: clicking the same word again closes the open popover.
     if (strongsPopover.value.show && activeStrongsEl === strongsEl) {
         closeStrongsPopover();
         return;
     }
 
-    const raw = (strongsEl.textContent ?? '').replace(/\D/g, '');
+    const raw = (strongsEl.dataset.strong ?? '').replace(/\D/g, '');
     if (!raw) return;
 
     const prefix = Number(verse.book_number) >= 470 ? 'G' : 'H';
     const key = `${prefix}${raw}`;
 
     const rect = strongsEl.getBoundingClientRect();
-    // Flip below the badge when it sits too near the top to show the popover
-    // above it (e.g. the first verse of a chapter).
-    const below = rect.top < 170;
+    // Place the popover on whichever side of the badge has more room, and cap
+    // its height to that space so a long definition scrolls internally instead
+    // of overflowing past the viewport edge.
+    const margin = 12; // keep this far from the viewport's top/bottom
+    const gap = 8; // distance between the badge and the popover
+    const chrome = 24; // popover padding + arrow allowance
+    const spaceAbove = rect.top - margin - gap;
+    const spaceBelow = window.innerHeight - rect.bottom - margin - gap;
+    const below = spaceBelow > spaceAbove;
+    const maxHeight = Math.max(120, Math.min(320, (below ? spaceBelow : spaceAbove) - chrome));
     const requestId = ++strongsRequestId;
     activeStrongsEl = strongsEl;
     strongsPopover.value = {
         show: true,
         x: rect.left + rect.width / 2,
-        y: below ? rect.bottom + 8 : rect.top - 8,
+        y: below ? rect.bottom + gap : rect.top - gap,
         below,
         loading: true,
         entry: null,
+        maxHeight,
     };
 
     window.addEventListener('mousedown', onStrongsOutsideClick, true);
@@ -1157,7 +1188,7 @@ onUnmounted(() => {
                                                     :data-key="verse.version[paneIndex].key"
                                                     :data-verse="verse.verse"
                                                     class="verse-select-text input-text-search"
-                                                    v-html="verse.version[paneIndex].text"
+                                                    v-html="settingStore.showStrongsNumbers ? wrapStrongsWords(verse.version[paneIndex].text) : verse.version[paneIndex].text"
                                                     @mouseover="handleFootnoteHover($event, verse.version[paneIndex], verse)"
                                                     @mouseleave="footnotePopover.show = false"
                                                     @mousedown="handleStrongsMouseDown($event, verse)"
@@ -1333,6 +1364,7 @@ onUnmounted(() => {
             :below="strongsPopover.below"
             :loading="strongsPopover.loading"
             :entry="strongsPopover.entry"
+            :max-height="strongsPopover.maxHeight"
             :font-size="fontSize"
         />
     </div>

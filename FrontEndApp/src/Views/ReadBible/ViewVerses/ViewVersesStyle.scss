@@ -70,28 +70,25 @@
         display: none;
     }
 
-    // Reveal Strong's numbers when the reader setting is enabled, as a quiet
-    // tonal superscript (no box) that recedes until hovered. The second
-    // selector keeps them visible on a selected verse, which otherwise hides
-    // <s> via `.the-selected-verse s { display: none !important }`.
-    &.show-strongs s,
-    &.show-strongs .the-selected-verse s {
-        display: inline-block !important;
-        vertical-align: super;
-        font-size: 0.62em !important; // scales with the verse font
-        font-weight: 600;
-        line-height: 1;
-        border: none !important;
-        background: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        margin: 0 1px 0 0 !important;
-        color: var(--primary-color) !important;
-        opacity: 0.6;
-        transition: opacity 0.12s ease;
+    // Reading-first lexicon affordance: when Strong's is enabled the numbers are
+    // dropped entirely (wrapStrongsWords in ViewVerses.vue rewrites
+    // "word<s>NNN</s>" → a .strongs-word span and discards the <s>). Each tagged
+    // word gets a quiet dotted underline that recedes into the text until
+    // hovered; the word itself is the click target for the lexicon popover.
+    &.show-strongs .strongs-word {
+        text-decoration: underline dotted;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+        // Muted by default so a Strong's-heavy page reads like Scripture; the
+        // color-mix recedes the line, with a plain-primary fallback for engines
+        // without color-mix support.
+        text-decoration-color: var(--primary-color);
+        text-decoration-color: color-mix(in srgb, var(--primary-color) 45%, transparent);
+        cursor: pointer;
+        transition: text-decoration-color 0.12s ease;
 
         &:hover {
-            opacity: 1;
+            text-decoration-color: var(--primary-color);
         }
     }
 

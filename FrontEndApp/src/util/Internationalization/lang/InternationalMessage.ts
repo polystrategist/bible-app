@@ -178,6 +178,7 @@ export interface InternationalMessageInterface {
     'strongs-definition'?: string;
     'strongs-kjv-usage'?: string;
     'strongs-not-found'?: string;
+    'strongs-loading'?: string;
     'Submit Sermon': string;
     Submit: string;
 

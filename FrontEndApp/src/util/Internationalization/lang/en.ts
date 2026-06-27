@@ -180,6 +180,7 @@ const message: InternationalMessageType = {
     'strongs-definition': 'Definition',
     'strongs-kjv-usage': 'KJV usage',
     'strongs-not-found': "No Strong's entry found",
+    'strongs-loading': "Loading Strong's entry",
     "Submit Sermon": 'Submit Sermon',
     Submit: 'Submit',
     "Create Clip Note": 'Create Clip Note',

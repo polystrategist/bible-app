@@ -138,6 +138,43 @@ function warnOnce(method: string) {
     console.warn(`[webBridge] ${method} is not implemented on web — returning a stub.`);
 }
 
+/**
+ * Persisted cache for Strong's lexicon lookups (web only).
+ *
+ * Entries are static public-domain data, so each successful lookup is kept in
+ * localStorage for a few days. Reopening the same Strong's popover then serves
+ * straight from the cache instead of re-hitting the API. Desktop doesn't use
+ * this — it reads its bundled SQLite DB over IPC.
+ */
+const STRONGS_CACHE_PREFIX = 'strongs-cache:';
+const STRONGS_CACHE_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+function readStrongsCache(key: string): unknown | undefined {
+    try {
+        const raw = localStorage.getItem(STRONGS_CACHE_PREFIX + key);
+        if (!raw) return undefined;
+        const parsed = JSON.parse(raw) as { v: unknown; exp: number };
+        if (!parsed || typeof parsed.exp !== 'number' || Date.now() > parsed.exp) {
+            localStorage.removeItem(STRONGS_CACHE_PREFIX + key);
+            return undefined;
+        }
+        return parsed.v;
+    } catch {
+        return undefined; // unparseable or localStorage unavailable
+    }
+}
+
+function writeStrongsCache(key: string, value: unknown): void {
+    try {
+        localStorage.setItem(
+            STRONGS_CACHE_PREFIX + key,
+            JSON.stringify({ v: value, exp: Date.now() + STRONGS_CACHE_TTL_MS }),
+        );
+    } catch {
+        /* localStorage full or unavailable (e.g. private mode) — caching is best-effort */
+    }
+}
+
 const stub: Window['browserWindow'] = {
     // ---------- Window / OS ----------
     versions: async () => ({
@@ -338,8 +375,24 @@ const stub: Window['browserWindow'] = {
     searchDictionary: async () => [],
     getDefinitions: async () => [],
 
-    // ---------- Strong's lexicon (desktop-only DB; no-op on web) ----------
-    getStrongsDefinition: async () => null,
+    // ---------- Strong's lexicon ----------
+    // Backed by the public /api/bible/strongs/{number} endpoint (same strongs.db
+    // the desktop bundles). Successful lookups are cached in localStorage for a
+    // few days so repeat clicks don't re-hit the API. Returns the entry or null.
+    getStrongsDefinition: async (strongNumber: string) => {
+        const key = String(strongNumber ?? '').trim().toUpperCase();
+        if (!/^[GH]\d+$/.test(key)) return null;
+
+        const cached = readStrongsCache(key);
+        if (cached !== undefined) return cached as any;
+
+        const entry = await apiFetch(`/bible/strongs/${encodeURIComponent(key)}`, null);
+        // Only cache real hits. apiFetch collapses network/HTTP errors into the
+        // null fallback, so persisting null could pin a transient failure for
+        // days; a genuine "not found" just re-checks cheaply next time.
+        if (entry) writeStrongsCache(key, entry);
+        return entry;
+    },
 
     // ---------- Piper TTS (drop on web — Web Speech API fallback) ----------
     piperStatus: async () => ({ binaryReady: false, modelReady: false, modelName: '' }),

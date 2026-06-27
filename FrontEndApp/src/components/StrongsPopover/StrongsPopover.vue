@@ -18,6 +18,9 @@ interface Props {
     loading?: boolean;
     entry: StrongsEntry | null;
     fontSize: number;
+    // Max height (px) for the scrollable body, sized to the available space
+    // above/below the badge so the popover never overflows the viewport.
+    maxHeight?: number;
 }
 
 defineProps<Props>();
@@ -32,8 +35,25 @@ defineProps<Props>();
                 :class="{ 'strongs-below': below }"
                 :style="{ top: `${y}px`, left: `${x}px`, fontSize: `${fontSize}px` }"
             >
-                <div class="strongs-tooltip-body">
-                    <div v-if="loading" class="strongs-loading">…</div>
+                <div
+                    class="strongs-tooltip-body"
+                    :style="maxHeight ? { maxHeight: `${maxHeight}px` } : undefined"
+                >
+                    <div
+                        v-if="loading"
+                        class="strongs-skeleton"
+                        role="status"
+                        :aria-label="$t('strongs-loading')"
+                    >
+                        <div class="strongs-sk-header">
+                            <span class="strongs-sk strongs-sk-number"></span>
+                            <span class="strongs-sk strongs-sk-lemma"></span>
+                        </div>
+                        <span class="strongs-sk strongs-sk-translit"></span>
+                        <span class="strongs-sk strongs-sk-line w90"></span>
+                        <span class="strongs-sk strongs-sk-line w70"></span>
+                        <span class="strongs-sk strongs-sk-line w55"></span>
+                    </div>
 
                     <template v-else-if="entry">
                         <div class="strongs-header">
@@ -143,10 +163,89 @@ defineProps<Props>();
     opacity: 0.85;
 }
 
-.strongs-empty,
-.strongs-loading {
+.strongs-empty {
     opacity: 0.6;
     font-style: italic;
+}
+
+/* Loading skeleton — bars echo the eventual entry layout (number + lemma,
+   transliteration, definition lines) so the popover keeps a stable size and
+   reads as loading rather than blank. */
+.strongs-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 170px;
+    padding: 2px 0;
+}
+
+.strongs-sk-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.strongs-sk {
+    display: block;
+    border-radius: 4px;
+    /* currentColor = the popover's theme text color, so the shimmer adapts to
+       both light and dark themes without hard-coded colors. */
+    background: linear-gradient(
+        90deg,
+        color-mix(in srgb, currentColor 9%, transparent) 25%,
+        color-mix(in srgb, currentColor 20%, transparent) 37%,
+        color-mix(in srgb, currentColor 9%, transparent) 63%
+    );
+    background-size: 400% 100%;
+    animation: strongs-shimmer 1.3s ease-in-out infinite;
+}
+
+.strongs-sk-number {
+    width: 34px;
+    height: 11px;
+}
+
+.strongs-sk-lemma {
+    width: 64px;
+    height: 15px;
+}
+
+.strongs-sk-translit {
+    width: 45%;
+    height: 10px;
+}
+
+.strongs-sk-line {
+    height: 9px;
+}
+
+.strongs-sk-line.w90 {
+    width: 90%;
+}
+
+.strongs-sk-line.w70 {
+    width: 70%;
+}
+
+.strongs-sk-line.w55 {
+    width: 55%;
+}
+
+@keyframes strongs-shimmer {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .strongs-sk {
+        animation: none;
+        background: color-mix(in srgb, currentColor 12%, transparent);
+    }
 }
 
 .strongs-tooltip-arrow {
