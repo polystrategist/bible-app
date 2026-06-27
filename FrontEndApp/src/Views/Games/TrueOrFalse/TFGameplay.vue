@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { NButton } from 'naive-ui';
 import { useGamesStore } from '../../../store/useGamesStore';
 import { formatProofReference } from '../../../util/books';
+import { stripVerseHtml } from '../../../util/helper';
 
 const emit = defineEmits<{ back: []; exit: [] }>();
 const store = useGamesStore();
@@ -98,7 +99,7 @@ function tfBtnProps(isTrue: boolean) {
             <template v-if="store.gameState === 'answered'">
                 <div v-if="statement.proof || statement.explanation" class="text-sm text-[var(--theme-text)] bg-[var(--theme-bg-soft)] p-3 rounded-xl border border-[var(--theme-border)] space-y-1">
                     <p v-if="statement.proof" class="font-medium text-[var(--theme-text-soft)]">{{ formatProofReference(statement.proof) }}</p>
-                    <p v-if="statement.explanation">{{ statement.explanation }}</p>
+                    <p v-if="statement.explanation">{{ stripVerseHtml(statement.explanation) }}</p>
                 </div>
                 <NButton block size="large" :color="ACCENT" :focusable="false" @click="store.nextTFQuestion()">
                     {{ store.currentIndex + 1 >= store.totalItems ? 'Finish' : 'Next' }}

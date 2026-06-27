@@ -1,22 +1,58 @@
-import { ipcMain, BrowserWindow, app } from 'electron';
+import { ipcMain, BrowserWindow, app, screen } from 'electron';
 import { isDev, isBeta } from '../config';
 import path from 'path';
 import fs from 'fs';
 import { getBibleVersionDb } from '../Modules/Bible/Common/BibleVersionCache';
 
+const COMPARE_WIN_WIDTH = 520;
+const COMPARE_WIN_HEIGHT = 680;
+
+/**
+ * Position the Compare Verse window centered over the window that opened it, so
+ * it appears on the same monitor as the main window. Clamped to that display's
+ * work area so it never lands partially off-screen.
+ */
+const positionOverParent = (
+    parent: BrowserWindow | null
+): { x: number; y: number } | undefined => {
+    if (!parent || parent.isDestroyed()) return undefined;
+    const pb = parent.getBounds();
+    const { workArea } = screen.getDisplayMatching(pb);
+
+    const centeredX = Math.round(pb.x + (pb.width - COMPARE_WIN_WIDTH) / 2);
+    const centeredY = Math.round(pb.y + (pb.height - COMPARE_WIN_HEIGHT) / 2);
+
+    return {
+        x: Math.max(
+            workArea.x,
+            Math.min(centeredX, workArea.x + workArea.width - COMPARE_WIN_WIDTH)
+        ),
+        y: Math.max(
+            workArea.y,
+            Math.min(centeredY, workArea.y + workArea.height - COMPARE_WIN_HEIGHT)
+        ),
+    };
+};
+
 export const CompareVerseIpcEvents = () => {
     ipcMain.handle(
         'compareVerse:open',
         async (
-            _event,
+            event,
             args: { book_number: number; chapter: number; verse: number; book_name: string }
         ) => {
             let iconPath = path.join(__dirname, 'assets', 'icon.ico');
             if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
+            const position = positionOverParent(
+                BrowserWindow.fromWebContents(event.sender)
+            );
+
             const win = new BrowserWindow({
-                width: 520,
-                height: 680,
+                width: COMPARE_WIN_WIDTH,
+                height: COMPARE_WIN_HEIGHT,
+                x: position?.x,
+                y: position?.y,
                 minWidth: 350,
                 minHeight: 420,
                 frame: false,

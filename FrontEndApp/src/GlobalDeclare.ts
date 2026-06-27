@@ -351,6 +351,13 @@ declare global {
             fpGetSolvedLevelIds: () => Promise<number[]>;
             fpMarkLevelSolved: (levelId: number) => Promise<void>;
             fpGetImagesBasePath: () => Promise<string>;
+
+            // Encouragement reminders
+            getReminderEnabled: () => Promise<boolean>;
+            setReminderEnabled: (value: boolean) => Promise<boolean>;
+            getReminderAutoStart: () => Promise<boolean>;
+            setReminderAutoStart: (value: boolean) => Promise<boolean>;
+            reminderRecordActivity: () => Promise<void>;
         };
     }
 }

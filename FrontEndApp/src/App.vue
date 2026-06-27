@@ -16,7 +16,7 @@ import { useMenuStore } from './store/menu';
 import { usePrayerStreakStore } from './store/prayerStreakStore';
 import { useDevotionStreakStore } from './store/devotionStreakStore';
 import { useNavBadgesStore } from './store/navBadgesStore';
-import { onBeforeMount, onMounted, ref, watch, h } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, ref, watch, h } from 'vue';
 import { useThemeStore } from './store/theme';
 import TitleBar from './components/TitleBar/TitleBar.vue';
 import Sermons from './Views/Sermons/Sermons.vue';
@@ -114,7 +114,19 @@ onMounted(async () => {
     void prayerStreak.loadDays();
     void devotionStreak.loadDays();
 
+    // Count opening/focusing the app as activity so reminders reset.
+    pingReminderActivity();
+    window.addEventListener('focus', pingReminderActivity);
+
     isMounted.value = true;
+});
+
+const pingReminderActivity = () => {
+    void window.browserWindow?.reminderRecordActivity?.();
+};
+
+onBeforeUnmount(() => {
+    window.removeEventListener('focus', pingReminderActivity);
 });
 </script>
 <template>

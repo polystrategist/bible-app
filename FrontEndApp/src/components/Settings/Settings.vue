@@ -10,6 +10,7 @@ import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
 import Scale from './Scale/Scale.vue';
 import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
 import Updates from './General/Updates.vue';
+import Notifications from './Notifications/Notifications.vue';
 import BibleSetting from './Bible/BibleSetting.vue';
 import { Icon } from '@iconify/vue';
 import { useMainStore } from '../../store/main';
@@ -42,6 +43,7 @@ const name = computed({
                         <Scale />
                         <SyncData />
                         <Deuterocanonical />
+                        <Notifications />
                         <Updates />
                     </div>
                 </NTabPane>

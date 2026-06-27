@@ -23,6 +23,7 @@ import AiInsights from './AiInsights/AiInsights';
 import PrayerDays from './PrayerDays/PrayerDays';
 import DevotionDays from './DevotionDays/DevotionDays';
 import Games from './Games/Games';
+import ReminderEvents from './Reminders/Reminders';
 
 export default (BrowserWindow: BrowserWindow) => {
     // Version Events
@@ -94,4 +95,7 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // Games (lives + Q&A + True/False + Four Pictures)
     Games();
+
+    // Encouragement reminders (enable/disable + activity ping)
+    ReminderEvents();
 };
