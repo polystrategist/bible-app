@@ -70,6 +70,31 @@
         display: none;
     }
 
+    // Reveal Strong's numbers when the reader setting is enabled, as a quiet
+    // tonal superscript (no box) that recedes until hovered. The second
+    // selector keeps them visible on a selected verse, which otherwise hides
+    // <s> via `.the-selected-verse s { display: none !important }`.
+    &.show-strongs s,
+    &.show-strongs .the-selected-verse s {
+        display: inline-block !important;
+        vertical-align: super;
+        font-size: 0.62em !important; // scales with the verse font
+        font-weight: 600;
+        line-height: 1;
+        border: none !important;
+        background: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 1px 0 0 !important;
+        color: var(--primary-color) !important;
+        opacity: 0.6;
+        transition: opacity 0.12s ease;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
     j {
         color: rgb(252, 84, 84);
         font-weight: 500;
@@ -98,6 +123,12 @@
         s {
             border: 1px solid rgb(71, 71, 71) !important;
             color: white !important;
+        }
+
+        // Tonal superscript wins over the dark boxed style above.
+        &.show-strongs s {
+            border: none !important;
+            color: var(--primary-color) !important;
         }
 
         j {

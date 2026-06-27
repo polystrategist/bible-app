@@ -173,6 +173,13 @@ const message: InternationalMessageType = {
     Yes: 'Yes',
     No: 'No',
     Deuterocanonical: 'Deuterocanonical',
+    'strongs-numbers': "Strong's Numbers",
+    'strongs-numbers-desc':
+        "Show tappable Strong's numbers next to words in Bibles that include them (e.g. KJV with Strong's), and view the original Hebrew/Greek lexicon entry.",
+    'strongs-derivation': 'Derivation',
+    'strongs-definition': 'Definition',
+    'strongs-kjv-usage': 'KJV usage',
+    'strongs-not-found': "No Strong's entry found",
     "Submit Sermon": 'Submit Sermon',
     Submit: 'Submit',
     "Create Clip Note": 'Create Clip Note',

@@ -39,6 +39,16 @@ export const DevotionalsDB = knex({
     },
 });
 
+// Strong's lexicon (read-only shipped content). Keyed on strong_number
+// (e.g. "G2424", "H7225"). Seeded by SetStrongsDB.ts from defaults/Main.
+export const StrongsDB = knex({
+    client: 'sqlite3',
+    useNullAsDefault: false,
+    connection: {
+        filename: dataPath + `\\StoreDB\\strongs.db`,
+    },
+});
+
 // Game content DBs (read-only seeded content). User data (lives, progress)
 // lives in StoreDB. Seeded by SetGamesDB.ts into userData\Games\.
 export const QaGamesDB = knex({

@@ -23,6 +23,7 @@ import { useMainStore } from '../../../store/main';
 import { Icon } from '@iconify/vue';
 import PiperModelsModal from '../../../components/Settings/VerseReader/PiperModelsModal.vue';
 import FootnotePopover from '../../../components/FootnotePopover/FootnotePopover.vue';
+import StrongsPopover from '../../../components/StrongsPopover/StrongsPopover.vue';
 import { useFlipbookStore } from '../../../store/flipbookStore';
 import { useModuleStore } from '../../../store/moduleStore';
 import { Splitpanes, Pane } from 'splitpanes';
@@ -400,6 +401,94 @@ async function handleFootnoteHover(event: MouseEvent, version: any, verse: any) 
         text: match.text,
     };
 }
+
+// --- Strong's numbers -------------------------------------------------------
+// The verse markup embeds bare Strong's numbers in <s> tags (e.g.
+// "God<s>430</s>"). Old Testament books (book_number < 470) are Hebrew (H),
+// the New Testament (>= 470) is Greek (G).
+const strongsPopover = ref<{
+    show: boolean;
+    x: number;
+    y: number;
+    below: boolean;
+    loading: boolean;
+    entry: any | null;
+}>({ show: false, x: 0, y: 0, below: false, loading: false, entry: null });
+
+let strongsRequestId = 0;
+
+function closeStrongsPopover() {
+    strongsPopover.value.show = false;
+    strongsPopover.value.entry = null;
+    window.removeEventListener('mousedown', onStrongsOutsideClick, true);
+    window.removeEventListener('scroll', onStrongsScroll, true);
+}
+
+function onStrongsOutsideClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    // Keep open when interacting inside the popover (scroll, select text) or
+    // when clicking another <s> (re-handled by handleStrongsMouseDown).
+    if (target?.closest?.('.strongs-tooltip')) return;
+    if (target?.closest?.('s')) return;
+    closeStrongsPopover();
+}
+
+// Close when the verse list scrolls (the popover is pinned to the badge), but
+// not when scrolling inside the popover's own body.
+function onStrongsScroll(event: Event) {
+    const target = event.target;
+    if (target instanceof Element && target.closest('.strongs-tooltip')) return;
+    closeStrongsPopover();
+}
+
+// Verse selection fires on mousedown (handleVerseMouseDown), which adds
+// .the-selected-verse and hides the <s> badge before a click can land — so the
+// badge must be handled on mousedown too, stopping propagation so the tap
+// neither selects the verse nor hides the badge.
+async function handleStrongsMouseDown(event: MouseEvent, verse: any) {
+    if (!settingStore.showStrongsNumbers) return;
+
+    const target = event.target as HTMLElement;
+    const strongsEl = target?.closest?.('s') as HTMLElement | null;
+    if (!strongsEl) return; // plain text → let normal verse selection happen
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const raw = (strongsEl.textContent ?? '').replace(/\D/g, '');
+    if (!raw) return;
+
+    const prefix = Number(verse.book_number) >= 470 ? 'G' : 'H';
+    const key = `${prefix}${raw}`;
+
+    const rect = strongsEl.getBoundingClientRect();
+    // Flip below the badge when it sits too near the top to show the popover
+    // above it (e.g. the first verse of a chapter).
+    const below = rect.top < 170;
+    const requestId = ++strongsRequestId;
+    strongsPopover.value = {
+        show: true,
+        x: rect.left + rect.width / 2,
+        y: below ? rect.bottom + 8 : rect.top - 8,
+        below,
+        loading: true,
+        entry: null,
+    };
+
+    window.addEventListener('mousedown', onStrongsOutsideClick, true);
+    window.addEventListener('scroll', onStrongsScroll, true);
+
+    try {
+        const entry = await (window as any).browserWindow.getStrongsDefinition(key);
+        if (requestId !== strongsRequestId) return; // superseded by a newer tap
+        strongsPopover.value.loading = false;
+        strongsPopover.value.entry = entry;
+    } catch (e) {
+        if (requestId !== strongsRequestId) return;
+        strongsPopover.value.loading = false;
+        strongsPopover.value.entry = null;
+    }
+}
 const message = useMessage();
 const createClipNoteRef = ref<null | { toggleClipNoteModal: Function }>(null);
 const clipNoteRender: any = (key: any) => {
@@ -662,7 +751,14 @@ function handleVerseMouseDown(event: MouseEvent, verseNum: number) {
 const verseSelectorRef = ref<{ open: () => void } | null>(null);
 
 function handleKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape') clearVerseSelection();
+    if (event.key === 'Escape') {
+        // Close the Strong's popover first, otherwise clear verse selection.
+        if (strongsPopover.value.show) {
+            closeStrongsPopover();
+            return;
+        }
+        clearVerseSelection();
+    }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
         event.preventDefault();
         verseSelectorRef.value?.open();
@@ -771,10 +867,14 @@ onUnmounted(() => {
     if (scrollSyncAnimationFrame !== null) {
         cancelAnimationFrame(scrollSyncAnimationFrame);
     }
+    closeStrongsPopover();
 });
 </script>
 <template>
-    <div class="w-full h-full show-chapter-verses flex flex-col read-bible-verses-panel">
+    <div
+        class="w-full h-full show-chapter-verses flex flex-col read-bible-verses-panel"
+        :class="{ 'show-strongs': settingStore.showStrongsNumbers }"
+    >
         <div
             class="dark:bg-dark-400 flex items-center py-6px select-none px-10px read-bible-verses-toolbar"
         >
@@ -1049,6 +1149,7 @@ onUnmounted(() => {
                                                     v-html="verse.version[paneIndex].text"
                                                     @mouseover="handleFootnoteHover($event, verse.version[paneIndex], verse)"
                                                     @mouseleave="footnotePopover.show = false"
+                                                    @mousedown="handleStrongsMouseDown($event, verse)"
                                                 ></span>
                                                 <NIcon
                                                     v-if="bookmarkStore.isBookmarkExists(`${verse.book_number}_${verse.chapter}_${verse.verse}`)"
@@ -1212,6 +1313,15 @@ onUnmounted(() => {
             :y="footnotePopover.y"
             :marker="footnotePopover.marker"
             :text="footnotePopover.text"
+            :font-size="fontSize"
+        />
+        <StrongsPopover
+            :show="strongsPopover.show"
+            :x="strongsPopover.x"
+            :y="strongsPopover.y"
+            :below="strongsPopover.below"
+            :loading="strongsPopover.loading"
+            :entry="strongsPopover.entry"
             :font-size="fontSize"
         />
     </div>

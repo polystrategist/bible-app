@@ -172,6 +172,12 @@ export interface InternationalMessageInterface {
     Yes: string;
     No: string;
     Deuterocanonical: string;
+    'strongs-numbers'?: string;
+    'strongs-numbers-desc'?: string;
+    'strongs-derivation'?: string;
+    'strongs-definition'?: string;
+    'strongs-kjv-usage'?: string;
+    'strongs-not-found'?: string;
     'Submit Sermon': string;
     Submit: string;
 

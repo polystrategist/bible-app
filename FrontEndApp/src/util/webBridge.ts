@@ -338,6 +338,9 @@ const stub: Window['browserWindow'] = {
     searchDictionary: async () => [],
     getDefinitions: async () => [],
 
+    // ---------- Strong's lexicon (desktop-only DB; no-op on web) ----------
+    getStrongsDefinition: async () => null,
+
     // ---------- Piper TTS (drop on web — Web Speech API fallback) ----------
     piperStatus: async () => ({ binaryReady: false, modelReady: false, modelName: '' }),
     piperInstall: async () => ({ success: false, error: 'Piper TTS is not available on web' }),

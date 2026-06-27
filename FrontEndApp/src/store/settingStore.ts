@@ -10,6 +10,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     const readVerseNumberKey = 'read-verse-number';
     const showLeftSidebarKey = 'show-left-sidebar';
     const showRightSidebarKey = 'show-right-sidebar';
+    const showStrongsNumbersKey = 'show-strongs-numbers';
     const showDeuterocanonical = ref(false);
     const appScale = ref(1);
     const isLoadingScale = ref(false);
@@ -18,6 +19,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     const readVerseNumber = ref<boolean>(true);
     const showLeftSidebar = ref(true);
     const showRightSidebar = ref(true);
+    const showStrongsNumbers = ref(false);
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
@@ -41,6 +43,11 @@ export const useSettingStore = defineStore('settingStore', () => {
         const savedShowRight = SESSION.get(showRightSidebarKey);
         if (savedShowRight !== null && savedShowRight !== undefined)
             showRightSidebar.value = savedShowRight !== false && savedShowRight !== 'false';
+
+        const savedShowStrongs = SESSION.get(showStrongsNumbersKey);
+        if (savedShowStrongs !== null && savedShowStrongs !== undefined)
+            showStrongsNumbers.value =
+                savedShowStrongs === true || savedShowStrongs === 'true';
 
         const savedScale = Number(SESSION.get(appScaleStorageKey));
         const fallbackScale = Number.isFinite(savedScale) ? savedScale : 1;
@@ -116,6 +123,11 @@ export const useSettingStore = defineStore('settingStore', () => {
         (val) => SESSION.set(showRightSidebarKey, val)
     );
 
+    watch(
+        () => showStrongsNumbers.value,
+        (val) => SESSION.set(showStrongsNumbersKey, val)
+    );
+
     return {
         showDeuterocanonical,
         appScale,
@@ -124,5 +136,6 @@ export const useSettingStore = defineStore('settingStore', () => {
         readVerseNumber,
         showLeftSidebar,
         showRightSidebar,
+        showStrongsNumbers,
     };
 });
