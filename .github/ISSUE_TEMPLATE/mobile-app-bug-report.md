@@ -1,5 +1,5 @@
 ---
-name: Desktop Bug report
+name: Mobile App Bug report
 about: Create a report to help us improve
 title: ''
 labels: ''
