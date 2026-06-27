@@ -154,6 +154,18 @@ declare global {
             searchDictionary: (search: string) => Promise<any>;
             getDefinitions: (word: string) => Promise<any>;
 
+            // Strong's lexicon
+            getStrongsDefinition: (strongNumber: string) => Promise<{
+                strong_number: string;
+                language: string;
+                lemma: string | null;
+                translit: string | null;
+                pronunciation: string | null;
+                derivation: string | null;
+                strongs_def: string | null;
+                kjv_def: string | null;
+            } | null>;
+
             // Piper TTS
             piperStatus: () => Promise<{ binaryReady: boolean; modelReady: boolean; modelName: string }>;
             piperInstall: () => Promise<{ success: boolean; modelName?: string; error?: string }>;

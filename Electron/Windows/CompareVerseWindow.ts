@@ -92,7 +92,9 @@ export const CompareVerseIpcEvents = () => {
 
             let availableVersions: string[] = [];
             try {
-                availableVersions = fs.readdirSync(modulesPath);
+                availableVersions = fs
+                    .readdirSync(modulesPath)
+                    .filter((f) => /\.(SQLite3|db)$/i.test(f));
             } catch {
                 return [];
             }

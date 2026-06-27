@@ -92,6 +92,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     searchDictionary: (args: any) => ipcRenderer.invoke('searchDictionary', args),
     getDefinitions: (word: string) => ipcRenderer.invoke('getDefinitions', word),
 
+    // Strong's lexicon
+    getStrongsDefinition: (strongNumber: string) =>
+        ipcRenderer.invoke('getStrongsDefinition', strongNumber),
+
     // Piper TTS
     piperStatus: () => ipcRenderer.invoke('piper:status'),
     piperInstall: () => ipcRenderer.invoke('piper:install'),

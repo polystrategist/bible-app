@@ -3,6 +3,11 @@ Scraper for ph4.org MyBible module index.
 Extracts only complete Bible entries (bgcolor="#ffffff" + <b>BIBLE</b> label)
 and outputs ph4_mybible.module.json to FrontEndApp/src/assets/json/.
 
+Each entry also records two feature flags read from the inline row markup:
+  - has_strongs:      row links "With Strong's lexicon" (href b4_my.php?qqq=s)
+  - has_red_letters:  row shows "The words of Jesus are highlighted in red"
+Rows omit these indicators when the module lacks the feature, so absence -> False.
+
 Usage:
     .venv/Scripts/python generate.py
 """
@@ -134,6 +139,17 @@ def extract_modules(html):
                 description = text
                 break
 
+        # --- feature flags (shown inline in each row when present) ---
+        # Strong's: green "With Strong's lexicon" link → href b4_my.php?qqq=s
+        has_strongs = bool(
+            row.find("a", href=re.compile(r"qqq=s"))
+            or row.find(string=re.compile(r"strong.?s lexicon", re.I))
+        )
+        # Red-letter: "The words of Jesus are highlighted in red" (red font)
+        has_red_letters = bool(
+            row.find(string=re.compile(r"words of Jesus are highlighted in red", re.I))
+        )
+
         version_short_name_and_date = f"{short_name}{year}" if year else short_name
 
         modules.append(
@@ -146,6 +162,8 @@ def extract_modules(html):
                 "language_full": current_language_full,
                 "module_type": "ph4_mybible",
                 "module_id": module_id,
+                "has_strongs": has_strongs,
+                "has_red_letters": has_red_letters,
                 "description": description,
                 "copyright": "",
                 "testament": "full",

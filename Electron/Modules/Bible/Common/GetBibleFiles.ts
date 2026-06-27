@@ -7,5 +7,7 @@ const dataPath = app.getPath('userData');
 const filePath = dataPath + `\\modules\\bible\\`;
 
 export default () => {
-    ipcMain.handle('availableBibles', () => fs.readdirSync(filePath));
+    ipcMain.handle('availableBibles', () =>
+        fs.readdirSync(filePath).filter((f) => /\.(SQLite3|db)$/i.test(f)),
+    );
 };

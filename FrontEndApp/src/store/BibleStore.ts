@@ -28,8 +28,11 @@ export const useBibleStore = defineStore('useBibleStore', () => {
         chapter_count: 50,
     });
     const clipNoteStore = useClipNoteStore();
-    const DefaultSelectedVersion = `King James Version - 1769.SQLite3`;
-    const selectedBibleVersions = ref<Array<string>>([`King James Version - 1769.SQLite3`]);
+    const DefaultSelectedVersion = `bs_KJV - 1769.SQLite3`;
+    const selectedBibleVersions = ref<Array<string>>([`bs_KJV - 1769.SQLite3`]);
+    // Old default module that has been replaced by bs_KJV - 1769 (now bundled
+    // with Strong's numbers). Persisted selections are migrated on load.
+    const deprecatedVersions = [`King James Version - 1769.SQLite3`];
     const selectedBookNumber = ref<number>(10);
     const selectedChapter = ref<number>(1);
     const selectedVerse = ref<number>(1);
@@ -197,7 +200,12 @@ export const useBibleStore = defineStore('useBibleStore', () => {
 
     onBeforeMount(async () => {
         const selectedVersions = SESSION.get(StorageSelectedVersions);
-        if (selectedVersions) selectedBibleVersions.value = selectedVersions;
+        if (selectedVersions) {
+            // Migrate any replaced default module to its bs_* successor.
+            selectedBibleVersions.value = (selectedVersions as string[]).map((v) =>
+                deprecatedVersions.includes(v) ? DefaultSelectedVersion : v,
+            );
+        }
         recallSavedChapter();
         await getVerses();
     });

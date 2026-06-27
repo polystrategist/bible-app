@@ -7,6 +7,7 @@ import Theme from './Theme/Theme.vue';
 import TabSetting from './Tabs/TabSetting.vue';
 import SyncData from './Sync/SyncData.vue';
 import Deuterocanonical from './Deuterocanonical/Deuterocanonical.vue';
+import StrongsNumbers from './StrongsNumbers/StrongsNumbers.vue';
 import Scale from './Scale/Scale.vue';
 import VerseReaderSetting from './VerseReader/VerseReaderSetting.vue';
 import Updates from './General/Updates.vue';
@@ -43,6 +44,7 @@ const name = computed({
                         <Scale />
                         <SyncData />
                         <Deuterocanonical />
+                        <StrongsNumbers />
                         <Notifications />
                         <Updates />
                     </div>

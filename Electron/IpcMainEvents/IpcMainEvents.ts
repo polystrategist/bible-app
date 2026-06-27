@@ -10,6 +10,7 @@ import { WindowOpenerIpcEvents } from '../Windows/WindowOpenerIpcEvents';
 import { CompareVerseIpcEvents } from '../Windows/CompareVerseWindow';
 import notesEvents from './notes/notesEvents';
 import dictionaries from './dictionaries/dictionaries';
+import strongs from './strongs/strongs';
 import { SyncHandlers } from './Sync/SyncHandlers';
 import { SermonHandlers } from './Sermons/SermonHandlers';
 import { PiperTTSHandlers } from './Piper/PiperTTS';
@@ -58,6 +59,9 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // dictionary events
     dictionaries();
+
+    // Strong's lexicon lookup
+    strongs();
 
     // sync handlers
     SyncHandlers(BrowserWindow);
