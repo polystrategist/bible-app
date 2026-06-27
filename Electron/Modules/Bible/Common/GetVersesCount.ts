@@ -7,7 +7,7 @@ export type GetVerseArgs = {
     selected_chapter: number;
 };
 
-const DEFAULT_BIBLE_MODULE = 'King James Version - 1769.SQLite3';
+const DEFAULT_BIBLE_MODULE = 'bs_KJV - 1769.SQLite3';
 
 export default () => {
     ipcMain.handle('getVersesCount', async (event: any, args: GetVerseArgs) => {

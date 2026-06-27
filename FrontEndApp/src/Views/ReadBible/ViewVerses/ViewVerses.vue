@@ -416,10 +416,14 @@ const strongsPopover = ref<{
 }>({ show: false, x: 0, y: 0, below: false, loading: false, entry: null });
 
 let strongsRequestId = 0;
+// The <s> badge the popover is currently anchored to, so clicking the same
+// badge again toggles it closed (clicking a different badge moves it instead).
+let activeStrongsEl: HTMLElement | null = null;
 
 function closeStrongsPopover() {
     strongsPopover.value.show = false;
     strongsPopover.value.entry = null;
+    activeStrongsEl = null;
     window.removeEventListener('mousedown', onStrongsOutsideClick, true);
     window.removeEventListener('scroll', onStrongsScroll, true);
 }
@@ -455,6 +459,12 @@ async function handleStrongsMouseDown(event: MouseEvent, verse: any) {
     event.preventDefault();
     event.stopPropagation();
 
+    // Toggle: clicking the same badge again closes the open popover.
+    if (strongsPopover.value.show && activeStrongsEl === strongsEl) {
+        closeStrongsPopover();
+        return;
+    }
+
     const raw = (strongsEl.textContent ?? '').replace(/\D/g, '');
     if (!raw) return;
 
@@ -466,6 +476,7 @@ async function handleStrongsMouseDown(event: MouseEvent, verse: any) {
     // above it (e.g. the first verse of a chapter).
     const below = rect.top < 170;
     const requestId = ++strongsRequestId;
+    activeStrongsEl = strongsEl;
     strongsPopover.value = {
         show: true,
         x: rect.left + rect.width / 2,

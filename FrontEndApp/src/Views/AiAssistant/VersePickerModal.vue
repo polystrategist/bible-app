@@ -24,7 +24,7 @@ const verses = ref<Array<{ verse: number; text: string }>>([]);
 const loading = ref(false);
 
 const version = computed(
-    () => bibleStore.selectedBibleVersions[0] ?? 'King James Version - 1769.SQLite3',
+    () => bibleStore.selectedBibleVersions[0] ?? 'bs_KJV - 1769.SQLite3',
 );
 
 const booksFiltered = computed(() =>
