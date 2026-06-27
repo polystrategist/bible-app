@@ -19,7 +19,7 @@ export const useSettingStore = defineStore('settingStore', () => {
     const readVerseNumber = ref<boolean>(true);
     const showLeftSidebar = ref(true);
     const showRightSidebar = ref(true);
-    const showStrongsNumbers = ref(false);
+    const showStrongsNumbers = ref(true);
 
     onMounted(() => {
         const showDeuterocanonicalStored = SESSION.get(showDeuterocanonicalStorageKey);
