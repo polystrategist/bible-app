@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+
+# Large working copies of shipped DBs — canonical lives in defaults/Main.
+# Recreate with: python sync_data.py  (admin also auto-copies on first open)
+data/Dictionary.db
+data/cross_references.db
