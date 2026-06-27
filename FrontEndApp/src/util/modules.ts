@@ -12,6 +12,9 @@ export type MODULE_BIBLE_TYPE = {
     is_zipped?: boolean | undefined | null;
     module_type?: string;
     copyright?: string;
+    year?: number | null;
+    has_strongs?: boolean;
+    has_red_letters?: boolean;
 };
 
 export const bible: MODULE_BIBLE_TYPE[] = BibleModules;

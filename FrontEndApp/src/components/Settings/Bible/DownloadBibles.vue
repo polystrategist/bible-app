@@ -10,6 +10,12 @@ import { Download } from '@vicons/carbon';
 const searchBible = ref<string | null>(null);
 const selectedLanguage = ref<string | null>(null);
 const selectedModuleType = ref<string | null>(null);
+const selectedFeatures = ref<string[]>([]);
+
+const featureOptions = [
+    { label: "With Strong's", value: 'strongs' },
+    { label: 'With red letters', value: 'red_letters' },
+];
 
 watch(selectedModuleType, () => {
     selectedLanguage.value = null;
@@ -102,6 +108,7 @@ const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
     const query = searchBible.value?.trim() ?? '';
     const langFilter = selectedLanguage.value;
     const typeFilter = selectedModuleType.value;
+    const features = selectedFeatures.value;
     const groupedVersions = new Map<string, MODULE_BIBLE_TYPE[]>();
 
     for (const version of bible) {
@@ -111,6 +118,9 @@ const bibleLanguageGroups = computed<BibleLanguageGroup[]>(() => {
         const language = version.language_full?.trim() || 'unknown';
         if (langFilter && language !== langFilter) continue;
         if (typeFilter && version.module_type !== typeFilter) continue;
+        // Feature filter: every selected feature must be present (AND).
+        if (features.includes('strongs') && !version.has_strongs) continue;
+        if (features.includes('red_letters') && !version.has_red_letters) continue;
 
         const versions = groupedVersions.get(language) ?? [];
         versions.push(version);
@@ -325,14 +335,21 @@ function startDownload(downloadLink: string, version: any) {
             Users are responsible for verifying usage rights.
         </div>
 
-        <div class="mb-3 flex gap-2">
-            <NInput v-model:value="searchBible" :placeholder="$t('Search versions...')" size="small" clearable class="flex-1" />
+        <NInput
+            v-model:value="searchBible"
+            :placeholder="$t('Search versions...')"
+            size="small"
+            clearable
+            class="mb-2 w-full"
+        />
+        <div class="mb-3 flex gap-2 flex-wrap">
             <NSelect
                 v-model:value="selectedModuleType"
                 :options="moduleTypeOptions"
                 size="small"
                 to="body"
-                style="width: 160px"
+                class="flex-1"
+                style="min-width: 140px"
                 :virtual-scroll="false"
             />
             <NSelect
@@ -341,7 +358,21 @@ function startDownload(downloadLink: string, version: any) {
                 size="small"
                 filterable
                 to="body"
-                style="width: 180px"
+                class="flex-1"
+                style="min-width: 140px"
+                :virtual-scroll="false"
+            />
+            <NSelect
+                v-model:value="selectedFeatures"
+                :options="featureOptions"
+                size="small"
+                multiple
+                clearable
+                placeholder="Features"
+                :max-tag-count="1"
+                to="body"
+                class="flex-1"
+                style="min-width: 140px"
                 :virtual-scroll="false"
             />
         </div>
@@ -414,6 +445,20 @@ function startDownload(downloadLink: string, version: any) {
                                     class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-gray-100 text-gray-500 dark:bg-dark-300 dark:text-gray-400 whitespace-nowrap"
                                 >
                                     {{ (item.version as any).year }}
+                                </span>
+                                <span
+                                    v-if="item.version.has_strongs"
+                                    class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 whitespace-nowrap"
+                                    title="Includes Strong's lexicon numbers"
+                                >
+                                    Strong's
+                                </span>
+                                <span
+                                    v-if="item.version.has_red_letters"
+                                    class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-600 rounded bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300 whitespace-nowrap"
+                                    title="Words of Jesus are highlighted in red"
+                                >
+                                    Red letter
                                 </span>
                             </div>
                             <div class="mt-1 text-xs opacity-60">

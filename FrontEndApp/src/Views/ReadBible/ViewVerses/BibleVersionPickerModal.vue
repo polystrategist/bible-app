@@ -100,6 +100,8 @@ const versions = computed(() => {
                 description: cleanDescription(b.description),
                 language: cap((b.language || '').trim()),
                 moduleType: b.module_type || '',
+                hasStrongs: !!b.has_strongs,
+                hasRedLetters: !!b.has_red_letters,
             };
         })
         .filter((v) => {
@@ -197,6 +199,25 @@ function openDownloadBibles() {
 
                     <div class="mt-0.5 text-xs text-gray-600 dark:text-gray-300 truncate">
                         {{ [v.shortName, v.language].filter(Boolean).join(' · ') }}
+                    </div>
+
+                    <div v-if="v.hasStrongs || v.hasRedLetters" class="mt-1 flex flex-wrap items-center gap-1">
+                        <span
+                            v-if="v.hasStrongs"
+                            class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-600 rounded bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:bg-opacity-40 dark:text-indigo-300 whitespace-nowrap"
+                            title="Includes Strong's lexicon numbers"
+                        >
+                            <Icon icon="lucide:book-a" width="11" height="11" />
+                            Strong's
+                        </span>
+                        <span
+                            v-if="v.hasRedLetters"
+                            class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-600 rounded bg-red-100 text-red-600 dark:bg-red-900 dark:bg-opacity-40 dark:text-red-300 whitespace-nowrap"
+                            title="Words of Jesus are highlighted in red"
+                        >
+                            <Icon icon="lucide:highlighter" width="11" height="11" />
+                            Red letter
+                        </span>
                     </div>
 
                     <div v-if="v.description" class="mt-1 text-xs leading-snug text-gray-500 dark:text-gray-400 line-clamp-1">
