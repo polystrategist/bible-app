@@ -1,0 +1,10 @@
+{
+  "next_book_id": 1,
+  "next_book": "Genesis",
+  "next_chapter": 11,
+  "last_completed_book_id": 1,
+  "last_completed_book": "Genesis",
+  "last_completed_chapter": 10,
+  "completed": false,
+  "updated_at": "2026-06-28T13:27:03.972974Z"
+}

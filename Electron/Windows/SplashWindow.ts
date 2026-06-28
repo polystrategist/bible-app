@@ -2,6 +2,7 @@ import Log from 'electron-log';
 import { BrowserWindow, screen, app } from 'electron';
 import path from 'path';
 import { isDev, isBeta } from '../config';
+import { appConfig } from '../ElectronStore/Configuration';
 import { createWindowState } from '../util/window';
 
 /**
@@ -10,20 +11,23 @@ import { createWindowState } from '../util/window';
  * window only once the renderer signals it is fully rendered (see the `app-ready` IPC
  * in main.ts), so the user never sees the app assembling.
  *
- * Branded "book cover" splash: a fixed deep-indigo cover (logo, scripture seal,
- * Hebrews 4:12 verse, version) shown regardless of the app's light/dark theme so it
- * always reads as a premium cover. The main process still matches the hidden main
- * window's background to the user's saved theme, so the swap into the app stays clean.
+ * Branded "book cover" splash (logo, scripture seal, Hebrews 4:12 verse, version),
+ * themed from the user's saved palette: the cover gradient is tinted from the theme
+ * accent and switches between a dark cover and a light "parchment" cover based on the
+ * theme background. splash.html does that derivation from the bg/text/accent query
+ * params; persisted via the `set-splash-theme` IPC. The window backgroundColor is set
+ * to the theme bg so any pre-paint frame matches (no white flash), and the main process
+ * matches the hidden main window's background to the same bg, so the swap into the app
+ * stays clean in both light and dark themes.
  *
- * Opaque window (not transparent — transparent frameless windows render black on
- * Windows); its backgroundColor is the cover's base color so any pre-paint frame is
- * on-brand rather than a white flash.
+ * Opaque window (not transparent — transparent frameless windows render black on Windows).
  */
 
-// Base color of the cover gradient's darkest corner — used as the window backgroundColor
-// so the splash never flashes white before splash.html paints. Keep in sync with the
-// --cover-c value in splash.html.
-const COVER_BG = '#1b1740';
+type SplashTheme = { bg?: string; text?: string; accent?: string };
+
+// Defaults for a fresh install with no saved theme yet: a light cover with the app's
+// default indigo accent.
+const DEFAULTS: Required<SplashTheme> = { bg: '#ffffff', text: '#1f2233', accent: '#4f46e5' };
 
 const SPLASH_WIDTH = 480;
 const SPLASH_HEIGHT = 300;
@@ -55,26 +59,36 @@ function splashPosition(): { x: number; y: number } | null {
     return null;
 }
 
+function resolveTheme(): Required<SplashTheme> {
+    const saved = (appConfig.get('setting.splashTheme') as SplashTheme | undefined) || {};
+    const pick = (v: string | undefined, fallback: string) =>
+        typeof v === 'string' && v.trim() ? v.trim() : fallback;
+    return {
+        bg: pick(saved.bg, DEFAULTS.bg),
+        text: pick(saved.text, DEFAULTS.text),
+        accent: pick(saved.accent, DEFAULTS.accent),
+    };
+}
+
 // Minimal self-contained splash used only when splash.html cannot be loaded
 // (e.g. a packaged build whose frontend dist predates the file). Guarantees the
-// loading window is never a silent blank box — it still shows the branded cover
-// color, name and a loading bar. Kept dependency-free (no external SVG) so it can
-// never itself fail. Mirrors the cover palette of splash.html.
-function fallbackSplashDataUrl(version: string): string {
+// loading window is never a silent blank box — it still shows a themed cover with
+// the name and a loading bar. Kept dependency-free (no external SVG) so it can never
+// itself fail. Uses the theme bg/text + accent so it matches the real splash.
+function fallbackSplashDataUrl(theme: Required<SplashTheme>, version: string): string {
     const ver = version ? `<div class="ver">v${version.replace(/^v/i, '')}</div>` : '';
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-        html,body{width:100%;height:100%;margin:0;overflow:hidden;color:#f6f7fb;
+        html,body{width:100%;height:100%;margin:0;overflow:hidden;color:${theme.text};
             font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none}
         .cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-            justify-content:center;
-            background:radial-gradient(120% 90% at 12% 8%,rgba(255,255,255,.12),transparent 46%),
-            linear-gradient(135deg,#4f46e5 0%,#312e81 52%,#1b1740 100%)}
+            justify-content:center;background:${theme.bg}}
         .name{font-size:24px;font-weight:800;letter-spacing:3px}
-        .name b{color:#e7c585}
-        .ver{margin-top:10px;font-size:12px;color:rgba(246,247,251,.6)}
-        .loader{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.1);overflow:hidden}
+        .name b{color:${theme.accent}}
+        .ver{margin-top:10px;font-size:12px;opacity:.6}
+        .loader{position:absolute;left:0;right:0;bottom:0;height:3px;
+            background:color-mix(in srgb, ${theme.text} 14%, transparent);overflow:hidden}
         .loader::before{content:"";position:absolute;top:0;left:0;height:100%;width:38%;
-            background:linear-gradient(90deg,transparent,#e7c585 35%,#fff 50%,#e7c585 65%,transparent);
+            background:linear-gradient(90deg,transparent,${theme.accent} 45%,${theme.accent} 55%,transparent);
             animation:slide 1.35s cubic-bezier(.45,.05,.35,1) infinite}
         @keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(360%)}}
     </style></head><body><div class="cover"><div class="name">BELIEVERS&nbsp;<b>SWORD</b></div>
@@ -87,6 +101,7 @@ export function createSplashWindow(): BrowserWindow {
     if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
     const version = app.getVersion();
+    const theme = resolveTheme();
     const pos = splashPosition();
 
     splashWindow = new BrowserWindow({
@@ -99,7 +114,7 @@ export function createSplashWindow(): BrowserWindow {
         alwaysOnTop: true,
         skipTaskbar: true,
         show: false,
-        backgroundColor: COVER_BG,
+        backgroundColor: theme.bg,
         icon: iconPath,
         webPreferences: {
             devTools: false,
@@ -120,10 +135,10 @@ export function createSplashWindow(): BrowserWindow {
         Log.warn(`[splash] failed to load (${errorCode} ${errorDescription}): ${validatedURL}`);
         if (usedFallback || !splashWindow || splashWindow.isDestroyed()) return;
         usedFallback = true;
-        splashWindow.loadURL(fallbackSplashDataUrl(version));
+        splashWindow.loadURL(fallbackSplashDataUrl(theme, version));
     });
 
-    const query = { version };
+    const query = { version, bg: theme.bg, text: theme.text, accent: theme.accent };
     if (isDev) {
         const qs = new URLSearchParams(query).toString();
         splashWindow.loadURL(`http://localhost:3000/splash.html?${qs}`);

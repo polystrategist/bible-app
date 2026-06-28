@@ -6,23 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Believers Sword</title>
     <style>
-        /* Branded "book cover" loading screen. Unlike the old splash this is a fixed
-           brand cover (deep indigo) independent of the app's light/dark theme, so it
-           always reads as a premium cover. The main process still sets the hidden main
-           window's background to the saved app theme, so the swap into the app stays
-           clean. Only the `version` query param is consumed here. */
+        /* Branded "book cover" loading screen, themed from the user's saved palette.
+           The main process passes the theme's bg/text/accent (+ app version) as query
+           params; this page derives the whole cover from them:
+             - the gradient is tinted from --accent (the selected palette's primary)
+             - a dark cover (dark mode) or a light "parchment" cover (light mode) is
+               chosen from the luminance of the theme background
+           so the splash reflects the user's theme AND the swap into the app stays
+           flash-free. Defaults below are a light/indigo cover for a fresh install. */
         :root {
-            --cover-a: #4f46e5;
-            /* indigo-600 (top-left light) */
-            --cover-b: #312e81;
-            /* indigo-900 */
-            --cover-c: #1b1740;
-            /* near indigo-950 (bottom-right) */
+            --accent: #4f46e5;
+            /* dark cover (default) — values derived from --accent */
+            --cover-a: color-mix(in srgb, var(--accent) 82%, #06070e);
+            --cover-b: color-mix(in srgb, var(--accent) 50%, #06070e);
+            --cover-c: color-mix(in srgb, var(--accent) 32%, #04050b);
             --ink: #f6f7fb;
             --muted: rgba(246, 247, 251, 0.60);
             --faint: rgba(246, 247, 251, 0.085);
             --gold: #e7c585;
             --gold-soft: rgba(231, 197, 133, 0.85);
+            --gold-bright: #ffffff;
+            --ring: rgba(231, 197, 133, 0.85);
+            --wm: #ffffff;
+            --wm-opacity: 0.055;
+            --frame: rgba(255, 255, 255, 0.10);
+            --track: rgba(255, 255, 255, 0.10);
+        }
+
+        /* light "parchment" cover — highlights become a deep tint of the accent */
+        body.light {
+            --cover-a: color-mix(in srgb, var(--accent) 9%, #ffffff);
+            --cover-b: color-mix(in srgb, var(--accent) 16%, #faf9f5);
+            --cover-c: color-mix(in srgb, var(--accent) 26%, #efece2);
+            --ink: color-mix(in srgb, var(--accent) 32%, #16172b);
+            --muted: rgba(40, 42, 70, 0.62);
+            --faint: color-mix(in srgb, var(--accent) 18%, transparent);
+            --gold: color-mix(in srgb, var(--accent) 82%, #000000);
+            --gold-soft: color-mix(in srgb, var(--accent) 70%, #000000);
+            --gold-bright: color-mix(in srgb, var(--accent) 45%, #ffffff);
+            --ring: color-mix(in srgb, var(--accent) 70%, #000000);
+            --wm: var(--accent);
+            --wm-opacity: 0.05;
+            --frame: rgba(20, 22, 50, 0.12);
+            --track: rgba(20, 22, 50, 0.10);
         }
 
         * {
@@ -56,7 +82,7 @@
             content: "";
             position: absolute;
             inset: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            border: 1px solid var(--frame);
             border-radius: 6px;
             pointer-events: none;
         }
@@ -68,9 +94,9 @@
             bottom: -66px;
             width: 280px;
             height: 280px;
-            opacity: 0.055;
+            opacity: var(--wm-opacity);
             transform: rotate(8deg);
-            color: #ffffff;
+            color: var(--wm);
             z-index: 0;
         }
 
@@ -94,7 +120,7 @@
             width: 38px;
             height: 38px;
             color: var(--ink);
-            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.30));
         }
 
         .brand .word {
@@ -135,7 +161,7 @@
 
         .seal .ring {
             fill: none;
-            stroke: var(--gold-soft);
+            stroke: var(--ring);
         }
 
         .seal .ring-text {
@@ -239,7 +265,7 @@
             right: 0;
             bottom: 0;
             height: 3px;
-            background: rgba(255, 255, 255, 0.10);
+            background: var(--track);
             overflow: hidden;
         }
 
@@ -251,7 +277,7 @@
             height: 100%;
             width: 38%;
             border-radius: 3px;
-            background: linear-gradient(90deg, transparent, var(--gold) 35%, #ffffff 50%, var(--gold) 65%, transparent);
+            background: linear-gradient(90deg, transparent, var(--gold) 35%, var(--gold-bright) 50%, var(--gold) 65%, transparent);
             animation: slide 1.35s cubic-bezier(0.45, 0.05, 0.35, 1) infinite;
         }
 
@@ -351,10 +377,46 @@
     </div>
 
     <script>
-        // The main process passes the real app version via ?version=...
+        // The main process passes the saved theme (bg/text/accent) + app version.
+        // We tint the cover from the accent and pick the light or dark variant from
+        // the luminance of the theme background.
         (function () {
-            var v = (new URLSearchParams(location.search).get('version') || '').trim();
+            var p = new URLSearchParams(location.search);
+            var get = function (k) { return (p.get(k) || '').trim(); };
+
+            var accent = get('accent');
+            if (accent) document.documentElement.style.setProperty('--accent', accent);
+
+            // Relative luminance of the theme background → choose light/dark cover.
+            // Falls back to the dark cover when the bg can't be parsed.
+            var bg = get('bg');
+            if (isLight(bg)) document.body.classList.add('light');
+
+            var v = get('version');
             if (v) document.getElementById('version').textContent = 'v' + v.replace(/^v/i, '');
+
+            function isLight(color) {
+                var rgb = parseColor(color);
+                if (!rgb) return false;
+                var lum = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+                return lum > 0.55;
+            }
+
+            function parseColor(c) {
+                if (!c) return null;
+                c = c.toLowerCase();
+                var m = c.match(/^#([0-9a-f]{3})$/);
+                if (m) return [h(m[1][0] + m[1][0]), h(m[1][1] + m[1][1]), h(m[1][2] + m[1][2])];
+                m = c.match(/^#([0-9a-f]{6})$/);
+                if (m) return [h(m[1].slice(0, 2)), h(m[1].slice(2, 4)), h(m[1].slice(4, 6))];
+                m = c.match(/rgba?\(([^)]+)\)/);
+                if (m) {
+                    var parts = m[1].split(',').map(function (s) { return parseFloat(s); });
+                    if (parts.length >= 3) return [parts[0], parts[1], parts[2]];
+                }
+                return null;
+            }
+            function h(s) { return parseInt(s, 16); }
         })();
     </script>
 </body>
