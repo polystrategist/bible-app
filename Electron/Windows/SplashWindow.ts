@@ -1,8 +1,7 @@
 import Log from 'electron-log';
-import { BrowserWindow, screen } from 'electron';
+import { BrowserWindow, screen, app } from 'electron';
 import path from 'path';
 import { isDev, isBeta } from '../config';
-import { appConfig } from '../ElectronStore/Configuration';
 import { createWindowState } from '../util/window';
 
 /**
@@ -11,18 +10,23 @@ import { createWindowState } from '../util/window';
  * window only once the renderer signals it is fully rendered (see the `app-ready` IPC
  * in main.ts), so the user never sees the app assembling.
  *
+ * Branded "book cover" splash: a fixed deep-indigo cover (logo, scripture seal,
+ * Hebrews 4:12 verse, version) shown regardless of the app's light/dark theme so it
+ * always reads as a premium cover. The main process still matches the hidden main
+ * window's background to the user's saved theme, so the swap into the app stays clean.
+ *
  * Opaque window (not transparent — transparent frameless windows render black on
- * Windows). Background follows the user's saved theme; defaults to white when nothing
- * is saved yet (e.g. first launch). The renderer persists these colors via the
- * `set-splash-theme` IPC.
+ * Windows); its backgroundColor is the cover's base color so any pre-paint frame is
+ * on-brand rather than a white flash.
  */
 
-type SplashTheme = { bg?: string; text?: string; accent?: string };
+// Base color of the cover gradient's darkest corner — used as the window backgroundColor
+// so the splash never flashes white before splash.html paints. Keep in sync with the
+// --cover-c value in splash.html.
+const COVER_BG = '#1b1740';
 
-const DEFAULTS: Required<SplashTheme> = { bg: '#f5f5f5', text: '#333333', accent: '#4A3AFF' };
-
-const SPLASH_WIDTH = 440;
-const SPLASH_HEIGHT = 320;
+const SPLASH_WIDTH = 480;
+const SPLASH_HEIGHT = 300;
 
 let splashWindow: BrowserWindow | null = null;
 
@@ -51,33 +55,30 @@ function splashPosition(): { x: number; y: number } | null {
     return null;
 }
 
-function resolveTheme(): Required<SplashTheme> {
-    const saved = (appConfig.get('setting.splashTheme') as SplashTheme | undefined) || {};
-    const pick = (v: string | undefined, fallback: string) =>
-        typeof v === 'string' && v.trim() ? v.trim() : fallback;
-    return {
-        bg: pick(saved.bg, DEFAULTS.bg),
-        text: pick(saved.text, DEFAULTS.text),
-        accent: pick(saved.accent, DEFAULTS.accent),
-    };
-}
-
 // Minimal self-contained splash used only when splash.html cannot be loaded
 // (e.g. a packaged build whose frontend dist predates the file). Guarantees the
-// loading window is never a silent blank box — it still shows the themed name
-// and spinner. Kept dependency-free (no external SVG) so it can never itself fail.
-function fallbackSplashDataUrl(theme: Required<SplashTheme>): string {
+// loading window is never a silent blank box — it still shows the branded cover
+// color, name and a loading bar. Kept dependency-free (no external SVG) so it can
+// never itself fail. Mirrors the cover palette of splash.html.
+function fallbackSplashDataUrl(version: string): string {
+    const ver = version ? `<div class="ver">v${version.replace(/^v/i, '')}</div>` : '';
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-        html,body{width:100%;height:100%;margin:0;background:${theme.bg};overflow:hidden;
+        html,body{width:100%;height:100%;margin:0;overflow:hidden;color:#f6f7fb;
             font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;user-select:none}
-        .wrap{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
-        .name{font-size:26px;font-weight:800;letter-spacing:.5px;color:${theme.text}}
-        .spinner{margin-top:28px;width:30px;height:30px;border-radius:50%;
-            border:3px solid color-mix(in srgb, ${theme.text} 18%, transparent);
-            border-top-color:${theme.accent};animation:spin .8s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-    </style></head><body><div class="wrap"><div class="name">Believers Sword</div>
-        <div class="spinner"></div></div></body></html>`;
+        .cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+            justify-content:center;
+            background:radial-gradient(120% 90% at 12% 8%,rgba(255,255,255,.12),transparent 46%),
+            linear-gradient(135deg,#4f46e5 0%,#312e81 52%,#1b1740 100%)}
+        .name{font-size:24px;font-weight:800;letter-spacing:3px}
+        .name b{color:#e7c585}
+        .ver{margin-top:10px;font-size:12px;color:rgba(246,247,251,.6)}
+        .loader{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.1);overflow:hidden}
+        .loader::before{content:"";position:absolute;top:0;left:0;height:100%;width:38%;
+            background:linear-gradient(90deg,transparent,#e7c585 35%,#fff 50%,#e7c585 65%,transparent);
+            animation:slide 1.35s cubic-bezier(.45,.05,.35,1) infinite}
+        @keyframes slide{0%{transform:translateX(-120%)}100%{transform:translateX(360%)}}
+    </style></head><body><div class="cover"><div class="name">BELIEVERS&nbsp;<b>SWORD</b></div>
+        ${ver}<div class="loader"></div></div></body></html>`;
     return `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 }
 
@@ -85,7 +86,7 @@ export function createSplashWindow(): BrowserWindow {
     let iconPath = path.join(__dirname, 'assets', 'icon.ico');
     if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
 
-    const theme = resolveTheme();
+    const version = app.getVersion();
     const pos = splashPosition();
 
     splashWindow = new BrowserWindow({
@@ -98,7 +99,7 @@ export function createSplashWindow(): BrowserWindow {
         alwaysOnTop: true,
         skipTaskbar: true,
         show: false,
-        backgroundColor: theme.bg,
+        backgroundColor: COVER_BG,
         icon: iconPath,
         webPreferences: {
             devTools: false,
@@ -119,10 +120,10 @@ export function createSplashWindow(): BrowserWindow {
         Log.warn(`[splash] failed to load (${errorCode} ${errorDescription}): ${validatedURL}`);
         if (usedFallback || !splashWindow || splashWindow.isDestroyed()) return;
         usedFallback = true;
-        splashWindow.loadURL(fallbackSplashDataUrl(theme));
+        splashWindow.loadURL(fallbackSplashDataUrl(version));
     });
 
-    const query = { bg: theme.bg, text: theme.text, accent: theme.accent };
+    const query = { version };
     if (isDev) {
         const qs = new URLSearchParams(query).toString();
         splashWindow.loadURL(`http://localhost:3000/splash.html?${qs}`);

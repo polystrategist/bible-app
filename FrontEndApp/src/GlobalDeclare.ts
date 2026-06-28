@@ -204,6 +204,20 @@ declare global {
             importBibleCheckDuplicate: (title: string) => Promise<{ exists: boolean }>;
             importBible: (args: { filePath: string; title: string; description: string; source: string }) => Promise<{ success: boolean; error?: string; verseCount?: number; fileName?: string }>;
 
+            // Commentaries
+            getCommentaryForVerse: (args: string) => Promise<Array<{ marker: string; text: string }>>;
+            getCommentariesForChapter: (args: { version: string; book_number: number; chapter: number }) => Promise<Array<{ marker: string; text: string; chapter_number_from: number; verse_number_from: number; chapter_number_to: number; verse_number_to: number }>>;
+            getCommentariesByFile: (args: { file: string; book_number: number; chapter: number }) => Promise<Array<{ marker: string; text: string; chapter_number_from: number; verse_number_from: number; chapter_number_to: number; verse_number_to: number }>>;
+            getCommentaryModules: () => Promise<Array<{ file: string; title: string }>>;
+            hasCommentary: (version: string) => Promise<boolean>;
+            getAvailableCommentaries: () => Promise<string[]>;
+
+            // Commentary Import
+            importCommentarySelectFile: () => Promise<{ canceled: boolean; filePath?: string }>;
+            importCommentaryValidate: (args: { filePath: string }) => Promise<{ valid: boolean; error?: string; entryCount?: number }>;
+            importCommentaryCheckDuplicate: (name: string) => Promise<{ exists: boolean }>;
+            importCommentary: (args: { filePath: string; name: string; overwrite?: boolean }) => Promise<{ success: boolean; error?: string; entryCount?: number; fileName?: string }>;
+
             // Sync
             logSyncChange: (entry: any) => Promise<any>;
             getUnsyncedChanges: () => Promise<any[]>;

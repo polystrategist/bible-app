@@ -1298,12 +1298,13 @@ onUnmounted(() => {
                     {{ selectedVerseNumbers.length }} verse{{ selectedVerseNumbers.length > 1 ? 's' : '' }} selected
                 </span>
                 <button
-                    class="opacity-75 hover:opacity-100 ml-4px text-white leading-none flex items-center"
+                    type="button"
+                    class="verse-sel-clear flex items-center justify-center w-18px h-18px p-0 rounded-full border-0 bg-white/20 hover:bg-white/35 text-white cursor-pointer transition-colors"
                     title="Clear selection (Esc)"
                     @mousedown.stop
                     @click="clearVerseSelection"
                 >
-                    <NIcon size="16"><Close /></NIcon>
+                    <NIcon size="12"><Close /></NIcon>
                 </button>
             </div>
         </Transition>

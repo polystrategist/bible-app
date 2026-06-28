@@ -137,8 +137,21 @@ contextBridge.exposeInMainWorld('browserWindow', {
 
     // Commentaries
     getCommentaryForVerse: (args: string) => ipcRenderer.invoke('getCommentaryForVerse', JSON.parse(args)),
+    getCommentariesForChapter: (args: { version: string; book_number: number; chapter: number }) =>
+        ipcRenderer.invoke('getCommentariesForChapter', args),
+    getCommentariesByFile: (args: { file: string; book_number: number; chapter: number }) =>
+        ipcRenderer.invoke('getCommentariesByFile', args),
+    getCommentaryModules: () => ipcRenderer.invoke('getCommentaryModules'),
     hasCommentary: (version: string) => ipcRenderer.invoke('hasCommentary', version),
     getAvailableCommentaries: () => ipcRenderer.invoke('availableCommentaries'),
+
+    // Commentary Import
+    importCommentarySelectFile: () => ipcRenderer.invoke('import-commentary:select-file'),
+    importCommentaryValidate: (args: { filePath: string }) => ipcRenderer.invoke('import-commentary:validate', args),
+    importCommentaryCheckDuplicate: (name: string) =>
+        ipcRenderer.invoke('import-commentary:check-duplicate', name),
+    importCommentary: (args: { filePath: string; name: string; overwrite?: boolean }) =>
+        ipcRenderer.invoke('import-commentary:import', args),
 
     // Updates
     getUpdateConfig: () => ipcRenderer.invoke('get-update-config'),

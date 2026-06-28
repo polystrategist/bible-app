@@ -429,6 +429,18 @@ const stub: Window['browserWindow'] = {
     importBibleCheckDuplicate: async () => ({ exists: false }),
     importBible: async () => ({ success: false, error: 'Bible import is not available on web' }),
 
+    // ---------- Commentaries (desktop-only SQLite; no web REST endpoint yet) ----------
+    getCommentaryForVerse: async () => [],
+    getCommentariesForChapter: async () => [],
+    getCommentariesByFile: async () => [],
+    getCommentaryModules: async () => [],
+    hasCommentary: async () => false,
+    getAvailableCommentaries: async () => [],
+    importCommentarySelectFile: async () => ({ canceled: true }),
+    importCommentaryValidate: async () => ({ valid: false, error: 'Commentary import is not available on web' }),
+    importCommentaryCheckDuplicate: async () => ({ exists: false }),
+    importCommentary: async () => ({ success: false, error: 'Commentary import is not available on web' }),
+
     // ---------- Sync (no-op on web; web talks to backend directly) ----------
     logSyncChange: async () => null,
     getUnsyncedChanges: async () => [],

@@ -17,6 +17,7 @@ import { PiperTTSHandlers } from './Piper/PiperTTS';
 import Commentaries from '../Modules/Commentaries/Commentaries';
 import DailyDevotional from './DailyDevotional/DailyDevotional';
 import importing from './importing/importing';
+import importCommentary from './importing/importCommentary';
 import exporting from './exporting/exporting';
 import CrossReferences from './CrossReferences/CrossReferences';
 import AiConversations from './AiConversations/AiConversations';
@@ -80,6 +81,9 @@ export default (BrowserWindow: BrowserWindow) => {
 
     // bible import handlers
     importing(BrowserWindow);
+
+    // commentary import handlers
+    importCommentary(BrowserWindow);
 
     // export handlers (PDF, DOCX)
     exporting(BrowserWindow);
