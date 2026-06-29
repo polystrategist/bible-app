@@ -1,10 +1,10 @@
 {
   "next_book_id": 1,
   "next_book": "Genesis",
-  "next_chapter": 31,
+  "next_chapter": 36,
   "last_completed_book_id": 1,
   "last_completed_book": "Genesis",
-  "last_completed_chapter": 30,
+  "last_completed_chapter": 35,
   "completed": false,
-  "updated_at": "2026-06-29T03:09:54.192758Z"
+  "updated_at": "2026-06-29T07:02:14.510490Z"
 }
