@@ -2,7 +2,7 @@
   "name": "believers-sword-local-dev",
   "description": "Believers Sword is an application for believers community, it is used to study bible, also used for praying, social or connect with other believers.",
   "author": "JenuelDev",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "main": "./dist/main.js",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
@@ -61,7 +61,11 @@
       "dist/**/*"
     ],
     "extraResources": [
-      "defaults/**/*"
+      "defaults/**/*",
+      {
+        "from": "assets/icon.ico",
+        "to": "icon.ico"
+      }
     ],
     "directories": {
       "buildResources": "assets",
