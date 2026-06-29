@@ -1,7 +1,7 @@
 import Log from 'electron-log';
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
-import { isDev, isBeta } from './config';
+import { isDev } from './config';
 import { setupDefault } from './Setups/setup';
 import { appConfig } from './ElectronStore/Configuration';
 import IpcMainEvents from './IpcMainEvents/IpcMainEvents';
@@ -14,6 +14,7 @@ import { registerGameImagesScheme, registerGameImagesProtocol } from './util/gam
 import { createSplashWindow, closeSplash } from './Windows/SplashWindow';
 import { startedHidden } from './util/autoLaunch';
 import { createAppTray } from './util/appTray';
+import { appIconPath } from './util/appIcon';
 import { startReminderScheduler, recordActivity, getReminderEnabled, applyAutoLaunch } from './Reminders/ReminderScheduler';
 
 // Custom scheme registration must happen before app `ready`.
@@ -40,9 +41,7 @@ async function createWindow() {
     const savedScale = Number(appConfig.get('setting.appScale', 1));
     const appScale = Number.isFinite(savedScale) ? Math.min(1.5, Math.max(0.75, savedScale)) : 1;
 
-    let iconPath = path.join(__dirname, 'assets', 'icon.ico');
-
-    if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
+    const iconPath = appIconPath();
 
     const windowState = createWindowState();
 
@@ -223,10 +222,7 @@ app.whenReady().then(async () => {
     // Reminders: mirror the settings to the OS login-item, create the tray, and
     // start the inactivity scheduler so nudges fire even when the window is hidden.
     applyAutoLaunch();
-    const trayIcon = (isDev || isBeta)
-        ? path.join('assets', 'icon.ico')
-        : path.join(__dirname, 'assets', 'icon.ico');
-    createAppTray({ iconPath: trayIcon, onOpen: showMainWindow, onQuit: quitApp });
+    createAppTray({ iconPath: appIconPath(), onOpen: showMainWindow, onQuit: quitApp });
     startReminderScheduler();
     app.on('browser-window-focus', () => recordActivity());
 

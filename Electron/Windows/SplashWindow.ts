@@ -1,9 +1,10 @@
 import Log from 'electron-log';
 import { BrowserWindow, screen, app } from 'electron';
 import path from 'path';
-import { isDev, isBeta } from '../config';
+import { isDev } from '../config';
 import { appConfig } from '../ElectronStore/Configuration';
 import { createWindowState } from '../util/window';
+import { appIconPath } from '../util/appIcon';
 
 /**
  * Borderless "loading" window shown immediately at launch while the main window loads
@@ -97,8 +98,7 @@ function fallbackSplashDataUrl(theme: Required<SplashTheme>, version: string): s
 }
 
 export function createSplashWindow(): BrowserWindow {
-    let iconPath = path.join(__dirname, 'assets', 'icon.ico');
-    if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
+    const iconPath = appIconPath();
 
     const version = app.getVersion();
     const theme = resolveTheme();
