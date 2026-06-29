@@ -3,6 +3,7 @@ import { isDev, isBeta } from '../config';
 import path from 'path';
 import fs from 'fs';
 import { getBibleVersionDb } from '../Modules/Bible/Common/BibleVersionCache';
+import { appIconPath } from '../util/appIcon';
 
 const COMPARE_WIN_WIDTH = 520;
 const COMPARE_WIN_HEIGHT = 680;
@@ -41,8 +42,7 @@ export const CompareVerseIpcEvents = () => {
             event,
             args: { book_number: number; chapter: number; verse: number; book_name: string }
         ) => {
-            let iconPath = path.join(__dirname, 'assets', 'icon.ico');
-            if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
+            const iconPath = appIconPath();
 
             const position = positionOverParent(
                 BrowserWindow.fromWebContents(event.sender)

@@ -1,10 +1,9 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { isDev, isBeta } from './../config';
+import { appIconPath } from '../util/appIcon';
 
 export const WindowOpenerIpcEvents = (win: BrowserWindow) => {
     ipcMain.handle('open-donate-window', (event, payload) => {
         const { BrowserWindow, screen } = require('electron');
-        const path = require('path');
 
         // Get the primary screen's dimensions
         const primaryDisplay = screen.getPrimaryDisplay();
@@ -12,9 +11,7 @@ export const WindowOpenerIpcEvents = (win: BrowserWindow) => {
 
         // Calculate 70% of the height
         const windowHeight = Math.round(height * 0.7);
-        let iconPath = path.join(__dirname, 'assets', 'icon.ico');
-
-        if (isDev || isBeta) iconPath = path.join('assets', 'icon.ico');
+        const iconPath = appIconPath();
 
         const win = new BrowserWindow({
             width: 700,
