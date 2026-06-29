@@ -243,3 +243,11 @@
     opacity: 0;
     transform: translateX(-50%) translateY(10px);
 }
+
+/* Clear-selection button inside the floating "N verses selected" pill.
+   Strip native button chrome so only the translucent circle shows. */
+.verse-sel-clear {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+}

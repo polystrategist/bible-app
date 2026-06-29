@@ -5,6 +5,7 @@ import { NButton, NCard, NDropdown, NEmpty, NIcon, NInput, NModal, NTabs, NTabPa
 import { Add, TrashCan } from '@vicons/carbon';
 import Editor from '../../../components/Editor/Editor.vue';
 import CrossReferences from './CrossReferences.vue';
+import Commentaries from './Commentaries.vue';
 import useNoteStore from '../../../store/useNoteStore';
 import SESSION from '../../../util/session';
 
@@ -268,6 +269,10 @@ function changePaneSizes(sizes: Array<any>) {
 
             <NTabPane name="cross-references" tab="Cross References" display-directive="show:lazy" class="flex-1 min-h-0">
                 <CrossReferences />
+            </NTabPane>
+
+            <NTabPane name="commentaries" tab="Commentaries" display-directive="show:lazy" class="flex-1 min-h-0">
+                <Commentaries />
             </NTabPane>
         </NTabs>
 
