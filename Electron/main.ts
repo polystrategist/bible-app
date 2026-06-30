@@ -15,7 +15,8 @@ import { createSplashWindow, closeSplash } from './Windows/SplashWindow';
 import { startedHidden } from './util/autoLaunch';
 import { createAppTray } from './util/appTray';
 import { appIconPath } from './util/appIcon';
-import { startReminderScheduler, recordActivity, getReminderEnabled, applyAutoLaunch } from './Reminders/ReminderScheduler';
+import { getCloseToTray } from './util/closeToTray';
+import { startReminderScheduler, recordActivity, applyAutoLaunch } from './Reminders/ReminderScheduler';
 
 // Custom scheme registration must happen before app `ready`.
 registerGameImagesScheme();
@@ -36,6 +37,14 @@ const MIN_SPLASH_MS = 3000;
 // chose a real Quit (vs. close-to-tray, which keeps the app alive for reminders).
 let currentWindow: BrowserWindow | null = null;
 let isQuiting = false;
+
+// Whether the app stays alive in the tray instead of quitting when its window
+// closes. Driven solely by the user's close-to-tray preference. Reminders depend
+// on this being on (enforced in the Settings UI) rather than forcing it on their
+// own, so turning close-to-tray off makes the X truly quit the app.
+function keepAliveInTray(): boolean {
+    return getCloseToTray();
+}
 
 async function createWindow() {
     const savedScale = Number(appConfig.get('setting.appScale', 1));
@@ -84,10 +93,11 @@ async function createWindow() {
     mainWindow.on('closed', () => {
         if (currentWindow === mainWindow) currentWindow = null;
     });
-    // Close-to-tray: keep the app alive so reminders can fire, unless the user
-    // explicitly chose Quit (tray menu sets isQuiting) or reminders are off.
+    // Close-to-tray: hide instead of quitting when close-to-tray is enabled or
+    // reminders need a background presence — unless the user explicitly chose Quit
+    // (tray menu sets isQuiting).
     mainWindow.on('close', (e) => {
-        if (!isQuiting && getReminderEnabled()) {
+        if (!isQuiting && keepAliveInTray()) {
             e.preventDefault();
             mainWindow.hide();
         }
@@ -241,9 +251,9 @@ app.on('window-all-closed', () => {
     clearBibleVersionCache();
     // macOS keeps apps alive by convention.
     if (process.platform === 'darwin') return;
-    // Stay alive in the tray while reminders are on (unless the user chose Quit),
-    // so inactivity nudges can still fire after the window is closed.
-    if (getReminderEnabled() && !isQuiting) return;
+    // Stay alive in the tray while close-to-tray is on (unless the user chose Quit),
+    // so the app — and any reminders riding on it — keeps running after close.
+    if (keepAliveInTray() && !isQuiting) return;
     app.quit();
 });
 

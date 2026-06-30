@@ -1,5 +1,7 @@
 import { appConfig } from "./../../ElectronStore/Configuration";
 import { app, BrowserWindow, clipboard, ipcMain, screen, shell } from "electron";
+import { getCloseToTray, setCloseToTray } from "../../util/closeToTray";
+import { applyAutoLaunch } from "../../Reminders/ReminderScheduler";
 
 const MIN_SCALE = 0.75;
 const MAX_SCALE = 1.5;
@@ -79,6 +81,15 @@ export const windowBrowserEvents = (win: BrowserWindow) => {
     // Persist current theme colors so the next launch's loading splash matches them.
     ipcMain.handle('set-splash-theme', (_event, payload) => {
         appConfig.set('setting.splashTheme', payload);
+    });
+    // Close-to-tray preference: when on, the window's X hides to the tray
+    // instead of quitting the app.
+    ipcMain.handle('window:get-close-to-tray', () => getCloseToTray());
+    ipcMain.handle('window:set-close-to-tray', (_event, value: boolean) => {
+        setCloseToTray(value);
+        // The login item rides on close-to-tray, so re-apply it when this changes.
+        applyAutoLaunch();
+        return getCloseToTray();
     });
     ipcMain.handle('openExternal', (_event, url: string) => shell.openExternal(url));
     // Native clipboard write. navigator.clipboard is unreliable in the renderer

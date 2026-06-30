@@ -540,6 +540,10 @@ const stub: Window['browserWindow'] = {
     fpMarkLevelSolved: async () => { /* no-op */ },
     fpGetImagesBasePath: async () => '',
 
+    // ---------- Close-to-tray (desktop-only; no tray on web) ----------
+    getCloseToTray: async () => false,
+    setCloseToTray: async (value: boolean) => { warnOnce('setCloseToTray'); return value; },
+
     // ---------- Encouragement reminders (desktop-only; no-op on web) ----------
     getReminderEnabled: async () => false,
     setReminderEnabled: async (value: boolean) => { warnOnce('setReminderEnabled'); return value; },

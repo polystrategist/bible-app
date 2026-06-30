@@ -378,6 +378,10 @@ declare global {
             fpMarkLevelSolved: (levelId: number) => Promise<void>;
             fpGetImagesBasePath: () => Promise<string>;
 
+            // Close-to-tray (X minimizes to tray)
+            getCloseToTray: () => Promise<boolean>;
+            setCloseToTray: (value: boolean) => Promise<boolean>;
+
             // Encouragement reminders
             getReminderEnabled: () => Promise<boolean>;
             setReminderEnabled: (value: boolean) => Promise<boolean>;

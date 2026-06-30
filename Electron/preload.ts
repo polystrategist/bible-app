@@ -245,6 +245,10 @@ contextBridge.exposeInMainWorld('browserWindow', {
     fpMarkLevelSolved: (levelId: number) => ipcRenderer.invoke('fp:markLevelSolved', levelId),
     fpGetImagesBasePath: () => ipcRenderer.invoke('fp:getImagesBasePath'),
 
+    // Close-to-tray (X minimizes to tray)
+    getCloseToTray: () => ipcRenderer.invoke('window:get-close-to-tray'),
+    setCloseToTray: (value: boolean) => ipcRenderer.invoke('window:set-close-to-tray', value),
+
     // Encouragement reminders
     getReminderEnabled: () => ipcRenderer.invoke('reminders:get-enabled'),
     setReminderEnabled: (value: boolean) => ipcRenderer.invoke('reminders:set-enabled', value),
