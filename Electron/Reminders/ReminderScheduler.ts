@@ -2,6 +2,7 @@ import Log from 'electron-log';
 import { Notification } from 'electron';
 import { appConfig } from '../ElectronStore/Configuration';
 import { setAutoLaunch } from '../util/autoLaunch';
+import { getCloseToTray } from '../util/closeToTray';
 import { nextDueMilestone, pickReminderMessage, FIRE_HOUR } from './reminderMilestones';
 
 const CHECK_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
@@ -26,11 +27,12 @@ export function setAutoStartEnabled(v: boolean): void {
 }
 
 /**
- * Register the OS login item iff reminders AND auto-start are both on. Auto-start
- * is pointless without reminders, so the two are AND-ed into one effective state.
+ * Register the OS login item iff close-to-tray, reminders, AND auto-start are all on.
+ * Reminders need the app to stay alive in the tray (close-to-tray), and auto-start is
+ * pointless without reminders — so the three are AND-ed into one effective state.
  */
 export function applyAutoLaunch(): void {
-    setAutoLaunch(getReminderEnabled() && getAutoStartEnabled());
+    setAutoLaunch(getCloseToTray() && getReminderEnabled() && getAutoStartEnabled());
 }
 
 /** Re-anchor inactivity to "now" and clear the fired marker (the reset). */
