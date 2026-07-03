@@ -1,10 +1,10 @@
 {
-  "next_book_id": 2,
-  "next_book": "Exodus",
-  "next_chapter": 37,
-  "last_completed_book_id": 2,
-  "last_completed_book": "Exodus",
-  "last_completed_chapter": 36,
+  "next_book_id": 3,
+  "next_book": "Leviticus",
+  "next_chapter": 12,
+  "last_completed_book_id": 3,
+  "last_completed_book": "Leviticus",
+  "last_completed_chapter": 11,
   "completed": false,
-  "updated_at": "2026-06-30T13:07:35.000Z"
+  "updated_at": "2026-07-02T13:09:04.000Z"
 }
