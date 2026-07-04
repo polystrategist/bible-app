@@ -15,6 +15,8 @@ import {
     TextNewLine,
     TextStrikethrough,
     TextUnderline,
+    TextIndentMore,
+    TextIndentLess,
     Undo,
     ChevronDown,
 } from '@vicons/carbon';
@@ -67,6 +69,8 @@ const props = defineProps({
             'heading6',
             'bulletList',
             'orderedList',
+            'indent',
+            'outdent',
             'blockQuote',
             'undo',
             'redo',
@@ -295,6 +299,28 @@ defineExpose({
             >
                 <NIcon>
                     <ListNumbered />
+                </NIcon>
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('indent')"
+                :disabled="!editor.can().chain().focus().indent().run()"
+                @click="editor?.chain().focus().indent().run()"
+                quaternary
+                size="small"
+            >
+                <NIcon>
+                    <TextIndentMore />
+                </NIcon>
+            </NButton>
+            <NButton
+                v-if="buttonActions.includes('outdent')"
+                :disabled="!editor.can().chain().focus().outdent().run()"
+                @click="editor?.chain().focus().outdent().run()"
+                quaternary
+                size="small"
+            >
+                <NIcon>
+                    <TextIndentLess />
                 </NIcon>
             </NButton>
             <NButton

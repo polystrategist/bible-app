@@ -74,7 +74,9 @@ export const CompareVerseIpcEvents = () => {
 
             const url = isDev
                 ? `http://localhost:3000/#/compare-verse?${query}`
-                : `file://${path.join(__dirname, './index.html')}#/compare-verse?${query}`;
+                // Compiled to dist/Windows/; index.html sits at the dist root (matching
+                // the `../preload.js` above), so go up one level.
+                : `file://${path.join(__dirname, '..', 'index.html')}#/compare-verse?${query}`;
 
             await win.loadURL(url);
             win.show();

@@ -83,9 +83,8 @@ export const Indent = Extension.create<IndentOptions>({
     addCommands() {
         const shiftIndent =
             (delta: number) =>
-            ({ state, dispatch }: any) => {
+            ({ tr, state, dispatch }: any) => {
                 const { from, to } = state.selection;
-                let tr = state.tr;
                 let changed = false;
 
                 state.doc.nodesBetween(from, to, (node: any, pos: number) => {
@@ -96,7 +95,10 @@ export const Indent = Extension.create<IndentOptions>({
                         this.options.maxLevel
                     );
                     if (next !== current) {
-                        tr = tr.setNodeMarkup(pos, undefined, {
+                        // Mutate the transaction supplied by the command chain so
+                        // this composes with a preceding `.focus()` and other
+                        // chained commands (e.g. from a toolbar button).
+                        tr.setNodeMarkup(pos, undefined, {
                             ...node.attrs,
                             indent: next,
                         });
