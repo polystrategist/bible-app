@@ -143,7 +143,11 @@ export function createSplashWindow(): BrowserWindow {
         const qs = new URLSearchParams(query).toString();
         splashWindow.loadURL(`http://localhost:3000/splash.html?${qs}`);
     } else {
-        splashWindow.loadFile(path.join(__dirname, 'splash.html'), { query });
+        // This file compiles to dist/Windows/SplashWindow.js, but splash.html is a
+        // Vite `public/` asset copied to the dist root (dist/splash.html) — so go up
+        // one level. Getting this wrong makes loadFile fail and silently fall back to
+        // the minimal splash (see did-fail-load above) in packaged builds.
+        splashWindow.loadFile(path.join(__dirname, '..', 'splash.html'), { query });
     }
 
     splashWindow.on('closed', () => {

@@ -105,7 +105,7 @@ onMounted(() => {
         </NSelect>
         <div
             id="show-dictionary-definitions"
-            class="py-2 relative h-[calc(100%-50px)]"
+            class="pl-3 pt-2 py-2 relative h-[calc(100%-50px)]"
             :style="`font-size:${fontSize}px`"
         >
             <NTag

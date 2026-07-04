@@ -1,2 +1,3 @@
 ## Updates
-- Bug Fix
+- Bug Fixes
+- Performance Improvement
