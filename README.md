@@ -2,144 +2,191 @@
 
 <div align="center">
 
-**A Bible study companion for reading, prayer, notes, highlights, and deeper daily devotion.**
+**A cross-platform Bible study companion for reading, prayer, notes, highlights, and daily devotion.**
 
-[![Version](https://img.shields.io/badge/version-1.1.8-2563eb.svg)](https://github.com/JenuelDev/Believers-Sword/releases/latest)
-[![Electron](https://img.shields.io/badge/Electron-41.0.3-47848F.svg)](https://www.electronjs.org/)
-[![Vue 3](https://img.shields.io/badge/Vue-3-42B883.svg)](https://vuejs.org/)
-[![License](https://img.shields.io/badge/license-GPL--3.0-16a34a.svg)](./LICENSE)
+[![Version](https://img.shields.io/badge/version-1.6.4-2563eb.svg)](https://github.com/polystrategist/bible-app/releases/latest)
+[![Electron](https://img.shields.io/badge/Electron-41.x-47848F.svg)](https://www.electronjs.org/)
+[![Vue](https://img.shields.io/badge/Vue-3-42B883.svg)](https://vuejs.org/)
+[![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial-16a34a.svg)](./LICENSE)
 
-<br />
-<br />
-
+[Releases](https://github.com/polystrategist/bible-app/releases/latest) · [Report an Issue](https://github.com/polystrategist/bible-app/issues) · [Contributing](#contributing)
 
 </div>
 
-> "Your word is a lamp to my feet and a light to my path."
->
-> Psalm 119:105
+> *"Your word is a lamp to my feet and a light to my path."* — Psalm 119:105
 
 <div align="center">
-  <img src="./design-assets/App%20for%20daily%20spiritual%20growth.png" alt="Believers Sword hero artwork" width="900" />
+  <img src="./design-assets/App%20for%20daily%20spiritual%20growth.png" alt="Believers Sword — daily spiritual growth" width="900" />
 </div>
 
-## Overview
+## Table of Contents
 
-Believers Sword is a desktop Bible app built to help believers stay close to Scripture throughout the day. It combines Bible reading, study tools, notes, highlights, prayer tracking, sermons, and offline-friendly access in one focused experience.
+- [About](#about)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Installation](#installation)
+- [System Requirements](#system-requirements)
+- [Development](#development)
+- [Tech Stack](#tech-stack)
+- [Contributing](#contributing)
+- [Support the Project](#support-the-project)
+- [License](#license)
 
-## Downloads
+## About
 
-Desktop downloads are published through GitHub Releases. Microsoft Store installs are also available for Windows users.
+Believers Sword is a desktop Bible application designed to help believers stay close to Scripture throughout the day. It brings reading, study tools, personal notes, highlights, prayer tracking, and offline access together in a single, focused workspace.
 
-- Windows installer: `NSIS` setup package
-- Windows Portable: no-install portable executable
-- macOS: `DMG`
-- Linux: `AppImage`
-- Microsoft Store: Store-managed Windows installation and updates
-
-If a direct asset link changes on a future release, use the latest releases page:
-
-- https://github.com/JenuelDev/Believers-Sword/releases/latest
+The app is built with Electron and Vue 3, and is available for Windows, macOS, and Linux.
 
 ## Features
 
-- Read multiple Bible translations in a focused reader
-- Highlight verses and organize them by color
-- Create notes and clip notes while studying
-- Save bookmarks for quick return
-- Manage prayer lists and answered prayers
-- Use Study Space to keep research organized
+### Bible Reading & Study
+
+- Read multiple Bible translations in a clean, distraction-free reader
 - Search verses quickly across installed modules
-- Listen with audio and TTS features
-- Explore commentary and verse comparison tools
-- Work offline with local resources
+- Compare translations side by side
+- Access commentary resources while you study
+
+### Notes & Organization
+
+- Highlight verses and organize them by color
+- Create notes and clip notes directly from Scripture
+- Save bookmarks for quick return
+- Use Study Space to keep research organized in one place
+
+### Prayer & Devotion
+
+- Manage prayer lists and track answered prayers
+- Listen with built-in audio and text-to-speech support
+
+### Platform
+
+- Work offline with locally stored Bible modules and resources
+- Install via GitHub Releases or the Microsoft Store on Windows
 
 ## Screenshots
 
 ### Desktop
 
 <div align="center">
-  <img src="./design-assets/screenshots/desktop/desktop-hero-01.png" alt="Believers Sword desktop hero screenshot" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-preview-01.png" alt="Believers Sword desktop preview screenshot 1" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-preview-02.png" alt="Believers Sword desktop preview screenshot 2" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-hero-01.png" alt="Believers Sword desktop — main reader" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-preview-01.png" alt="Believers Sword desktop — study view" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-preview-02.png" alt="Believers Sword desktop — notes and highlights" width="300" />
 </div>
 
 <div align="center">
-  <img src="./design-assets/screenshots/desktop/desktop-01.png" alt="Believers Sword desktop screenshot 1" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-02.png" alt="Believers Sword desktop screenshot 2" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-03.png" alt="Believers Sword desktop screenshot 3" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-01.png" alt="Believers Sword desktop screenshot" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-02.png" alt="Believers Sword desktop screenshot" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-03.png" alt="Believers Sword desktop screenshot" width="300" />
 </div>
 
 <div align="center">
-  <img src="./design-assets/screenshots/desktop/desktop-04.png" alt="Believers Sword desktop screenshot 4" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-05.png" alt="Believers Sword desktop screenshot 5" width="300" />
-  <img src="./design-assets/screenshots/desktop/desktop-06.png" alt="Believers Sword desktop screenshot 6" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-04.png" alt="Believers Sword desktop screenshot" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-05.png" alt="Believers Sword desktop screenshot" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-06.png" alt="Believers Sword desktop screenshot" width="300" />
 </div>
 
 <div align="center">
-  <img src="./design-assets/screenshots/desktop/desktop-07.png" alt="Believers Sword desktop screenshot 7" width="300" />
+  <img src="./design-assets/screenshots/desktop/desktop-07.png" alt="Believers Sword desktop screenshot" width="300" />
 </div>
 
 ### Mobile
 
 <div align="center">
-  <img src="./design-assets/screenshots/mobile/mobile-preview-01.jpg" alt="Believers Sword mobile preview screenshot 1" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-preview-02.jpg" alt="Believers Sword mobile preview screenshot 2" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-01.jpg" alt="Believers Sword mobile screenshot 1" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-02.jpg" alt="Believers Sword mobile screenshot 2" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-preview-01.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-preview-02.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-01.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-02.jpg" alt="Believers Sword mobile screenshot" width="220" />
 </div>
 
 <div align="center">
-  <img src="./design-assets/screenshots/mobile/mobile-03.jpg" alt="Believers Sword mobile screenshot 3" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-04.jpg" alt="Believers Sword mobile screenshot 4" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-05.jpg" alt="Believers Sword mobile screenshot 5" width="220" />
-  <img src="./design-assets/screenshots/mobile/mobile-06.jpg" alt="Believers Sword mobile screenshot 6" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-03.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-04.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-05.jpg" alt="Believers Sword mobile screenshot" width="220" />
+  <img src="./design-assets/screenshots/mobile/mobile-06.jpg" alt="Believers Sword mobile screenshot" width="220" />
 </div>
+
+## Installation
+
+Pre-built packages are published on [GitHub Releases](https://github.com/polystrategist/bible-app/releases/latest). Windows users can also install from the Microsoft Store.
+
+| Platform | Format | Notes |
+| --- | --- | --- |
+| Windows | NSIS installer | Recommended for most users |
+| Windows | Portable executable | No installation required |
+| Windows | Microsoft Store | Store-managed updates |
+| macOS | DMG | Available when published for a release |
+| Linux | AppImage | Portable, distribution-independent |
+
+Download the latest release for your platform from the [releases page](https://github.com/polystrategist/bible-app/releases/latest).
 
 ## System Requirements
 
-- Windows 10 or newer
-- macOS build support when release assets are published
-- Linux support through `AppImage`
-- 2 GB RAM minimum
-- Around 500 MB of free storage recommended
+| Requirement | Minimum |
+| --- | --- |
+| Operating system | Windows 10+, macOS (when published), or Linux |
+| Memory | 2 GB RAM |
+| Storage | ~500 MB free disk space |
 
 ## Development
 
 ### Prerequisites
 
-- Node.js
-- Yarn
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [Yarn](https://yarnpkg.com/)
 
-### Setup
+### Getting Started
 
 ```bash
-git clone https://github.com/JenuelDev/Believers-Sword.git
-cd Believers-Sword
+git clone https://github.com/polystrategist/bible-app.git
+cd bible-app
 yarn setup
-```
-
-### Run locally
-
-```bash
 yarn start
 ```
 
-### Build desktop packages
+### Available Scripts
 
-```bash
-yarn app:build
-```
+| Command | Description |
+| --- | --- |
+| `yarn setup` | Install root and frontend dependencies |
+| `yarn start` | Run the app locally in development mode |
+| `yarn app:build` | Build desktop packages for distribution |
+| `yarn app:build:msix` | Build the Microsoft Store (MSIX) package |
 
-### Build Microsoft Store package
+## Tech Stack
 
-```bash
-yarn app:build:msix
-```
+| Layer | Technology |
+| --- | --- |
+| Desktop shell | [Electron](https://www.electronjs.org/) |
+| Frontend | [Vue 3](https://vuejs.org/), [Vite](https://vitejs.dev/) |
+| Local data | SQLite |
+| Packaging | [electron-builder](https://www.electron.build/) |
 
-## Support
+## Contributing
 
-If the app blesses you and you want to support development:
+Contributions are welcome. To propose a change:
+
+1. Fork the [repository](https://github.com/polystrategist/bible-app).
+2. Create a feature branch from `main`.
+3. Make your changes with clear, focused commits.
+4. Push your branch and open a pull request.
+
+### Pull Request Labels
+
+Add one of the following labels so changes are categorized correctly in release notes:
+
+| Label | Use when |
+| --- | --- |
+| `feature` or `enhancement` | Adding new functionality |
+| `bug` or `fix` | Fixing a defect |
+| `improvement`, `refactor`, or `performance` | Improving existing code without new features |
+| `documentation` or `docs` | Documentation-only changes |
+
+If no label is added, the pull request appears under **Other Changes** in the release notes.
+
+## Support the Project
+
+If Believers Sword has been helpful and you would like to support ongoing development:
 
 <div align="center">
 
@@ -147,40 +194,10 @@ If the app blesses you and you want to support development:
 
 </div>
 
-- One-time donation: https://buymeacoffee.com/jenuel.dev
-- Membership: https://buymeacoffee.com/jenuel.dev/membership
-- GitHub Sponsors: https://github.com/sponsors/JenuelDev
-
-## Contributing
-
-Contributions are welcome.
-
-1. Fork the repository.
-2. Create a branch for your change.
-3. Commit your work.
-4. Push the branch.
-5. Open a pull request.
-
-### PR Labels
-
-When opening a pull request, please add one of the following labels so your change is categorized correctly in the release notes:
-
-| Label | Use when |
-|---|---|
-| `feature` or `enhancement` | Adding new functionality |
-| `bug` or `fix` | Fixing a bug |
-| `improvement`, `refactor`, or `performance` | Improving existing code without adding features |
-| `documentation` or `docs` | Updating documentation only |
-
-**Examples:**
-
-- Adding a new "verse of the day" feature → label: `feature`
-- Fixing a crash when opening bookmarks → label: `bug`
-- Speeding up Bible module loading → label: `performance`
-- Updating the README → label: `docs`
-
-If no label is added, your PR will appear under "Other Changes" in the release notes.
+- [Buy Me a Coffee](https://buymeacoffee.com/jenuel.dev) — one-time donation
+- [Membership](https://buymeacoffee.com/jenuel.dev/membership) — recurring support
+- [GitHub Sponsors](https://github.com/sponsors/JenuelDev) — sponsor the maintainer
 
 ## License
 
-This project is licensed under the GPL-3.0 license. See [LICENSE](./LICENSE).
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](./LICENSE). Noncommercial use is permitted; commercial use requires a separate license from the copyright holder.
