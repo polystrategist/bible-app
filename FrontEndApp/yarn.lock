@@ -26,11 +26,6 @@
     execa "^5.1.1"
     find-up "^5.0.0"
 
-"@antfu/utils@^0.7.2":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@antfu/utils/-/utils-0.7.5.tgz#c36f37add92a7de57b9c29ae0c1f399706bff345"
-  integrity sha512-dlR6LdS+0SzOAPx/TPRhnoi7hE251OVeT2Snw0RguNbBSbjUHdWr0l3vcUUDg26rEysT89kCbtw1lVorBXLLCg==
-
 "@antfu/utils@^0.7.7":
   version "0.7.10"
   resolved "https://registry.yarnpkg.com/@antfu/utils/-/utils-0.7.10.tgz#ae829f170158e297a9b6a28f161a8e487d00814d"
@@ -1759,28 +1754,6 @@
   dependencies:
     vue-demi ">=0.14.5"
 
-"@windicss/config@1.9.1":
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/@windicss/config/-/config-1.9.1.tgz#d14081c92d29191614a168b1087dff0873c0e17d"
-  integrity sha512-MjutTiS9XIteriwkH9D+que+bILbpulekYzjJGQDg3Sb2H87aOcO30f7N11ZiHF5OYoZn4yJz4lDbB3A6IuXfQ==
-  dependencies:
-    debug "^4.3.4"
-    jiti "^1.18.2"
-    windicss "^3.5.6"
-
-"@windicss/plugin-utils@1.9.1":
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/@windicss/plugin-utils/-/plugin-utils-1.9.1.tgz#ee1787f929f469dfb4bc2f0176bc988e99bd544c"
-  integrity sha512-sz/Z2sxUZIkJ2nVeTmtYTtXhWxe/yTTkM5nqU6eKhP0n6waipTCJJdLvWoZcgzQBbBCL/JLRQd/9BYsBqKuLDQ==
-  dependencies:
-    "@antfu/utils" "^0.7.2"
-    "@windicss/config" "1.9.1"
-    debug "^4.3.4"
-    fast-glob "^3.2.12"
-    magic-string "^0.30.0"
-    micromatch "^4.0.5"
-    windicss "^3.5.6"
-
 acorn@^8.11.3:
   version "8.12.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.12.0.tgz#1627bfa2e058148036133b8d9b51a700663c294c"
@@ -2370,7 +2343,7 @@ fast-deep-equal@^3.1.3:
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz#3a7d56b559d6cbc3eb512325244e619a65c6c525"
   integrity sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==
 
-fast-glob@^3.2.12, fast-glob@^3.3.0:
+fast-glob@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.0.tgz#7c40cb491e1e2ed5664749e87bfb516dbe8727c0"
   integrity sha512-ChDuvbOypPuNjO8yIDf36x7BlZX1smcUMTTcyoIjycexOxd6DFsKsg21qVBzEmr3G7fUKIRy2/psii+CIUt7FA==
@@ -2667,11 +2640,6 @@ isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==
 
-jiti@^1.18.2:
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.19.1.tgz#fa99e4b76a23053e0e7cde098efe1704a14c16f1"
-  integrity sha512-oVhqoRDaBXf7sjkll95LHVS6Myyyb1zaunVwk4Z0+WPSW4gjS0pl01zYKHScTuyEhQsFxV5L4DR5r+YqSyqyyg==
-
 jiti@^1.21.0:
   version "1.21.6"
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-1.21.6.tgz#6c7f7398dd4b3142767f9a168af2f317a428d268"
@@ -2877,7 +2845,7 @@ merge2@^1.3.0, merge2@^1.4.1:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-micromatch@^4.0.4, micromatch@^4.0.5:
+micromatch@^4.0.4:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-4.0.5.tgz#bc8999a7cbbf77cdc89f132f6e467051b49090c6"
   integrity sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==
@@ -3754,16 +3722,6 @@ vdirs@^0.1.4, vdirs@^0.1.8:
   dependencies:
     evtd "^0.2.2"
 
-vite-plugin-windicss@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/vite-plugin-windicss/-/vite-plugin-windicss-1.9.1.tgz#8a31ec5c37248037db076305925b8c2e6472ff22"
-  integrity sha512-CWm1b/tXVCJTbEGn4oB8B7Gev9xDuY9k4E/KiJqDuLYspBUFQyZKPF2mSZ3DfNdojsfqgzxu9ervqvlb9jJ7fw==
-  dependencies:
-    "@windicss/plugin-utils" "1.9.1"
-    debug "^4.3.4"
-    kolorist "^1.8.0"
-    windicss "^3.5.6"
-
 vite@^4.4.9:
   version "4.4.9"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.9.tgz#1402423f1a2f8d66fd8d15e351127c7236d29d3d"
@@ -3884,11 +3842,6 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
-
-windicss@^3.5.6:
-  version "3.5.6"
-  resolved "https://registry.yarnpkg.com/windicss/-/windicss-3.5.6.tgz#30a34da76894d952a96c9a1921f2e91e13932183"
-  integrity sha512-P1mzPEjgFMZLX0ZqfFht4fhV/FX8DTG7ERG1fBLiWvd34pTLVReS5CVsewKn9PApSgXnVfPWwvq+qUsRwpnwFA==
 
 yallist@^3.0.2:
   version "3.1.1"

@@ -14,3 +14,6 @@ settings.local.json
 dist-web
 combined.log
 error.log
+yarn-error.log
+composer.lock
+FrontEndApp/pnpm-lock.yaml

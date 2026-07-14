@@ -1,4 +1,5 @@
 import { app } from 'electron';
+import path from 'path';
 import knex from 'knex';
 import Log from 'electron-log';
 import { setupPortableMode } from '../util/portable';
@@ -7,11 +8,19 @@ import { setupPortableMode } from '../util/portable';
 setupPortableMode();
 const dataPath = app.getPath('userData');
 
+function storeDbPath(fileName: string): string {
+    return path.join(dataPath, 'StoreDB', fileName);
+}
+
+function gamesDbPath(fileName: string): string {
+    return path.join(dataPath, 'Games', fileName);
+}
+
 export const StoreDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\StoreDB\\Store.db`,
+        filename: storeDbPath('Store.db'),
     },
 });
 
@@ -19,7 +28,7 @@ export const DictionaryDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\StoreDB\\Dictionary.db`,
+        filename: storeDbPath('Dictionary.db'),
     },
 });
 
@@ -27,7 +36,7 @@ export const CrossReferencesDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\StoreDB\\cross_references.db`,
+        filename: storeDbPath('cross_references.db'),
     },
 });
 
@@ -35,7 +44,7 @@ export const DevotionalsDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\StoreDB\\devotionals.db`,
+        filename: storeDbPath('devotionals.db'),
     },
 });
 
@@ -45,17 +54,17 @@ export const StrongsDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\StoreDB\\strongs.db`,
+        filename: storeDbPath('strongs.db'),
     },
 });
 
 // Game content DBs (read-only seeded content). User data (lives, progress)
-// lives in StoreDB. Seeded by SetGamesDB.ts into userData\Games\.
+// lives in StoreDB. Seeded by SetGamesDB.ts into userData/Games/.
 export const QaGamesDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\Games\\qa_games.db`,
+        filename: gamesDbPath('qa_games.db'),
     },
 });
 
@@ -63,7 +72,7 @@ export const TfGamesDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\Games\\tf_games.db`,
+        filename: gamesDbPath('tf_games.db'),
     },
 });
 
@@ -71,7 +80,7 @@ export const FpGamesDB = knex({
     client: 'sqlite3',
     useNullAsDefault: false,
     connection: {
-        filename: dataPath + `\\Games\\fp_games.db`,
+        filename: gamesDbPath('fp_games.db'),
     },
 });
 

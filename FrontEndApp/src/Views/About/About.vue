@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { NButton, NScrollbar } from 'naive-ui';
 import { useMainStore } from '../../store/main';
+import {
+    GITHUB_LATEST_RELEASE_URL,
+    GITHUB_REPO_URL,
+    GITHUB_SPONSORS_URL,
+    LICENSE_NAME,
+} from '../../config/project';
 
 const mainStore = useMainStore();
 
@@ -14,7 +20,7 @@ const features = [
     'Create notes and clip notes while studying',
     'Save bookmarks for quick return',
     'Manage prayer lists and answered prayers',
-    'Use Study Space to keep research organized',
+    'Search verses quickly across installed modules',
     'Listen with audio and TTS features',
     'Explore commentary and verse comparison tools',
     'Work offline with local resources',
@@ -75,13 +81,13 @@ const features = [
                     </NButton>
                     <NButton
                         size="small"
-                        @click="openExternal('https://github.com/JenuelDev/Believers-Sword/releases')"
+                        @click="openExternal(GITHUB_LATEST_RELEASE_URL)"
                     >
                         📋 Release Notes
                     </NButton>
                     <NButton
                         size="small"
-                        @click="openExternal('https://github.com/JenuelDev/Believers-Sword')"
+                        @click="openExternal(GITHUB_REPO_URL)"
                     >
                         ⭐ GitHub
                     </NButton>
@@ -105,7 +111,7 @@ const features = [
                     </NButton>
                     <NButton
                         size="small"
-                        @click="openExternal('https://github.com/sponsors/JenuelDev')"
+                        @click="openExternal(GITHUB_SPONSORS_URL)"
                     >
                         ❤️ GitHub Sponsors
                     </NButton>
@@ -114,10 +120,10 @@ const features = [
 
             <!-- License -->
             <div class="text-size-11px opacity-40 text-center pb-4">
-                Licensed under GPL-3.0 &nbsp;·&nbsp;
+                Licensed under {{ LICENSE_NAME }} &nbsp;·&nbsp;
                 <span
                     class="cursor-pointer hover:opacity-70 underline"
-                    @click="openExternal('https://github.com/JenuelDev/Believers-Sword')"
+                    @click="openExternal(GITHUB_REPO_URL)"
                 >
                     View source on GitHub
                 </span>

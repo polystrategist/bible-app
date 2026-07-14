@@ -52,7 +52,6 @@ The app is built with Electron and Vue 3, and is available for Windows, macOS, a
 - Highlight verses and organize them by color
 - Create notes and clip notes directly from Scripture
 - Save bookmarks for quick return
-- Use Study Space to keep research organized in one place
 
 ### Prayer & Devotion
 

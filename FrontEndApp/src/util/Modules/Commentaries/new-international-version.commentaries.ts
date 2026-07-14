@@ -1,3 +1,5 @@
+import { githubRawUrl } from '../../../config/project';
+
 export default {
     file_name: `New International Version.commentaries.SQLite3`,
     language: `en`,
@@ -6,5 +8,5 @@ export default {
     description: `New International Version 2011 – <br/>
     The Holy Bible, New International Version® NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by Permission of Biblica, Inc.® All rights reserved worldwide. <br/>
     English`,
-    download_link: `https://github.com/JenuelDev/Believers-Sword/raw/main/Modules/Commentaries/New International Version.commentaries.SQLite3`,
+    download_link: githubRawUrl('Modules/Commentaries/New International Version.commentaries.SQLite3'),
 };

@@ -6,6 +6,10 @@ import { useI18n } from 'vue-i18n';
 import { useMenuStore } from '../../store/menu';
 import { useFeedbackModalStore } from '../../store/feedbackModalStore';
 import { useKeyboardShortcutsModalStore } from '../../store/keyboardShortcutsModalStore';
+import {
+    GITHUB_LATEST_RELEASE_URL,
+    GITHUB_SPONSORS_URL,
+} from '../../config/project';
 
 const { t } = useI18n();
 const menuStore = useMenuStore();
@@ -71,7 +75,7 @@ function openKeyboardShortcuts() {
         </div>
         <NDivider style="margin: 0" />
         <div class="flex flex-col p-2">
-            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://github.com/sponsors/JenuelDev')">
+            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open(GITHUB_SPONSORS_URL)">
                 ❤️&nbsp; Donate (GitHub Sponsors)
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://buymeacoffee.com/jenuel.dev')">
@@ -80,7 +84,7 @@ function openKeyboardShortcuts() {
         </div>
         <NDivider style="margin: 0" />
         <div class="flex flex-col p-2">
-            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open('https://github.com/JenuelDev/Believers-Sword/releases')">
+            <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="open(GITHUB_LATEST_RELEASE_URL)">
                 📋&nbsp; {{ t('Release Notes') }}
             </NButton>
             <NButton quaternary style="justify-content: flex-start; padding: 6px 10px; border-radius: 8px" @click="navigate('/about-page')">

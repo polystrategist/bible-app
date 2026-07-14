@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
 import { NModal } from 'naive-ui';
+import { GITHUB_ISSUES_URL } from '../../config/project';
 
 const { t } = useI18n();
 
@@ -628,7 +629,7 @@ function toggleFaq(i: number) {
             <div class="help-footer-note">
                 <Icon icon="mdi:github" />
                 {{ $t('help-portal.bug-note') }} &nbsp;
-                <a href="https://github.com/Broskie/believers-sword/issues" target="_blank">{{
+                <a :href="GITHUB_ISSUES_URL" target="_blank">{{
                     $t('help-portal.github-link')
                 }}</a>
             </div>

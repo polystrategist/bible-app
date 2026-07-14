@@ -1,10 +1,18 @@
 {
   "name": "believers-sword-local-dev",
-  "description": "Believers Sword is an application for believers community, it is used to study bible, also used for praying, social or connect with other believers.",
+  "description": "Believers Sword — a cross-platform Bible study companion for reading, prayer, notes, highlights, and daily devotion.",
   "author": "JenuelDev",
   "version": "1.6.4",
   "main": "./dist/main.js",
   "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/polystrategist/bible-app.git"
+  },
+  "homepage": "https://github.com/polystrategist/bible-app#readme",
+  "bugs": {
+    "url": "https://github.com/polystrategist/bible-app/issues"
+  },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit && cd FrontEndApp && yarn typecheck",
@@ -48,8 +56,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "JenuelDev",
-        "repo": "Believers-Sword"
+        "owner": "polystrategist",
+        "repo": "bible-app"
       }
     ],
     "nsis": {
